@@ -1,0 +1,15 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://effects/items/double_value_effect.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+key = "reroll_price"
+text_key = "EFFECT_GAIN_STATS_ON_REROLL"
+value = -2
+custom_key = "gain_stats_on_reroll"
+storage_method = 1
+effect_sign = 3
+custom_args = [  ]
+value2 = 50
+sum_strategy = 0

@@ -1,0 +1,18 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/effects/effect_shop_item_count.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+key = ""
+text_key = "EFFECT_RANDOM_SHOP_ITEM_COUNT_PRICE"
+value = 0
+custom_key = "shop_item_count"
+storage_method = 0
+effect_sign = 3
+custom_args = [  ]
+stat_min_value = 0
+stat_max_value = 3
+stat_no_zero = false
+shop_count_price = -30
+can_shop_locked = 1

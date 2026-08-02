@@ -1,0 +1,86 @@
+extends Main
+
+var effect_can_add_chance_stat_damage_when_pickup_gold = Keys.generate_hash("effect_can_add_chance_stat_damage_when_pickup_gold")
+var effect_can_add_chance_stat_damage_when_death = Keys.generate_hash("effect_can_add_chance_stat_damage_when_death")
+var effect_random_stats_on_level_up = Keys.generate_hash("effect_random_stats_on_level_up")
+
+
+static func get_dynamic_chance(stat_count: int, init_chance: int, add_chance: int) -> int:
+	var dynamic_chance = int(init_chance + (stat_count * (add_chance / 100.0)))
+	if dynamic_chance > 100:
+		return 100
+		
+	return dynamic_chance
+
+
+static func get_dynamic_chance_to_effect(effect: Array, player_index: int) -> Array:
+	var stat = Utils.get_stat(effect[4], player_index)
+	effect[2] = get_dynamic_chance(stat, effect[-1], effect[-2])
+	return effect
+	
+
+static func get_dynamic_value(stat_min_value: int, stat_max_value: int, stat_no_zero: bool) -> int:
+	var dynamic_value = int(floor(rand_range(stat_min_value, stat_max_value + 1)))
+	if dynamic_value == 0 and stat_no_zero:
+		return get_dynamic_value(stat_min_value, stat_max_value, stat_no_zero)
+	return dynamic_value
+
+
+static func get_dynamic_value_from_gain(dynamic_value: int, stat_gain: int, stat_gain_value: int) -> int:
+	return dynamic_value * (1 + (int(stat_gain / stat_gain_value)))
+	
+
+static func get_dynamic_value_to_effect(effect: Array, player_index: int) -> int:
+	if effect[5] == 0:
+		return get_dynamic_value(effect[1], effect[2], effect[3])
+	
+	return int(get_dynamic_value_from_gain(get_dynamic_value(effect[1], effect[2], effect[3]), RunData.get_stat(effect[4], player_index), effect[5]))
+
+
+func on_gold_picked_up(gold: Node, player_index: int) -> void :
+	if gold.already_picked_up:
+		.on_gold_picked_up(gold, player_index)
+		return
+	
+	if not player_index >= 0:
+		.on_gold_picked_up(gold, player_index)
+		return
+		
+	var effects = RunData.get_player_effect(effect_can_add_chance_stat_damage_when_pickup_gold, player_index)
+	if effects.size() == 0:
+		.on_gold_picked_up(gold, player_index)
+		return
+	
+	effects[0] = get_dynamic_chance_to_effect(effects[0], player_index)
+	handle_stat_damages(effects, player_index)
+	.on_gold_picked_up(gold, player_index)
+
+
+func _on_enemy_died(enemy: Enemy, args: Entity.DieArgs) -> void:
+	if _cleaning_up and args.enemy_killed_by_player or enemy is Boss:
+		._on_enemy_died(enemy, args)
+		return
+	
+	for player in _get_shuffled_live_players():
+		var player_index = player.player_index
+		var effects = RunData.get_player_effect(effect_can_add_chance_stat_damage_when_death, player_index)
+		if effects.size() > 0:
+			effects[0] = get_dynamic_chance_to_effect(effects[0], player_index)
+			handle_stat_damages(effects, player_index)
+				
+	._on_enemy_died(enemy, args)
+
+
+func on_levelled_up(player_index: int) -> void :
+	.on_levelled_up(player_index)
+	
+	var effects = RunData.get_player_effect(effect_random_stats_on_level_up, player_index)
+	for effect in effects:
+		var stat_hash = effect[0]
+		var random_add_value = get_dynamic_value_to_effect(effect, player_index) 
+		if effect[4]:
+			RunData.add_stat(stat_hash, random_add_value, player_index)
+			return
+			
+		RunData.add_stat(stat_hash, random_add_value, player_index)
+		
