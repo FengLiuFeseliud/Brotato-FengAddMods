@@ -10,13 +10,14 @@
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/six_sided_gun/six_sided_gun_4_data.tres" type="Resource" id=8]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/six_sided_gun/six_sided_gun_3_data.tres" type="Resource" id=9]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/miser/miser_data.tres" type="Resource" id=10]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/the_despised/the_despised_data.tres" type="Resource" id=11]
 
 [resource]
 script = ExtResource( 3 )
-characters = [ ExtResource( 1 ), ExtResource( 4 ), ExtResource( 10 ) ]
+characters = [ ExtResource( 1 ), ExtResource( 4 ), ExtResource( 10 ) , ExtResource( 11 )]
 items = [ ExtResource( 2 ) ]
 weapons = [ ExtResource( 5 ), ExtResource( 7 ), ExtResource( 9 ), ExtResource( 8 )]
-weapons_characters = [ [ ExtResource( 4 ), ExtResource( 1 ) , ExtResource( 10 )] ]
+weapons_characters = [ [ ExtResource( 4 ), ExtResource( 1 ) , ExtResource( 10 ), ExtResource( 11 )] ]
 sets = [ ExtResource( 6 ) ]
 challenges = [  ]
 upgrades = [  ]

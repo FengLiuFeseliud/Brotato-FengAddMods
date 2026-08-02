@@ -2,6 +2,7 @@
 RAT_KING,Rat King,鼠王
 MISER,Miser,吝啬鬼
 DICE,Dice,骰子
+THE_DESPISED,The Despised,被厌恶者
 EFFECT_TWO_HAND_WEAPON_SLOT_LIMIT,Only has two hands (so can only hold two weapons),只有两只手所以只拿两个武器
 ITEM_RAT_KING_RATZILLA,Rat Subject,鼠族臣民
 EFFECT_RATZILLA_KILLER_BOSS_TEXT,Ratzilla targets and attacks bosses,鼠斯拉会锁定并攻击 boss
@@ -23,3 +24,4 @@ EFFECT_ADD_GAIN_STAT_AFTER_REMOVE_CHANGE,{1} {0} grants +{2} Modification Increa
 EFFECT_ADD_GAIN_STAT_AFTER_REMOVE_CHANGE_WAVE_MAX,{1} {0} grants +{2} Modification Increase {3} permanently (Max {4} per wave) [{5}],每损失{1}{0}时永久增加{2}的修改增加{3}。每波上限{4} [{5}]
 EFFECT_RANDOM_SHOP_ITEM_COUNT_PRICE,-0 to 3 items in the shop upon entering,商店道具数随机减少{1}至{2}每减少一个道具剩余的道具{3}道具价格 但是可锁定道具上限为{4}
 EFFECT_GOLD_LOW_SET_HP_SHOP,,材料每低于进入商店时的{0}切换至生命商店
+EFFECT_THE_DESPISED_NO_SHOP,,你被所有人厌恶商店不会有任何物品

@@ -3,9 +3,9 @@
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/miser/appearance/miser_hat_appearance.tres" type="Resource" id=30]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/miser/appearance/miser_eyes_appearance.tres" type="Resource" id=31]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/miser/miser_icon.png" type="Texture" id=1]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/miser/miser_effect_1.tres" type="Resource" id=2]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/miser/miser_effect_2.tres" type="Resource" id=3]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/miser/miser_effect_3.tres" type="Resource" id=4]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/miser/effects/miser_effect_1.tres" type="Resource" id=2]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/miser/effects/miser_effect_2.tres" type="Resource" id=3]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/miser/effects/miser_effect_3.tres" type="Resource" id=4]
 [ext_resource path="res://items/characters/character_data.gd" type="Script" id=5]
 [ext_resource path="res://weapons/melee/cactus_mace/1/cactus_mace_data.tres" type="Resource" id=8]
 [ext_resource path="res://weapons/ranged/double_barrel_shotgun/1/double_barrel_shotgun_data.tres" type="Resource" id=9]
@@ -25,6 +25,7 @@
 [ext_resource path="res://weapons/melee/hatchet/1/hatchet_data.tres" type="Resource" id=23]
 [ext_resource path="res://weapons/melee/spiky_shield/1/spiky_shield_data.tres" type="Resource" id=24]
 [ext_resource path="res://weapons/melee/fighting_stick/1/fighting_stick_data.tres" type="Resource" id=25]
+
 
 [resource]
 script = ExtResource( 5 )
