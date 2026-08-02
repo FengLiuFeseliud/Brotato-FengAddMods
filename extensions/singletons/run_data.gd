@@ -103,12 +103,12 @@ func check_stat(stat_hsh: int, value: int, player_index: int) -> void :
 	if value >= 0:
 		return 
 	
-	remove_stat_set(stat_hsh, abs(value), player_index)
+	remove_stat_set(stat_hsh, int(abs(value)), player_index)
 	var effects = RunData.get_player_effect(effect_add_stat_after_change, player_index)
 	if effects.size() == 0:
 		return 
 	
-	_add_stat_after_change(effects, stat_hsh, abs(value), player_index)
+	_add_stat_after_change(effects, stat_hsh, int(abs(value)), player_index)
 	return 
 	
 
