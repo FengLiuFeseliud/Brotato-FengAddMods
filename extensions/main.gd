@@ -3,6 +3,7 @@ extends Main
 var effect_can_add_chance_stat_damage_when_pickup_gold = Keys.generate_hash("effect_can_add_chance_stat_damage_when_pickup_gold")
 var effect_can_add_chance_stat_damage_when_death = Keys.generate_hash("effect_can_add_chance_stat_damage_when_death")
 var effect_random_stats_on_level_up = Keys.generate_hash("effect_random_stats_on_level_up")
+var effect_picked_box_cost_gold = Keys.generate_hash("picke_box_cost_gold")
 
 
 static func get_dynamic_chance(stat_count: int, init_chance: int, add_chance: int) -> int:
@@ -83,4 +84,52 @@ func on_levelled_up(player_index: int) -> void :
 			return
 			
 		RunData.add_stat(stat_hash, random_add_value, player_index)
+
+	
+func add_weapon(player_index: int) -> WeaponData:
+	var effects = RunData.get_player_effects(player_index)
+	var weapons = RunData.get_player_weapons(player_index)
+
+	if weapons.size() < effects[Keys.weapon_slot_hash]:
+		return RunData.add_weapon(weapons[randi() % weapons.size()], player_index)
+
+	var upgrades = null
+	for weapon in weapons:
+		upgrades = weapon.upgrades_into
+		if upgrades == null:
+			continue
 		
+		RunData.remove_weapon(weapon, player_index)
+		break
+
+	if upgrades == null:
+		return null
+
+	return RunData.add_weapon(upgrades, player_index)
+		
+
+func on_consumable_picked_up(consumable: Node, player_index: int) -> void :
+	if consumable.consumable_data.my_id_hash != Keys.consumable_item_box_hash and consumable.consumable_data.my_id_hash != Keys.consumable_legendary_item_box_hash:
+		.on_consumable_picked_up(consumable, player_index)
+		return 
+
+	var effects = RunData.get_player_effect(effect_picked_box_cost_gold, player_index)
+	if effects.size() == 0:
+		.on_consumable_picked_up(consumable, player_index)
+		return
+
+	var effect = effects[0]
+	var gold = RunData.get_player_gold(player_index)
+	var cost_gold = effect[1] + int(gold * (effect[2] / 100.0))
+
+	if cost_gold > gold:
+		consumable.consumable_data = ItemService.get_consumable_for_tier(Tier.COMMON)
+		.on_consumable_picked_up(consumable, player_index)
+		return
+
+	RunData.remove_gold(cost_gold, player_index)
+	if add_weapon(player_index) == null and effect[3] > 0:
+		for _i in range(effect[3]):
+			RunData.add_stat(RunData.get_random_primary_stats(), 1, player_index)
+
+	.on_consumable_picked_up(consumable, player_index)

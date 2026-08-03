@@ -3,7 +3,8 @@ extends "res://singletons/run_data.gd"
 
 var effect_add_stat_after_change = Keys.generate_hash("add_stat_after_change")
 var effect_add_stat_cap = Keys.generate_hash("add_stat_cap")
-var shop_item_count = Keys.generate_hash("shop_item_count")
+var effect_shop_item_count = Keys.generate_hash("shop_item_count")
+var effect_picked_box_cost_gold_get_stat_or_weapon = Keys.generate_hash("picked_box_cost_gold_get_stat_or_weapon")
 
 
 var levels = Keys.generate_hash("levels")
@@ -147,7 +148,7 @@ func remove_stat(stat_hsh: int, value: int, player_index: int) -> void :
 
 ## shop_item_count - 商店道具数效果 保留锁定数
 func lock_player_shop_item(item_data: ItemParentData, wave_value: int, player_index: int) -> void :
-	var effects = RunData.get_player_effect(shop_item_count, player_index)
+	var effects = RunData.get_player_effect(effect_shop_item_count, player_index)
 	if effects.size() == 0:
 		.lock_player_shop_item(item_data, wave_value, player_index)
 		return
