@@ -24,6 +24,6 @@ EFFECT_ADD_GAIN_STAT_AFTER_REMOVE_CHANGE,{1} {0} grants +{2} Modification Increa
 EFFECT_ADD_GAIN_STAT_AFTER_REMOVE_CHANGE_WAVE_MAX,{1} {0} grants +{2} Modification Increase {3} permanently (Max {4} per wave) [{5}],每损失{1}{0}时永久增加{2}的修改增加{3}。每波上限{4} [{5}]
 EFFECT_RANDOM_SHOP_ITEM_COUNT_PRICE,-0 to 3 items in the shop upon entering,商店道具数随机减少{1}至{2}每减少一个道具剩余的道具{3}道具价格 但是可锁定道具上限为{4}
 EFFECT_GOLD_LOW_SET_HP_SHOP,,材料每低于进入商店时的{0}切换至生命商店
-EFFECT_THE_DESPISED_NO_SHOP,,你被所有人厌恶商店不会有任何物品
-EFFECT_CAN_ALL_DROP_BOX,,所有果子全部掉落为箱子有{0} ({1}) 概率掉落为红箱子
-EFFECT_WAVE_END_COST_GOLD_GET_STAT_OR_WEAPON,,每次捡起箱子需花费{0} ({1}) 材料获取箱子并且获取武具全部无法提升后随机获取{2}属性
+EFFECT_THE_DESPISED_NO_SHOP,"Everyone hates you, so the shop will be empty",你被所有人厌恶商店不会有任何物品
+EFFECT_CAN_ALL_DROP_BOX,"All fruit drop as Crates, with a {0} ({1}) chance to drop as Red Crates",所有果子全部掉落为箱子有{0} ({1}) 概率掉落为红箱子
+EFFECT_WAVE_END_COST_GOLD_GET_STAT_OR_WEAPON,"Picking up a Crate costs {0} ({1}) Materials to gain a weapon, or {2} random stats if weapons cannot be upgraded.",每次捡起箱子需花费{0} ({1}) 材料获取箱子并且获取武具全部无法提升后随机获取{2}属性
