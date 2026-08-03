@@ -7,6 +7,7 @@ steam 创意工坊: https://steamcommunity.com/sharedfiles/filedetails/?id=37683
 鼠王
 骰子
 吝啬鬼
+被厌恶者
 
 ## 武器
 
