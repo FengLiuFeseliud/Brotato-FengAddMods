@@ -28,7 +28,7 @@ EFFECT_GOLD_LOW_SET_HP_SHOP,,材料每低于进入商店时的{0}切换至生命
 EFFECT_THE_DESPISED_NO_SHOP,"Everyone hates you, so the shop will be empty",你被所有人厌恶商店不会有任何物品
 EFFECT_CAN_ALL_DROP_BOX,"All fruit drop as Crates, with a {0} ({1}) chance to drop as Red Crates",所有果子全部掉落为箱子有{0} ({1}) 概率掉落为红箱子
 EFFECT_WAVE_END_COST_GOLD_GET_STAT_OR_WEAPON,"Picking up a Crate costs {0} ({1}) Materials to gain a weapon, or {2} random stats if weapons cannot be upgraded.",每次捡起箱子需花费{0} ({1}) 材料获取箱子并且获取武具全部无法提升后随机获取{2}属性
-EFFECT_CONSUMABLE_STAT,,捡起一个消耗品时{0}{1}
-EFFECT_RICE,,果子饭
-EFFECT_PICKE_CONSUMABLE_DROP_STRUCTURE_GAIN,,当捡起消耗品时产生{0} (+{2}) 个{3}对一块区域造成{4} ({5}) 伤害
-EFFECT_ELEMENTAL_STOP,,使用{1}替代材料购买道具 ({1}替代{0}材料)
+EFFECT_CONSUMABLE_STAT,"{0}{1} when picking up a consumable",捡起一个消耗品时{0}{1}
+EFFECT_RICE,Fruit Pilaf,水果焖饭
+EFFECT_PICKE_CONSUMABLE_DROP_STRUCTURE_GAIN,"When picking up a consumable, spawns {0} (+{2}) {3} dealing {4} ({5}) damage in an area",当捡起消耗品时产生{0} (+{2}) 个{3}对一块区域造成{4} ({5}) 伤害
+EFFECT_ELEMENTAL_STOP,"Buy items with {1} instead of materials ({1} replaces {0} materials)",使用{1}替代材料购买道具 ({1}替代{0}材料)

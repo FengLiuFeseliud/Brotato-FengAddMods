@@ -8,6 +8,7 @@ steam 创意工坊: https://steamcommunity.com/sharedfiles/filedetails/?id=37683
 骰子
 吝啬鬼
 被厌恶者
+高压锅
 
 ## 武器
 
