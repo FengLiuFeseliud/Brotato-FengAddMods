@@ -1,0 +1,14 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/effects/effect_add_structure.gd" type="Script" id=1]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/cooker/rice/rice_effect_1.tres" type="Resource" id=2]
+
+[resource]
+script = ExtResource( 1 )
+key = "stat_elemental_damage"
+text_key = "EFFECT_PICKE_CONSUMABLE_DROP_STRUCTURE_GAIN"
+value = 2
+custom_key = "picke_consumable_drop_structure"
+custom_args = [  ]
+gain_value = 30
+stucture_effect = ExtResource( 2 )

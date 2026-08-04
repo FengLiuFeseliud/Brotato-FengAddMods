@@ -4,6 +4,7 @@ var effect_can_add_chance_stat_damage_when_pickup_gold = Keys.generate_hash("eff
 var effect_can_add_chance_stat_damage_when_death = Keys.generate_hash("effect_can_add_chance_stat_damage_when_death")
 var effect_random_stats_on_level_up = Keys.generate_hash("effect_random_stats_on_level_up")
 var effect_picked_box_cost_gold = Keys.generate_hash("picke_box_cost_gold")
+var effect_picke_consumable_drop_structure = Keys.generate_hash("picke_consumable_drop_structure")
 
 
 static func get_dynamic_chance(stat_count: int, init_chance: int, add_chance: int) -> int:
@@ -106,14 +107,27 @@ func add_weapon(player_index: int) -> WeaponData:
 		return null
 
 	return RunData.add_weapon(upgrades, player_index)
+
+
+func spawm_effect_structure(effect: Array, consumable: Node, player_index: int) -> void:
+	var stat = Utils.get_stat(effect[0], player_index)
+	var structure_count = effect[1] + int(stat / effect[2])
+	for _index in range(structure_count):
+		var pos = _entity_spawner.get_spawn_pos_in_area(consumable.global_position, 200)
+		var queue = _entity_spawner.queues_to_spawn_structures[player_index]
+		queue.push_back([EntityType.STRUCTURE, effect[3].scene, pos, effect[3]])
 		
 
 func on_consumable_picked_up(consumable: Node, player_index: int) -> void :
+	var effects = RunData.get_player_effect(effect_picke_consumable_drop_structure, player_index)
+	if effects.size() > 0:
+		spawm_effect_structure(effects[0], consumable, player_index)
+
 	if consumable.consumable_data.my_id_hash != Keys.consumable_item_box_hash and consumable.consumable_data.my_id_hash != Keys.consumable_legendary_item_box_hash:
 		.on_consumable_picked_up(consumable, player_index)
 		return 
 
-	var effects = RunData.get_player_effect(effect_picked_box_cost_gold, player_index)
+	effects = RunData.get_player_effect(effect_picked_box_cost_gold, player_index)
 	if effects.size() == 0:
 		.on_consumable_picked_up(consumable, player_index)
 		return
