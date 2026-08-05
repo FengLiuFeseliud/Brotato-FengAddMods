@@ -1,15 +1,15 @@
 [gd_resource type="Resource" load_steps=2 format=2]
 
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/effects/effect_picke_box_cost_gold.gd" type="Script" id=1]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/effects/effect_pick_box_cost_gold.gd" type="Script" id=1]
 
 [resource]
 script = ExtResource( 1 )
 key = ""
 text_key = "EFFECT_WAVE_END_COST_GOLD_GET_STAT_OR_WEAPON"
-value = 20
+value = 15
 custom_key = "picke_box_cost_gold"
 storage_method = 0
 effect_sign = 3
 custom_args = [  ]
-gain_value = 15
+wave_inflation_rate = 0.36
 random_get_stat = 2

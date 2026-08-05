@@ -13,6 +13,7 @@ func _init():
 	ModLoaderMod.install_script_extension(EXTENSIONS_DIR + "ui/menus/shop/base_shop.gd")
 	ModLoaderMod.install_script_extension(EXTENSIONS_DIR + "ui/menus/shop/shop_item.gd")
 	ModLoaderMod.install_script_extension(EXTENSIONS_DIR + "entities/units/player/player.gd")
+	ModLoaderMod.install_script_extension(EXTENSIONS_DIR + "item/consumables/consumable.gd")
 	ModLoaderMod.install_script_extension(EXTENSIONS_DIR + "main.gd")
 
 

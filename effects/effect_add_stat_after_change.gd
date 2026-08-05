@@ -53,7 +53,7 @@ func get_args(player_index: int) -> Array:
 			"[color=lime]+%s[/color]" % add_stat
 		]
 	
-	if gain_stat:
+	if gain_stat or not "stat" in key:
 		add_stat = RunData.get_player_effect(key_hash, player_index)
 		return [
 			tr(change_stat.to_upper()), 

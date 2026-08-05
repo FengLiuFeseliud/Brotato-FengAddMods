@@ -116,6 +116,10 @@ func spawm_effect_structure(effect: Array, consumable: Node, player_index: int) 
 		var pos = _entity_spawner.get_spawn_pos_in_area(consumable.global_position, 200)
 		var queue = _entity_spawner.queues_to_spawn_structures[player_index]
 		queue.push_back([EntityType.STRUCTURE, effect[3].scene, pos, effect[3]])
+
+
+func get_box_cost(effect: Array) -> int:
+    return int(effect[1] * (1.0 + (max(1, RunData.current_wave) - 1) * effect[2]))
 		
 
 func on_consumable_picked_up(consumable: Node, player_index: int) -> void :
@@ -133,10 +137,9 @@ func on_consumable_picked_up(consumable: Node, player_index: int) -> void :
 		return
 
 	var effect = effects[0]
-	var gold = RunData.get_player_gold(player_index)
-	var cost_gold = effect[1] + int(gold * (effect[2] / 100.0))
+	var cost_gold = get_box_cost(effect)
 
-	if cost_gold > gold:
+	if cost_gold > RunData.get_player_gold(player_index):
 		consumable.consumable_data = ItemService.get_consumable_for_tier(Tier.COMMON)
 		.on_consumable_picked_up(consumable, player_index)
 		return

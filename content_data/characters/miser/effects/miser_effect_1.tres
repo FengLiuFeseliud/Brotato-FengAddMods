@@ -14,5 +14,5 @@ custom_args = [  ]
 stat_min_value = 0
 stat_max_value = 3
 stat_no_zero = false
-shop_count_price = -30
+shop_count_price = -25
 can_shop_locked = 1

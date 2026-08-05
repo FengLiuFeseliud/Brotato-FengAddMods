@@ -1,13 +1,13 @@
 [gd_resource type="Resource" load_steps=2 format=2]
 
-[ext_resource path="res://items/global/effect.gd" type="Script" id=1]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/effects/effect_wave_end_not_pick_consumable.gd" type="Script" id=1]
 
 [resource]
 script = ExtResource( 1 )
-key = "enemy_gold_drops"
-text_key = "effect_enemy_gold_drops"
-value = -50
-custom_key = ""
+key = ""
+text_key = "EFFECT_WAVE_END_NOT_PICK_CONSUMABLE"
+value = 0
+custom_key = "wave_end_not_pick_consumable"
 storage_method = 0
 effect_sign = 3
 custom_args = [  ]
