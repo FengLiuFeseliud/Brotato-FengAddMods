@@ -23,7 +23,7 @@ func get_args(player_index: int) -> Array:
     return [
         args[0], 
         args[1], 
-        Utils.get_scaling_stat_icon_text(key_hash, gain_value / 100.0, false),
+        Utils.get_scaling_stat_icon_text(key_hash, gain_value / 100.0),
         tr(stucture_effect.text_key.to_upper()),
         str(init_stats.damage),
         scaling_stats_names

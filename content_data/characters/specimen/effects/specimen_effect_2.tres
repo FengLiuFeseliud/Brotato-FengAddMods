@@ -1,0 +1,15 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/effects/effect_regen_hit_protection.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+key = "stat_hp_regeneration"
+text_key = "EFFECT_REGEN_HIT_PROTECTION"
+value = 10
+custom_key = "regen_hit_protection"
+storage_method = 2
+effect_sign = 3
+custom_args = [  ]
+wait_time = 1
+gain_value = 75

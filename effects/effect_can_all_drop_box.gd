@@ -27,6 +27,6 @@ func get_args(player_index: int) -> Array:
 	var stat = Utils.get_stat(key_hash, player_index)
 	return [
 		"[color=lime]%s%%[/color]" % get_dynamic_chance(stat, chance, value), 
-		Utils.get_scaling_stat_icon_text(key_hash, value / 100.0, false), 
+		Utils.get_scaling_stat_icon_text(key_hash, value / 100.0), 
 	]
 

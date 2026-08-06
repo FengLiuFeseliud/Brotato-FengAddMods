@@ -6,6 +6,7 @@ var effect_add_stat_cap = Keys.generate_hash("add_stat_cap")
 var effect_shop_item_count = Keys.generate_hash("shop_item_count")
 var effect_picked_box_cost_gold_get_stat_or_weapon = Keys.generate_hash("picked_box_cost_gold_get_stat_or_weapon")
 var stats_stop = Keys.generate_hash("stats_stop")
+var effect_stat_not_add = Keys.generate_hash("stat_not_add")
 
 
 var levels = Keys.generate_hash("levels")
@@ -14,8 +15,8 @@ var levels = Keys.generate_hash("levels")
 var stat_after_change_wave_value_count = {}
 
 
-## 清除波次上限
 func on_wave_start(timer: WaveTimer) -> void :
+	## 清除波次上限
 	for value_keys in stat_after_change_wave_value_count.keys():
 		stat_after_change_wave_value_count[value_keys] = 0
 	.on_wave_start(timer)
@@ -135,16 +136,23 @@ func stat_after_change_wave_count(stat_effect: Array, value: int, player_index: 
 		return value - (stat_after_change_wave_value_count[stat_hsh] - max_wave_count)
 	
 	return value
+
+
+func reset_value(stat_hsh: int, value: int, player_index: int, remove: bool) -> int:
+	for effect in get_player_effect(effect_stat_not_add, player_index):
+		if effect[0] == stat_hsh and (value > 0 and !remove) or (value < 0 and remove):
+			return 0
 	
+	return value
 
 func add_stat(stat_hsh: int, value: int, player_index: int) -> void :
 	check_stat(stat_hsh, value, player_index)
-	.add_stat(stat_hsh, value, player_index)
+	.add_stat(stat_hsh, reset_value(stat_hsh, value, player_index, false), player_index)
 
 
 func remove_stat(stat_hsh: int, value: int, player_index: int) -> void :
 	check_stat(stat_hsh, -value, player_index)
-	.remove_stat(stat_hsh, value, player_index)
+	.remove_stat(stat_hsh, reset_value(stat_hsh, value, player_index, true), player_index)
 
 
 ## shop_item_count - 商店道具数效果 保留锁定数

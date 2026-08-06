@@ -1,0 +1,13 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/effects/effect_temp_stats_on_hit_protection.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+key = "stat_attack_speed"
+text_key = "EFFECT_TEMP_ON_HIT_PROTECTION"
+value = 10
+custom_key = "temp_stats_on_hit_protection"
+storage_method = 1
+effect_sign = 3
+custom_args = [  ]
