@@ -7,6 +7,7 @@ var effect_shop_item_count = Keys.generate_hash("shop_item_count")
 var effect_picked_box_cost_gold_get_stat_or_weapon = Keys.generate_hash("picked_box_cost_gold_get_stat_or_weapon")
 var stats_stop = Keys.generate_hash("stats_stop")
 var effect_stat_not_add = Keys.generate_hash("stat_not_add")
+var effect_apply_item_not_add = Keys.generate_hash("apply_item_not_add")
 
 
 var levels = Keys.generate_hash("levels")
@@ -173,7 +174,8 @@ func get_player_currency(player_index: int) -> int:
 	if effects.size() == 0:
 		return .get_player_currency(player_index)
 
-	return int(get_stat(effects[0][0], player_index) * 40)
+	var effect = effects[0]
+	return int(get_stat(effect[0], player_index) * effect[1])
 
 
 func remove_currency(value: int, player_index: int) -> void :
@@ -182,4 +184,32 @@ func remove_currency(value: int, player_index: int) -> void :
 		.remove_currency(value, player_index)
 		return
 	
+	if effects[0][2]:
+		.remove_currency(0, player_index)
+		return
+
 	remove_stat(effects[0][0], int(ceil(value / float(effects[0][1]))), player_index)
+
+
+func apply_item_effects(item_data: ItemParentData, player_index: int) -> void :
+	var old_effects = item_data.effects.duplicate()
+	for effect in RunData.get_player_effect(effect_apply_item_not_add, player_index):
+		for index in range(0, item_data.effects.size()):
+			var item_effect = item_data.effects[index]
+			if effect[0] != item_effect.key_hash:
+				continue
+
+			if not effect[2]:
+				item_data.effects.remove(index)
+				break
+			
+			if effect[1] > 0 and item_effect.value < 0:
+				item_effect.value = abs(item_effect.value)
+
+			if effect[1] < 0 and item_effect.value > 0:
+				item_effect.value = -item_effect.value
+
+			break
+	
+	.apply_item_effects(item_data, player_index)
+	item_data.effects = old_effects

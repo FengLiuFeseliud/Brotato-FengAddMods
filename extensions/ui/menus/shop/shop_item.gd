@@ -10,10 +10,14 @@ func set_shop_item(p_item_data: ItemParentData, p_wave_value: int = RunData.curr
     var effects = RunData.get_player_effect(stats_stop, player_index)
     if effects.size() == 0:
         return
+    
+    var effect = effects[0]
+    if RunData.get_player_gold(player_index) >= value and effect[2]:
+        return
 
-    var material_icon: Image = ItemService.get_stat_icon(effects[0][0]).get_data()
+    var material_icon: Image = ItemService.get_stat_icon(effect[0]).get_data()
     var texture: = ImageTexture.new()
     texture.create_from_image(material_icon)
     _button.set_material_icon(texture)
-    _button.set_value(int(ceil(value / float(effects[0][1]))), RunData.get_player_currency(player_index))
+    _button.set_value(int(ceil(value / float(effect[1]))), RunData.get_player_currency(player_index))
     

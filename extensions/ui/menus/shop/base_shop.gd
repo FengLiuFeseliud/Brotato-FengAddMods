@@ -4,6 +4,8 @@ extends "res://ui/menus/shop/base_shop.gd"
 var shop_item_count = Keys.generate_hash("shop_item_count")
 var shop_item_count_price = Keys.generate_hash("effect_stat_item_price")
 var shop_items_count_price = Keys.generate_hash("shop_items_count_price")
+var stats_stop = Keys.generate_hash("stats_stop")
+var stats_buy_item = Keys.generate_hash("stats_buy_item")
 
 var shop_items_price = {}
 
@@ -58,3 +60,30 @@ func fill_shop_items(player_locked_items: Array, player_index: int, just_entered
 	if effect[5] == 0:
 		return
 	set_items_price_from_shop_item_count(effect[5], player_index)
+
+
+func on_shop_item_bought(shop_item: ShopItem, player_index: int) -> void :
+	var effects = RunData.get_player_effect(stats_stop, player_index)
+	if effects.size() == 0 and not effects[0][2]:
+		.on_shop_item_bought(shop_item, player_index)
+		return
+
+	var gold = RunData.get_player_gold(player_index)
+	if gold >= shop_item.value:
+		RunData.remove_gold(shop_item.value, player_index)
+		.on_shop_item_bought(shop_item, player_index)
+		return
+
+	for effect in RunData.get_player_effect(stats_buy_item, player_index):
+		RunData.add_stat(effect[0], effect[1], player_index)
+
+	var effect = effects[0]
+	var currency = RunData.get_player_currency(player_index)
+	var stat_value = int(ceil(shop_item.value / float(effect[1])))
+	if currency < shop_item.value:
+		RunData.remove_stat(effect[0], currency, player_index)
+		.on_shop_item_bought(shop_item, player_index)
+		return
+
+	RunData.remove_stat(effect[0], stat_value, player_index)
+	.on_shop_item_bought(shop_item, player_index)

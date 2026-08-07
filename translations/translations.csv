@@ -5,6 +5,7 @@ DICE,Dice,骰子
 COOKER,Cooker,高压锅
 THE_DESPISED,The Despised,被厌恶者
 SPECIMEN,Specimen,标本
+CURSE_FIEND,Curse Fiend,咒魔
 EFFECT_TWO_HAND_WEAPON_SLOT_LIMIT,Only has two hands (so can only hold two weapons),只有两只手所以只拿两个武器
 ITEM_RAT_KING_RATZILLA,Rat Subject,鼠族臣民
 EFFECT_RATZILLA_KILLER_BOSS_TEXT,Ratzilla targets and attacks bosses,鼠斯拉会锁定并攻击 boss
@@ -25,7 +26,7 @@ EFFECT_ADD_STAT_AFTER_REMOVE_CHANGE,{3} {2} permanently for every {1} {0} lost [
 EFFECT_ADD_GAIN_STAT_AFTER_REMOVE_CHANGE,{1} {0} grants +{2} Modification Increase {3} permanently [{5}],每损失{1}{0}时永久增加{2}的修改增加{3} [{5}]
 EFFECT_ADD_GAIN_STAT_AFTER_REMOVE_CHANGE_WAVE_MAX,{1} {0} grants +{2} Modification Increase {3} permanently (Max {4} per wave) [{5}],"每损失{1}{0}时永久增加{2}的修改增加{3}，每波上限{4} [{5}]"
 EFFECT_RANDOM_SHOP_ITEM_COUNT_PRICE,-0 to 3 items in the shop upon entering,"商店道具数随机减少{1}至{2}每减少一个道具剩余的道具{3}道具价格，但是可锁定道具上限为{4}"
-EFFECT_GOLD_LOW_SET_HP_SHOP,,材料每低于进入商店时的{0}切换至生命商店
+EFFECT_GOLD_LOW_SET_STAT_SHOP,,材料不足时使用{1}替代材料购买道具（{1}替代{0}材料）
 EFFECT_THE_DESPISED_NO_SHOP,"Everyone hates you, so the shop will be empty",你被所有人厌恶商店不会有任何物品
 EFFECT_CAN_ALL_DROP_BOX,"All fruit drop as Crates, with a {0} ({1}) chance to drop as Red Crates",所有果子全部掉落为箱子有{0}（{1}）概率掉落为红箱子
 EFFECT_WAVE_END_COST_GOLD_GET_STAT_OR_WEAPON,"Picking up a Crate costs {0} ({1}) Materials to gain a weapon, or {2} random stats if weapons cannot be upgraded.",每次捡起箱子需花费{0}材料获取箱子（材料不足时只回复）并且获取武器全部无法提升后随机获取{1}属性，花费材料随波次膨胀
@@ -33,7 +34,9 @@ EFFECT_WAVE_END_NOT_PICK_CONSUMABLE,Consumables are not automatically picked up 
 EFFECT_CONSUMABLE_STAT,"{0}{1} when picking up a consumable",捡起一个消耗品时{0}{1}
 EFFECT_RICE,Fruit Pilaf,水果焖饭
 EFFECT_PICKE_CONSUMABLE_DROP_STRUCTURE_GAIN,"When picking up a consumable, spawns {0} (+{2}) {3} dealing {4} ({5}) damage in an area",当捡起消耗品时产生{0}（{2}）个{3}，对一块区域造成{4}（{5}）伤害
-EFFECT_ELEMENTAL_STOP,"Buy items with {1} instead of materials ({1} replaces {0} materials)",使用{1}替代材料购买道具（{1}替代{0}材料）
+EFFECT_STAT_STOP,"Buy items with {1} instead of materials ({1} replaces {0} materials)",使用{1}替代材料购买道具（{1}替代{0}材料）
 EFFECT_STAT_HIT_PROTECTION,"+1 hit protection for every {0} {1} [{2}]",每持有{0}点{1}获取一次抵消伤害的机会 [{2}]
 EFFECT_REGEN_HIT_PROTECTION,"{0} ({2}) chance to recover 1 Hit Protection every {1} seconds",每{1}秒有{0}（{2}）概率回复一次抵消伤害的机会
 EFFECT_TEMP_ON_HIT_PROTECTION,"{0} {1} when negating damage until the end of the wave","抵消伤害一次伤害时{0}{1}，直至敌袭结束"
+EFFECT_APPLY_ITEM_REVERSAL,,获取道具时将扣除{1}效果反转
+EFFECT_STATS_BUY_ITEM,,替代材料购买时增加{0}{1}

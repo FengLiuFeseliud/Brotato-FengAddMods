@@ -13,13 +13,14 @@
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/the_despised/the_despised_data.tres" type="Resource" id=11]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/cooker/cooker_data.tres" type="Resource" id=12]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/specimen/specimen_data.tres" type="Resource" id=13]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/curse_fiend/curse_fiend_data.tres" type="Resource" id=14]
 
 [resource]
 script = ExtResource( 3 )
-characters = [ ExtResource( 1 ), ExtResource( 4 ), ExtResource( 10 ) , ExtResource( 11 ), ExtResource( 12 ), ExtResource( 13 )]
+characters = [ ExtResource( 1 ), ExtResource( 4 ), ExtResource( 10 ) , ExtResource( 11 ), ExtResource( 12 ), ExtResource( 13 ), ExtResource( 14 )]
 items = [ ExtResource( 2 ) ]
 weapons = [ ExtResource( 5 ), ExtResource( 7 ), ExtResource( 9 ), ExtResource( 8 )]
-weapons_characters = [ [ ExtResource( 4 ), ExtResource( 1 ) , ExtResource( 10 ), ExtResource( 11 ), ExtResource( 13 )] ]
+weapons_characters = [ [ ExtResource( 4 ), ExtResource( 1 ) , ExtResource( 10 ), ExtResource( 11 ), ExtResource( 13 ), ExtResource( 14 )] ]
 sets = [ ExtResource( 6 ) ]
 challenges = [  ]
 upgrades = [  ]
