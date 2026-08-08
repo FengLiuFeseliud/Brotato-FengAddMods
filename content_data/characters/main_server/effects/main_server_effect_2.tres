@@ -1,0 +1,13 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/effects/effect_structure_add_range.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+key = "stat_range"
+text_key = "EFFECT_STRUCTURE_ADD_RANGE"
+value = 0
+custom_key = "structure_add_range"
+storage_method = 0
+effect_sign = 3
+custom_args = [  ]

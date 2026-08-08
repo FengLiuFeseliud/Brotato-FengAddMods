@@ -64,7 +64,7 @@ func fill_shop_items(player_locked_items: Array, player_index: int, just_entered
 
 func on_shop_item_bought(shop_item: ShopItem, player_index: int) -> void :
 	var effects = RunData.get_player_effect(stats_stop, player_index)
-	if effects.size() == 0 and not effects[0][2]:
+	if effects.size() == 0 or not effects[0][2]:
 		.on_shop_item_bought(shop_item, player_index)
 		return
 
