@@ -11,3 +11,4 @@ custom_key = "stats_stop"
 storage_method = 2
 effect_sign = 3
 custom_args = [  ]
+alternative_coins = false

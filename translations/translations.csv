@@ -7,6 +7,7 @@ THE_DESPISED,The Despised,被厌恶者
 SPECIMEN,Specimen,标本
 CURSE_FIEND,Curse Fiend,咒魔
 MAIN_SERVER,Main Server,主服务器
+STEVE,Steve,史蒂夫
 EFFECT_TWO_HAND_WEAPON_SLOT_LIMIT,Only has two hands (so can only hold two weapons),只有两只手所以只拿两个武器
 ITEM_RAT_KING_RATZILLA,Rat Subject,鼠族臣民
 EFFECT_RATZILLA_KILLER_BOSS_TEXT,Ratzilla targets and attacks bosses,鼠斯拉会锁定并攻击 boss
@@ -44,3 +45,5 @@ EFFECT_STATS_BUY_ITEM,"When purchasing substitute materials, gain {0}{1}",替代
 EFFECT_TURRET_PRIORITY_ATTACK_HIGHEST_HP,"Structures prioritize attacking the target with the highest health within range",构筑物优先攻击范围内生命值最高的目标
 EFFECT_STRUCTURE_ADD_RANGE,"Structure attack range is modified by {1}",构筑物攻击范围将受到{1}加成
 EFFECT_TURRET_COPY,"Structures have a {0} ({2}) chance to copy themselves upon killing a target",构筑物击杀目标后有 {0}（{2}）概率复制自身
+WOOD_PICKAXE,Wood PickAxe,木镐
+EFFECT_MINECRAFT,,世界生成中...

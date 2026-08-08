@@ -22,3 +22,4 @@ effect_sign = 0
 custom_args = [ SubResource( 1 ) ]
 nb_stat_scaled = 1
 stat_scaled = "structure"
+perm_stats_only = true

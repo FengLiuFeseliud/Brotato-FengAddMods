@@ -22,7 +22,6 @@
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/six_sided_gun/six_sided_gun_data.tres" type="Resource" id=20]
 [ext_resource path="res://weapons/melee/jousting_lance/1/jousting_lance_data.tres" type="Resource" id=21]
 
-
 [resource]
 script = ExtResource( 1 )
 my_id = "rat_king"

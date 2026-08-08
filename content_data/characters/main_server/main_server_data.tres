@@ -1,4 +1,4 @@
-[gd_resource type="Resource" load_steps=14 format=2]
+[gd_resource type="Resource" load_steps=13 format=2]
 
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/main_server/main_server_icon.png" type="Texture" id=1]
 [ext_resource path="res://items/characters/character_data.gd" type="Script" id=2]

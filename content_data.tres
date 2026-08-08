@@ -1,4 +1,4 @@
-[gd_resource type="Resource" load_steps=11 format=2]
+[gd_resource type="Resource" load_steps=18 format=2]
 
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/rat_king/rat_king_data.tres" type="Resource" id=1]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/rat_king_ratzilla/rat_king_ratzilla.tres" type="Resource" id=2]
@@ -15,13 +15,15 @@
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/specimen/specimen_data.tres" type="Resource" id=13]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/curse_fiend/curse_fiend_data.tres" type="Resource" id=14]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/main_server/main_server_data.tres" type="Resource" id=15]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/steve/steve_data.tres" type="Resource" id=16]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/pickaxe/wood/wood_pickaxe_data.tres" type="Resource" id=17]
 
 [resource]
 script = ExtResource( 3 )
-characters = [ ExtResource( 1 ), ExtResource( 4 ), ExtResource( 10 ) , ExtResource( 11 ), ExtResource( 12 ), ExtResource( 13 ), ExtResource( 14 ), ExtResource( 15 )]
+characters = [ ExtResource( 1 ), ExtResource( 4 ), ExtResource( 10 ), ExtResource( 11 ), ExtResource( 12 ), ExtResource( 13 ), ExtResource( 14 ), ExtResource( 15 ), ExtResource( 16 ) ]
 items = [ ExtResource( 2 ) ]
-weapons = [ ExtResource( 5 ), ExtResource( 7 ), ExtResource( 9 ), ExtResource( 8 )]
-weapons_characters = [ [ ExtResource( 4 ), ExtResource( 1 ) , ExtResource( 10 ), ExtResource( 11 ), ExtResource( 13 ), ExtResource( 14 )] ]
+weapons = [ ExtResource( 5 ), ExtResource( 7 ), ExtResource( 9 ), ExtResource( 8 ), ExtResource( 17 ) ]
+weapons_characters = [ [ ExtResource( 4 ), ExtResource( 1 ), ExtResource( 10 ), ExtResource( 11 ), ExtResource( 13 ), ExtResource( 14 ) ] ]
 sets = [ ExtResource( 6 ) ]
 challenges = [  ]
 upgrades = [  ]
