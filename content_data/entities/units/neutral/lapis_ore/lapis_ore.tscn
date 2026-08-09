@@ -1,0 +1,15 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/entities/units/neutral/lapis_ore/lapis_ore_neutral.tscn" type="PackedScene" id=2]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/entities/units/neutral/lapis_ore/lapis_ore_stats.tres" type="Resource" id=3]
+
+[sub_resource type="CircleShape2D" id=2]
+radius = 24.0
+
+[node name="Tree" instance=ExtResource( 2 )]
+stats = ExtResource( 3 )
+
+[node name="Collision" parent="." index="1"]
+shape = SubResource( 2 )
+
+[editable path="Hurtbox"]

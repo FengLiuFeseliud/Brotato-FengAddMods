@@ -64,16 +64,16 @@ func try_item_merge(item_merge_effect: Array, player_index: int) -> void:
 	if get_item_count(item_merge_effect[0], player_index) < item_merge_effect[1]:
 		return
 	
-	if get_item_count(item_merge_effect[2], player_index) < item_merge_effect[3]:
+	if item_merge_effect[3] != 0 and get_item_count(item_merge_effect[2], player_index) < item_merge_effect[3]:
 		return
-
 
 	var item = ItemService.get_element(ItemService.items, item_merge_effect[4])
 	if item == null and not merge_weapon(item_merge_effect[4], player_index):
 		return
 	
 	if item != null:
-		RunData.add_item(item, player_index)
+		for _index in range(item_merge_effect[5]):
+			RunData.add_item(item, player_index)
 
 	for _index in range(item_merge_effect[1]):
 		RunData.remove_item(ItemService.get_element(ItemService.items, item_merge_effect[0]), player_index)

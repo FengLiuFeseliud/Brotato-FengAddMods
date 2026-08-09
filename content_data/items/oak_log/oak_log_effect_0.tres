@@ -1,0 +1,17 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/effects/effect_item_merge.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+key = "item_oak_log"
+text_key = "EFFECT_ITEM_MERGE"
+value = 1
+custom_key = "item_merge"
+storage_method = 0
+effect_sign = 3
+custom_args = [  ]
+merge_from_count = 2
+merge_from_item = "item_stick"
+merge_to_item = "wood_pickaxe"
+merge_to_item_count = 1

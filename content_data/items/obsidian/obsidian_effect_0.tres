@@ -13,4 +13,4 @@ effect_sign = 3
 custom_args = [  ]
 merge_from_count = 2
 merge_from_item = "item_diamond"
-merge_to_item = "item"
+merge_to_item = "item_enchanting_table"

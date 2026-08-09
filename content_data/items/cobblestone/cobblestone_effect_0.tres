@@ -14,3 +14,4 @@ custom_args = [  ]
 merge_from_count = 2
 merge_from_item = "item_stick"
 merge_to_item = "stone_pickaxe"
+merge_to_item_count = 1

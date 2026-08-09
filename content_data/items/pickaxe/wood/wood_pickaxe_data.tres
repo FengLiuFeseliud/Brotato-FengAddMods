@@ -1,9 +1,14 @@
 [gd_resource type="Resource" load_steps=5 format=2]
 
+
 [ext_resource path="res://items/global/weapon_data.gd" type="Script" id=1]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/pickaxe/wood/wood_pickaxe_icon.png" type="Texture" id=2]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/pickaxe/wood/wood_pickaxe.tscn" type="PackedScene" id=3]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/pickaxe/wood/wood_pickaxe_stats.tres" type="Resource" id=5]
+[ext_resource path="res://items/sets/blunt/blunt_set_data.tres" type="Resource" id=6]
+[ext_resource path="res://items/sets/heavy/heavy_set_data.tres" type="Resource" id=7]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/pickaxe/wood/effects/wood_pickaxe_effects_0.tres" type="Resource" id=8]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/pickaxe/wood/effects/wood_pickaxe_effects_1.tres" type="Resource" id=9]
 
 [resource]
 script = ExtResource( 1 )
@@ -14,7 +19,7 @@ icon = ExtResource( 2 )
 name = "WOOD_PICKAXE"
 tier = 0
 value = 20
-effects = [  ]
+effects = [ ExtResource( 8 ), ExtResource( 9 ) ]
 tracking_text = ""
 is_lockable = true
 unlock_codex_descr_after_get_it = 1
@@ -22,7 +27,7 @@ is_cursed = false
 curse_factor = 0.0
 weapon_id = "pickaxe"
 type = 0
-sets = [  ]
+sets = [ ExtResource( 6 ), ExtResource( 7 ) ]
 scene = ExtResource( 3 )
 stats = ExtResource( 5 )
 add_to_chars_as_starting = [  ]
