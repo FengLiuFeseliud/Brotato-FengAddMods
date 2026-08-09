@@ -47,3 +47,6 @@ EFFECT_STRUCTURE_ADD_RANGE,"Structure attack range is modified by {1}",构筑物
 EFFECT_TURRET_COPY,"Structures have a {0} ({2}) chance to copy themselves upon killing a target",构筑物击杀目标后有 {0}（{2}）概率复制自身
 WOOD_PICKAXE,Wood PickAxe,木镐
 EFFECT_MINECRAFT,,世界生成中...
+ITEM_COBBLESTONE,,圆石
+ITEM_STICK,,木棍
+STONE_PICKAXE,,石镐

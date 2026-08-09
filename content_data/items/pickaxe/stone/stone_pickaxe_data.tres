@@ -1,19 +1,19 @@
 [gd_resource type="Resource" load_steps=5 format=2]
 
 [ext_resource path="res://items/global/weapon_data.gd" type="Script" id=1]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/pickaxe/wood/wood_pickaxe_icon.png" type="Texture" id=2]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/pickaxe/wood/wood_pickaxe.tscn" type="PackedScene" id=3]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/pickaxe/wood/wood_pickaxe_stats.tres" type="Resource" id=5]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/pickaxe/stone/stone_pickaxe_icon.png" type="Texture" id=2]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/pickaxe/stone/stone_pickaxe.tscn" type="PackedScene" id=3]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/pickaxe/stone/stone_pickaxe_stats.tres" type="Resource" id=5]
 
 [resource]
 script = ExtResource( 1 )
-my_id = "wood_pickaxe"
+my_id = "stone_pickaxe"
 unlocked_by_default = true
 can_be_looted = false
 icon = ExtResource( 2 )
-name = "WOOD_PICKAXE"
-tier = 0
-value = 20
+name = "STONE_PICKAXE"
+tier = 1
+value = 0
 effects = [  ]
 tracking_text = ""
 is_lockable = true
