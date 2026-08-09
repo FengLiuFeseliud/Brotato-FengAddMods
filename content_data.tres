@@ -1,4 +1,4 @@
-[gd_resource type="Resource" load_steps=20 format=2]
+[gd_resource type="Resource" load_steps=21 format=2]
 
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/rat_king/rat_king_data.tres" type="Resource" id=1]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/rat_king_ratzilla/rat_king_ratzilla.tres" type="Resource" id=2]
@@ -20,12 +20,16 @@
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/cobblestone/cobblestone_data.tres" type="Resource" id=18]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/stick/stick_data.tres" type="Resource" id=19]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/pickaxe/stone/stone_pickaxe_data.tres" type="Resource" id=20]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/pickaxe/iron/iron_pickaxe_data.tres" type="Resource" id=21]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/iron_ingot/iron_ingot_data.tres" type="Resource" id=22]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/diamond/diamond_data.tres" type="Resource" id=23]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/pickaxe/diamond/diamond_pickaxe_data.tres" type="Resource" id=24]
 
 [resource]
 script = ExtResource( 3 )
 characters = [ ExtResource( 1 ), ExtResource( 4 ), ExtResource( 10 ), ExtResource( 11 ), ExtResource( 12 ), ExtResource( 13 ), ExtResource( 14 ), ExtResource( 15 ), ExtResource( 16 ) ]
-items = [ ExtResource( 2 ), ExtResource( 18 ), ExtResource( 19 ) ]
-weapons = [ ExtResource( 5 ), ExtResource( 7 ), ExtResource( 9 ), ExtResource( 8 ), ExtResource( 17 ), ExtResource( 20 ) ]
+items = [ ExtResource( 2 ), ExtResource( 18 ), ExtResource( 19 ), ExtResource( 22 ), ExtResource( 23 ) ]
+weapons = [ ExtResource( 5 ), ExtResource( 7 ), ExtResource( 9 ), ExtResource( 8 ), ExtResource( 17 ), ExtResource( 20 ), ExtResource( 21 ), ExtResource( 24 ) ]
 weapons_characters = [ [ ExtResource( 4 ), ExtResource( 1 ), ExtResource( 10 ), ExtResource( 11 ), ExtResource( 13 ), ExtResource( 14 ) ] ]
 sets = [ ExtResource( 6 ) ]
 challenges = [  ]

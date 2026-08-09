@@ -22,3 +22,6 @@ func die(args: = Utils.default_die_args) -> void :
         return
 
     RunData.add_item(_drop_stick_item, args.killed_by_player_index)
+    RunData.add_item(_drop_stick_item, args.killed_by_player_index)
+    RunData.add_item(_drop_stick_item, args.killed_by_player_index)
+    RunData.add_item(_drop_stick_item, args.killed_by_player_index)

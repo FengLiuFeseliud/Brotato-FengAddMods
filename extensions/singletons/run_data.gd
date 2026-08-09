@@ -8,6 +8,7 @@ var effect_picked_box_cost_gold_get_stat_or_weapon = Keys.generate_hash("picked_
 var stats_stop = Keys.generate_hash("stats_stop")
 var effect_stat_not_add = Keys.generate_hash("stat_not_add")
 var effect_apply_item_not_add = Keys.generate_hash("apply_item_not_add")
+var effect_item_merge = Keys.generate_hash("item_merge")
 
 
 var levels = Keys.generate_hash("levels")
@@ -21,6 +22,73 @@ func on_wave_start(timer: WaveTimer) -> void :
 	for value_keys in stat_after_change_wave_value_count.keys():
 		stat_after_change_wave_value_count[value_keys] = 0
 	.on_wave_start(timer)
+
+
+func get_item_count(item_hash: int, player_index: int) -> int:
+	var count = 0
+    
+	for item in RunData.get_player_items(player_index):
+		if item.my_id_hash == item_hash:
+			count += 1
+            
+	return count
+
+
+func merge_weapon(weapon_hash: int, player_index: int) -> bool:
+	var merge_weapon = ItemService.get_element(ItemService.weapons, weapon_hash)
+	if merge_weapon == null:
+		return false
+		
+	var effects = RunData.get_player_effects(player_index)
+	var weapons = RunData.get_player_weapons(player_index)
+
+	if weapons.size() < effects[Keys.weapon_slot_hash]:
+		RunData.add_weapon(merge_weapon, player_index)
+		return true
+
+	for weapon in weapons:
+		if weapon.weapon_id != merge_weapon.weapon_id:
+			continue
+
+		if weapon.tier >= merge_weapon.tier:
+			continue
+		
+		RunData.remove_weapon(weapon, player_index)
+		RunData.add_weapon(merge_weapon, player_index)
+		return true
+
+	return false
+
+
+func try_item_merge(item_merge_effect: Array, player_index: int) -> void:
+	if get_item_count(item_merge_effect[0], player_index) < item_merge_effect[1]:
+		return
+	
+	if get_item_count(item_merge_effect[2], player_index) < item_merge_effect[3]:
+		return
+
+
+	var item = ItemService.get_element(ItemService.items, item_merge_effect[4])
+	if item == null and not merge_weapon(item_merge_effect[4], player_index):
+		return
+	
+	if item != null:
+		RunData.add_item(item, player_index)
+
+	for _index in range(item_merge_effect[1]):
+		RunData.remove_item(ItemService.get_element(ItemService.items, item_merge_effect[0]), player_index)
+
+	for _index in range(item_merge_effect[3]):
+		RunData.remove_item(ItemService.get_element(ItemService.items, item_merge_effect[2]), player_index)
+
+
+func on_wave_end() -> void :
+	.on_wave_end()
+	for player_index in RunData.get_player_count():
+		var effects = RunData.get_player_effect(effect_item_merge, player_index)
+		if effects.size() > 0:
+			for item_merge_effect in effects:
+				try_item_merge(item_merge_effect, player_index)
 	
 
 ## 统一添加效果 hsah
