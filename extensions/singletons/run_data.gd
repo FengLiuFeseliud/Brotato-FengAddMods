@@ -9,6 +9,7 @@ var stats_stop = Keys.generate_hash("stats_stop")
 var effect_stat_not_add = Keys.generate_hash("stat_not_add")
 var effect_apply_item_not_add = Keys.generate_hash("apply_item_not_add")
 var effect_item_merge = Keys.generate_hash("item_merge")
+var effect_random_curse = Keys.generate_hash("random_curse")
 
 
 var levels = Keys.generate_hash("levels")
@@ -82,13 +83,74 @@ func try_item_merge(item_merge_effect: Array, player_index: int) -> void:
 		RunData.remove_item(ItemService.get_element(ItemService.items, item_merge_effect[2]), player_index)
 
 
+func curse_item(curse_item_effect: Array, player_index: int) -> bool:
+	var dlc = ProgressData.get_dlc_data("abyssal_terrors")
+	for item in get_player_items(player_index):
+		if item.is_cursed or item.my_id_hash in curse_item_effect[3] or item.get_category() == Category.CHARACTER:
+			continue
+		
+		var new_curse_item = dlc.curse_item(item, player_index, true)
+		remove_item(item, player_index)
+		add_item(new_curse_item, player_index)
+		return true
+	
+	return false
+
+
+func curse_weapon(curse_item_effect: Array, player_index: int) -> bool:
+	var dlc = ProgressData.get_dlc_data("abyssal_terrors")
+	for weapon in get_player_weapons(player_index):
+		if weapon.is_cursed or weapon.my_id_hash in curse_item_effect[3]:
+			continue
+		
+		var new_curse_weapon = dlc.curse_item(weapon, player_index, true)
+		remove_weapon(weapon, player_index)
+		add_weapon(new_curse_weapon, player_index)
+		return true
+	
+	return false
+
+	
+func auto_curse(curse_item_effect: Array, player_index: int) -> void:
+	if ProgressData.get_dlc_data("abyssal_terrors") == null or get_item_count(curse_item_effect[0], player_index) < curse_item_effect[1]:
+		return
+		
+	if get_player_level(player_index) < curse_item_effect[2]:
+		return
+
+	if Utils.get_chance_success(0.5):
+		if not curse_item(curse_item_effect, player_index):
+			if not curse_weapon(curse_item_effect, player_index):
+				return
+	else:
+		if not curse_weapon(curse_item_effect, player_index):
+			if not curse_item(curse_item_effect, player_index):
+				return
+	
+	for _index in range(curse_item_effect[1]):
+		var curse_need_item = get_player_item(curse_item_effect[0], player_index)
+		if curse_need_item == null:
+			break
+		remove_item(curse_need_item, player_index)
+	
+	var player_data = players_data[player_index]
+	player_data.current_level -= curse_item_effect[2]
+	player_data.current_xp = max(0, player_data.current_xp - get_next_level_xp_needed(player_index))
+	auto_curse(curse_item_effect, player_index)
+
+
 func on_wave_end() -> void :
 	.on_wave_end()
-	for player_index in RunData.get_player_count():
-		var effects = RunData.get_player_effect(effect_item_merge, player_index)
+	for player_index in get_player_count():
+		var effects = get_player_effect(effect_item_merge, player_index)
 		if effects.size() > 0:
 			for item_merge_effect in effects:
 				try_item_merge(item_merge_effect, player_index)
+
+		effects = get_player_effect(effect_random_curse, player_index)
+		if effects.size() > 0:
+			auto_curse(effects[0], player_index)
+		
 	
 
 ## 统一添加效果 hsah

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/effects/effect_random_curse.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+key = "item_lapis_lazuli"
+text_key = "EFFECT_RANDOM_CURSE_NEED_ITEM"
+value = 1
+custom_key = "random_curse"
+storage_method = 0
+effect_sign = 3
+custom_args = [  ]
+need_level = 1
+not_curse_item_ids = ["item_stick", "item_enchanting_table", "item_emerald", "item_diamond", "item_cobblestone", "item_iron_ingot", "item_lapis_lazuli", "item_oak_log", "item_obsidian"]

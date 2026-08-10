@@ -8,7 +8,7 @@ export (int) var drop_item_tier = 0
 
 
 func take_damage(value: int, args: TakeDamageArgs) -> Array:
-    if not "weapon_id" in args.hitbox.from:
+    if args.hitbox == null or not "weapon_id" in args.hitbox.from:
         return [0, 0, false]
         
     if args.hitbox.from.weapon_id == null or drop_item_weapon_id == null:

@@ -47,7 +47,7 @@ EFFECT_STRUCTURE_ADD_RANGE,"Structure attack range is modified by {1}",构筑物
 EFFECT_TURRET_COPY,"Structures have a {0} ({2}) chance to copy themselves upon killing a target",构筑物击杀目标后有 {0}（{2}）概率复制自身
 WOOD_PICKAXE,Wood PickAxe,木镐
 EFFECT_WOOD_CAN_DROP_ITEM,,可以挖掘石头
-EFFECT_MINECRAFT,,世界生成中...
+EFFECT_MINECRAFT,,世界生成中
 ITEM_OAK_LOG,Oak Log,橡树原木
 ITEM_COBBLESTONE,Cobblestone,圆石
 ITEM_STICK,Stick,木棍
@@ -61,9 +61,10 @@ DIAMOND_PICKAXE,Diamond Pickaxe,钻镐
 EFFECT_DIAMOND_CAN_DROP_ITEM,,可以挖掘石头，铁矿，青金石，绿宝石，钻石，黑曜石
 ITEM_OBSIDIAN,Obsidian,黑曜石
 ITEM_ENCHANTING_TABLE,Enchanting Table,附魔台
+EFFECT_RANDOM_CURSE_NEED_ITEM,,进入商店时消耗{2}级与{0}{1}随机诅咒道具与武器至等级与{1}消尽
 ITEM_LAPIS_LAZULI,Lapis Lazuli,青金石
 EFFECT_LAPIS_LAZULI_CAN_USE,,好像可以用来强化什么？
 ITEM_EMERALD,Emerald,绿宝石
-EFFECT_EMERALD_CAN_USE,,好像有人很喜欢？可以用来换点什么
+EFFECT_EMERALD_CAN_USE,,找到村民的话，好像可以用来换点什么？
 EFFECT_ITEM_MERGE,,{0}个此道具跟{2}个{1}可能可以用点什么东西？
 EFFECT_ITEM_MERGE_ONE_FROM,,{0}个此道具可能可以做点什么东西？

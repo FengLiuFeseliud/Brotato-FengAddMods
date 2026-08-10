@@ -2,6 +2,8 @@
 
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/enchanting_table/enchanting_table_icon.png" type="Texture" id=1]
 [ext_resource path="res://items/global/item_data.gd" type="Script" id=2]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/enchanting_table/effect/enchanting_table_effect_0.tres" type="Resource" id=3]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/enchanting_table/effect/enchanting_table_effect_1.tres" type="Resource" id=4]
 
 [resource]
 script = ExtResource( 2 )
@@ -12,7 +14,7 @@ icon = ExtResource( 1 )
 name = "ITEM_ENCHANTING_TABLE"
 tier = 2
 value = 0
-effects = [ ]
+effects = [ ExtResource( 3 ), ExtResource( 4 ) ]
 tracking_text = ""
 is_lockable = true
 unlock_codex_descr_after_get_it = 1

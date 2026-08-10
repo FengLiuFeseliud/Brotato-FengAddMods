@@ -6,6 +6,12 @@
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/steve/appearance/steve_oathar_appearance.tres" type="Resource" id=4]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/pickaxe/wood/wood_pickaxe_data.tres" type="Resource" id=5]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/steve/effects/steve_effect_0.tres" type="Resource" id=6]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/steve/effects/steve_effect_1.tres" type="Resource" id=7]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/steve/effects/steve_effect_2.tres" type="Resource" id=8]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/steve/effects/steve_effect_3.tres" type="Resource" id=9]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/steve/effects/steve_effect_4.tres" type="Resource" id=10]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/steve/effects/steve_effect_5.tres" type="Resource" id=11]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/steve/effects/steve_effect_6.tres" type="Resource" id=12]
 
 [resource]
 script = ExtResource( 1 )
@@ -16,7 +22,7 @@ icon = ExtResource( 2 )
 name = "STEVE"
 tier = 0
 value = 1
-effects = [ ExtResource( 6 ) ]
+effects = [ ExtResource( 6 ), ExtResource( 7 ), ExtResource( 8 ), ExtResource( 9 ), ExtResource( 10 ), ExtResource( 11 ), ExtResource( 12 ) ]
 tracking_text = ""
 is_lockable = false
 unlock_codex_descr_after_get_it = 1
@@ -27,7 +33,7 @@ item_appearances = [ ExtResource( 3 ), ExtResource( 4 ) ]
 tags = [  ]
 wanted_tags = [  ]
 banned_item_groups = [  ]
-banned_items = [  ]
+banned_items = [ "item_lumberjack_shirt" ]
 banned_upgrades = [  ]
 starting_weapons = [ ExtResource( 5 ) ]
 starting_items = [  ]

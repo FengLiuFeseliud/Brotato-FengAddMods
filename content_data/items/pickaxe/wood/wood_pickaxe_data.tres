@@ -8,7 +8,6 @@
 [ext_resource path="res://items/sets/blunt/blunt_set_data.tres" type="Resource" id=6]
 [ext_resource path="res://items/sets/heavy/heavy_set_data.tres" type="Resource" id=7]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/pickaxe/wood/effects/wood_pickaxe_effects_0.tres" type="Resource" id=8]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/pickaxe/wood/effects/wood_pickaxe_effects_1.tres" type="Resource" id=9]
 
 [resource]
 script = ExtResource( 1 )
@@ -19,7 +18,7 @@ icon = ExtResource( 2 )
 name = "WOOD_PICKAXE"
 tier = 0
 value = 20
-effects = [ ExtResource( 8 ), ExtResource( 9 ) ]
+effects = [ ExtResource( 8 )]
 tracking_text = ""
 is_lockable = true
 unlock_codex_descr_after_get_it = 1

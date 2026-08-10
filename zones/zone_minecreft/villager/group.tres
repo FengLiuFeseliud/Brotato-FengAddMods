@@ -1,14 +1,14 @@
 [gd_resource type="Resource" load_steps=3 format=2]
 
 [ext_resource path="res://zones/wave_group_data.gd" type="Script" id=1]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/zones/zone_minecreft/emerald_ore/unit.tres" type="Resource" id=2]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/zones/zone_minecreft/villager/unit.tres" type="Resource" id=2]
 
 [resource]
 script = ExtResource( 1 )
 spawn_chance = 0.5
-spawn_timing = 10
+spawn_timing = 30
 repeating = 999
-repeating_interval = 5
+repeating_interval = 30
 reduce_repeating_interval = 0
 min_repeating_interval = 1
 area = -1
