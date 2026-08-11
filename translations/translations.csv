@@ -8,6 +8,7 @@ SPECIMEN,Specimen,标本
 CURSE_FIEND,Curse Fiend,咒魔
 MAIN_SERVER,Main Server,主服务器
 STEVE,Steve,史蒂夫
+THE_GLITCH,The Glitch,漏洞
 EFFECT_TWO_HAND_WEAPON_SLOT_LIMIT,Only has two hands (so can only hold two weapons),只有两只手所以只拿两个武器
 ITEM_RAT_KING_RATZILLA,Rat Subject,鼠族臣民
 EFFECT_RATZILLA_KILLER_BOSS_TEXT,Ratzilla targets and attacks bosses,鼠斯拉会锁定并攻击 boss
@@ -46,25 +47,25 @@ EFFECT_TURRET_PRIORITY_ATTACK_HIGHEST_HP,"Structures prioritize attacking the ta
 EFFECT_STRUCTURE_ADD_RANGE,"Structure attack range is modified by {1}",构筑物攻击范围将受到{1}加成
 EFFECT_TURRET_COPY,"Structures have a {0} ({2}) chance to copy themselves upon killing a target",构筑物击杀目标后有 {0}（{2}）概率复制自身
 WOOD_PICKAXE,Wood PickAxe,木镐
-EFFECT_WOOD_CAN_DROP_ITEM,,可以挖掘石头
-EFFECT_MINECRAFT,,世界生成中
+EFFECT_WOOD_CAN_DROP_ITEM,Can mine stone,可以挖掘石头
+EFFECT_MINECRAFT,Generating world,世界生成中
 ITEM_OAK_LOG,Oak Log,橡树原木
 ITEM_COBBLESTONE,Cobblestone,圆石
 ITEM_STICK,Stick,木棍
 STONE_PICKAXE,Stone Pickaxe,石镐
-EFFECT_STONE_CAN_DROP_ITEM,,可以挖掘石头，铁矿，青金石，绿宝石
+EFFECT_STONE_CAN_DROP_ITEM,"Can mine stone, iron ore, lapis lazuli, emerald",可以挖掘石头，铁矿，青金石，绿宝石
 ITEM_IRON_INGOT,Iron Ingot,铁锭
 IRON_PICKAXE,Iron Pickaxe,铁镐
-EFFECT_IRON_CAN_DROP_ITEM,,可以挖掘石头，铁矿，青金石，绿宝石，钻石
+EFFECT_IRON_CAN_DROP_ITEM,"Can mine stone, iron ore, lapis lazuli, emerald, diamond",可以挖掘石头，铁矿，青金石，绿宝石，钻石
 ITEM_DIAMOND,Diamond,钻石
 DIAMOND_PICKAXE,Diamond Pickaxe,钻镐
-EFFECT_DIAMOND_CAN_DROP_ITEM,,可以挖掘石头，铁矿，青金石，绿宝石，钻石，黑曜石
+EFFECT_DIAMOND_CAN_DROP_ITEM,"Can mine stone, iron ore, lapis lazuli, emerald, diamond, obsidian",可以挖掘石头，铁矿，青金石，绿宝石，钻石，黑曜石
 ITEM_OBSIDIAN,Obsidian,黑曜石
 ITEM_ENCHANTING_TABLE,Enchanting Table,附魔台
-EFFECT_RANDOM_CURSE_NEED_ITEM,,进入商店时消耗{2}级与{0}{1}随机诅咒道具与武器至等级与{1}消尽
+EFFECT_RANDOM_CURSE_NEED_ITEM,"When entering the shop, consumes level {2} and {0} {1} to randomly curse items and weapons until level and {1} are depleted",进入商店时消耗{2}级与{0}{1}随机诅咒道具与武器至等级与{1}消尽
 ITEM_LAPIS_LAZULI,Lapis Lazuli,青金石
-EFFECT_LAPIS_LAZULI_CAN_USE,,好像可以用来强化什么？
+EFFECT_LAPIS_LAZULI_CAN_USE,"Seems to be used for enhancing something?",好像可以用来强化什么？
 ITEM_EMERALD,Emerald,绿宝石
-EFFECT_EMERALD_CAN_USE,,找到村民的话，好像可以用来换点什么？
-EFFECT_ITEM_MERGE,,{0}个此道具跟{2}个{1}可能可以用点什么东西？
-EFFECT_ITEM_MERGE_ONE_FROM,,{0}个此道具可能可以做点什么东西？
+EFFECT_EMERALD_CAN_USE,"If you find a villager, seems to be usable for trading?",找到村民的话，好像可以用来换点什么？
+EFFECT_ITEM_MERGE,"{0} of this item and {2} {1} might be used for something?",{0}个此道具跟{2}个{1}可能可以用点什么东西？
+EFFECT_ITEM_MERGE_ONE_FROM,"{0} of this item might be used to craft something?",{0}个此道具可能可以做点什么东西？

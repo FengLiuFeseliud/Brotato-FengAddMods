@@ -189,7 +189,7 @@ func _calculate_add_value(effect: Array, value: int, player_index: int, effect_i
 	if not effects.has(remainder_hash):
 		effects[remainder_hash] = {}
 	
-	var remainder_counts: Dictionary = effects[remainder_hash]
+	var remainder_counts = effects[remainder_hash]
 	var remainder_key = str(effect[0]) + "_" + str(effect[2]) + "_" + str(effect_index)
 	
 	var remainder = 0
