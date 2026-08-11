@@ -319,27 +319,32 @@ func remove_currency(value: int, player_index: int) -> void :
 		return
 
 	remove_stat(effects[0][0], int(ceil(value / float(effects[0][1]))), player_index)
+ 
 
 
 func apply_item_effects(item_data: ItemParentData, player_index: int) -> void :
 	var old_effects = item_data.effects.duplicate()
+	var new_effects = item_data.effects.duplicate()
 	for effect in RunData.get_player_effect(effect_apply_item_not_add, player_index):
-		for index in range(0, item_data.effects.size()):
-			var item_effect = item_data.effects[index]
-			if effect[0] != item_effect.key_hash:
+		for index in range(new_effects.size() - 1, -1, -1):
+			var item_effect = new_effects[index]
+			if effect[0] != item_effect.key_hash and not (effect[3] and "stat_" in item_effect.key):
 				continue
 
 			if not effect[2]:
-				item_data.effects.remove(index)
-				break
+				new_effects.remove(index)
+				continue
 			
-			if effect[1] > 0 and item_effect.value < 0:
-				item_effect.value = abs(item_effect.value)
+			var modified_effect = item_effect.duplicate()
+			if effect[1] > 0 and modified_effect.value < 0:
+				modified_effect.value = abs(item_effect.value)
 
-			if effect[1] < 0 and item_effect.value > 0:
-				item_effect.value = -item_effect.value
+			if effect[1] < 0 and modified_effect.value > 0:
+				modified_effect.value = -modified_effect.value
 
-			break
+			new_effects[index] = modified_effect
+			continue
 	
+	item_data.effects = new_effects
 	.apply_item_effects(item_data, player_index)
 	item_data.effects = old_effects

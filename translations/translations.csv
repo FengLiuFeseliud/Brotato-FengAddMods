@@ -41,7 +41,7 @@ EFFECT_STAT_STOP,"Buy items with {1} instead of materials ({1} replaces {0} mate
 EFFECT_STAT_HIT_PROTECTION,"+1 hit protection for every {0} {1} [{2}]",每持有{0}点{1}获取一次抵消伤害的机会 [{2}]
 EFFECT_REGEN_HIT_PROTECTION,"{0} ({2}) chance to recover 1 Hit Protection every {1} seconds",每{1}秒有{0}（{2}）概率回复一次抵消伤害的机会
 EFFECT_TEMP_ON_HIT_PROTECTION,"{0} {1} when negating damage until the end of the wave","抵消伤害一次伤害时{0}{1}，直至敌袭结束"
-EFFECT_APPLY_ITEM_REVERSAL,"When picking up an item, removes {1}. Effects are inverted",获取道具时将扣除{1}效果反转
+EFFECT_APPLY_ITEM_REVERSAL,"When picking up an item, removes {1}. Effects are inverted",获取道具时将扣除{1}的效果改为增加{1}
 EFFECT_STATS_BUY_ITEM,"When purchasing substitute materials, gain {0}{1}",替代材料购买时增加{0}{1}
 EFFECT_TURRET_PRIORITY_ATTACK_HIGHEST_HP,"Structures prioritize attacking the target with the highest health within range",构筑物优先攻击范围内生命值最高的目标
 EFFECT_STRUCTURE_ADD_RANGE,"Structure attack range is modified by {1}",构筑物攻击范围将受到{1}加成
@@ -69,3 +69,7 @@ ITEM_EMERALD,Emerald,绿宝石
 EFFECT_EMERALD_CAN_USE,"If you find a villager, seems to be usable for trading?",找到村民的话，好像可以用来换点什么？
 EFFECT_ITEM_MERGE,"{0} of this item and {2} {1} might be used for something?",{0}个此道具跟{2}个{1}可能可以用点什么东西？
 EFFECT_ITEM_MERGE_ONE_FROM,"{0} of this item might be used to craft something?",{0}个此道具可能可以做点什么东西？
+EFFECT_APPLY_ITEM_ALL_SATAS_REVERSAL,,获取道具时将所有扣除属性的效果改为增加属性
+EFFECT_APPLY_NOT_LOSE_HP,,获取道具时无视每秒扣血效果
+EFFECT_APPLY_ITEM_REVERSAL_HP_START_WAVE,,获取道具时将从波次开始减少血量的效果改为增加血量
+EFFECT_APPLY_ITEM_NOT_NO_HEAL,,获取道具时无视无法治疗效果

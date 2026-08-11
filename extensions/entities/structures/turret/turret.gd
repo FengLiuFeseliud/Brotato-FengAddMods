@@ -19,6 +19,7 @@ static func get_dynamic_chance(init_chance: int, add_chance: int = 100, stat_cou
 
 
 func _ready():
+    ._ready()
     for player_index in RunData.get_player_count():
         if RunData.get_player_effect(turret_prioriy_attack_highest_hp, player_index).size() > 0:
             _hp_current_target = true
