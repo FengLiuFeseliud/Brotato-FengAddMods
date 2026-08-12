@@ -45,7 +45,7 @@ EFFECT_APPLY_ITEM_REVERSAL,"When picking up an item, removes {1}. Effects are in
 EFFECT_STATS_BUY_ITEM,"When purchasing substitute materials, gain {0}{1}",替代材料购买时增加{0}{1}
 EFFECT_TURRET_PRIORITY_ATTACK_HIGHEST_HP,"Structures prioritize attacking the target with the highest health within range",构筑物优先攻击范围内生命值最高的目标
 EFFECT_STRUCTURE_ADD_RANGE,"Structure attack range is modified by {1}",构筑物攻击范围将受到{1}加成
-EFFECT_TURRET_COPY,"Structures have a {0} ({2}) chance to copy themselves upon killing a target",构筑物击杀目标后有 {0}（{2}）概率复制自身
+EFFECT_TURRET_COPY,"Structures have a {0} ({2}) chance to copy themselves upon killing a target",构筑物击杀锁定目标后有 {0}（{2}）概率复制自身
 WOOD_PICKAXE,Wood PickAxe,木镐
 EFFECT_WOOD_CAN_DROP_ITEM,Can mine stone,可以挖掘石头
 EFFECT_MINECRAFT,Generating world,世界生成中
