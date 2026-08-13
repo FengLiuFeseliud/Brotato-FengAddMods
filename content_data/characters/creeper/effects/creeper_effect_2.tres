@@ -1,0 +1,25 @@
+[gd_resource type="Resource" load_steps=4 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/creeper/creeper_exploding_effect.gd" type="Script" id=1]
+[ext_resource path="res://projectiles/explosion.tscn" type="PackedScene" id=2]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/creeper/creeper_explosion_stats.tres" type="Resource" id=3]
+
+[resource]
+script = ExtResource( 1 )
+key = "not_moving_explosion"
+text_key = "EFFECT_NOT_MOVING_EXPLOSION_TO_CLEAN_UP_ROOM"
+value = 1
+custom_key = ""
+storage_method = 0
+effect_sign = 3
+custom_args = [  ]
+chance = 1.0
+explosion_scene = ExtResource( 2 )
+scale = 2.0
+base_smoke_amount = 20
+sound_db_mod = -13
+stats = ExtResource( 3 )
+tracking_key = "character_creeper"
+scale_with_missing_health = false
+wait_time = 1
+exploding_on_clean_up_room = true

@@ -19,7 +19,6 @@ static func get_dynamic_chance(init_chance: int, add_chance: int = 100, stat_cou
 
 
 func _ready():
-    ._ready()
     for player_index in RunData.get_player_count():
         if RunData.get_player_effect(turret_prioriy_attack_highest_hp, player_index).size() > 0:
             _hp_current_target = true
@@ -57,16 +56,8 @@ func _physics_process(delta):
         return
 
 
-    if dead: return
-
-    _cooldown -= 60 * delta
-
+    ._physics_process(delta)
     _current_target = get_highest_hp_target(_targets_in_range, global_position, stats.min_range)
-
-    if should_shoot():
-	    _is_shooting = true
-	    _animation_player.playback_speed = _shooting_speed
-	    _animation_player.play("shoot")
 
 
 func set_data(data: Resource) -> void :

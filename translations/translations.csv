@@ -9,6 +9,7 @@ CURSE_FIEND,Curse Fiend,咒魔
 MAIN_SERVER,Main Server,主服务器
 STEVE,Steve,史蒂夫
 THE_GLITCH,The Glitch,漏洞
+CREEPER,Creeper,苦力怕
 EFFECT_TWO_HAND_WEAPON_SLOT_LIMIT,Only has two hands (so can only hold two weapons),只有两只手所以只拿两个武器
 ITEM_RAT_KING_RATZILLA,Rat Subject,鼠族臣民
 EFFECT_RATZILLA_KILLER_BOSS_TEXT,Ratzilla targets and attacks bosses,鼠斯拉会锁定并攻击 boss
@@ -73,3 +74,6 @@ EFFECT_APPLY_ITEM_ALL_SATAS_REVERSAL,,获取道具时将所有扣除属性的效
 EFFECT_APPLY_NOT_LOSE_HP,,获取道具时无视每秒扣血效果
 EFFECT_APPLY_ITEM_REVERSAL_HP_START_WAVE,,获取道具时将从波次开始减少血量的效果改为增加血量
 EFFECT_APPLY_ITEM_NOT_NO_HEAL,,获取道具时无视无法治疗效果
+EFFECT_NOT_MOVING_EXPLOSION_TO_CLEAN_UP_ROOM,,当你站立不动超过{4}秒时将会爆炸造成 {1}（{2}）伤害，爆炸后会直接通过当前波次
+EFFECT_CAN_ONE_NOT_MOVING_EXPLOSION,,爆炸后若无法杀死场上的 Boss 将直接死亡
+EFFECT_NO_PET,,你无法召唤宠物
