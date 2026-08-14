@@ -10,6 +10,7 @@ var effect_stat_not_add = Keys.generate_hash("stat_not_add")
 var effect_apply_item_not_add = Keys.generate_hash("apply_item_not_add")
 var effect_item_merge = Keys.generate_hash("item_merge")
 var effect_random_curse = Keys.generate_hash("random_curse")
+var effect_wave_elites_spawn = Keys.generate_hash("wave_elites_spawn")
 
 
 var levels = Keys.generate_hash("levels")
@@ -348,3 +349,20 @@ func apply_item_effects(item_data: ItemParentData, player_index: int) -> void :
 	item_data.effects = new_effects
 	.apply_item_effects(item_data, player_index)
 	item_data.effects = old_effects
+
+
+
+func wave_elites_spawn() -> void :
+	for wave in range(9999):
+		var possible_elites = ItemService.get_elites_from_zone(current_zone)
+		var new_elite_id = Utils.get_rand_element(possible_elites).my_id_hash
+		elites_spawn.push_back([wave, EliteType.ELITE, new_elite_id])
+		check_elite_generation.append(wave)
+
+
+func init_elites_spawn(base_wave: int = 10, horde_chance: float = 0.4) -> void :
+	.init_elites_spawn(base_wave, horde_chance)
+
+	for player_data in players_data:
+		if player_data.effects.has(effect_wave_elites_spawn):
+			wave_elites_spawn()

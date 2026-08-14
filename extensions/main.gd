@@ -5,6 +5,7 @@ var effect_can_add_chance_stat_damage_when_death = Keys.generate_hash("effect_ca
 var effect_random_stats_on_level_up = Keys.generate_hash("effect_random_stats_on_level_up")
 var effect_picked_box_cost_gold = Keys.generate_hash("picke_box_cost_gold")
 var effect_picke_consumable_drop_structure = Keys.generate_hash("picke_consumable_drop_structure")
+var effect_boss_died_respawn = Keys.generate_hash("boss_died_respawn")
 
 
 static func get_dynamic_chance(stat_count: int, init_chance: int, add_chance: int) -> int:
@@ -58,7 +59,44 @@ func on_gold_picked_up(gold: Node, player_index: int) -> void :
 	.on_gold_picked_up(gold, player_index)
 
 
+func respawn_boss(enemy: Enemy, effect: Array) -> void:
+	var gain_value = effect[1] / 100.0
+	var old_health = enemy.max_stats.health
+	var old_damage = enemy.max_stats.damage
+	var old_speed = enemy.max_stats.speed
+	var global_position = enemy.global_position
+	var filename = enemy.filename
+
+	yield(get_tree().create_timer(1.0), "timeout")
+
+	if _wave_timer.is_stopped() or RunData.is_in_last_waves():
+		return
+
+	var args = _entity_spawner.SpawnEntityArgs.new(global_position, EntityType.BOSS)
+	var new_boss = _entity_spawner.spawn_entity(load(filename), args)
+
+	var new_health = old_health + int(old_health * gain_value)
+	if new_health < 30:
+		new_health = 30
+
+	new_boss.max_stats.health = new_health
+	new_boss.current_stats.health = new_health
+		
+	var new_damage = old_damage + int(old_damage * gain_value)
+	new_boss.max_stats.damage = new_damage
+	new_boss.current_stats.damage = new_damage
+
+	var new_speed = old_speed + int(old_speed * gain_value)
+	new_boss.max_stats.damage = new_speed
+	new_boss.current_stats.damage = new_speed
+
+
 func _on_enemy_died(enemy: Enemy, args: Entity.DieArgs) -> void:
+	for player in _get_shuffled_live_players(): 
+		var effects = RunData.get_player_effect(effect_boss_died_respawn, player.player_index)
+		if enemy is Boss and effects.size() > 0:
+			respawn_boss(enemy, effects[0])
+	
 	if _cleaning_up and args.enemy_killed_by_player or enemy is Boss:
 		._on_enemy_died(enemy, args)
 		return
