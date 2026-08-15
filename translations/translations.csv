@@ -34,7 +34,7 @@ EFFECT_RANDOM_SHOP_ITEM_COUNT_PRICE,-0 to 3 items in the shop upon entering,"商
 EFFECT_GOLD_LOW_SET_STAT_SHOP,"When lacking materials, use {1} substitute materials to purchase items ({1} replaces {0} materials)",材料不足时使用{1}替代材料购买道具（{1}替代{0}材料）
 EFFECT_THE_DESPISED_NO_SHOP,"Everyone hates you, so the shop will be empty",你被所有人厌恶商店不会有任何物品
 EFFECT_CAN_ALL_DROP_BOX,"All fruit drop as Crates, with a {0} ({1}) chance to drop as Red Crates",所有果子全部掉落为箱子有{0}（{1}）概率掉落为红箱子
-EFFECT_WAVE_END_COST_GOLD_GET_STAT_OR_WEAPON,"Picking up a Crate costs {0} ({1}) Materials to gain a weapon, or {2} random stats if weapons cannot be upgraded.",每次捡起箱子需花费{0}材料获取箱子（材料不足时只回复）并且获取武器全部无法提升后随机获取{1}属性，花费材料随波次膨胀
+EFFECT_WAVE_END_COST_GOLD_GET_STAT_OR_WEAPON,"Picking up a Crate costs {0} Materials (only heals if lacking Materials). Material cost scales with waves. When weapons can no longer be upgraded, acquiring weapons grants {1} random stat instead",每次捡起箱子需花费{0}材料获取箱子（材料不足时只回复）并且获取武器全部无法提升后随机获取{1}属性，花费材料随波次膨胀
 EFFECT_WAVE_END_NOT_PICK_CONSUMABLE,Consumables are not automatically picked up at the end of a wave,波次结束时不会自动捡起消耗品
 EFFECT_CONSUMABLE_STAT,"{0}{1} when picking up a consumable",捡起一个消耗品时{0}{1}
 EFFECT_RICE,Fruit Pilaf,水果焖饭
@@ -71,14 +71,14 @@ ITEM_EMERALD,Emerald,绿宝石
 EFFECT_EMERALD_CAN_USE,"If you find a villager, seems to be usable for trading?",找到村民的话，好像可以用来换点什么？
 EFFECT_ITEM_MERGE,"{0} of this item and {2} {1} might be used for something?",{0}个此道具跟{2}个{1}可能可以用点什么东西？
 EFFECT_ITEM_MERGE_ONE_FROM,"{0} of this item might be used to craft something?",{0}个此道具可能可以做点什么东西？
-EFFECT_APPLY_ITEM_ALL_SATAS_REVERSAL,,获取道具时将所有扣除属性的效果改为增加属性
-EFFECT_APPLY_NOT_LOSE_HP,,获取道具时无视每秒扣血效果
-EFFECT_APPLY_ITEM_REVERSAL_HP_START_WAVE,,获取道具时将从波次开始减少血量的效果改为增加血量
-EFFECT_APPLY_ITEM_NOT_NO_HEAL,,获取道具时无视无法治疗效果
-EFFECT_NOT_MOVING_EXPLOSION_TO_CLEAN_UP_ROOM,,当你站立不动超过{4}秒时将会爆炸造成 {1}（{2}）伤害，爆炸后会直接通过当前波次
-EFFECT_CAN_ONE_NOT_MOVING_EXPLOSION,,爆炸后若无法杀死场上的 Boss 将直接死亡
-EFFECT_NO_PET,,你无法召唤宠物
-EFFECT_ALL_WAVE_ELITES_SPAWN,,所有波次额外生成一个 Boss
-EFFECT_BOSS_DIED_RESPAWN,,Boss 死亡后将重生并且各向属性强化 {1}
-EFFECT_ITEM_BOUGHT_SPAWN_BOSS,, 购买{0}后下场敌袭{1}（+{2} {0}数量）概率额外生成一个 Boss
-EFFECT_APPLY_NOT_EXTRA_ENEMIES,,获取道具时无视下场敌袭出现特殊怪效果
+EFFECT_APPLY_ITEM_ALL_SATAS_REVERSAL,"When acquiring an item, all effects that decrease primary stats increase them instead",获取道具时将所有扣除主要属性的效果改为增加主要属性
+EFFECT_APPLY_NOT_LOSE_HP,"When acquiring an item, ignore effects that cause HP loss per second",获取道具时无视每秒扣血效果
+EFFECT_APPLY_ITEM_REVERSAL_HP_START_WAVE,"When acquiring an item, effects that reduce HP at the start of a wave increase it instead",获取道具时将从波次开始减少血量的效果改为从波次开始增加血量
+EFFECT_APPLY_ITEM_NOT_NO_HEAL,"When acquiring an item, ignore effects that disable healing",获取道具时无视无法治疗效果
+EFFECT_NOT_MOVING_EXPLOSION_TO_CLEAN_UP_ROOM,"When standing still for more than {4} seconds, explode dealing {1} ({2}) damage and instantly clear the current wave",当你站立不动超过{4}秒时将会爆炸造成 {1}（{2}）伤害，爆炸后会直接通过当前波次
+EFFECT_CAN_ONE_NOT_MOVING_EXPLOSION,"Die instantly if the explosion fails to kill any Boss on the field",爆炸后若无法杀死场上的 Boss 将直接死亡
+EFFECT_NO_PET,"You cannot summon pets",你无法召唤宠物
+EFFECT_ALL_WAVE_ELITES_SPAWN,"+1 extra Boss spawns in all waves",所有波次额外生成一个 Boss
+EFFECT_BOSS_DIED_RESPAWN,"When a Boss dies, it respawns with {1} increased all stats",Boss 死亡后将重生并且各向属性强化 {1}
+EFFECT_ITEM_BOUGHT_SPAWN_BOSS,"Buying {0} adds a {1} (+{2} per {0}) chance to spawn +1 extra Boss in the next wave",购买{0}后下场敌袭{1}（+{2} {0}数量）概率额外生成一个 Boss
+EFFECT_APPLY_NOT_EXTRA_ENEMIES,"When acquiring an item, ignore effects that spawn special enemies in the next wave",获取道具时无视下场敌袭出现特殊怪效果

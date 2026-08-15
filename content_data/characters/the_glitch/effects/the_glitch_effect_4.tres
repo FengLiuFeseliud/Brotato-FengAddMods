@@ -4,11 +4,12 @@
 
 [resource]
 script = ExtResource( 1 )
-key = "hp_start_wave"
-text_key = "EFFECT_APPLY_ITEM_REVERSAL_HP_START_WAVE"
+key = ""
+text_key = "EFFECT_APPLY_ITEM_ALL_SATAS_REVERSAL"
 value = 1
 custom_key = "apply_item_not_add"
 storage_method = 2
 effect_sign = 3
 custom_args = [  ]
 reversal = true
+all_stats = true

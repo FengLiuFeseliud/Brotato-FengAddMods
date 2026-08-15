@@ -19,11 +19,21 @@ var levels = Keys.generate_hash("levels")
 var stat_after_change_wave_value_count = {}
 
 
+func wave_elites_spawn(player_data) -> void :
+	var possible_elites = ItemService.get_elites_from_zone(current_zone)
+	var new_elite_id = Utils.get_rand_element(possible_elites).my_id_hash
+	player_data.effects[Keys.extra_enemies_next_wave_hash].append(["res://zones/common/elite/group_elite.tres", 1, new_elite_id])
+
+
 func on_wave_start(timer: WaveTimer) -> void :
 	## 清除波次上限
 	for value_keys in stat_after_change_wave_value_count.keys():
 		stat_after_change_wave_value_count[value_keys] = 0
 	.on_wave_start(timer)
+
+	for player_data in players_data:
+		if player_data.effects.has(effect_wave_elites_spawn) and player_data.effects[effect_wave_elites_spawn].size() > 0:
+			wave_elites_spawn(player_data)
 
 
 func get_item_count(item_hash: int, player_index: int) -> int:
@@ -349,20 +359,3 @@ func apply_item_effects(item_data: ItemParentData, player_index: int) -> void :
 	item_data.effects = new_effects
 	.apply_item_effects(item_data, player_index)
 	item_data.effects = old_effects
-
-
-
-func wave_elites_spawn() -> void :
-	for wave in range(9999):
-		var possible_elites = ItemService.get_elites_from_zone(current_zone)
-		var new_elite_id = Utils.get_rand_element(possible_elites).my_id_hash
-		elites_spawn.push_back([wave, EliteType.ELITE, new_elite_id])
-		check_elite_generation.append(wave)
-
-
-func init_elites_spawn(base_wave: int = 10, horde_chance: float = 0.4) -> void :
-	.init_elites_spawn(base_wave, horde_chance)
-
-	for player_data in players_data:
-		if player_data.effects.has(effect_wave_elites_spawn):
-			wave_elites_spawn()

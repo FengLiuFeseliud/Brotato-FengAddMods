@@ -20,6 +20,6 @@ custom_key = ""
 storage_method = 0
 effect_sign = 0
 custom_args = [ SubResource( 1 ) ]
-nb_stat_scaled = 1
+nb_stat_scaled = 3
 stat_scaled = "item_bait"
 perm_stats_only = true

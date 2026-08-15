@@ -6,8 +6,9 @@
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/the_glitch/effects/the_glitch_effect_1.tres" type="Resource" id=4]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/the_glitch/effects/the_glitch_effect_2.tres" type="Resource" id=5]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/the_glitch/effects/the_glitch_effect_3.tres" type="Resource" id=6]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/the_glitch/appearance/the_glitch_appearance.tres" type="Resource" id=7]
-[ext_resource path="res://weapons/melee/cactus_mace/1/cactus_mace_data.tres" type="Resource" id=8]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/the_glitch/effects/the_glitch_effect_4.tres" type="Resource" id=7]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/the_glitch/appearance/the_glitch_appearance.tres" type="Resource" id=8]
+[ext_resource path="res://weapons/melee/cactus_mace/1/cactus_mace_data.tres" type="Resource" id=26]
 [ext_resource path="res://weapons/ranged/double_barrel_shotgun/1/double_barrel_shotgun_data.tres" type="Resource" id=9]
 [ext_resource path="res://weapons/melee/stick/1/stick_data.tres" type="Resource" id=10]
 [ext_resource path="res://weapons/melee/knife/1/knife_data.tres" type="Resource" id=11]
@@ -35,18 +36,18 @@ icon = ExtResource( 2 )
 name = "THE_GLITCH"
 tier = 0
 value = 1
-effects = [ ExtResource( 3 ), ExtResource( 4 ) , ExtResource( 5 ), ExtResource( 6 ) ]
+effects = [ ExtResource( 3 ), ExtResource( 4 ) , ExtResource( 5 ), ExtResource( 6 ), ExtResource( 7 ) ]
 tracking_text = ""
 is_lockable = false
 unlock_codex_descr_after_get_it = 1
 is_cursed = false
 curse_factor = 0.0
 max_nb = -1
-item_appearances = [ ExtResource( 7 ) ]
+item_appearances = [ ExtResource( 8 ) ]
 tags = [  ]
 wanted_tags = [  ]
 banned_item_groups = [  ]
 banned_items = [  ]
 banned_upgrades = [  ]
-starting_weapons = [ ExtResource( 11 ), ExtResource( 10 ), ExtResource( 17 ), ExtResource( 22 ), ExtResource( 25 ), ExtResource( 8 ), ExtResource( 23 ), ExtResource( 24 ), ExtResource( 16 ), ExtResource( 18 ), ExtResource( 14 ), ExtResource( 15 ), ExtResource( 9 ), ExtResource( 20 ), ExtResource( 13 ), ExtResource( 12 ), ExtResource( 19 ), ExtResource( 21 ) ]
+starting_weapons = [ ExtResource( 11 ), ExtResource( 10 ), ExtResource( 17 ), ExtResource( 22 ), ExtResource( 25 ), ExtResource( 26 ), ExtResource( 23 ), ExtResource( 24 ), ExtResource( 16 ), ExtResource( 18 ), ExtResource( 14 ), ExtResource( 15 ), ExtResource( 9 ), ExtResource( 20 ), ExtResource( 13 ), ExtResource( 12 ), ExtResource( 19 ), ExtResource( 21 ) ]
 starting_items = [  ]
