@@ -19,7 +19,7 @@
 [ext_resource path="res://weapons/melee/spear/1/spear_data.tres" type="Resource" id=17]
 [ext_resource path="res://weapons/melee/sharp_tooth/1/sharp_tooth_data.tres" type="Resource" id=18]
 [ext_resource path="res://weapons/melee/scissors/1/scissors_data.tres" type="Resource" id=19]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/six_sided_gun/six_sided_gun_data.tres" type="Resource" id=20]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/ranged/six_sided_gun/six_sided_gun_data.tres" type="Resource" id=20]
 [ext_resource path="res://weapons/melee/jousting_lance/1/jousting_lance_data.tres" type="Resource" id=21]
 
 [resource]
