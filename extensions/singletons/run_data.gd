@@ -35,7 +35,6 @@ func on_wave_start(timer: WaveTimer) -> void :
 		if player_data.effects.has(effect_wave_elites_spawn) and player_data.effects[effect_wave_elites_spawn].size() > 0:
 			wave_elites_spawn(player_data)
 
-
 func get_item_count(item_hash: int, player_index: int) -> int:
 	var count = 0
     
@@ -162,7 +161,6 @@ func on_wave_end() -> void :
 		if effects.size() > 0:
 			auto_curse(effects[0], player_index)
 		
-	
 
 ## 统一添加效果 hsah
 func get_player_effect(key: int, player_index: int):

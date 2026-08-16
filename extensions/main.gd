@@ -1,11 +1,17 @@
 extends Main
 
+
 var effect_can_add_chance_stat_damage_when_pickup_gold = Keys.generate_hash("effect_can_add_chance_stat_damage_when_pickup_gold")
 var effect_can_add_chance_stat_damage_when_death = Keys.generate_hash("effect_can_add_chance_stat_damage_when_death")
 var effect_random_stats_on_level_up = Keys.generate_hash("effect_random_stats_on_level_up")
 var effect_picked_box_cost_gold = Keys.generate_hash("picke_box_cost_gold")
 var effect_picke_consumable_drop_structure = Keys.generate_hash("picke_consumable_drop_structure")
 var effect_boss_died_respawn = Keys.generate_hash("boss_died_respawn")
+var effect_killed_all_boss_wave_end = Keys.generate_hash("killed_all_boss_wave_end")
+var effect_add_xp_gold_from_wave_time = Keys.generate_hash("add_xp_gold_from_wave_time")
+
+
+var _is_speedrun_ending: bool = false
 
 
 static func get_dynamic_chance(stat_count: int, init_chance: int, add_chance: int) -> int:
@@ -93,7 +99,17 @@ func respawn_boss(enemy: Enemy, effect: Array) -> void:
 
 func _on_enemy_died(enemy: Enemy, args: Entity.DieArgs) -> void:
 	for player in _get_shuffled_live_players(): 
-		var effects = RunData.get_player_effect(effect_boss_died_respawn, player.player_index)
+		var effects = RunData.get_player_effect(effect_killed_all_boss_wave_end, player.player_index)
+		if effects.size() > 0 and _entity_spawner.get_nb_bosses_and_elites_alive() == 1 and enemy is Boss:
+			._on_enemy_died(enemy, args)
+			yield(get_tree().create_timer(1.0), "timeout")
+			if _cleaning_up:
+				return
+				
+			_on_WaveTimer_timeout()
+			return
+
+		effects = RunData.get_player_effect(effect_boss_died_respawn, player.player_index)
 		if enemy is Boss and effects.size() > 0:
 			respawn_boss(enemy, effects[0])
 	
@@ -109,6 +125,7 @@ func _on_enemy_died(enemy: Enemy, args: Entity.DieArgs) -> void:
 			handle_stat_damages(effects, player_index)
 				
 	._on_enemy_died(enemy, args)
+
 
 
 func on_levelled_up(player_index: int) -> void :
@@ -188,3 +205,25 @@ func on_consumable_picked_up(consumable: Node, player_index: int) -> void :
 			RunData.add_stat(RunData.get_random_primary_stats(), 1, player_index)
 
 	.on_consumable_picked_up(consumable, player_index)
+
+
+func add_xp_gold_from_wave_time(effect: Array, player_index: int):
+	var add_value = effect[1]
+	if effect[0] != Keys.stat_levels_hash:
+		add_value += RunData.get_stat(effect[0], player_index) * effect[2]
+	else:
+		add_value += RunData.get_player_level(player_index * effect[2])
+
+	var gold = int(_wave_timer.time_left * add_value)
+	RunData.add_gold(gold, player_index)
+	RunData.add_xp(gold, player_index)
+
+
+func clean_up_room():
+	for player_index in RunData.get_player_count():
+		var effects = RunData.get_player_effect(effect_add_xp_gold_from_wave_time, player_index)
+		if effects.size() > 0:
+			add_xp_gold_from_wave_time(effects[0], player_index)
+	
+	if not _end_wave_timer_timedout:
+		.clean_up_room()

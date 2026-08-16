@@ -1,0 +1,14 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/effects/effect_add_xp_gold_from_wave_time.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+key = "stat_levels"
+text_key = "EFFECT_ADD_XP_GOLD_FROM_WAVE_TIME"
+value = 3
+custom_key = "add_xp_gold_from_wave_time"
+storage_method = 0
+effect_sign = 3
+custom_args = [  ]
+gain_value = 0.10
