@@ -4,10 +4,10 @@
 
 [resource]
 script = ExtResource( 1 )
-key = "effect_gain_random_killed_stat"
+key = ""
 text_key = "EFFECT_GIN_RANDOM_KILLED_STAT"
 value = 20
-custom_key = ""
+custom_key = "gain_random_killed_stat"
 storage_method = 0
 effect_sign = 3
 custom_args = [  ]

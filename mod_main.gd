@@ -1,13 +1,15 @@
 extends Node
 
+const MOD_ID = "FengAddMods"
 const MOD_DIR = "res://mods-unpacked/FengLiu-FengAddMods/"
 const EXTENSIONS_DIR = MOD_DIR + "extensions/"
 const CONTENT_DATA_DIR = MOD_DIR + "content_data.tres"
 
 func _init():
 	add_translations()
-	
-	ModLoaderMod.install_script_extension(EXTENSIONS_DIR + "weapon/base_mod_ranged_weapon.gd")
+
+	ModLoaderLog.info("add extensions...", MOD_ID)
+	ModLoaderMod.install_script_extension(EXTENSIONS_DIR + "weapon/weapon.gd")
 	ModLoaderMod.install_script_extension(EXTENSIONS_DIR + "entities/structures/turret/turret.gd")
 	ModLoaderMod.install_script_extension(EXTENSIONS_DIR + "entities/structures/structure.gd")
 	ModLoaderMod.install_script_extension(EXTENSIONS_DIR + "entities/units/neutral/neutral.gd")
@@ -22,9 +24,19 @@ func _init():
 
 
 func add_translations() -> void:
+	ModLoaderLog.info("add translations...", MOD_ID)
 	ModLoaderMod.add_translation(MOD_DIR + "translations/translations.zh_Hans_CN.translation")
 	ModLoaderMod.add_translation(MOD_DIR + "translations/translations.en.translation")
 
 func _ready()->void:
+	var dlc_probe_path = "res://dlcs/dlc_1/characters/builder/effects/builder_effect_1c.tres" 
+	if not ResourceLoader.exists(dlc_probe_path):
+		ModLoaderLog.info("DLC not load, load DLC...", MOD_ID)
+		if is_instance_valid(ProgressData):
+			ProgressData.load_dlc_pcks()
+
 	var ContentLoader = get_node("/root/ModLoader/Darkly77-ContentLoader/ContentLoader")
-	ContentLoader.load_data(CONTENT_DATA_DIR, "FengAddMods")
+	if ContentLoader == null:
+		ModLoaderLog.error("ContentLoader not load...", MOD_ID)
+
+	ContentLoader.load_data(CONTENT_DATA_DIR, MOD_ID)

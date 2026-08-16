@@ -13,10 +13,6 @@ var stat_hash: int = Keys.empty_hash
 func _generate_hashes() -> void :
 	._generate_hashes()
 	stat_hash = Keys.generate_hash(stat)
-
-
-static func get_id() -> String:
-	return "effect_gain_random_killed_stat"
 	
 	
 func get_dynamic_value() -> int:

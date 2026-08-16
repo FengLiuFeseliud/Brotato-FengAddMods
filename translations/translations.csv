@@ -12,6 +12,7 @@ THE_GLITCH,The Glitch,漏洞
 CREEPER,Creeper,苦力怕
 THE_ANGLER,The Angler,钓鱼佬
 SPEED_RUNNER,Speed Runner,速通者
+WEAPON_KEY,Key,钥匙
 EFFECT_TWO_HAND_WEAPON_SLOT_LIMIT,Only has two hands (so can only hold two weapons),只有两只手所以只拿两个武器
 ITEM_RAT_KING_RATZILLA,Rat Subject,鼠族臣民
 EFFECT_RATZILLA_KILLER_BOSS_TEXT,Ratzilla targets and attacks bosses,鼠斯拉会锁定并攻击 boss
@@ -85,3 +86,5 @@ EFFECT_ITEM_BOUGHT_SPAWN_BOSS,"Buying {0} adds a {1} (+{2} per {0}) chance to sp
 EFFECT_APPLY_NOT_EXTRA_ENEMIES,"When acquiring an item, ignore effects that spawn special enemies in the next wave",获取道具时无视下场敌袭出现特殊怪效果
 EFFECT_KILLED_ALL_BOSS_WAVE_END,,杀死波次所有 Boss 时将直接通过当前波次
 EFFECT_ADD_XP_GOLD_FROM_WAVE_TIME,,通过波次时按剩余秒数获取材料与经验，每秒获取{0}（{1}）
+EFFECT_WEAPON_KILLED_LOOT,,每击杀{0}敌人获取一个箱子，每波增加{1}所需击杀数（上限{2}击杀数）
+LOOT_BOX,,获取到的箱子：{0}
