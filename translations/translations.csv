@@ -39,7 +39,7 @@ EFFECT_THE_DESPISED_NO_SHOP,"Everyone hates you, so the shop will be empty",你�
 EFFECT_CAN_ALL_DROP_BOX,"All fruit drop as Crates, with a {0} ({1}) chance to drop as Red Crates",所有果子全部掉落为箱子有{0}（{1}）概率掉落为红箱子
 EFFECT_WAVE_END_COST_GOLD_GET_STAT_OR_WEAPON,"Picking up a Crate costs {0} Materials (only heals if lacking Materials). Material cost scales with waves. When weapons can no longer be upgraded, acquiring weapons grants {1} random stat instead",每次捡起箱子需花费{0}材料获取箱子（材料不足时只回复）并且获取武器全部无法提升后随机获取{1}属性，花费材料随波次膨胀
 EFFECT_WAVE_END_NOT_PICK_CONSUMABLE,Consumables are not automatically picked up at the end of a wave,波次结束时不会自动捡起消耗品
-EFFECT_CONSUMABLE_STAT,"{0}{1} when picking up a consumable",捡起一个消耗品时{0}{1}
+EFFECT_CONSUMABLE_STAT,"{0}{1} when picking up a consumable",捡起一个消耗品时永久{0}{1}
 EFFECT_RICE,Fruit Pilaf,水果焖饭
 EFFECT_PICKE_CONSUMABLE_DROP_STRUCTURE_GAIN,"When picking up a consumable, spawns {0} (+{2}) {3} dealing {4} ({5}) damage in an area",当捡起消耗品时产生{0}（{2}）个{3}，对一块区域造成{4}（{5}）伤害
 EFFECT_STAT_STOP,"Buy items with {1} instead of materials ({1} replaces {0} materials)",使用{1}替代材料购买道具（{1}替代{0}材料）
@@ -92,4 +92,4 @@ LOOT_BOX,"Crates Acquired: {0}",获取到的箱子：{0}
 EFFECT_AUTO_OPEN_BOX,,你将自动获取箱子中的道具
 EFFECT_CHANCE_APPLY_ITEM_NOT_ADD_ALL_DEBUFF_FROM_BOX,,从箱子获取道具时有{0}概率无视道具所有负面效果
 EFFECT_PICKED_UP_CONSUMABLE_ADD_SIZE,,当捡起消耗品时你的角色与武器将放大{0}，直至敌袭结束
-EFFECT_BOX_STAT,"{0}{1} when picking up a crate",捡起一个箱子时{0}{1}
+EFFECT_BOX_STAT,"{0}{1} when picking up a crate",捡起一个箱子时永久{0}{1}

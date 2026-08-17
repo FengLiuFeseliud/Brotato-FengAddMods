@@ -20,7 +20,7 @@ func gain_random_killed_stat(effect: NullEffect) -> void:
 		return
 	
 	var random_val = get_dynamic_value(effect.stat_min_value, effect.stat_max_value, effect.stat_no_zero)
-	RunData.add_stat(effect.stat, random_val, player_index)
+	RunData.add_stat(effect.stat_hash, random_val, player_index)
 	emit_signal("tracked_value_updated", random_val)
 
 
