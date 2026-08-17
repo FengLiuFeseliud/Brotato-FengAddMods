@@ -9,6 +9,8 @@ var effect_picke_consumable_drop_structure = Keys.generate_hash("picke_consumabl
 var effect_boss_died_respawn = Keys.generate_hash("boss_died_respawn")
 var effect_killed_all_boss_wave_end = Keys.generate_hash("killed_all_boss_wave_end")
 var effect_add_xp_gold_from_wave_time = Keys.generate_hash("add_xp_gold_from_wave_time")
+var effect_auto_open_box = Keys.generate_hash("auto_open_box")
+var effect_apply_item_not_add_all_debuff = Keys.generate_hash("apply_item_not_add_all_debuff")
 
 
 var _is_speedrun_ending: bool = false
@@ -75,7 +77,7 @@ func respawn_boss(enemy: Enemy, effect: Array) -> void:
 
 	yield(get_tree().create_timer(1.0), "timeout")
 
-	if _wave_timer.is_stopped() or RunData.is_in_last_waves():
+	if _cleaning_up:
 		return
 
 	var args = _entity_spawner.SpawnEntityArgs.new(global_position, EntityType.BOSS)
@@ -125,7 +127,6 @@ func _on_enemy_died(enemy: Enemy, args: Entity.DieArgs) -> void:
 			handle_stat_damages(effects, player_index)
 				
 	._on_enemy_died(enemy, args)
-
 
 
 func on_levelled_up(player_index: int) -> void :
@@ -186,11 +187,32 @@ func on_consumable_picked_up(consumable: Node, player_index: int) -> void :
 		.on_consumable_picked_up(consumable, player_index)
 		return 
 
+	effects = RunData.get_player_effect(effect_auto_open_box, player_index)
+	if effects.size() > 0:
+		# 禁止 UI 显示
+		consumable.consumable_data.to_be_processed_at_end_of_wave = false
+		# 开箱
+		var box_item_data = ItemService.process_item_box(consumable.consumable_data, RunData.current_wave, player_index)
+		
+		# 概率删除箱子道具全部负面效果
+		effects = RunData.get_player_effect(effect_apply_item_not_add_all_debuff, player_index)
+		if effects.size() > 0 and effects[0][1] and Utils.get_chance_success(effects[0][0] / 100.0):
+			var old_effects = box_item_data.effects.duplicate()
+			var new_effects = box_item_data.effects.duplicate()
+			RunData.remove_all_item_debuff_effects(new_effects)
+
+			box_item_data.effects = new_effects
+			RunData.add_item(box_item_data, player_index)
+			box_item_data.effects = old_effects
+		else:
+			RunData.add_item(box_item_data, player_index)
+
 	effects = RunData.get_player_effect(effect_picked_box_cost_gold, player_index)
 	if effects.size() == 0:
 		.on_consumable_picked_up(consumable, player_index)
 		return
 
+	# 花费开箱
 	var effect = effects[0]
 	var cost_gold = get_box_cost(effect)
 

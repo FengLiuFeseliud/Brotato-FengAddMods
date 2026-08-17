@@ -2,11 +2,13 @@ extends Player
 
 
 var effect_consumable_stats = Keys.generate_hash("consumable_stats")
+var effect_box_stats = Keys.generate_hash("box_stats")
 var effect_stat_hit_protection = Keys.generate_hash("stat_hit_protection")
 var effect_regen_hit_protection = Keys.generate_hash("regen_hit_protection")
 var effect_temp_stats_on_hit_protection = Keys.generate_hash("temp_stats_on_hit_protection")
 var effect_not_moving_explosion = Keys.generate_hash("not_moving_explosion")
 var effect_can_one_not_moving_explosion = Keys.generate_hash("can_one_not_moving_explosion")
+var effect_picked_up_consumable_add_size = Keys.generate_hash("picked_up_consumable_add_size")
 
 
 var _max_hit_protection = 0
@@ -17,6 +19,8 @@ var _not_moving_explosion_timer
 var _can_not_moving_explosio = false
 var _clean_up_room_timer
 var _exploding_on_clean_up_room
+var _scale_value = 1 
+var _dynamic_scale = false
 
 
 static func get_dynamic_chance(init_chance: int, add_chance: int = 0, stat_count: int = 0) -> float:
@@ -46,6 +50,9 @@ func _ready() -> void :
         _can_not_moving_explosio = false
         _exploding_on_clean_up_room = effects[0].exploding_on_clean_up_room
 
+    effects = RunData.get_player_effect(effect_picked_up_consumable_add_size, player_index)
+    if effects.size() > 0: 
+        _dynamic_scale = true
 
 func get_player_ui() -> PlayerUIElements:
     if _player_ui == null:
@@ -64,6 +71,9 @@ func _physics_process(delta: float) -> void :
 
     if _clean_up_room_timer != null and _clean_up_room_timer.try_loop(delta) > 0:
         on_clean_up_room()
+
+    if _dynamic_scale:
+        scale = Vector2(_scale_value, _scale_value)
     
 
 func take_damage(value: int, args: TakeDamageArgs) -> Array:
@@ -91,11 +101,23 @@ func on_regen_hit_protection() -> void:
         get_player_ui().update_hit_protection_count(self, _hit_protection)
 
 
-func on_consumable_picked_up(_consumable_data: ConsumableData) -> void :
+func on_consumable_picked_up(consumable_data: ConsumableData) -> void :
     var effects = RunData.get_player_effect(effect_consumable_stats, player_index)
     if effects.size() > 0:
         for effect in effects:
             RunData.add_stat(effect[0], effect[1], player_index)
+
+    effects = RunData.get_player_effect(effect_box_stats, player_index)
+    if effects.size() > 0 and (consumable_data.my_id_hash == Keys.consumable_item_box_hash 
+            or consumable_data.my_id_hash == Keys.consumable_legendary_item_box_hash):
+        for effect in effects:
+            RunData.add_stat(effect[0], effect[1], player_index)
+
+    effects = RunData.get_player_effect(effect_picked_up_consumable_add_size, player_index)
+    if effects.size() > 0: 
+        _scale_value +=  _scale_value * (effects[0][0] / 100.0)
+
+    .on_consumable_picked_up(consumable_data)
 
 
 func on_clean_up_room():

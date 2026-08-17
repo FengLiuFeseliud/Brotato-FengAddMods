@@ -1,6 +1,42 @@
 extends "res://singletons/run_data.gd"
 
 
+const ALL_SECONDARY_STATS = [
+	"consumable_heal",
+	"xp_gain",
+	"effect_pickup_range",
+	"items_price",
+	"explosion_size",
+	"explosion_damage",
+	"effect_bouncing",
+	"effect_piercing_damage",
+	"damage_against_bosses",
+	"structure_attack_speed",
+	"structure_range",
+	"burning_cooldown_reduction",
+	"burning_spread",
+	"knockback",
+	"chance_double_gold",
+	"free_rerolls",
+	"trees",
+	"number_of_enemies",
+	"enemy_speed",
+	"reroll_price",
+
+	"hp_start_wave"
+]
+
+
+const ALL_ITEM_DEBUFF = [
+	"lose_hp_per_second",
+	"no_heal",
+	"extra_enemies_next_wave",
+	"minimum_weapon_cooldowns",
+	"hp_cap",
+	"lock_current_weapons"
+]
+
+
 var effect_add_stat_after_change = Keys.generate_hash("add_stat_after_change")
 var effect_add_stat_cap = Keys.generate_hash("add_stat_cap")
 var effect_shop_item_count = Keys.generate_hash("shop_item_count")
@@ -11,12 +47,23 @@ var effect_apply_item_not_add = Keys.generate_hash("apply_item_not_add")
 var effect_item_merge = Keys.generate_hash("item_merge")
 var effect_random_curse = Keys.generate_hash("random_curse")
 var effect_wave_elites_spawn = Keys.generate_hash("wave_elites_spawn")
+var effect_apply_item_not_add_all_debuff = Keys.generate_hash("apply_item_not_add_all_debuff")
 
 
 var levels = Keys.generate_hash("levels")
 
 
 var stat_after_change_wave_value_count = {}
+var all_secondary_stats_hashs = []
+var all_item_debuff_hashs = []
+
+
+func _ready() -> void :
+	for secondary_stat in ALL_SECONDARY_STATS:
+		all_secondary_stats_hashs.append(Keys.generate_hash(secondary_stat))
+
+	for item_debuff in ALL_ITEM_DEBUFF:
+		all_item_debuff_hashs.append(Keys.generate_hash(item_debuff))
 
 
 func wave_elites_spawn(player_data) -> void :
@@ -328,12 +375,42 @@ func remove_currency(value: int, player_index: int) -> void :
 		return
 
 	remove_stat(effects[0][0], int(ceil(value / float(effects[0][1]))), player_index)
- 
+
+
+func remove_all_item_debuff_effects(effects: Array):
+	for index in range(effects.size() - 1, -1, -1):
+		var effect = effects[index]
+		var effect_key_hash = effect.key_hash
+
+		if effect_key_hash in all_item_debuff_hashs:
+			effects.remove(index)
+			continue
+		
+		var effect_value = effect.value
+		if not effect_key_hash in all_secondary_stats_hashs and not "stat_" in effect.key:
+			continue
+
+		if Keys.items_price_hash == effect_key_hash and effect_value > 0:
+			effects.remove(index)
+			continue
+
+		if Keys.enemy_speed_hash == effect_key_hash and effect_value > 0:
+			effects.remove(index)
+			continue
+
+		if Keys.reroll_price_hash == effect_key_hash and effect_value > 0:
+			effects.remove(index)
+			continue
+
+		if effect_value < 0:
+			effects.remove(index)
 
 
 func apply_item_effects(item_data: ItemParentData, player_index: int) -> void :
 	var old_effects = item_data.effects.duplicate()
 	var new_effects = item_data.effects.duplicate()
+
+	# 固定修改效果
 	for effect in RunData.get_player_effect(effect_apply_item_not_add, player_index):
 		for index in range(new_effects.size() - 1, -1, -1):
 			var item_effect = new_effects[index]
@@ -341,10 +418,12 @@ func apply_item_effects(item_data: ItemParentData, player_index: int) -> void :
 				continue
 
 			if not effect[2]:
+				# 删除效果
 				new_effects.remove(index)
 				continue
 			
 			var modified_effect = item_effect.duplicate()
+			# 效果属性反转
 			if effect[1] > 0 and modified_effect.value < 0:
 				modified_effect.value = abs(item_effect.value)
 
@@ -353,6 +432,11 @@ func apply_item_effects(item_data: ItemParentData, player_index: int) -> void :
 
 			new_effects[index] = modified_effect
 			continue
+
+	# 概率删除全部负面效果
+	var effects = RunData.get_player_effect(effect_apply_item_not_add_all_debuff, player_index)
+	if effects.size() > 0 and not effects[0][1] and Utils.get_chance_success(effects[0][0] / 100.0):
+		remove_all_item_debuff_effects(new_effects)
 	
 	item_data.effects = new_effects
 	.apply_item_effects(item_data, player_index)

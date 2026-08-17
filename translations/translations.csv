@@ -12,6 +12,7 @@ THE_GLITCH,The Glitch,漏洞
 CREEPER,Creeper,苦力怕
 THE_ANGLER,The Angler,钓鱼佬
 SPEED_RUNNER,Speed Runner,速通者
+CRATE_GOBBLER,Crate Gobbler,箱子吞吞怪
 WEAPON_KEY,Key,钥匙
 EFFECT_TWO_HAND_WEAPON_SLOT_LIMIT,Only has two hands (so can only hold two weapons),只有两只手所以只拿两个武器
 ITEM_RAT_KING_RATZILLA,Rat Subject,鼠族臣民
@@ -84,7 +85,11 @@ EFFECT_ALL_WAVE_ELITES_SPAWN,"+1 extra Boss spawns in all waves",所有波次额
 EFFECT_BOSS_DIED_RESPAWN,"When a Boss dies, it respawns with {1} increased all stats",Boss 死亡后将重生并且各向属性强化 {1}
 EFFECT_ITEM_BOUGHT_SPAWN_BOSS,"Buying {0} adds a {1} (+{2} per {0}) chance to spawn +1 extra Boss in the next wave",购买{0}后下场敌袭{1}（+{2} {0}数量）概率额外生成一个 Boss
 EFFECT_APPLY_NOT_EXTRA_ENEMIES,"When acquiring an item, ignore effects that spawn special enemies in the next wave",获取道具时无视下场敌袭出现特殊怪效果
-EFFECT_KILLED_ALL_BOSS_WAVE_END,,杀死波次所有 Boss 时将直接通过当前波次
-EFFECT_ADD_XP_GOLD_FROM_WAVE_TIME,,通过波次时按剩余秒数获取材料与经验，每秒获取{0}（{1}）
-EFFECT_WEAPON_KILLED_LOOT,,每击杀{0}敌人获取一个箱子，每波增加{1}所需击杀数（上限{2}击杀数）
-LOOT_BOX,,获取到的箱子：{0}
+EFFECT_KILLED_ALL_BOSS_WAVE_END,"Killing all Bosses in the wave instantly clears the current wave",杀死波次所有 Boss 时将直接通过当前波次
+EFFECT_ADD_XP_GOLD_FROM_WAVE_TIME,"Clearing a wave grants Materials and XP based on remaining seconds: {0} ({1}) per second",通过波次时按剩余秒数获取材料与经验，每秒获取{0}（{1}）
+EFFECT_WEAPON_KILLED_LOOT,"Grants a Crate every {0} kills (+{1} kills required per wave, up to {2} kills)",每击杀{0}敌人获取一个箱子，每波增加{1}所需击杀数（上限{2}击杀数）
+LOOT_BOX,"Crates Acquired: {0}",获取到的箱子：{0}
+EFFECT_AUTO_OPEN_BOX,,你将自动获取箱子中的道具
+EFFECT_CHANCE_APPLY_ITEM_NOT_ADD_ALL_DEBUFF_FROM_BOX,,从箱子获取道具时有{0}概率无视道具所有负面效果
+EFFECT_PICKED_UP_CONSUMABLE_ADD_SIZE,,当捡起消耗品时你的角色与武器将放大{0}，直至敌袭结束
+EFFECT_BOX_STAT,"{0}{1} when picking up a crate",捡起一个箱子时{0}{1}
