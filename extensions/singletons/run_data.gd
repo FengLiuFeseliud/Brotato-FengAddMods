@@ -460,6 +460,9 @@ func apply_item_effects(item_data: ItemParentData, player_index: int) -> void :
 		if effect[5]:
 			fengliu_remove_item_debuff(new_effects)
 
+		if effect[0] == Keys.empty_hash:
+			continue
+
 		for index in range(new_effects.size() - 1, -1, -1):
 			var item_effect = new_effects[index]
 			if effect[0] != item_effect.key_hash:
