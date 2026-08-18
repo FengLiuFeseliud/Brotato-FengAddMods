@@ -20,7 +20,6 @@ var _can_not_moving_explosio = false
 var _clean_up_room_timer
 var _exploding_on_clean_up_room
 var _scale_value = 1 
-var _dynamic_scale = false
 
 
 static func get_dynamic_chance(init_chance: int, add_chance: int = 0, stat_count: int = 0) -> float:
@@ -50,9 +49,6 @@ func _ready() -> void :
         _can_not_moving_explosio = false
         _exploding_on_clean_up_room = effects[0].exploding_on_clean_up_room
 
-    effects = RunData.get_player_effect(effect_picked_up_consumable_add_size, player_index)
-    if effects.size() > 0: 
-        _dynamic_scale = true
 
 func get_player_ui() -> PlayerUIElements:
     if _player_ui == null:
@@ -71,9 +67,6 @@ func _physics_process(delta: float) -> void :
 
     if _clean_up_room_timer != null and _clean_up_room_timer.try_loop(delta) > 0:
         on_clean_up_room()
-
-    if _dynamic_scale:
-        scale = Vector2(_scale_value, _scale_value)
     
 
 func take_damage(value: int, args: TakeDamageArgs) -> Array:
@@ -101,6 +94,14 @@ func on_regen_hit_protection() -> void:
         get_player_ui().update_hit_protection_count(self, _hit_protection)
 
 
+func set_scale_size(gain: float) -> void:
+    _scale_value += _scale_value * (gain / 100.0)
+    if _scale_value > 20:
+        _scale_value = 20
+
+    scale = Vector2(_scale_value, _scale_value)
+
+
 func on_consumable_picked_up(consumable_data: ConsumableData) -> void :
     var effects = RunData.get_player_effect(effect_consumable_stats, player_index)
     if effects.size() > 0:
@@ -115,7 +116,7 @@ func on_consumable_picked_up(consumable_data: ConsumableData) -> void :
 
     effects = RunData.get_player_effect(effect_picked_up_consumable_add_size, player_index)
     if effects.size() > 0: 
-        _scale_value +=  _scale_value * (effects[0][0] / 100.0)
+        set_scale_size(effects[0][0])
 
     .on_consumable_picked_up(consumable_data)
 
