@@ -24,12 +24,12 @@ func fengliu_gain_random_killed_stat(effect: NullEffect) -> void:
 	emit_signal("tracked_value_updated", random_val)
 
 
-func wave_gain(effect: NullEffect) -> int:
+func fengliu_wave_gain(effect: NullEffect) -> int:
 	var kill_count_value = effect.value + RunData.current_wave * effect.gain_value
 	return int(effect.cap_value if kill_count_value > effect.cap_value else kill_count_value)
 
 
-func spawn_consumable(spawn_pos: Vector2) -> void:
+func fengliu_spawn_consumable(spawn_pos: Vector2) -> void:
 	var main = get_tree().current_scene
 
 	var consumable = main.get_node_from_pool(main._consumable_pool_id, main._consumables_container)
@@ -53,11 +53,11 @@ func spawn_consumable(spawn_pos: Vector2) -> void:
 
 
 func fengliu_weapon_killed_loot(effect: NullEffect, spawn_pos: Vector2) -> void:
-	var kill_count_value = wave_gain(effect)
+	var kill_count_value = fengliu_wave_gain(effect)
 	if _enemies_killed_this_wave_count % kill_count_value != 0:
 		return
 
-	spawn_consumable(spawn_pos)
+	fengliu_spawn_consumable(spawn_pos)
 
 
 func on_killed_something(_thing_killed: Node, hitbox: Hitbox) -> void :
@@ -65,6 +65,7 @@ func on_killed_something(_thing_killed: Node, hitbox: Hitbox) -> void :
 
 	for effect in effects:
 		if effect.custom_key_hash == effect_fengliu_gain_random_killed_stat:
+			# 杀敌获取随机值主要属性
 			fengliu_gain_random_killed_stat(effect)
 
 		if effect.custom_key_hash == effect_fengliu_weapon_killed_loot:

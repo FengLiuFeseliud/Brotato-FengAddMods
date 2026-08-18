@@ -48,102 +48,7 @@ static func get_dynamic_value_to_effect(effect: Array, player_index: int) -> int
 	return int(get_dynamic_value_from_gain(get_dynamic_value(effect[1], effect[2], effect[3]), RunData.get_stat(effect[4], player_index), effect[5]))
 
 
-func on_gold_picked_up(gold: Node, player_index: int) -> void :
-	if gold.already_picked_up:
-		.on_gold_picked_up(gold, player_index)
-		return
-	
-	if not player_index >= 0:
-		.on_gold_picked_up(gold, player_index)
-		return
-		
-	var effects = RunData.get_player_effect(effect_fengliu_can_add_chance_stat_damage_when_pickup_gold, player_index)
-	if effects.size() == 0:
-		.on_gold_picked_up(gold, player_index)
-		return
-	
-	effects[0] = get_dynamic_chance_to_effect(effects[0], player_index)
-	handle_stat_damages(effects, player_index)
-	.on_gold_picked_up(gold, player_index)
-
-
-func respawn_boss(enemy: Enemy, effect: Array) -> void:
-	var gain_value = effect[1] / 100.0
-	var old_health = enemy.max_stats.health
-	var old_damage = enemy.max_stats.damage
-	var old_speed = enemy.max_stats.speed
-	var global_position = enemy.global_position
-	var filename = enemy.filename
-
-	yield(get_tree().create_timer(1.0), "timeout")
-
-	if _cleaning_up:
-		return
-
-	var args = _entity_spawner.SpawnEntityArgs.new(global_position, EntityType.BOSS)
-	var new_boss = _entity_spawner.spawn_entity(load(filename), args)
-
-	var new_health = old_health + int(old_health * gain_value)
-	if new_health < 30:
-		new_health = 30
-
-	new_boss.max_stats.health = new_health
-	new_boss.current_stats.health = new_health
-		
-	var new_damage = old_damage + int(old_damage * gain_value)
-	new_boss.max_stats.damage = new_damage
-	new_boss.current_stats.damage = new_damage
-
-	var new_speed = old_speed + int(old_speed * gain_value)
-	new_boss.max_stats.damage = new_speed
-	new_boss.current_stats.damage = new_speed
-
-
-func _on_enemy_died(enemy: Enemy, args: Entity.DieArgs) -> void:
-	for player in _get_shuffled_live_players(): 
-		var effects = RunData.get_player_effect(effect_fengliu_killed_all_boss_wave_end, player.player_index)
-		if effects.size() > 0 and _entity_spawner.get_nb_bosses_and_elites_alive() == 1 and enemy is Boss:
-			._on_enemy_died(enemy, args)
-			yield(get_tree().create_timer(1.0), "timeout")
-			if _cleaning_up:
-				return
-				
-			_on_WaveTimer_timeout()
-			return
-
-		effects = RunData.get_player_effect(effect_fengliu_boss_died_respawn, player.player_index)
-		if enemy is Boss and effects.size() > 0:
-			respawn_boss(enemy, effects[0])
-	
-	if _cleaning_up and args.enemy_killed_by_player or enemy is Boss:
-		._on_enemy_died(enemy, args)
-		return
-	
-	for player in _get_shuffled_live_players():
-		var player_index = player.player_index
-		var effects = RunData.get_player_effect(effect_fengliu_can_add_chance_stat_damage_when_death, player_index)
-		if effects.size() > 0:
-			effects[0] = get_dynamic_chance_to_effect(effects[0], player_index)
-			handle_stat_damages(effects, player_index)
-				
-	._on_enemy_died(enemy, args)
-
-
-func on_levelled_up(player_index: int) -> void :
-	.on_levelled_up(player_index)
-	
-	var effects = RunData.get_player_effect(effect_fengliu_random_stats_on_level_up, player_index)
-	for effect in effects:
-		var stat_hash = effect[0]
-		var random_add_value = get_dynamic_value_to_effect(effect, player_index) 
-		if effect[4]:
-			RunData.add_stat(stat_hash, random_add_value, player_index)
-			return
-			
-		RunData.add_stat(stat_hash, random_add_value, player_index)
-
-	
-func add_weapon(player_index: int) -> WeaponData:
+func fengliu_add_weapon(player_index: int) -> WeaponData:
 	var effects = RunData.get_player_effects(player_index)
 	var weapons = RunData.get_player_weapons(player_index)
 
@@ -165,7 +70,7 @@ func add_weapon(player_index: int) -> WeaponData:
 	return RunData.add_weapon(upgrades, player_index)
 
 
-func spawm_effect_fengliu_structure(effect: Array, consumable: Node, player_index: int) -> void:
+func fengliu_picke_consumable_drop_structure(effect: Array, consumable: Node, player_index: int) -> void:
 	var stat = Utils.get_stat(effect[0], player_index)
 	var structure_count = effect[1] + int(stat / effect[2])
 	for _index in range(structure_count):
@@ -174,66 +79,27 @@ func spawm_effect_fengliu_structure(effect: Array, consumable: Node, player_inde
 		queue.push_back([EntityType.STRUCTURE, effect[3].scene, pos, effect[3]])
 
 
-func get_box_cost(effect: Array) -> int:
+func fengliu_get_box_cost(effect: Array) -> int:
     return int(effect[1] * (1.0 + (max(1, RunData.current_wave) - 1) * effect[2]))
-		
 
-func on_consumable_picked_up(consumable: Node, player_index: int) -> void :
-	var effects = RunData.get_player_effect(effect_fengliu_picke_consumable_drop_structure, player_index)
-	if effects.size() > 0:
-		spawm_effect_fengliu_structure(effects[0], consumable, player_index)
 
-	if consumable.consumable_data.my_id_hash != Keys.consumable_item_box_hash and consumable.consumable_data.my_id_hash != Keys.consumable_legendary_item_box_hash:
-		.on_consumable_picked_up(consumable, player_index)
-		return 
+func fengliu_apply_item_not_add_all_debuff(item_data: ItemParentData, player_index: int) -> void:
+	var old_effects = item_data.effects.duplicate()
+	var new_effects = item_data.effects.duplicate()
+	RunData.remove_all_item_debuff_effects(new_effects)
 
-	effects = RunData.get_player_effect(effect_fengliu_auto_open_box, player_index)
-	if effects.size() > 0:
-		# 禁止 UI 显示
-		consumable.consumable_data.to_be_processed_at_end_of_wave = false
-		# 开箱
-		var box_item_data = ItemService.process_item_box(consumable.consumable_data, RunData.current_wave, player_index)
-		
-		# 概率删除箱子道具全部负面效果
-		effects = RunData.get_player_effect(effect_fengliu_apply_item_not_add_all_debuff, player_index)
-		if effects.size() > 0 and effects[0][1] and Utils.get_chance_success(effects[0][0] / 100.0):
-			var old_effects = box_item_data.effects.duplicate()
-			var new_effects = box_item_data.effects.duplicate()
-			RunData.remove_all_item_debuff_effects(new_effects)
-
-			box_item_data.effects = new_effects
-			RunData.add_item(box_item_data, player_index)
-			box_item_data.effects = old_effects
-		else:
-			RunData.add_item(box_item_data, player_index)
-
-	effects = RunData.get_player_effect(effect_fengliu_picked_box_cost_gold, player_index)
-	if effects.size() == 0:
-		.on_consumable_picked_up(consumable, player_index)
-		return
-
-	# 花费开箱
-	var effect = effects[0]
-	var cost_gold = get_box_cost(effect)
-
-	if cost_gold > RunData.get_player_gold(player_index):
-		consumable.consumable_data = ItemService.get_consumable_for_tier(Tier.COMMON)
-		.on_consumable_picked_up(consumable, player_index)
-		return
-
-	RunData.remove_gold(cost_gold, player_index)
-	if add_weapon(player_index) == null and effect[3] > 0:
-		for _i in range(effect[3]):
-			RunData.add_stat(RunData.get_random_primary_stats(), 1, player_index)
-
-	.on_consumable_picked_up(consumable, player_index)
+	item_data.effects = new_effects
+	RunData.add_item(item_data, player_index)
+	item_data.effects = old_effects
 
 
 func fengliu_add_xp_gold_from_wave_time(effect: Array, player_index: int):
 	var add_value = effect[1]
 	if effect[0] != Keys.stat_levels_hash:
+		# 按主要属性加算
 		add_value += RunData.get_stat(effect[0], player_index) * effect[2]
 	else:
+		# 按等级加算
 		add_value += RunData.get_player_level(player_index * effect[2])
 
 	var gold = int(_wave_timer.time_left * add_value)
@@ -241,10 +107,184 @@ func fengliu_add_xp_gold_from_wave_time(effect: Array, player_index: int):
 	RunData.add_xp(gold, player_index)
 
 
+func fengliu_random_stats_on_level_up(effect: Array, player_index: int) -> void:
+	var stat_hash = effect[0]
+	var random_add_value = get_dynamic_value_to_effect(effect, player_index) 
+	if effect[4]:
+		RunData.add_stat(stat_hash, random_add_value, player_index)
+		return
+			
+	RunData.add_stat(stat_hash, random_add_value, player_index)
+
+
+func fengliu_respawn_boss(enemy: Enemy, effect: Array) -> void:
+	var gain_value = effect[1] / 100.0
+	# 记录旧 boss 属性
+	var old_health = enemy.max_stats.health
+	var old_damage = enemy.max_stats.damage
+	var old_speed = enemy.max_stats.speed
+	var global_position = enemy.global_position
+	var filename = enemy.filename
+
+	yield(get_tree().create_timer(1.0), "timeout")
+
+	if _cleaning_up:
+		return
+
+	# 生成新 Boss
+	var args = _entity_spawner.SpawnEntityArgs.new(global_position, EntityType.BOSS)
+	var new_boss = _entity_spawner.spawn_entity(load(filename), args)
+
+	# 重设新 Boss 属性
+	var new_health = old_health + int(old_health * gain_value)
+	if new_health < 30:
+		new_health = 30
+
+	new_boss.max_stats.health = new_health
+	new_boss.current_stats.health = new_health
+		
+	var new_damage = old_damage + int(old_damage * gain_value)
+	new_boss.max_stats.damage = new_damage
+	new_boss.current_stats.damage = new_damage
+
+	var new_speed = old_speed + int(old_speed * gain_value)
+	new_boss.max_stats.damage = new_speed
+	new_boss.current_stats.damage = new_speed
+
+
+# 扩展材料捡起后
+func on_gold_picked_up(gold: Node, player_index: int) -> void :
+	if gold.already_picked_up:
+		.on_gold_picked_up(gold, player_index)
+		return
+	
+	if not player_index >= 0:
+		.on_gold_picked_up(gold, player_index)
+		return
+		
+	var effects = RunData.get_player_effect(effect_fengliu_can_add_chance_stat_damage_when_pickup_gold, player_index)
+	if effects.size() == 0:
+		.on_gold_picked_up(gold, player_index)
+		return
+	
+	# 随机造成伤害
+	effects[0] = get_dynamic_chance_to_effect(effects[0], player_index)
+	handle_stat_damages(effects, player_index)
+	.on_gold_picked_up(gold, player_index)
+
+
+# 扩展怪物死亡后
+func _on_enemy_died(enemy: Enemy, args: Entity.DieArgs) -> void:
+	for player in _get_shuffled_live_players(): 
+		var effects = RunData.get_player_effect(effect_fengliu_killed_all_boss_wave_end, player.player_index)
+		if effects.size() > 0 and _entity_spawner.get_nb_bosses_and_elites_alive() == 1 and enemy is Boss:
+			# 若有可以杀死所有 boss 跳过波次的玩家存活时跳过波次
+			._on_enemy_died(enemy, args)
+			yield(get_tree().create_timer(1.0), "timeout")
+			if _cleaning_up:
+				return
+				
+			_on_WaveTimer_timeout()
+			return
+
+		# 所有 boss 跳过波次优先级大于重新生成死亡的 boss
+		effects = RunData.get_player_effect(effect_fengliu_boss_died_respawn, player.player_index)
+		if enemy is Boss and effects.size() > 0:
+			# 重新生成死亡的 boss
+			fengliu_respawn_boss(enemy, effects[0])
+	
+	if _cleaning_up and args.enemy_killed_by_player or enemy is Boss:
+		._on_enemy_died(enemy, args)
+		return
+	
+	for player in _get_shuffled_live_players():
+		var player_index = player.player_index
+		var effects = RunData.get_player_effect(effect_fengliu_can_add_chance_stat_damage_when_death, player_index)
+		if effects.size() > 0:
+			# 随机造成伤害
+			effects[0] = get_dynamic_chance_to_effect(effects[0], player_index)
+			handle_stat_damages(effects, player_index)
+				
+	._on_enemy_died(enemy, args)
+
+
+# 扩展升级提升
+func on_levelled_up(player_index: int) -> void :
+	.on_levelled_up(player_index)
+	
+	var effects = RunData.get_player_effect(effect_fengliu_random_stats_on_level_up, player_index)
+	for effect in effects:
+		# 随机升级获取属性
+		fengliu_random_stats_on_level_up(effect, player_index)
+		
+
+# 扩展拾取消耗品
+func on_consumable_picked_up(consumable: Node, player_index: int) -> void :
+	var effects = RunData.get_player_effect(effect_fengliu_picke_consumable_drop_structure, player_index)
+	if effects.size() > 0:
+		# 拾取消耗品生成构造物
+		fengliu_picke_consumable_drop_structure(effects[0], consumable, player_index)
+
+	if consumable.consumable_data.my_id_hash != Keys.consumable_item_box_hash and consumable.consumable_data.my_id_hash != Keys.consumable_legendary_item_box_hash:
+		# 判断为不是箱子
+		.on_consumable_picked_up(consumable, player_index)
+		return
+
+	if consumable.already_picked_up:
+		.on_consumable_picked_up(consumable, player_index)
+		return
+	
+	var picked_box_need_cost = false
+	var picked_box_cost_gold_effect = []
+	var cost_gold = 0
+	effects = RunData.get_player_effect(effect_fengliu_picked_box_cost_gold, player_index)
+	if effects.size() > 0:
+		# 花费开箱
+		picked_box_need_cost = true
+		picked_box_cost_gold_effect = effects[0]
+		cost_gold = fengliu_get_box_cost(picked_box_cost_gold_effect)
+
+	if picked_box_need_cost and cost_gold > RunData.get_player_gold(player_index):
+		consumable.consumable_data = ItemService.get_consumable_for_tier(Tier.COMMON)
+		.on_consumable_picked_up(consumable, player_index)
+		return
+
+	effects = RunData.get_player_effect(effect_fengliu_auto_open_box, player_index)
+	if effects.size() > 0:
+		# 自动开箱
+		# 跳过 UI 显示
+		consumable.consumable_data.to_be_processed_at_end_of_wave = false
+		# 开箱
+		var box_item_data = ItemService.process_item_box(consumable.consumable_data, RunData.current_wave, player_index)
+		
+		# 概率删除箱子道具全部负面效果
+		effects = RunData.get_player_effect(effect_fengliu_apply_item_not_add_all_debuff, player_index)
+		if effects.size() > 0 and effects[0][1] and Utils.get_chance_success(effects[0][0] / 100.0):
+			fengliu_apply_item_not_add_all_debuff(box_item_data, player_index)
+		else:
+			RunData.add_item(box_item_data, player_index)
+		# 箱子已捡起
+		consumable.already_picked_up = true
+
+	if not picked_box_need_cost:
+		.on_consumable_picked_up(consumable, player_index)
+		return
+
+	RunData.remove_gold(cost_gold, player_index)
+	# 花费开箱升级武器
+	if fengliu_add_weapon(player_index) == null and picked_box_cost_gold_effect[3] > 0:
+		for _i in range(picked_box_cost_gold_effect[3]):
+			RunData.add_stat(RunData.get_random_primary_stats(), 1, player_index)
+
+	.on_consumable_picked_up(consumable, player_index)
+
+
+# 扩展清理房间
 func clean_up_room():
 	for player_index in RunData.get_player_count():
 		var effects = RunData.get_player_effect(effect_fengliu_add_xp_gold_from_wave_time, player_index)
 		if effects.size() > 0:
+			# 波次结束后按剩余时间加材料与经验
 			fengliu_add_xp_gold_from_wave_time(effects[0], player_index)
 	
 	if not _end_wave_timer_timedout:
