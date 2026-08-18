@@ -86,7 +86,7 @@ func fengliu_get_box_cost(effect: Array) -> int:
 func fengliu_apply_item_not_add_all_debuff(item_data: ItemParentData, player_index: int) -> void:
 	var old_effects = item_data.effects.duplicate()
 	var new_effects = item_data.effects.duplicate()
-	RunData.remove_all_item_debuff_effects(new_effects)
+	RunData.fengliu_remove_all_item_debuff_effects(new_effects)
 
 	item_data.effects = new_effects
 	RunData.add_item(item_data, player_index)

@@ -7,17 +7,18 @@
 [ext_resource path="res://items/sets/precise/precise_set_data.tres" type="Resource" id=6]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/sets/dice/dice_set_data.tres" type="Resource" id=7]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/melee/key/effects/key_effects_0.tres" type="Resource" id=8]
+[ext_resource path="res://items/all/garden/garden_effect_1.tres" type="Resource" id=9]
 
 [resource]
 script = ExtResource( 1 )
-my_id = "weapon_key_3"
+my_id = "weapon_key_4"
 unlocked_by_default = true
 can_be_looted = true
 icon = ExtResource( 2 )
 name = "WEAPON_KEY"
 tier = 3
 value = 95
-effects = [ ExtResource( 8 )]
+effects = [ ExtResource( 8 ), ExtResource( 9 )]
 tracking_text = "loot_box"
 is_lockable = true
 unlock_codex_descr_after_get_it = 1

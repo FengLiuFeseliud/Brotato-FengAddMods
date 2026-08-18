@@ -5,11 +5,10 @@ const ALL_SECONDARY_STATS = [
 	"consumable_heal",
 	"xp_gain",
 	"effect_pickup_range",
-	"items_price",
 	"explosion_size",
 	"explosion_damage",
 	"effect_bouncing",
-	"effect_piercing_damage",
+	"piercing_damage",
 	"damage_against_bosses",
 	"structure_attack_speed",
 	"structure_range",
@@ -20,10 +19,19 @@ const ALL_SECONDARY_STATS = [
 	"free_rerolls",
 	"trees",
 	"number_of_enemies",
-	"enemy_speed",
-	"reroll_price",
 
-	"hp_start_wave"
+	"hp_start_wave",
+	"hp_start_next_wave"
+]
+
+
+const ALL_SECONDARY_ABS_DEBUFF_STATS = [
+	"items_price",
+	"reroll_price",
+	
+	"enemy_speed",
+	"enemy_damage",
+	"enemy_health"
 ]
 
 
@@ -49,6 +57,7 @@ var effect_fengliu_apply_item_not_add_all_debuff = Keys.generate_hash("fengliu_a
 
 var stat_after_change_wave_value_count = {}
 var all_secondary_stats_hashs = []
+var all_secondary_abs_debuff_stats_hashs = []
 var all_item_debuff_hashs = []
 
 
@@ -58,6 +67,9 @@ func _ready() -> void :
 
 	for item_debuff in ALL_ITEM_DEBUFF:
 		all_item_debuff_hashs.append(Keys.generate_hash(item_debuff))
+
+	for item_debuff in ALL_SECONDARY_ABS_DEBUFF_STATS:
+		all_secondary_abs_debuff_stats_hashs.append(Keys.generate_hash(item_debuff))
 
 
 func fengliu_wave_elites_spawn(player_data) -> void :
@@ -365,33 +377,72 @@ func remove_currency(value: int, player_index: int) -> void :
 	remove_stat(effects[0][0], int(ceil(value / float(effects[0][1]))), player_index)
 
 
-func remove_all_item_debuff_effects(effects: Array):
+func fengliu_remove_item_debuff(effects: Array) -> void:
 	for index in range(effects.size() - 1, -1, -1):
 		var effect = effects[index]
 		var effect_key_hash = effect.key_hash
 
 		if effect_key_hash in all_item_debuff_hashs:
 			effects.remove(index)
+
+	
+func fengliu_reversal_effect_value(new_effect, abs_value: bool) -> Array:
+	var modified_effect = new_effect.duplicate()
+	# 效果属性反转
+	if abs_value and modified_effect.value < 0:
+		modified_effect.value = abs(new_effect.value)
+
+	if not abs_value and modified_effect.value > 0:
+		modified_effect.value = -modified_effect.value
+
+	return modified_effect
+
+
+func fengliu_remove_all_secondary_stats(new_effects: Array, reversal: bool = true) -> void:
+	for index in range(new_effects.size() - 1, -1, -1):
+		var effect = new_effects[index]
+		var effect_key_hash = effect.key_hash
+
+		if not effect_key_hash in all_secondary_stats_hashs and not effect_key_hash in all_secondary_abs_debuff_stats_hashs:
 			continue
-		
+
 		var effect_value = effect.value
-		if not effect_key_hash in all_secondary_stats_hashs and not "stat_" in effect.key:
-			continue
+		if effect_key_hash in all_secondary_abs_debuff_stats_hashs:
+			if effect_value < 0:
+				continue
 
-		if Keys.items_price_hash == effect_key_hash and effect_value > 0:
-			effects.remove(index)
-			continue
-
-		if Keys.enemy_speed_hash == effect_key_hash and effect_value > 0:
-			effects.remove(index)
-			continue
-
-		if Keys.reroll_price_hash == effect_key_hash and effect_value > 0:
-			effects.remove(index)
+			if not reversal:
+				new_effects.remove(index)
+			else:
+				new_effects[index] = fengliu_reversal_effect_value(effect, false)
 			continue
 
 		if effect_value < 0:
-			effects.remove(index)
+			if not reversal:
+				new_effects.remove(index)
+			else:
+				new_effects[index] = fengliu_reversal_effect_value(effect, true)
+
+
+func fengliu_remove_all_stats(new_effects: Array, reversal: bool = false) -> void:
+	for index in range(new_effects.size() - 1, -1, -1):
+		var effect = new_effects[index]
+		var effect_value = effect.value
+
+		if not "stat_" in effect.key or effect_value > 0:
+			continue
+
+		if not reversal:
+			new_effects.remove(index)
+			continue
+
+		new_effects[index] = fengliu_reversal_effect_value(effect, true)
+
+
+func fengliu_remove_all_item_debuff_effects(effects: Array):
+	fengliu_remove_item_debuff(effects)
+	fengliu_remove_all_secondary_stats(effects)
+	fengliu_remove_all_stats(effects)
 
 
 func apply_item_effects(item_data: ItemParentData, player_index: int) -> void :
@@ -400,9 +451,18 @@ func apply_item_effects(item_data: ItemParentData, player_index: int) -> void :
 
 	# 固定修改效果
 	for effect in RunData.get_player_effect(effect_fengliu_apply_item_not_add, player_index):
+		if effect[3]:
+			fengliu_remove_all_stats(new_effects, effect[2])
+
+		if effect[4]:
+			fengliu_remove_all_secondary_stats(new_effects, effect[2])
+
+		if effect[5]:
+			fengliu_remove_item_debuff(new_effects)
+
 		for index in range(new_effects.size() - 1, -1, -1):
 			var item_effect = new_effects[index]
-			if effect[0] != item_effect.key_hash and not (effect[3] and "stat_" in item_effect.key):
+			if effect[0] != item_effect.key_hash:
 				continue
 
 			if not effect[2]:
@@ -410,21 +470,14 @@ func apply_item_effects(item_data: ItemParentData, player_index: int) -> void :
 				new_effects.remove(index)
 				continue
 			
-			var modified_effect = item_effect.duplicate()
 			# 效果属性反转
-			if effect[1] > 0 and modified_effect.value < 0:
-				modified_effect.value = abs(item_effect.value)
-
-			if effect[1] < 0 and modified_effect.value > 0:
-				modified_effect.value = -modified_effect.value
-
-			new_effects[index] = modified_effect
+			new_effects[index] = fengliu_reversal_effect_value(item_effect, effect[1] > 0)
 			continue
 
 	# 概率删除全部负面效果
 	var effects = RunData.get_player_effect(effect_fengliu_apply_item_not_add_all_debuff, player_index)
 	if effects.size() > 0 and not effects[0][1] and Utils.get_chance_success(effects[0][0] / 100.0):
-		remove_all_item_debuff_effects(new_effects)
+		fengliu_remove_all_item_debuff_effects(new_effects)
 	
 	item_data.effects = new_effects
 	.apply_item_effects(item_data, player_index)

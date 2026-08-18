@@ -58,7 +58,7 @@ ITEM_OAK_LOG,Oak Log,橡树原木
 ITEM_COBBLESTONE,Cobblestone,圆石
 ITEM_STICK,Stick,木棍
 STONE_PICKAXE,Stone Pickaxe,石镐
-EFFECT_STONE_CAN_DROP_ITEM,"Can mine stone, iron ore, lapis lazuli, emerald",可以挖掘石头，铁矿，青金石，绿宝石
+EFFECT_STONE_CAN_DROP_ITEM,"Can mine stone, iron ore, lapis lazuli, emerald",可以挖掘石头，铁矿，青金石
 ITEM_IRON_INGOT,Iron Ingot,铁锭
 IRON_PICKAXE,Iron Pickaxe,铁镐
 EFFECT_IRON_CAN_DROP_ITEM,"Can mine stone, iron ore, lapis lazuli, emerald, diamond",可以挖掘石头，铁矿，青金石，绿宝石，钻石
@@ -93,3 +93,5 @@ EFFECT_AUTO_OPEN_BOX,"You automatically collect items from Crates",你将自动�
 EFFECT_CHANCE_APPLY_ITEM_NOT_ADD_ALL_DEBUFF_FROM_BOX,"When acquiring an item from a Crate, {0} chance to ignore all negative effects",从箱子获取道具时有{0}概率无视道具所有负面效果
 EFFECT_PICKED_UP_CONSUMABLE_ADD_SIZE,"When you pick up a Consumable, your character and weapons increase in size by {0} until the end of the wave",当捡起消耗品时你的角色与武器将放大{0}，直至敌袭结束
 EFFECT_BOX_STAT,"{0}{1} when picking up a crate",捡起一个箱子时永久{0}{1}
+EFFECT_APPLY_ITEM_NOT_ALL_DEBUFF,"You ignore all negative effects on items (except Shackles)",你无视道具的所有负面效果（除了脚铐）
+EFFECT_APPLY_ITEM_ALL_SECONDERY_SATAS_REVERSAL,"When acquiring an item, all effects that decrease secondary stats increase them instead (secondary stats on the stat panel and all enemy-related stats)",获取道具时将所有负面次要属性效果改为正面次要属性效果（面板上的次要属性与所有敌人相关属性）

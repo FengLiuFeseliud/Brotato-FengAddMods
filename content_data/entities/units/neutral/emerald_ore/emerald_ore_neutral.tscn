@@ -17,7 +17,7 @@ script = ExtResource( 4 )
 number_of_hits_before_dying = 8
 drop_item = ExtResource( 5 )
 drop_item_weapon_id = "pickaxe"
-drop_item_tier = 1
+drop_item_tier = 2
 
 [node name="Sprite" parent="Animation" index="0"]
 position = Vector2( 0, -32 )

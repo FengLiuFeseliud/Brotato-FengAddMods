@@ -4,10 +4,11 @@
 
 [resource]
 script = ExtResource( 1 )
-key = "lose_hp_per_second"
-text_key = "EFFECT_APPLY_NOT_LOSE_HP"
-value = -1
+key = ""
+text_key = "EFFECT_APPLY_ITEM_NOT_ALL_DEBUFF"
+value = 0
 custom_key = "fengliu_stat_not_add"
 storage_method = 2
 effect_sign = 3
 custom_args = [  ]
+all_item_debuff = true
