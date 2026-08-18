@@ -34,7 +34,7 @@ func get_args(player_index: int) -> Array:
 	var args = .get_args(player_index)
 	
 	var add_stat = 0
-	if custom_key == "add_stat_cap":
+	if custom_key == "fengliu_add_stat_cap":
 		var change_stat_count = 0
 		var change_stat_effect = RunData.get_player_effect(change_stat_hash, player_index)
 		if change_stat_effect.size() > 0:

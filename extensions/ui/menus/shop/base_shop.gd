@@ -1,14 +1,17 @@
 extends "res://ui/menus/shop/base_shop.gd"
 
 
-var shop_item_count = Keys.generate_hash("shop_item_count")
-var shop_item_count_price = Keys.generate_hash("effect_stat_item_price")
-var shop_items_count_price = Keys.generate_hash("shop_items_count_price")
-var stats_stop = Keys.generate_hash("stats_stop")
-var stats_buy_item = Keys.generate_hash("stats_buy_item")
-var effect_item_bought_spawn_boss = Keys.generate_hash("item_bought_spawn_boss")
+var effect_fengliu_shop_item_count = Keys.generate_hash("fengliu_shop_item_count")
+var effect_fengliu_stats_stop = Keys.generate_hash("fengliu_stats_stop")
+var effect_fengliu_stats_buy_item = Keys.generate_hash("fengliu_stats_buy_item")
+var effect_fengliu_item_bought_spawn_boss = Keys.generate_hash("fengliu_item_bought_spawn_boss")
+
+
+var fengliu_shop_items_count_price = Keys.generate_hash("fengliu_shop_items_count_price")
+
 
 var shop_items_price = {}
+
 
 static func get_dynamic_value(stat_min_value: int, stat_max_value: int, stat_no_zero: bool) -> int:
 	var dynamic_value = int(floor(rand_range(stat_min_value, stat_max_value + 1)))
@@ -45,15 +48,15 @@ func set_item_count(player_locked_items: Array, item_count: int, player_index: i
 func set_items_price_from_shop_item_count(price: int, player_index: int) -> void:
 	var effects = RunData.get_player_effects(player_index)
 	var new_price = price * (ItemService.NB_SHOP_ITEMS - _shop_items[player_index].size())
-	if not effects.has(shop_items_count_price):
-		effects[shop_items_count_price] = 0
+	if not effects.has(fengliu_shop_items_count_price):
+		effects[fengliu_shop_items_count_price] = 0
 
-	effects[Keys.items_price_hash] = effects[Keys.items_price_hash] + abs(effects[shop_items_count_price]) + new_price
-	effects[shop_items_count_price] = new_price
+	effects[Keys.items_price_hash] = effects[Keys.items_price_hash] + abs(effects[fengliu_shop_items_count_price]) + new_price
+	effects[fengliu_shop_items_count_price] = new_price
 
 
 func fill_shop_items(player_locked_items: Array, player_index: int, just_entered_shop: bool = false) -> void:
-	var effects = RunData.get_player_effect(shop_item_count, player_index)
+	var effects = RunData.get_player_effect(effect_fengliu_shop_item_count, player_index)
 	if effects.size() == 0:
 		.fill_shop_items(player_locked_items, player_index, just_entered_shop)
 		return
@@ -102,11 +105,11 @@ func add_item_bought_elite(effect: Array, shop_item: ShopItem, player_index: int
 
 
 func on_shop_item_bought(shop_item: ShopItem, player_index: int) -> void :
-	for effect in RunData.get_player_effect(effect_item_bought_spawn_boss, player_index):
+	for effect in RunData.get_player_effect(effect_fengliu_item_bought_spawn_boss, player_index):
 		if shop_item.item_data.my_id_hash == effect[0]:
 			add_item_bought_elite(effect, shop_item, player_index)
 
-	var effects = RunData.get_player_effect(stats_stop, player_index)
+	var effects = RunData.get_player_effect(effect_fengliu_stats_stop, player_index)
 	if effects.size() == 0 or not effects[0][2]:
 		.on_shop_item_bought(shop_item, player_index)
 		return
@@ -117,7 +120,7 @@ func on_shop_item_bought(shop_item: ShopItem, player_index: int) -> void :
 		.on_shop_item_bought(shop_item, player_index)
 		return
 
-	for effect in RunData.get_player_effect(stats_buy_item, player_index):
+	for effect in RunData.get_player_effect(effect_fengliu_stats_buy_item, player_index):
 		RunData.add_stat(effect[0], effect[1], player_index)
 
 	var effect = effects[0]

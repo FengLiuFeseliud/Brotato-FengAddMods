@@ -37,20 +37,14 @@ const ALL_ITEM_DEBUFF = [
 ]
 
 
-var effect_add_stat_after_change = Keys.generate_hash("add_stat_after_change")
-var effect_add_stat_cap = Keys.generate_hash("add_stat_cap")
-var effect_shop_item_count = Keys.generate_hash("shop_item_count")
-var effect_picked_box_cost_gold_get_stat_or_weapon = Keys.generate_hash("picked_box_cost_gold_get_stat_or_weapon")
-var stats_stop = Keys.generate_hash("stats_stop")
-var effect_stat_not_add = Keys.generate_hash("stat_not_add")
-var effect_apply_item_not_add = Keys.generate_hash("apply_item_not_add")
-var effect_item_merge = Keys.generate_hash("item_merge")
-var effect_random_curse = Keys.generate_hash("random_curse")
-var effect_wave_elites_spawn = Keys.generate_hash("wave_elites_spawn")
-var effect_apply_item_not_add_all_debuff = Keys.generate_hash("apply_item_not_add_all_debuff")
-
-
-var levels = Keys.generate_hash("levels")
+var effect_fengliu_add_stat_after_change = Keys.generate_hash("fengliu_add_stat_after_change")
+var effect_fengliu_shop_item_count = Keys.generate_hash("fengliu_shop_item_count")
+var effect_fengliu_stats_stop = Keys.generate_hash("fengliu_stats_stop")
+var effect_fengliu_apply_item_not_add = Keys.generate_hash("fengliu_stat_not_add")
+var effect_fengliu_item_merge = Keys.generate_hash("fengliu_item_merge")
+var effect_fengliu_random_curse = Keys.generate_hash("fengliu_random_curse")
+var effect_fengliu_wave_elites_spawn = Keys.generate_hash("fengliu_wave_elites_spawn")
+var effect_fengliu_apply_item_not_add_all_debuff = Keys.generate_hash("fengliu_apply_item_not_add_all_debuff")
 
 
 var stat_after_change_wave_value_count = {}
@@ -66,7 +60,7 @@ func _ready() -> void :
 		all_item_debuff_hashs.append(Keys.generate_hash(item_debuff))
 
 
-func wave_elites_spawn(player_data) -> void :
+func fengliu_wave_elites_spawn(player_data) -> void :
 	var possible_elites = ItemService.get_elites_from_zone(current_zone)
 	var new_elite_id = Utils.get_rand_element(possible_elites).my_id_hash
 	player_data.effects[Keys.extra_enemies_next_wave_hash].append(["res://zones/common/elite/group_elite.tres", 1, new_elite_id])
@@ -79,8 +73,9 @@ func on_wave_start(timer: WaveTimer) -> void :
 	.on_wave_start(timer)
 
 	for player_data in players_data:
-		if player_data.effects.has(effect_wave_elites_spawn) and player_data.effects[effect_wave_elites_spawn].size() > 0:
-			wave_elites_spawn(player_data)
+		if player_data.effects.has(effect_fengliu_wave_elites_spawn) and player_data.effects[effect_fengliu_wave_elites_spawn].size() > 0:
+			fengliu_wave_elites_spawn(player_data)
+
 
 func get_item_count(item_hash: int, player_index: int) -> int:
 	var count = 0
@@ -199,12 +194,12 @@ func auto_curse(curse_item_effect: Array, player_index: int) -> void:
 func on_wave_end() -> void :
 	.on_wave_end()
 	for player_index in get_player_count():
-		var effects = get_player_effect(effect_item_merge, player_index)
+		var effects = get_player_effect(effect_fengliu_item_merge, player_index)
 		if effects.size() > 0:
 			for item_merge_effect in effects:
 				try_item_merge(item_merge_effect, player_index)
 
-		effects = get_player_effect(effect_random_curse, player_index)
+		effects = get_player_effect(effect_fengliu_random_curse, player_index)
 		if effects.size() > 0:
 			auto_curse(effects[0], player_index)
 		
@@ -294,7 +289,7 @@ func check_stat(stat_hsh: int, value: int, player_index: int) -> void :
 		return 
 	
 	remove_stat_set(stat_hsh, int(abs(value)), player_index)
-	var effects = RunData.get_player_effect(effect_add_stat_after_change, player_index)
+	var effects = RunData.get_player_effect(effect_fengliu_add_stat_after_change, player_index)
 	if effects.size() == 0:
 		return 
 	
@@ -303,7 +298,7 @@ func check_stat(stat_hsh: int, value: int, player_index: int) -> void :
 	
 
 func stat_after_change_wave_count(stat_effect: Array, value: int, player_index: int):
-	for effect in RunData.get_player_effect(effect_add_stat_after_change, player_index):
+	for effect in RunData.get_player_effect(effect_fengliu_add_stat_after_change, player_index):
 		var max_wave_count = effect[4]
 		
 		var stat_hsh = stat_effect[0]
@@ -325,26 +320,19 @@ func stat_after_change_wave_count(stat_effect: Array, value: int, player_index: 
 	return value
 
 
-func reset_value(stat_hsh: int, value: int, player_index: int, remove: bool) -> int:
-	for effect in get_player_effect(effect_stat_not_add, player_index):
-		if effect[0] == stat_hsh and (value > 0 and !remove) or (value < 0 and remove):
-			return 0
-	
-	return value
-
 func add_stat(stat_hsh: int, value: int, player_index: int) -> void :
 	check_stat(stat_hsh, value, player_index)
-	.add_stat(stat_hsh, reset_value(stat_hsh, value, player_index, false), player_index)
+	.add_stat(stat_hsh, value, player_index)
 
 
 func remove_stat(stat_hsh: int, value: int, player_index: int) -> void :
 	check_stat(stat_hsh, -value, player_index)
-	.remove_stat(stat_hsh, reset_value(stat_hsh, value, player_index, true), player_index)
+	.remove_stat(stat_hsh, value, player_index)
 
 
-## shop_item_count - 商店道具数效果 保留锁定数
+## fengliu_shop_item_count - 商店道具数效果 保留锁定数
 func lock_player_shop_item(item_data: ItemParentData, wave_value: int, player_index: int) -> void :
-	var effects = RunData.get_player_effect(effect_shop_item_count, player_index)
+	var effects = RunData.get_player_effect(effect_fengliu_shop_item_count, player_index)
 	if effects.size() == 0:
 		.lock_player_shop_item(item_data, wave_value, player_index)
 		return
@@ -356,7 +344,7 @@ func lock_player_shop_item(item_data: ItemParentData, wave_value: int, player_in
 
 
 func get_player_currency(player_index: int) -> int:
-	var effects = get_player_effect(stats_stop, player_index)
+	var effects = get_player_effect(effect_fengliu_stats_stop, player_index)
 	if effects.size() == 0:
 		return .get_player_currency(player_index)
 
@@ -365,7 +353,7 @@ func get_player_currency(player_index: int) -> int:
 
 
 func remove_currency(value: int, player_index: int) -> void :
-	var effects = get_player_effect(stats_stop, player_index)
+	var effects = get_player_effect(effect_fengliu_stats_stop, player_index)
 	if effects.size() == 0:
 		.remove_currency(value, player_index)
 		return
@@ -411,7 +399,7 @@ func apply_item_effects(item_data: ItemParentData, player_index: int) -> void :
 	var new_effects = item_data.effects.duplicate()
 
 	# 固定修改效果
-	for effect in RunData.get_player_effect(effect_apply_item_not_add, player_index):
+	for effect in RunData.get_player_effect(effect_fengliu_apply_item_not_add, player_index):
 		for index in range(new_effects.size() - 1, -1, -1):
 			var item_effect = new_effects[index]
 			if effect[0] != item_effect.key_hash and not (effect[3] and "stat_" in item_effect.key):
@@ -434,7 +422,7 @@ func apply_item_effects(item_data: ItemParentData, player_index: int) -> void :
 			continue
 
 	# 概率删除全部负面效果
-	var effects = RunData.get_player_effect(effect_apply_item_not_add_all_debuff, player_index)
+	var effects = RunData.get_player_effect(effect_fengliu_apply_item_not_add_all_debuff, player_index)
 	if effects.size() > 0 and not effects[0][1] and Utils.get_chance_success(effects[0][0] / 100.0):
 		remove_all_item_debuff_effects(new_effects)
 	

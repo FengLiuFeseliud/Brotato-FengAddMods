@@ -1,8 +1,8 @@
 extends Turret
 
 
-var turret_prioriy_attack_highest_hp = Keys.generate_hash("turret_prioriy_attack_highest_hp")
-var turret_copy = Keys.generate_hash("turret_copy")
+var effect_fengliu_turret_prioriy_attack_highest_hp = Keys.generate_hash("fengliu_turret_prioriy_attack_highest_hp")
+var effect_fengliu_turret_copy = Keys.generate_hash("fengliu_turret_copy")
 
 var _hp_current_target = false
 var _entity_spawner = null
@@ -20,10 +20,10 @@ static func get_dynamic_chance(init_chance: int, add_chance: int = 100, stat_cou
 
 func _ready():
     for player_index in RunData.get_player_count():
-        if RunData.get_player_effect(turret_prioriy_attack_highest_hp, player_index).size() > 0:
+        if RunData.get_player_effect(effect_fengliu_turret_prioriy_attack_highest_hp, player_index).size() > 0:
             _hp_current_target = true
 
-        var effects = RunData.get_player_effect(turret_copy, player_index)
+        var effects = RunData.get_player_effect(effect_fengliu_turret_copy, player_index)
         if effects.size() > 0:
             _turret_copy_effects.append([effects[0], player_index])
 

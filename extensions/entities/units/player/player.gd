@@ -1,14 +1,14 @@
 extends Player
 
 
-var effect_consumable_stats = Keys.generate_hash("consumable_stats")
-var effect_box_stats = Keys.generate_hash("box_stats")
-var effect_stat_hit_protection = Keys.generate_hash("stat_hit_protection")
-var effect_regen_hit_protection = Keys.generate_hash("regen_hit_protection")
-var effect_temp_stats_on_hit_protection = Keys.generate_hash("temp_stats_on_hit_protection")
-var effect_not_moving_explosion = Keys.generate_hash("not_moving_explosion")
-var effect_can_one_not_moving_explosion = Keys.generate_hash("can_one_not_moving_explosion")
-var effect_picked_up_consumable_add_size = Keys.generate_hash("picked_up_consumable_add_size")
+var effect_fengliu_consumable_stats = Keys.generate_hash("fengliu_consumable_stats")
+var effect_fengliu_effect_box_stats = Keys.generate_hash("fengliu_box_stats")
+var effect_fengliu_effect_stat_hit_protection = Keys.generate_hash("fengliu_stat_hit_protection")
+var effect_fengliu_regen_hit_protection = Keys.generate_hash("fengliu_regen_hit_protection")
+var effect_fengliu_temp_stats_on_hit_protection = Keys.generate_hash("fengliu_temp_stats_on_hit_protection")
+var effect_fengliu_not_moving_explosion = Keys.generate_hash("fengliu_not_moving_explosion")
+var effect_fengliu_can_one_not_moving_explosion = Keys.generate_hash("fengliu_can_one_not_moving_explosion")
+var effect_fengliu_picked_up_consumable_add_size = Keys.generate_hash("fengliu_picked_up_consumable_add_size")
 
 
 var _max_hit_protection = 0
@@ -31,18 +31,18 @@ static func get_dynamic_chance(init_chance: int, add_chance: int = 0, stat_count
 
 
 func _ready() -> void :
-    var effects = RunData.get_player_effect(effect_stat_hit_protection, player_index)
+    var effects = RunData.get_player_effect(effect_fengliu_effect_stat_hit_protection, player_index)
     if effects.size() > 0:
         var effect = effects[0]
         _hit_protection += int(Utils.get_stat(effect[0], player_index) / effect[1])
         _max_hit_protection = _hit_protection
     
-    effects = RunData.get_player_effect(effect_regen_hit_protection, player_index)
+    effects = RunData.get_player_effect(effect_fengliu_regen_hit_protection, player_index)
     if effects.size() > 0:
         _regen_hit_protection_timer = FixedTimer.new(effects[0][2])
         _regen_hit_protection = effects[0]
 
-    effects = RunData.get_player_effect(effect_not_moving_explosion, player_index)
+    effects = RunData.get_player_effect(effect_fengliu_not_moving_explosion, player_index)
     if effects.size() > 0:
         _not_moving_explosion_timer = FixedTimer.new(effects[0].wait_time)
         _clean_up_room_timer = FixedTimer.new(1)
@@ -74,7 +74,7 @@ func take_damage(value: int, args: TakeDamageArgs) -> Array:
         if _regen_hit_protection_timer.is_stopped():
             _regen_hit_protection_timer.start()
 
-        for effect in RunData.get_player_effect(effect_temp_stats_on_hit_protection, player_index):
+        for effect in RunData.get_player_effect(effect_fengliu_temp_stats_on_hit_protection, player_index):
             TempStats.add_stat(effect[0], effect[1], player_index)
 
     return .take_damage(value, args)
@@ -103,18 +103,18 @@ func set_scale_size(gain: float) -> void:
 
 
 func on_consumable_picked_up(consumable_data: ConsumableData) -> void :
-    var effects = RunData.get_player_effect(effect_consumable_stats, player_index)
+    var effects = RunData.get_player_effect(effect_fengliu_consumable_stats, player_index)
     if effects.size() > 0:
         for effect in effects:
             RunData.add_stat(effect[0], effect[1], player_index)
 
-    effects = RunData.get_player_effect(effect_box_stats, player_index)
+    effects = RunData.get_player_effect(effect_fengliu_effect_box_stats, player_index)
     if effects.size() > 0 and (consumable_data.my_id_hash == Keys.consumable_item_box_hash 
             or consumable_data.my_id_hash == Keys.consumable_legendary_item_box_hash):
         for effect in effects:
             RunData.add_stat(effect[0], effect[1], player_index)
 
-    effects = RunData.get_player_effect(effect_picked_up_consumable_add_size, player_index)
+    effects = RunData.get_player_effect(effect_fengliu_picked_up_consumable_add_size, player_index)
     if effects.size() > 0: 
         set_scale_size(effects[0][0])
 
@@ -131,7 +131,7 @@ func on_clean_up_room():
     var main = Utils.get_scene_node()
     if main._entity_spawner.get_nb_bosses_and_elites_alive() == 0:
         main.clean_up_room()
-    elif RunData.get_player_effect(effect_can_one_not_moving_explosion, player_index).size() > 0:
+    elif RunData.get_player_effect(effect_fengliu_can_one_not_moving_explosion, player_index).size() > 0:
         if not main._end_wave_timer.is_stopped():
             main._end_wave_timer.stop()
         main._cleaning_up = false
@@ -142,7 +142,7 @@ func on_clean_up_room():
         var _dmg_taken = take_damage(int(Utils.get_stat(Keys.stat_max_hp_hash, player_index)), _take_damage_args)
 
 func on_moving_explosion_timeout():
-    var effects = RunData.get_player_effect(effect_not_moving_explosion, player_index)
+    var effects = RunData.get_player_effect(effect_fengliu_not_moving_explosion, player_index)
     if effects.size() > 0 and not effects[0] is int:
         RunData.handle_explode_effect(effects[0].key_hash, global_position, player_index)
 

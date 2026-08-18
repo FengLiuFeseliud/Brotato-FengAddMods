@@ -1,7 +1,7 @@
 extends "res://singletons/item_service.gd"
 
 
-var can_all_drop_box = Keys.generate_hash("can_all_drop_box")
+var effect_fengliu_can_all_drop_box = Keys.generate_hash("fengliu_can_all_drop_box")
 
 
 static func get_dynamic_chance(init_chance: int, add_chance: int = 0, stat_count: int = 0) -> float:
@@ -23,7 +23,7 @@ func get_consumable_to_drop(unit: Unit, item_chance: float) -> ConsumableData:
     var effect = null
     var player_index = 0
     for _player_index in RunData.get_player_count():
-        var effects = RunData.get_player_effect(can_all_drop_box, _player_index)
+        var effects = RunData.get_player_effect(effect_fengliu_can_all_drop_box, _player_index)
         if effects.size() == 0:
             continue
             

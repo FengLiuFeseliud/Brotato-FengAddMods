@@ -6,7 +6,7 @@
 
 [resource]
 script = ExtResource( 1 )
-key = "not_moving_explosion"
+key = "fengliu_not_moving_explosion"
 text_key = "EFFECT_NOT_MOVING_EXPLOSION_TO_CLEAN_UP_ROOM"
 value = 1
 custom_key = ""

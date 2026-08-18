@@ -1,8 +1,8 @@
 extends Weapon
 
 
-var effect_gain_random_killed_stat = Keys.generate_hash("gain_random_killed_stat")
-var effect_weapon_killed_loot = Keys.generate_hash("weapon_killed_loot")
+var effect_fengliu_gain_random_killed_stat = Keys.generate_hash("fengliu_gain_random_killed_stat")
+var effect_fengliu_weapon_killed_loot = Keys.generate_hash("fengliu_weapon_killed_loot")
 
 
 var wave_gain = Keys.generate_hash("wave_gain")
@@ -15,7 +15,7 @@ static func get_dynamic_value(stat_min_value: int, stat_max_value: int, stat_no_
 	return dynamic_value
 
 
-func gain_random_killed_stat(effect: NullEffect) -> void:
+func fengliu_gain_random_killed_stat(effect: NullEffect) -> void:
 	if _enemies_killed_this_wave_count % effect.value != 0:
 		return
 	
@@ -52,7 +52,7 @@ func spawn_consumable(spawn_pos: Vector2) -> void:
 	emit_signal("tracked_value_updated", 1)
 
 
-func weapon_killed_loot(effect: NullEffect, spawn_pos: Vector2) -> void:
+func fengliu_weapon_killed_loot(effect: NullEffect, spawn_pos: Vector2) -> void:
 	var kill_count_value = wave_gain(effect)
 	if _enemies_killed_this_wave_count % kill_count_value != 0:
 		return
@@ -64,9 +64,9 @@ func on_killed_something(_thing_killed: Node, hitbox: Hitbox) -> void :
 	.on_killed_something(_thing_killed, hitbox)
 
 	for effect in effects:
-		if effect.custom_key_hash == effect_gain_random_killed_stat:
-			gain_random_killed_stat(effect)
+		if effect.custom_key_hash == effect_fengliu_gain_random_killed_stat:
+			fengliu_gain_random_killed_stat(effect)
 
-		if effect.custom_key_hash == effect_weapon_killed_loot:
-			weapon_killed_loot(effect, _thing_killed.global_position)
+		if effect.custom_key_hash == effect_fengliu_weapon_killed_loot:
+			fengliu_weapon_killed_loot(effect, _thing_killed.global_position)
 

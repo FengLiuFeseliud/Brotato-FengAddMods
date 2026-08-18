@@ -1,6 +1,6 @@
 extends WaveManager
 
-var effect_minecraft = Keys.generate_hash("minecraft")
+var effect_fengliu_minecraft = Keys.generate_hash("fengliu_minecraft")
 var minecreft_zone_data = []
 
 
@@ -20,7 +20,7 @@ func init_minecreft_zone(zone_data: ZoneData) -> void:
 
 func init(p_wave_timer: Timer, zone_data: ZoneData, wave_data: Resource) -> void :
     for player_index in RunData.get_player_count():
-        if RunData.get_player_effect(effect_minecraft, player_index).size() == 0:
+        if RunData.get_player_effect(effect_fengliu_minecraft, player_index).size() == 0:
             continue
         
         init_minecreft_zone(zone_data)

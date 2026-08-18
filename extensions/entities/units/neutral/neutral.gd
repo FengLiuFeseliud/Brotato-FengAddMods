@@ -4,13 +4,13 @@ extends Neutral
 const DROP_STICK_ITEM = preload("res://mods-unpacked/FengLiu-FengAddMods/content_data/items/stick/stick_data.tres")
 const DROP_OAK_ITEM = preload("res://mods-unpacked/FengLiu-FengAddMods/content_data/items/oak_log/oak_log_data.tres")
 
-var effect_minecraft = Keys.generate_hash("minecraft")
+var effect_fengliu_minecraft = Keys.generate_hash("fengliu_minecraft")
 var in_minecraft = false
 
 
 func _ready():
     for player_index in RunData.get_player_count():
-        if RunData.get_player_effect(effect_minecraft, player_index).size() == 0:
+        if RunData.get_player_effect(effect_fengliu_minecraft, player_index).size() == 0:
             continue
         
         in_minecraft = true
