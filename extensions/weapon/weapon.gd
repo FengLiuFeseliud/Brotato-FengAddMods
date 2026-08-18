@@ -57,6 +57,7 @@ func fengliu_weapon_killed_loot(effect: NullEffect, spawn_pos: Vector2) -> void:
 	if _enemies_killed_this_wave_count % kill_count_value != 0:
 		return
 
+	# 生成箱子
 	fengliu_spawn_consumable(spawn_pos)
 
 
@@ -69,5 +70,6 @@ func on_killed_something(_thing_killed: Node, hitbox: Hitbox) -> void :
 			fengliu_gain_random_killed_stat(effect)
 
 		if effect.custom_key_hash == effect_fengliu_weapon_killed_loot:
+			# 杀敌获取箱子
 			fengliu_weapon_killed_loot(effect, _thing_killed.global_position)
 
