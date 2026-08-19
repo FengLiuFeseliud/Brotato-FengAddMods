@@ -1,19 +1,89 @@
 # Brotato-FengAddMods
 
-steam 创意工坊: https://steamcommunity.com/sharedfiles/filedetails/?id=3768330140
+为《Brotato》（土豆兄弟）新增大量角色、武器与物品的内容型 Mod。
+
+- Steam 创意工坊：<https://steamcommunity.com/sharedfiles/filedetails/?id=3768330140>
+
+## Mod 信息
+
+| 项目 | 内容 |
+| --- | --- |
+| 名称 | FengAddMods |
+| 命名空间 | FengLiu |
+| 作者 | FengLiu |
+| 版本 | 1.2.5 |
+| 依赖 | Darkly77-ContentLoader、Darkly77-Brotils |
+| 兼容游戏版本 | 1.1.13.1 |
+| 兼容 Mod Loader | 6.2.0 |
+| 标签 | Characters、Items |
+
+## 安装
+
+1. 通过 Steam 创意工坊订阅本 Mod（推荐）。
+2. 或手动将本目录放入游戏的 mods 目录，并确保已安装依赖 Mod：`Darkly77-ContentLoader` 与 `Darkly77-Brotils`。
 
 ## 角色
 
-鼠王
-骰子
-吝啬鬼
-被厌恶者
-高压锅
+本 Mod 共新增 14 名可玩角色：
+
+| 中文名 | 英文名 | 简要特性 |
+| --- | --- | --- |
+| 鼠王 | Rat King | 只有两只手（只能拿两个武器）；初始携带宠物「鼠族臣民」，会锁定并攻击 Boss；无法放置建筑 |
+| 吝啬鬼 | Miser | 进入商店时随机减少道具数量、改变剩余道具价格；刷新价格机制特殊；敌人金币掉落减少 |
+| 骰子 | Dice | 运气主题；升级时随机获得属性（不含 0）；生命回复/吸血下降，运气上限提升 |
+| 高压锅 | Cooker | 无法持有武器；拾取消耗品时爆炸并对区域造成元素伤害；护甲 +5；用元素伤害代替材料购买道具；波次结束时材料转化为元素伤害 |
+| 被厌恶者 | The Despised | 商店为空；所有果子掉落为箱子；捡箱子需花费材料（随波次膨胀），武器无法升级后随机获得属性；波次结束不自动拾取消耗品 |
+| 标本 | Specimen | 受击保护与闪避主题；攻速、移速有加成/惩罚 |
+| 咒魔 | Curse Fiend | 诅咒主题；材料不足时可用血量购买道具；购买道具获得诅咒，诅咒可强化武器 |
+| 主服务器 | Main Server | 炮塔/工程主题；炮塔优先攻击血量最高的敌人、可复制炮塔、建筑加射程；只能拿一个武器；无法治疗 |
+| 史蒂夫 | Steve | 生成 Minecraft 世界；只能使用近战武器；可挖矿 |
+| 漏洞 | The Glitch | 无视道具的所有负面效果（脚铐除外）；可将负面效果反转为正面 |
+| 苦力怕 | Creeper | 爆炸主题；站立不动一段时间后爆炸并直接清场（失败则死亡）；无法使用武器、建筑与宠物 |
+| 钓鱼佬 | The Angler | Boss 主题；所有波次额外生成 Boss；Boss 死亡后重生并强化；商店保底刷出诱饵 |
+| 速通者 | Speed Runner | 所有波次额外生成 Boss；杀光场上 Boss 直接清场；按波次剩余时间获得材料与经验 |
+| 箱子吞吞怪 | Crate Gobbler | 自动开启箱子；拾取消耗品时体型增大；拾取箱子回复生命；波次结束不自动拾取消耗品 |
 
 ## 武器
 
-六面枪
+| 中文名 | 英文名 | 类型 |
+| --- | --- | --- |
+| 六面枪 | Six Sided Gun | 远程（每射击 10 次随机发射 1-6 发、6 种子弹类型中随机的弹丸） |
+| 花园钥匙 | Key | 近战 |
+| 木镐 | Wood Pickaxe | 近战（可挖掘石头） |
+| 石镐 | Stone Pickaxe | 近战（可挖掘石头、铁矿、青金石） |
+| 铁镐 | Iron Pickaxe | 近战（可挖掘石头、铁矿、青金石、绿宝石、钻石） |
+| 钻镐 | Diamond Pickaxe | 近战（可挖掘石头、铁矿、青金石、绿宝石、钻石、黑曜石） |
 
 ## 物品
 
-鼠族臣民
+| 中文名 | 英文名 | 说明 |
+| --- | --- | --- |
+| 鼠族臣民 | Rat Subject（Ratzilla） | 鼠王的专属宠物，会锁定并攻击 Boss、贴近目标 |
+| 橡树原木 | Oak Log | Minecraft 合成材料 |
+| 木棍 | Stick | Minecraft 合成材料 |
+| 圆石 | Cobblestone | Minecraft 合成材料 |
+| 铁锭 | Iron Ingot | Minecraft 合成材料 |
+| 钻石 | Diamond | Minecraft 合成材料 |
+| 青金石 | Lapis Lazuli | 似乎可以用来强化什么？ |
+| 绿宝石 | Emerald | 找到村民的话，似乎可以用来交换？ |
+| 黑曜石 | Obsidian | Minecraft 合成材料 |
+| 附魔台 | Enchanting Table | 进入商店时消耗等级与材料，随机诅咒道具与武器 |
+
+## 套装
+
+| 名称 | 说明 |
+| --- | --- |
+| 骰子套装 | Dice Set（共 5 个等级效果） |
+
+## 特殊内容
+
+- **Minecraft 世界区域（zone_minecreft）**：使用「史蒂夫」角色时会生成专属世界，包含石头、铁矿、青金石矿、绿宝石矿、钻石矿、黑曜石，以及可交易的村民等中立单位。
+
+## 致谢
+
+- 感谢原版《Brotato》及 Mod 加载器作者。
+- 依赖：Darkly77 的 ContentLoader 与 Brotils。
+
+## 关于 AI
+
+- 代码注释与 README 由 DeepSeek v4 pro 生成。

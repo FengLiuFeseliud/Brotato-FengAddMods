@@ -16,45 +16,61 @@ var effect_fengliu_apply_item_not_add_all_debuff = Keys.generate_hash("fengliu_a
 var _is_speedrun_ending: bool = false
 
 
-static func get_dynamic_chance(stat_count: int, init_chance: int, add_chance: int) -> int:
+# 计算动态概率
+static func fengliu_get_dynamic_chance(stat_count: int, init_chance: int, add_chance: int) -> int:
+	# 基础概率 + 属性数 * 每点加成
 	var dynamic_chance = int(init_chance + (stat_count * (add_chance / 100.0)))
+	# 上限 100
 	if dynamic_chance > 100:
 		return 100
 		
 	return dynamic_chance
 
 
-static func get_dynamic_chance_to_effect(effect: Array, player_index: int) -> Array:
+# 刷新效果动态概率
+static func fengliu_get_dynamic_chance_to_effect(effect: Array, player_index: int) -> Array:
+	# 根据属性刷新概率
 	var stat = Utils.get_stat(effect[4], player_index)
-	effect[2] = get_dynamic_chance(stat, effect[-1], effect[-2])
+	effect[2] = fengliu_get_dynamic_chance(stat, effect[-1], effect[-2])
 	return effect
 	
 
-static func get_dynamic_value(stat_min_value: int, stat_max_value: int, stat_no_zero: bool) -> int:
+# 随机生成动态值
+static func fengliu_get_dynamic_value(stat_min_value: int, stat_max_value: int, stat_no_zero: bool) -> int:
+	# 范围内随机取值
 	var dynamic_value = int(floor(rand_range(stat_min_value, stat_max_value + 1)))
+	# 为 0 时重新取值
 	if dynamic_value == 0 and stat_no_zero:
-		return get_dynamic_value(stat_min_value, stat_max_value, stat_no_zero)
+		return fengliu_get_dynamic_value(stat_min_value, stat_max_value, stat_no_zero)
 	return dynamic_value
 
 
-static func get_dynamic_value_from_gain(dynamic_value: int, stat_gain: int, stat_gain_value: int) -> int:
+# 计算动态值倍率
+static func fengliu_get_dynamic_value_from_gain(dynamic_value: int, stat_gain: int, stat_gain_value: int) -> int:
+	# 按属性增益放大
 	return dynamic_value * (1 + (int(stat_gain / stat_gain_value)))
 	
 
-static func get_dynamic_value_to_effect(effect: Array, player_index: int) -> int:
+# 计算效果动态值
+static func fengliu_get_dynamic_value_to_effect(effect: Array, player_index: int) -> int:
+	# 无增益直接随机
 	if effect[5] == 0:
-		return get_dynamic_value(effect[1], effect[2], effect[3])
+		return fengliu_get_dynamic_value(effect[1], effect[2], effect[3])
 	
-	return int(get_dynamic_value_from_gain(get_dynamic_value(effect[1], effect[2], effect[3]), RunData.get_stat(effect[4], player_index), effect[5]))
+	# 按属性增益放大随机值
+	return int(fengliu_get_dynamic_value_from_gain(fengliu_get_dynamic_value(effect[1], effect[2], effect[3]), RunData.get_stat(effect[4], player_index), effect[5]))
 
 
+# 添加武器
 func fengliu_add_weapon(player_index: int) -> WeaponData:
 	var effects = RunData.get_player_effects(player_index)
 	var weapons = RunData.get_player_weapons(player_index)
 
+	# 武器槽未满直接添加
 	if weapons.size() < effects[Keys.weapon_slot_hash]:
 		return RunData.add_weapon(weapons[randi() % weapons.size()], player_index)
 
+	# 槽满则升级一把已有武器
 	var upgrades = null
 	for weapon in weapons:
 		upgrades = weapon.upgrades_into
@@ -70,29 +86,39 @@ func fengliu_add_weapon(player_index: int) -> WeaponData:
 	return RunData.add_weapon(upgrades, player_index)
 
 
+# 拾取消耗品生成构造物
 func fengliu_picke_consumable_drop_structure(effect: Array, consumable: Node, player_index: int) -> void:
+	# 计算生成数量
 	var stat = Utils.get_stat(effect[0], player_index)
 	var structure_count = effect[1] + int(stat / effect[2])
+	# 逐个生成构造物
 	for _index in range(structure_count):
 		var pos = _entity_spawner.get_spawn_pos_in_area(consumable.global_position, 200)
 		var queue = _entity_spawner.queues_to_spawn_structures[player_index]
 		queue.push_back([EntityType.STRUCTURE, effect[3].scene, pos, effect[3]])
 
 
+# 计算开箱花费
 func fengliu_get_box_cost(effect: Array) -> int:
+    # 基础花费随波次递增
     return int(effect[1] * (1.0 + (max(1, RunData.current_wave) - 1) * effect[2]))
 
 
+# 移除道具全部负面效果
 func fengliu_apply_item_not_add_all_debuff(item_data: ItemParentData, player_index: int) -> void:
+	# 备份原效果
 	var old_effects = item_data.effects.duplicate()
 	var new_effects = item_data.effects.duplicate()
 	RunData.fengliu_remove_all_item_debuff_effects(new_effects)
 
+	# 移除负面后添加道具
 	item_data.effects = new_effects
 	RunData.add_item(item_data, player_index)
+	# 还原效果
 	item_data.effects = old_effects
 
 
+# 按波次剩余时间结算材料与经验
 func fengliu_add_xp_gold_from_wave_time(effect: Array, player_index: int):
 	var add_value = effect[1]
 	if effect[0] != Keys.stat_levels_hash:
@@ -102,14 +128,17 @@ func fengliu_add_xp_gold_from_wave_time(effect: Array, player_index: int):
 		# 按等级加算
 		add_value += RunData.get_player_level(player_index * effect[2])
 
+	# 按剩余时间结算材料与经验
 	var gold = int(_wave_timer.time_left * add_value)
 	RunData.add_gold(gold, player_index)
 	RunData.add_xp(gold, player_index)
 
 
+# 升级随机增加属性
 func fengliu_random_stats_on_level_up(effect: Array, player_index: int) -> void:
 	var stat_hash = effect[0]
-	var random_add_value = get_dynamic_value_to_effect(effect, player_index) 
+	# 随机计算属性值
+	var random_add_value = fengliu_get_dynamic_value_to_effect(effect, player_index) 
 	if effect[4]:
 		RunData.add_stat(stat_hash, random_add_value, player_index)
 		return
@@ -117,6 +146,7 @@ func fengliu_random_stats_on_level_up(effect: Array, player_index: int) -> void:
 	RunData.add_stat(stat_hash, random_add_value, player_index)
 
 
+# 复活 boss
 func fengliu_respawn_boss(enemy: Enemy, effect: Array) -> void:
 	var gain_value = effect[1] / 100.0
 	# 记录旧 boss 属性
@@ -126,6 +156,7 @@ func fengliu_respawn_boss(enemy: Enemy, effect: Array) -> void:
 	var global_position = enemy.global_position
 	var filename = enemy.filename
 
+	# 等待后生成
 	yield(get_tree().create_timer(1.0), "timeout")
 
 	if _cleaning_up:
@@ -168,7 +199,7 @@ func on_gold_picked_up(gold: Node, player_index: int) -> void :
 		return
 	
 	# 随机造成伤害
-	effects[0] = get_dynamic_chance_to_effect(effects[0], player_index)
+	effects[0] = fengliu_get_dynamic_chance_to_effect(effects[0], player_index)
 	handle_stat_damages(effects, player_index)
 	.on_gold_picked_up(gold, player_index)
 
@@ -202,7 +233,7 @@ func _on_enemy_died(enemy: Enemy, args: Entity.DieArgs) -> void:
 		var effects = RunData.get_player_effect(effect_fengliu_can_add_chance_stat_damage_when_death, player_index)
 		if effects.size() > 0:
 			# 随机造成伤害
-			effects[0] = get_dynamic_chance_to_effect(effects[0], player_index)
+			effects[0] = fengliu_get_dynamic_chance_to_effect(effects[0], player_index)
 			handle_stat_damages(effects, player_index)
 				
 	._on_enemy_died(enemy, args)

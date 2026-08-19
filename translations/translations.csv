@@ -21,19 +21,19 @@ EFFECT_RATZILLA_BOX_TEXT,Ratzilla stays closer to its target,鼠斯拉会更加�
 WEAPON_CLASS_DICE,Dice,骰子
 SIX_SIDED_GUN,Six Sided Gun,六面枪
 EFFECT_RANDOM_PROJECTILES_TEXT,Every 10th shot fires 1-6 projectiles of 6 random bullet types (Projectile traits scale with weapon tier),每射击10次随机1至6弹丸数并且弹丸从6种子弹类型中随机（子弹特性会随武器提升）
-EFFECT_RANDOM_COOLDOWN_DAMAGE_TEXT,More projectiles increase shooting cooldown and reduce damage (Damage / Projectiles),弹丸数越多射击伤害冷却越慢，越多伤害越低（伤害 /弹丸数）
-EFFECT_GIN_RANDOM_KILLED_STAT,Gain {1} to {2} {3} for every {0} enemies killed with this weapon during a wave,使用该武器在敌袭中每击杀{2}名敌人便会{3}至{4}{1}
-EFFECT_ADD_CHANCE_DEAL_DMG_WHEN_PICKUP_GOLD,{0} ({1}) chance to deal {2} ({3}) damage to a random enemy when picking up a material,拾取材料时有{0}（{1}）概率对随机1名敌人造成{2} （{3}） 伤害
-EFFECT_ADD_CHANCE_DEAL_DMG_WHEN_DEATH,{0} ({1}) chance to deal {2} ({3}) damage to a random enemy when an enemy dies,敌人死亡时有{0} ({1}) 概率对随机1名敌人造成{2} ({3}) 伤害
+EFFECT_RANDOM_COOLDOWN_DAMAGE_TEXT,More projectiles increase shooting cooldown and reduce damage (Damage / Projectiles),弹丸数越多射击伤害冷却越慢，越多伤害越低（伤害/弹丸数）
+EFFECT_GIN_RANDOM_KILLED_STAT,Gain {3} to {4} {1} for every {2} enemies killed with this weapon during a wave,使用该武器在敌袭中每击杀{2}名敌人便会{3}至{4}{1}
+EFFECT_ADD_CHANCE_DEAL_DMG_WHEN_PICKUP_GOLD,{0} ({1}) chance to deal {2} ({3}) damage to a random enemy when picking up a material,拾取材料时有{0}（{1}）概率对随机1名敌人造成{2}（{3}）伤害
+EFFECT_ADD_CHANCE_DEAL_DMG_WHEN_DEATH,{0} ({1}) chance to deal {2} ({3}) damage to a random enemy when an enemy dies,敌人死亡时有{0}（{1}）概率对随机1名敌人造成{2}（{3}）伤害
 LEVELS,levels,等级
-EFFECT_ADD_STAT_CAP,{2} has a cap +{3} {2} cap for every {1} {0} [{4}],"{2}存在上限，每{1}{0}增加{3}{2}上限 [{4}]"  
-EFFECT_RANDOM_STAT_ON_LEVEL_UP_NO_ZERO,{0} to {1} {2} on level up (excluding 0),升级时有{0}至{1}{2}(不包含0)
-EFFECT_RANDOM_STAT_ON_LEVEL_UP_FROM_GAIN_NO_ZERO,On level up gain {0} to {1} {2} (excluding 0) effect increases for every {4} {3} [{5}],"升级时有{0}至{1}{2}（不包含0，每{4}{3}效果升级 [{5}]"
+EFFECT_ADD_STAT_CAP,{2} has a cap +{3} {2} cap for every {1} {0} [{4}],"{2}存在上限，每{1}{0}增加{3}{2}上限[{4}]"
+EFFECT_RANDOM_STAT_ON_LEVEL_UP_NO_ZERO,{0} to {1} {2} on level up (excluding 0),升级时有{0}至{1}{2}（不包含0）
+EFFECT_RANDOM_STAT_ON_LEVEL_UP_FROM_GAIN_NO_ZERO,On level up gain {0} to {1} {2} (excluding 0) effect increases for every {4} {3} [{5}],"升级时有{0}至{1}{2}（不包含0，每{4}{3}效果升级）[{5}]"
 EFFECT_RANDOM_STAT_ON_LEVEL_UP,{0} to {1} {2} on level up,升级时有{0}至{1}{2}
-EFFECT_ADD_STAT_AFTER_REMOVE_CHANGE,{3} {2} permanently for every {1} {0} lost [{5}],每损失{1}{0}时永久增加{3}{2} [{5}]
-EFFECT_ADD_GAIN_STAT_AFTER_REMOVE_CHANGE,{1} {0} grants +{2} Modification Increase {3} permanently [{5}],每损失{1}{0}时永久增加{2}的修改增加{3} [{5}]
-EFFECT_ADD_GAIN_STAT_AFTER_REMOVE_CHANGE_WAVE_MAX,{1} {0} grants +{2} Modification Increase {3} permanently (Max {4} per wave) [{5}],"每损失{1}{0}时永久增加{2}的修改增加{3}，每波上限{4} [{5}]"
-EFFECT_RANDOM_SHOP_ITEM_COUNT_PRICE,-0 to 3 items in the shop upon entering,"商店道具数随机减少{1}至{2}每减少一个道具剩余的道具{3}道具价格，但是可锁定道具上限为{4}"
+EFFECT_ADD_STAT_AFTER_REMOVE_CHANGE,{3} {2} permanently for every {1} {0} lost [{5}],每损失{1}{0}时永久增加{3}{2}[{5}]
+EFFECT_ADD_GAIN_STAT_AFTER_REMOVE_CHANGE,{1} {0} grants +{2} Modification Increase {3} permanently [{5}],每损失{1}{0}时永久增加{2}的修改增加{3}[{5}]
+EFFECT_ADD_GAIN_STAT_AFTER_REMOVE_CHANGE_WAVE_MAX,{1} {0} grants +{2} Modification Increase {3} permanently (Max {4} per wave) [{5}],"每损失{1}{0}时永久增加{2}的修改增加{3}，每波上限{4}[{5}]"
+EFFECT_RANDOM_SHOP_ITEM_COUNT_PRICE,"Removes {1} to {2} items in the shop upon entering. Each removed item makes the remaining items cost {3}, and the lockable item cap is {4}","商店道具数随机减少{1}至{2}每减少一个道具剩余的道具{3}道具价格，但是可锁定道具上限为{4}"
 EFFECT_GOLD_LOW_SET_STAT_SHOP,"When lacking materials, use {1} substitute materials to purchase items ({1} replaces {0} materials)",材料不足时使用{1}替代材料购买道具（{1}替代{0}材料）
 EFFECT_THE_DESPISED_NO_SHOP,"Everyone hates you, so the shop will be empty",你被所有人厌恶商店不会有任何物品
 EFFECT_CAN_ALL_DROP_BOX,"All fruit drop as Crates, with a {0} ({1}) chance to drop as Red Crates",所有果子全部掉落为箱子有{0}（{1}）概率掉落为红箱子
@@ -43,14 +43,14 @@ EFFECT_CONSUMABLE_STAT,"{0}{1} when picking up a consumable",捡起一个消耗�
 EFFECT_RICE,Fruit Pilaf,水果焖饭
 EFFECT_PICKE_CONSUMABLE_DROP_STRUCTURE_GAIN,"When picking up a consumable, spawns {0} (+{2}) {3} dealing {4} ({5}) damage in an area",当捡起消耗品时产生{0}（{2}）个{3}，对一块区域造成{4}（{5}）伤害
 EFFECT_STAT_STOP,"Buy items with {1} instead of materials ({1} replaces {0} materials)",使用{1}替代材料购买道具（{1}替代{0}材料）
-EFFECT_STAT_HIT_PROTECTION,"+1 hit protection for every {0} {1} [{2}]",每持有{0}点{1}获取一次抵消伤害的机会 [{2}]
+EFFECT_STAT_HIT_PROTECTION,"+1 hit protection for every {0} {1} [{2}]",每持有{0}点{1}获取一次抵消伤害的机会[{2}]
 EFFECT_REGEN_HIT_PROTECTION,"{0} ({2}) chance to recover 1 Hit Protection every {1} seconds",每{1}秒有{0}（{2}）概率回复一次抵消伤害的机会
 EFFECT_TEMP_ON_HIT_PROTECTION,"{0} {1} when negating damage until the end of the wave","抵消伤害一次伤害时{0}{1}，直至敌袭结束"
 EFFECT_APPLY_ITEM_REVERSAL,"When picking up an item, removes {1}. Effects are inverted",获取道具时将扣除{1}的效果改为增加{1}
 EFFECT_STATS_BUY_ITEM,"When purchasing substitute materials, gain {0}{1}",替代材料购买时增加{0}{1}
 EFFECT_TURRET_PRIORITY_ATTACK_HIGHEST_HP,"Structures prioritize attacking the target with the highest health within range",构筑物优先攻击范围内生命值最高的目标
 EFFECT_STRUCTURE_ADD_RANGE,"Structure attack range is modified by {1}",构筑物攻击范围将受到{1}加成
-EFFECT_TURRET_COPY,"Structures have a {0} ({2}) chance to copy themselves upon killing a target",构筑物击杀锁定目标后有 {0}（{2}）概率复制自身
+EFFECT_TURRET_COPY,"Structures have a {0} ({2}) chance to copy themselves upon killing a target",构筑物击杀锁定目标后有{0}（{2}）概率复制自身
 WOOD_PICKAXE,Wood PickAxe,木镐
 EFFECT_WOOD_CAN_DROP_ITEM,Can mine stone,可以挖掘石头
 EFFECT_MINECRAFT,Generating world,世界生成中
@@ -58,7 +58,7 @@ ITEM_OAK_LOG,Oak Log,橡树原木
 ITEM_COBBLESTONE,Cobblestone,圆石
 ITEM_STICK,Stick,木棍
 STONE_PICKAXE,Stone Pickaxe,石镐
-EFFECT_STONE_CAN_DROP_ITEM,"Can mine stone, iron ore, lapis lazuli, emerald",可以挖掘石头，铁矿，青金石
+EFFECT_STONE_CAN_DROP_ITEM,"Can mine stone, iron ore, lapis lazuli",可以挖掘石头，铁矿，青金石
 ITEM_IRON_INGOT,Iron Ingot,铁锭
 IRON_PICKAXE,Iron Pickaxe,铁镐
 EFFECT_IRON_CAN_DROP_ITEM,"Can mine stone, iron ore, lapis lazuli, emerald, diamond",可以挖掘石头，铁矿，青金石，绿宝石，钻石
