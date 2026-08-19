@@ -2,10 +2,24 @@ class_name ItemMerge
 extends Effect
 
 
-export (int) var merge_from_count = 0
-export (String) var merge_from_item
-export (String) var merge_to_item
-export (int) var merge_to_item_count = 1
+# ============================================================
+# 效果：道具合成
+#   波次结束时，用若干道具合成另一道具（或武器）。
+#   运行时 custom_key：fengliu_item_merge
+# ------------------------------------------------------------
+# 效果值：
+#   key                  被消耗的源道具（同 merge_from_item）
+#   value                （参与存储）
+#   merge_from_item      消耗的源道具
+#   merge_from_count     需要消耗的源道具数量
+#   merge_to_item        合成目标道具/武器
+#   merge_to_item_count  合成的目标数量
+# ============================================================
+
+export (int) var merge_from_count = 0 # 需要消耗的源道具数量
+export (String) var merge_from_item # 消耗的源道具
+export (String) var merge_to_item # 合成目标道具/武器
+export (int) var merge_to_item_count = 1 # 合成的目标数量
 var merge_from_item_hash = Keys.empty_hash
 var merge_to_item_hash = Keys.empty_hash
 
@@ -25,6 +39,10 @@ func unapply(player_index: int) -> void:
 
 
 func get_args(player_index: int) -> Array:
+    # 返回数组按顺序填充描述文本 {0}~{2} 占位符：
+    #   [0] = 基类 args[0]（key/value）
+    #   [1] = 源道具名（大写翻译）
+    #   [2] = 需要消耗的源道具数量
     var args = .get_args(player_index)
     return [
         args[0],

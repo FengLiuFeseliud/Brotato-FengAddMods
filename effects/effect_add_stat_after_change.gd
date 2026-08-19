@@ -1,6 +1,21 @@
 class_name AddStatAfterChange
 extends Effect
 
+# ============================================================
+# 效果：损失转换属性
+#   当玩家损失「change_stat」属性时，按比例转换成另一属性。
+#   若 key 以 "gain_" 开头，则为纯增益（损失时不扣除，只加）。
+#   运行时 custom_key：fengliu_add_stat_after_change
+#   （另有 fengliu_add_stat_cap 用于波次上限的显示版本）
+# ------------------------------------------------------------
+# 效果值：
+#   key             获得的属性（以 "gain_" 开头 = 纯增益）
+#   value           每次转换触发时增加的量
+#   change_stat     被损失/被监控的属性
+#   stat_scaled     每损失多少点 change_stat 触发一次转换
+#   wave_max_value  波次转换上限（每波最多转换多少点）
+# ============================================================
+
 # 损失转换属性
 
 export (String) var change_stat # 被损失属性
@@ -31,6 +46,13 @@ func unapply(player_index: int) -> void:
 	
 	
 func get_args(player_index: int) -> Array:
+	# 返回数组按顺序填充描述文本 {0}~{5} 占位符：
+	#   [0] = 被损失属性名 (change_stat)
+	#   [1] = 转换所需损失 (stat_scaled)
+	#   [2] = 获得属性名 / 被损失属性名（视分支）
+	#   [3] = 基础数值 / 获得属性名（视分支）
+	#   [4] = 波次上限 (wave_max_value)
+	#   [5] = 实际转换获得量（绿色 +N 或 +N%）
 	var args = .get_args(player_index)
 	
 	var add_stat = 0
