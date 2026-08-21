@@ -1,11 +1,11 @@
 [gd_resource type="Resource" load_steps=22 format=2]
 
 [ext_resource path="res://items/characters/character_data.gd" type="Script" id=1]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/the_glitch/the_glitch_icon.png" type="Texture" id=2]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/the_glitch/effects/the_glitch_effect_0.tres" type="Resource" id=3]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/the_glitch/effects/the_glitch_effect_1.tres" type="Resource" id=4]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/the_glitch/effects/the_glitch_effect_2.tres" type="Resource" id=5]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/the_glitch/appearance/the_glitch_appearance.tres" type="Resource" id=8]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/glitch/glitch_icon.png" type="Texture" id=2]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/glitch/effects/glitch_effect_0.tres" type="Resource" id=3]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/glitch/effects/glitch_effect_1.tres" type="Resource" id=4]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/glitch/effects/glitch_effect_2.tres" type="Resource" id=5]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/glitch/appearance/glitch_appearance.tres" type="Resource" id=8]
 [ext_resource path="res://weapons/melee/cactus_mace/1/cactus_mace_data.tres" type="Resource" id=26]
 [ext_resource path="res://weapons/ranged/double_barrel_shotgun/1/double_barrel_shotgun_data.tres" type="Resource" id=9]
 [ext_resource path="res://weapons/melee/stick/1/stick_data.tres" type="Resource" id=10]
@@ -27,11 +27,11 @@
 
 [resource]
 script = ExtResource( 1 )
-my_id = "the_glitch"
+my_id = "glitch"
 unlocked_by_default = true
 can_be_looted = false
 icon = ExtResource( 2 )
-name = "THE_GLITCH"
+name = "GLITCH"
 tier = 0
 value = 1
 effects = [ ExtResource( 3 ), ExtResource( 4 ) , ExtResource( 5 ) ]

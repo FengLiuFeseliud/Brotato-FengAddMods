@@ -1,18 +1,12 @@
 [gd_resource type="Resource" load_steps=7 format=2]
 
 [ext_resource path="res://items/characters/character_data.gd" type="Script" id=1]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/the_angler/the_angler_icon.png" type="Texture" id=2]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/the_angler/appearance/the_angler_eyes_appearance.tres" type="Resource" id=3]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/the_angler/appearance/the_angler_hat_appearance.tres" type="Resource" id=4]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/the_angler/effects/the_angler_effect_0.tres" type="Resource" id=5]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/the_angler/effects/the_angler_effect_1.tres" type="Resource" id=6]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/the_angler/effects/the_angler_effect_2.tres" type="Resource" id=7]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/the_angler/effects/the_angler_effect_3.tres" type="Resource" id=8]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/the_angler/effects/the_angler_effect_4.tres" type="Resource" id=9]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/the_angler/effects/the_angler_effect_5.tres" type="Resource" id=10]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/the_angler/effects/the_angler_effect_6.tres" type="Resource" id=11]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/the_angler/effects/the_angler_effect_7.tres" type="Resource" id=12]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/the_angler/effects/the_angler_effect_8.tres" type="Resource" id=13]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/adaptor/adaptor_icon.png" type="Texture" id=2]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/adaptor/appearance/adaptor_eyes_appearance.tres" type="Resource" id=3]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/adaptor/effects/adaptor_effect_0.tres" type="Resource" id=5]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/adaptor/effects/adaptor_effect_1.tres" type="Resource" id=6]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/adaptor/effects/adaptor_effect_2.tres" type="Resource" id=7]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/adaptor/effects/adaptor_effect_3.tres" type="Resource" id=8]
 [ext_resource path="res://weapons/melee/spear/1/spear_data.tres" type="Resource" id=27]
 [ext_resource path="res://weapons/melee/dagger/1/dagger_data.tres" type="Resource" id=28]
 [ext_resource path="res://weapons/melee/chopper/1/chopper_data.tres" type="Resource" id=29]
@@ -32,25 +26,25 @@
 
 [resource]
 script = ExtResource( 1 )
-my_id = "the_angler"
+my_id = "adaptor"
 unlocked_by_default = true
 can_be_looted = false
 icon = ExtResource( 2 )
-name = "THE_ANGLER"
+name = "ADAPTOR"
 tier = 0
 value = 1
-effects = [ ExtResource( 5 ), ExtResource( 6 ), ExtResource( 7 ), ExtResource( 8 ), ExtResource( 9 ), ExtResource( 10 ), ExtResource( 11 ), ExtResource( 12 ), ExtResource( 13 )]
+effects = [ ExtResource( 5 ), ExtResource( 6 ), ExtResource( 7 ), ExtResource( 8 ) ]
 tracking_text = ""
 is_lockable = false
 unlock_codex_descr_after_get_it = 1
 is_cursed = false
 curse_factor = 0.0
 max_nb = -1
-item_appearances = [ ExtResource( 3 ), ExtResource( 4 )]
+item_appearances = [ ExtResource( 3 ) ]
 tags = [  ]
 wanted_tags = [  ]
 banned_item_groups = [  ]
-banned_items = [ "item_giant_belt" ]
+banned_items = [ ]
 banned_upgrades = [  ]
 starting_weapons = [ ExtResource( 27 ), ExtResource( 28 ),ExtResource( 29 ), ExtResource( 14 ), ExtResource( 15 ), ExtResource( 30 ), ExtResource( 16 ), ExtResource( 17 ), ExtResource( 18 ), ExtResource( 19 ), ExtResource( 20 ), ExtResource( 21 ), ExtResource( 23 ), ExtResource( 24 ), ExtResource( 25 ), ExtResource( 26 ) ]
 starting_items = [  ]

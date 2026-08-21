@@ -9,18 +9,25 @@ func _init():
 	add_translations()
 
 	ModLoaderLog.info("add extensions...", MOD_ID)
-	ModLoaderMod.install_script_extension(EXTENSIONS_DIR + "weapon/weapon.gd")
-	ModLoaderMod.install_script_extension(EXTENSIONS_DIR + "entities/structures/turret/turret.gd")
-	ModLoaderMod.install_script_extension(EXTENSIONS_DIR + "entities/structures/structure.gd")
-	ModLoaderMod.install_script_extension(EXTENSIONS_DIR + "entities/units/neutral/neutral.gd")
-	ModLoaderMod.install_script_extension(EXTENSIONS_DIR + "singletons/run_data.gd")
-	ModLoaderMod.install_script_extension(EXTENSIONS_DIR + "singletons/item_service.gd")
-	ModLoaderMod.install_script_extension(EXTENSIONS_DIR + "ui/menus/shop/base_shop.gd")
-	ModLoaderMod.install_script_extension(EXTENSIONS_DIR + "ui/menus/shop/shop_item.gd")
-	ModLoaderMod.install_script_extension(EXTENSIONS_DIR + "entities/units/player/player.gd")
-	ModLoaderMod.install_script_extension(EXTENSIONS_DIR + "item/consumables/consumable.gd")
-	ModLoaderMod.install_script_extension(EXTENSIONS_DIR + "zones/wave_manager.gd")
-	ModLoaderMod.install_script_extension(EXTENSIONS_DIR + "main.gd")
+	_install_extensions_from_dir(EXTENSIONS_DIR)
+
+
+func _install_extensions_from_dir(dir_path: String) -> void:
+	var dir := Directory.new()
+	if dir.open(dir_path) != OK:
+		ModLoaderLog.error("Failed to open extensions directory: %s" % dir_path, MOD_ID)
+		return
+
+	dir.list_dir_begin(true, true)
+	var file_name := dir.get_next()
+	while file_name != "":
+		var full_path := dir_path.plus_file(file_name)
+		if dir.current_is_dir():
+			_install_extensions_from_dir(full_path)
+		elif file_name.get_extension() == "gd":
+			ModLoaderMod.install_script_extension(full_path)
+		file_name = dir.get_next()
+	dir.list_dir_end()
 
 
 func add_translations() -> void:

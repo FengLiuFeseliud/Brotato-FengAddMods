@@ -1,0 +1,15 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/effects/effect_add_stat_fron_wave_intensity.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+key = "weapon_slot"
+text_key = "EFFECT_ADD_STAT_FRON_WAVE_INTENSITY"
+value = 1
+custom_key = "fengliu_add_stat_fron_wave_intensity"
+storage_method = 0
+effect_sign = 3
+custom_args = [  ]
+boss_wave_add_value = 3
+value_cap = 24

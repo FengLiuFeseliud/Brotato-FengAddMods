@@ -1,4 +1,4 @@
-extends "res://ui/menus/shop/base_shop.gd"
+extends BaseShop
 
 
 var effect_fengliu_shop_item_count = Keys.generate_hash("fengliu_shop_item_count")

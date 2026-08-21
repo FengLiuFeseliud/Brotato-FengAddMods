@@ -11,6 +11,7 @@ var effect_fengliu_killed_all_boss_wave_end = Keys.generate_hash("fengliu_killed
 var effect_fengliu_add_xp_gold_from_wave_time = Keys.generate_hash("fengliu_add_xp_gold_from_wave_time")
 var effect_fengliu_auto_open_box = Keys.generate_hash("fengliu_auto_open_box")
 var effect_fengliu_apply_item_not_add_all_debuff = Keys.generate_hash("fengliu_apply_item_not_add_all_debuff")
+var effect_fengliu_add_stat_fron_wave_intensity = Keys.generate_hash("fengliu_add_stat_fron_wave_intensity")
 
 
 var _is_speedrun_ending: bool = false
@@ -126,7 +127,7 @@ func fengliu_add_xp_gold_from_wave_time(effect: Array, player_index: int):
 		add_value += RunData.get_stat(effect[0], player_index) * effect[2]
 	else:
 		# 按等级加算
-		add_value += RunData.get_player_level(player_index * effect[2])
+		add_value += RunData.get_player_level(player_index) * effect[2]
 
 	# 按剩余时间结算材料与经验
 	var gold = int(_wave_timer.time_left * add_value)
@@ -310,6 +311,24 @@ func on_consumable_picked_up(consumable: Node, player_index: int) -> void :
 	.on_consumable_picked_up(consumable, player_index)
 
 
+func fengliu_add_stat_fron_wave_intensity(effect: Array, player_index: int) -> void:
+	if not RunData.fengliu_is_high_wave_intensity() and not _is_horde_wave and not _is_elite_wave:
+		return
+
+	var add_value = 0
+
+	if _is_horde_wave or _is_elite_wave:
+		add_value = effect[2]
+	else:
+		add_value = effect[1]
+
+	if effect[4]:
+		RunData.add_stat(effect[0], add_value, player_index)
+		return
+
+	RunData.get_player_effects(player_index)[effect[0]] += add_value
+
+
 # 扩展清理房间
 func clean_up_room():
 	for player_index in RunData.get_player_count():
@@ -317,6 +336,11 @@ func clean_up_room():
 		if effects.size() > 0:
 			# 波次结束后按剩余时间加材料与经验
 			fengliu_add_xp_gold_from_wave_time(effects[0], player_index)
+
+		effects = RunData.get_player_effect(effect_fengliu_add_stat_fron_wave_intensity, player_index)
+		if effects.size() > 0:
+			for effect in effects:
+				fengliu_add_stat_fron_wave_intensity(effect, player_index)
 	
 	if not _end_wave_timer_timedout:
 		.clean_up_room()

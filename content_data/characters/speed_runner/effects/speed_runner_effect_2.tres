@@ -11,4 +11,4 @@ custom_key = "fengliu_add_xp_gold_from_wave_time"
 storage_method = 0
 effect_sign = 3
 custom_args = [  ]
-gain_value = 0.10
+gain_value = 0.5

@@ -1,12 +1,12 @@
 [gd_resource type="Resource" load_steps=3 format=2]
 
 [ext_resource path="res://items/global/item_appearance_data.gd" type="Script" id=1]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/the_glitch/appearance/the_glitch_eyes.png" type="Texture" id=2]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/angler/appearance/angler_hat.png" type="Texture" id=2]
 
 [resource]
 script = ExtResource( 1 )
 sprite = ExtResource( 2 )
-position = 0
+position = 4
 display_priority = 2
-depth = 9000.0
-is_character_appearance = false
+depth = 1000.0
+is_character_appearance = true

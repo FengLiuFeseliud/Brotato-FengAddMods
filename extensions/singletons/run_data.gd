@@ -59,6 +59,12 @@ var stat_after_change_wave_value_count = {}
 var all_secondary_stats_hashs = []
 var all_secondary_abs_debuff_stats_hashs = []
 var all_item_debuff_hashs = []
+var _wave_total_hp_to_durations = [1.0, 1.0, 1.0]
+var _wave_total_hp = 0
+
+var _wave_intensity = 0
+var _current_wave_intensity = 0
+var _restart_wave = false
 
 
 # 扩展初始化哈希列表
@@ -76,6 +82,18 @@ func _ready() -> void :
 		all_secondary_abs_debuff_stats_hashs.append(Keys.generate_hash(item_debuff))
 
 
+func fengliu_is_high_wave_intensity() -> bool:
+	return (_current_wave_intensity / _wave_intensity) >= 1.8
+
+
+func fengliu_get_wave_total_hp() -> float:
+	return _wave_total_hp
+
+
+func fengliu_get_wave_total_hp_to_duration() -> float:
+	return _current_wave_intensity
+
+
 # 生成波次精英
 func fengliu_wave_elites_spawn(player_data) -> void :
 	# 随机取一只精英
@@ -83,19 +101,6 @@ func fengliu_wave_elites_spawn(player_data) -> void :
 	var new_elite_id = Utils.get_rand_element(possible_elites).my_id_hash
 	# 加入下一波额外敌人
 	player_data.effects[Keys.extra_enemies_next_wave_hash].append(["res://zones/common/elite/group_elite.tres", 1, new_elite_id])
-
-
-# 扩展波次开始
-func on_wave_start(timer: WaveTimer) -> void :
-	## 清除波次上限
-	for value_keys in stat_after_change_wave_value_count.keys():
-		stat_after_change_wave_value_count[value_keys] = 0
-	.on_wave_start(timer)
-
-	# 注入精英
-	for player_data in players_data:
-		if player_data.effects.has(effect_fengliu_wave_elites_spawn) and player_data.effects[effect_fengliu_wave_elites_spawn].size() > 0:
-			fengliu_wave_elites_spawn(player_data)
 
 
 # 获取玩家持有道具数量
@@ -236,6 +241,76 @@ func fengliu_auto_curse(curse_item_effect: Array, player_index: int) -> void:
 	fengliu_auto_curse(curse_item_effect, player_index)
 
 
+# 计算当前波次每秒平均生命值
+func fengliu_calc_wave_total_hp_to_duration() -> float:
+	# 获取本波数据
+	var wave_data = ZoneService.get_wave_data(current_zone, current_wave)
+	var total := 0
+
+	# 遍历所有刷怪组
+	for group in wave_data.groups_data:
+		# 遍历组内刷怪单位
+		for unit_data in group.wave_units_data:
+			# 只统计敌人与 Boss
+			if unit_data.type != EntityType.ENEMY and unit_data.type != EntityType.BOSS:
+				continue
+
+			# 无场景则跳过
+			if unit_data.unit_scene == null:
+				continue
+
+			# 实例化敌人场景读取其基础属性
+			var scene_inst = unit_data.unit_scene.instance()
+			var stats = scene_inst.stats
+			if stats == null:
+				scene_inst.free()
+				continue
+
+			var base_hp = stats.get_base_health(current_wave)
+			# 最终生命值
+			var final_hp = EntityService.get_final_enemy_health(base_hp)
+
+			# 期望生成数量 = 平均数量 * 生成概率
+			var avg_count = (unit_data.min_number + unit_data.max_number) / 2.0 * unit_data.spawn_chance
+
+			# 累加该单位的生命值贡献
+			total += int(final_hp * avg_count)
+
+			# 立即释放临时实例
+			scene_inst.free()
+
+	_wave_total_hp = total
+	# 返回每秒平均生命值 = 总生命值 / 波次时长
+	return total / float(max(1, wave_data.wave_duration))
+
+
+# 扩展波次开始
+func on_wave_start(timer: WaveTimer) -> void :
+	## 清除波次上限
+	for value_keys in stat_after_change_wave_value_count.keys():
+		stat_after_change_wave_value_count[value_keys] = 0
+	.on_wave_start(timer)
+
+	# 注入精英
+	for player_data in players_data:
+		if player_data.effects.has(effect_fengliu_wave_elites_spawn) and player_data.effects[effect_fengliu_wave_elites_spawn].size() > 0:
+			fengliu_wave_elites_spawn(player_data)
+
+
+	if is_elite_wave(EliteType.ELITE) or is_elite_wave(EliteType.HORDE) or _restart_wave:
+		return
+
+	_current_wave_intensity = fengliu_calc_wave_total_hp_to_duration()
+	
+	var _wave_intensity_count = 0.0
+	for _wave_total_hp_to_duration in _wave_total_hp_to_durations:
+		_wave_intensity_count += _wave_total_hp_to_duration
+	
+	_wave_intensity = _wave_intensity_count / 3
+	_wave_total_hp_to_durations.remove(0)
+	_wave_total_hp_to_durations.append(_current_wave_intensity)
+
+
 # 扩展波次结束
 func on_wave_end() -> void :
 	.on_wave_end()
@@ -251,7 +326,8 @@ func on_wave_end() -> void :
 		effects = get_player_effect(effect_fengliu_random_curse, player_index)
 		if effects.size() > 0:
 			fengliu_auto_curse(effects[0], player_index)
-		
+	
+	_restart_wave = false
 
 ## 统一添加效果 hsah
 func get_player_effect(key: int, player_index: int):
@@ -265,16 +341,8 @@ func get_player_effect(key: int, player_index: int):
 
 ## 添加倍倍率修改
 func fengliu_add_gain_stat(effect: Array, add_value: int, player_index: int):
-	var effects = get_player_effects(player_index)
-	
-	var _gain = 0.0
-	var gain_stat = effect[0]
-	# 读取已有增益值
-	if effects.has(gain_stat):
-		_gain = effects[gain_stat]
-	
-	# 累加按波次计数的增益
-	get_player_effects(player_index)[gain_stat] += fengliu_stat_after_change_wave_count(effect, add_value, player_index)
+	# 累加增益值
+	get_player_effects(player_index)[effect[0]] += add_value
 	
 
 ## 计算是否达到计数 达到返回计算值
@@ -331,6 +399,11 @@ func fengliu_add_stat_after_change(effects: Array, stat_hsh: int, value: int, pl
 		if add_value == 0:
 			continue
 			
+		# 应用每波转换上限
+		add_value = fengliu_stat_after_change_wave_count(effect, add_value, player_index)
+		if add_value == 0:
+			continue
+
 		# 按增益或直接添加
 		if effect[-1]:
 			fengliu_add_gain_stat(effect, add_value, player_index)
@@ -591,3 +664,7 @@ func apply_item_effects(item_data: ItemParentData, player_index: int) -> void :
 	.apply_item_effects(item_data, player_index)
 	# 还原效果
 	item_data.effects = old_effects
+
+func reset_to_start_wave_state() -> void :
+	_restart_wave = true
+	.reset_to_start_wave_state()

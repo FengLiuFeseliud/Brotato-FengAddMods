@@ -1,0 +1,14 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/effects/effect_wave_intensity_damage.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+key = ""
+text_key = "EFFECT_WAVE_INTENSITY_DAMAGE"
+value = 25
+custom_key = "fengliu_wave_intensity_damage"
+storage_method = 0
+effect_sign = 3
+custom_args = [  ]
+value_cap = 6

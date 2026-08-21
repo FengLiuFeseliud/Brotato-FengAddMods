@@ -3,17 +3,18 @@ RAT_KING,Rat King,鼠王
 MISER,Miser,吝啬鬼
 DICE,Dice,骰子
 COOKER,Cooker,高压锅
-THE_DESPISED,The Despised,被厌恶者
+DESPISED,Despised,被厌恶者
 SPECIMEN,Specimen,标本
 CURSE_FIEND,Curse Fiend,咒魔
 MAIN_SERVER,Main Server,主服务器
 STEVE,Steve,史蒂夫
-THE_GLITCH,The Glitch,漏洞
+GLITCH,Glitch,漏洞
 CREEPER,Creeper,苦力怕
-THE_ANGLER,The Angler,钓鱼佬
+ANGLER,Angler,钓鱼佬
 SPEED_RUNNER,Speed Runner,速通者
 CRATE_GOBBLER,Crate Gobbler,箱子吞吞怪
 WEAPON_KEY,Key,花园钥匙
+ADAPTOR,Adaptor,适应者
 EFFECT_TWO_HAND_WEAPON_SLOT_LIMIT,Only has two hands (so can only hold two weapons),只有两只手所以只拿两个武器
 ITEM_RAT_KING_RATZILLA,Rat Subject,鼠族臣民
 EFFECT_RATZILLA_KILLER_BOSS_TEXT,Ratzilla targets and attacks bosses,鼠斯拉会锁定并攻击 boss
@@ -81,7 +82,7 @@ EFFECT_APPLY_ITEM_NOT_NO_HEAL,"When acquiring an item, ignore effects that disab
 EFFECT_NOT_MOVING_EXPLOSION_TO_CLEAN_UP_ROOM,"When standing still for more than {4} seconds, explode dealing {1} ({2}) damage and instantly clear the current wave",当你站立不动超过{4}秒时将会爆炸造成 {1}（{2}）伤害，爆炸后会直接通过当前波次
 EFFECT_CAN_ONE_NOT_MOVING_EXPLOSION,"Die instantly if the explosion fails to kill any Boss on the field",爆炸后若无法杀死场上的 Boss 将直接死亡
 EFFECT_NO_PET,"You cannot summon pets",你无法召唤宠物
-EFFECT_ALL_WAVE_ELITES_SPAWN,"+1 extra Boss spawns in all waves",所有波次额外生成一个 Boss
+EFFECT_ALL_WAVE_ELITES_SPAWN,"+1 extra Boss spawns in all waves",波次开始额外生成一个随机 Boss
 EFFECT_BOSS_DIED_RESPAWN,"When a Boss dies, it respawns with {1} increased all stats",Boss 死亡后将重生并且各向属性强化 {1}
 EFFECT_ITEM_BOUGHT_SPAWN_BOSS,"Buying {0} adds a {1} (+{2} per {0}) chance to spawn +1 extra Boss in the next wave",购买{0}后下场敌袭{1}（+{2} {0}数量）概率额外生成一个 Boss
 EFFECT_APPLY_NOT_EXTRA_ENEMIES,"When acquiring an item, ignore effects that spawn special enemies in the next wave",获取道具时无视下场敌袭出现特殊怪效果
@@ -95,3 +96,5 @@ EFFECT_PICKED_UP_CONSUMABLE_ADD_SIZE,"When you pick up a Consumable, your charac
 EFFECT_BOX_STAT,"{0}{1} when picking up a crate",捡起一个箱子时永久{0}{1}
 EFFECT_APPLY_ITEM_NOT_ALL_DEBUFF,"You ignore all negative effects on items (except Shackles)",你无视道具的所有负面效果（除了脚铐）
 EFFECT_APPLY_ITEM_ALL_SECONDERY_SATAS_REVERSAL,"When acquiring an item, all effects that decrease secondary stats increase them instead (secondary stats on the stat panel and all enemy-related stats)",获取道具时将所有负面次要属性效果改为正面次要属性效果（面板上的次要属性与所有敌人相关属性）
+EFFECT_ADD_STAT_FRON_WAVE_INTENSITY,,你通过近期高质量波次时加{1}{0}，通过敌众或精英波次时加{2}{0}，上限：{3}（高质量波次依据为前三波波次总血量/秒数的两倍）
+EFFECT_WAVE_INTENSITY_DAMAGE,,你的攻击附加波次每秒总血量的{0}伤害

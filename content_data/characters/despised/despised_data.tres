@@ -1,15 +1,15 @@
 [gd_resource type="Resource" load_steps=22 format=2]
 
 [ext_resource path="res://items/characters/character_data.gd" type="Script" id=1]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/the_despised/the_despised_icon.png" type="Texture" id=2]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/the_despised/appearance/the_despised_eyes_appearance.tres" type="Resource" id=3]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/the_despised/effects/the_despised_effect_0.tres" type="Resource" id=5]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/the_despised/effects/the_despised_effect_1.tres" type="Resource" id=6]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/the_despised/effects/the_despised_effect_2.tres" type="Resource" id=7]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/the_despised/effects/the_despised_effect_3.tres" type="Resource" id=8]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/the_despised/effects/the_despised_effect_4.tres" type="Resource" id=9]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/the_despised/effects/the_despised_effect_5.tres" type="Resource" id=10]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/the_despised/effects/the_despised_effect_6.tres" type="Resource" id=100]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/despised/despised_icon.png" type="Texture" id=2]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/despised/appearance/despised_eyes_appearance.tres" type="Resource" id=3]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/despised/effects/despised_effect_0.tres" type="Resource" id=5]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/despised/effects/despised_effect_1.tres" type="Resource" id=6]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/despised/effects/despised_effect_2.tres" type="Resource" id=7]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/despised/effects/despised_effect_3.tres" type="Resource" id=8]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/despised/effects/despised_effect_4.tres" type="Resource" id=9]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/despised/effects/despised_effect_5.tres" type="Resource" id=10]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/despised/effects/despised_effect_6.tres" type="Resource" id=100]
 [ext_resource path="res://weapons/melee/spear/1/spear_data.tres" type="Resource" id=11]
 [ext_resource path="res://weapons/melee/dagger/1/dagger_data.tres" type="Resource" id=12]
 [ext_resource path="res://weapons/melee/chopper/1/chopper_data.tres" type="Resource" id=13]
@@ -28,11 +28,11 @@
 
 [resource]
 script = ExtResource( 1 )
-my_id = "the_despised"
+my_id = "despised"
 unlocked_by_default = true
 can_be_looted = false
 icon = ExtResource( 2 )
-name = "THE_DESPISED"
+name = "DESPISED"
 tier = 0
 value = 1
 effects = [ ExtResource( 5 ) , ExtResource( 6 ), ExtResource( 7 ), ExtResource( 8 ), ExtResource( 9 ), ExtResource( 10 ), ExtResource( 100 )]
