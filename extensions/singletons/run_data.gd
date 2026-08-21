@@ -82,14 +82,17 @@ func _ready() -> void :
 		all_secondary_abs_debuff_stats_hashs.append(Keys.generate_hash(item_debuff))
 
 
+# 判断是否为高质量波次（当前强度 ≥ 前三波平均强度的 1.8 倍）
 func fengliu_is_high_wave_intensity() -> bool:
 	return (_current_wave_intensity / _wave_intensity) >= 1.8
 
 
+# 获取当前波次总血量
 func fengliu_get_wave_total_hp() -> float:
 	return _wave_total_hp
 
 
+# 获取当前波次每秒平均血量
 func fengliu_get_wave_total_hp_to_duration() -> float:
 	return _current_wave_intensity
 
@@ -286,7 +289,7 @@ func fengliu_calc_wave_total_hp_to_duration() -> float:
 
 # 扩展波次开始
 func on_wave_start(timer: WaveTimer) -> void :
-	## 清除波次上限
+	# 清除波次上限
 	for value_keys in stat_after_change_wave_value_count.keys():
 		stat_after_change_wave_value_count[value_keys] = 0
 	.on_wave_start(timer)
@@ -297,16 +300,21 @@ func on_wave_start(timer: WaveTimer) -> void :
 			fengliu_wave_elites_spawn(player_data)
 
 
+	# 精英/敌众波次或重开波次时不更新强度统计
 	if is_elite_wave(EliteType.ELITE) or is_elite_wave(EliteType.HORDE) or _restart_wave:
 		return
 
+	# 计算本波每秒平均血量
 	_current_wave_intensity = fengliu_calc_wave_total_hp_to_duration()
 	
+	# 累加前三波每秒平均血量
 	var _wave_intensity_count = 0.0
 	for _wave_total_hp_to_duration in _wave_total_hp_to_durations:
 		_wave_intensity_count += _wave_total_hp_to_duration
 	
+	# 记录前三波平均强度，供高质量波次判断使用
 	_wave_intensity = _wave_intensity_count / 3
+	# 滑动窗口：移除最旧、加入最新，保留最近三波
 	_wave_total_hp_to_durations.remove(0)
 	_wave_total_hp_to_durations.append(_current_wave_intensity)
 
@@ -329,7 +337,7 @@ func on_wave_end() -> void :
 	
 	_restart_wave = false
 
-## 统一添加效果 hsah
+# 统一添加效果哈希
 func get_player_effect(key: int, player_index: int):
 	var effects = get_player_effects(player_index)
 	if not effects.has(key):
@@ -339,13 +347,13 @@ func get_player_effect(key: int, player_index: int):
 	return effects[key]
 	
 
-## 添加倍倍率修改
+# 添加倍率修改
 func fengliu_add_gain_stat(effect: Array, add_value: int, player_index: int):
 	# 累加增益值
 	get_player_effects(player_index)[effect[0]] += add_value
 	
 
-## 计算是否达到计数 达到返回计算值
+# 计算是否达到计数，达到则返回计算值
 func fengliu_calculate_add_value(effect: Array, value: int, player_index: int, effect_index: int) -> int:
 	# 取计数阈值
 	var scaled = effect[3]
@@ -484,7 +492,7 @@ func remove_stat(stat_hsh: int, value: int, player_index: int) -> void :
 	.remove_stat(stat_hsh, value, player_index)
 
 
-## fengliu_shop_item_count - 商店道具数效果 保留锁定数
+# fengliu_shop_item_count - 商店道具数效果 保留锁定数
 func lock_player_shop_item(item_data: ItemParentData, wave_value: int, player_index: int) -> void :
 	# 获取商店道具数效果
 	var effects = RunData.get_player_effect(effect_fengliu_shop_item_count, player_index)
@@ -665,6 +673,7 @@ func apply_item_effects(item_data: ItemParentData, player_index: int) -> void :
 	# 还原效果
 	item_data.effects = old_effects
 
+# 扩展重置波次状态
 func reset_to_start_wave_state() -> void :
 	_restart_wave = true
 	.reset_to_start_wave_state()

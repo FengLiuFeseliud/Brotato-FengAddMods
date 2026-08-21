@@ -311,21 +311,26 @@ func on_consumable_picked_up(consumable: Node, player_index: int) -> void :
 	.on_consumable_picked_up(consumable, player_index)
 
 
+# 扩展波次强度增加属性
 func fengliu_add_stat_fron_wave_intensity(effect: Array, player_index: int) -> void:
+	# 非高质量/敌众/精英波次则跳过
 	if not RunData.fengliu_is_high_wave_intensity() and not _is_horde_wave and not _is_elite_wave:
 		return
 
 	var add_value = 0
 
+	# 敌众或精英波次取额外值
 	if _is_horde_wave or _is_elite_wave:
 		add_value = effect[2]
 	else:
 		add_value = effect[1]
 
+	# 主属性直接添加
 	if effect[4]:
 		RunData.add_stat(effect[0], add_value, player_index)
 		return
 
+	# 非主属性按增益累加
 	RunData.get_player_effects(player_index)[effect[0]] += add_value
 
 

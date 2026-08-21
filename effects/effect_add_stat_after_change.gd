@@ -24,14 +24,12 @@ export (int) var wave_max_value # 波次上限
 var change_stat_hash = ""
 var gain_stat = false
 var stat = ""
-var stat_kay = ""
 
 
 func _generate_hashes() -> void:
 	._generate_hashes()
 	if "gain_" in key:
 		stat = key.lstrip("gain_")
-		stat_kay = Keys.generate_hash(stat_kay)
 	change_stat_hash = Keys.generate_hash(change_stat)
 
 
