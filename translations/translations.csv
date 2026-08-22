@@ -15,6 +15,7 @@ SPEED_RUNNER,Speed Runner,速通者
 CRATE_GOBBLER,Crate Gobbler,箱子吞吞怪
 WEAPON_KEY,Key,花园钥匙
 ADAPTOR,Adaptor,适应者
+WEAPON_ADAPTOR_SMG,Adaptor SMG,适应冲锋枪
 EFFECT_TWO_HAND_WEAPON_SLOT_LIMIT,Only has two hands (so can only hold two weapons),只有两只手所以只拿两个武器
 ITEM_RAT_KING_RATZILLA,Rat Subject,鼠族臣民
 EFFECT_RATZILLA_KILLER_BOSS_TEXT,Ratzilla targets and attacks bosses,鼠斯拉会锁定并攻击 boss
@@ -96,5 +97,6 @@ EFFECT_PICKED_UP_CONSUMABLE_ADD_SIZE,"When you pick up a Consumable, your charac
 EFFECT_BOX_STAT,"{0}{1} when picking up a crate",捡起一个箱子时永久{0}{1}
 EFFECT_APPLY_ITEM_NOT_ALL_DEBUFF,"You ignore all negative effects on items (except Shackles)",你无视道具的所有负面效果（除了脚铐）
 EFFECT_APPLY_ITEM_ALL_SECONDERY_SATAS_REVERSAL,"When acquiring an item, all effects that decrease secondary stats increase them instead (secondary stats on the stat panel and all enemy-related stats)",获取道具时将所有负面次要属性效果改为正面次要属性效果（面板上的次要属性与所有敌人相关属性）
-EFFECT_ADD_STAT_FRON_WAVE_INTENSITY,"Gain {1} {0} when clearing a recent high-quality wave, and {2} {0} when clearing a Horde or Elite wave. Cap: {3} (High-quality wave = twice the total HP per second of the previous three waves)",你通过近期高质量波次时加{1}{0}，通过敌众或精英波次时加{2}{0}，上限：{3}（高质量波次依据为前三波波次总血量/秒数的两倍）
+EFFECT_ADD_STAT_FRON_WAVE_INTENSITY,"Gain {1} {0} when clearing a recent high-quality wave, and {2} {0} when clearing a Horde or Elite wave. Cap: {3} (High-quality wave = twice the total HP per second of the previous three waves)",你通过近期高质量波次时加{1}{0}，通过敌众或精英波次时加{2}{0}，上限：{3}（高质量波次依据为前三波波次总血量/秒数的[color=lime]2[/color]倍）
 EFFECT_WAVE_INTENSITY_DAMAGE,Your attacks deal additional damage equal to {0} of the wave's total HP per second,你的攻击附加波次每秒总血量的{0}伤害
+EFFECT_ADAPTOR_SMG_0,,高质量波次与敌众或精英波次时，投掷物[color=lime]+2[/color]

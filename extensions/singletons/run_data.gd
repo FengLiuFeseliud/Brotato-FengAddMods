@@ -64,6 +64,7 @@ var _wave_total_hp = 0
 
 var _wave_intensity = 0
 var _current_wave_intensity = 0
+var _high_wave_count = 0
 var _restart_wave = false
 
 
@@ -82,9 +83,13 @@ func _ready() -> void :
 		all_secondary_abs_debuff_stats_hashs.append(Keys.generate_hash(item_debuff))
 
 
-# 判断是否为高质量波次（当前强度 ≥ 前三波平均强度的 1.8 倍）
+func fengliu_get_high_wave_count() -> int:
+	return _high_wave_count
+
+
+# 判断是否为高质量波次（当前强度 ≥ 前三波平均强度的 2 倍）
 func fengliu_is_high_wave_intensity() -> bool:
-	return (_current_wave_intensity / _wave_intensity) >= 1.8
+	return (_current_wave_intensity / _wave_intensity) >= 2
 
 
 # 获取当前波次总血量
@@ -317,6 +322,9 @@ func on_wave_start(timer: WaveTimer) -> void :
 	# 滑动窗口：移除最旧、加入最新，保留最近三波
 	_wave_total_hp_to_durations.remove(0)
 	_wave_total_hp_to_durations.append(_current_wave_intensity)
+
+	if fengliu_is_high_wave_intensity() or is_elite_wave(EliteType.ELITE) or is_elite_wave(EliteType.HORDE):
+		_high_wave_count += 1
 
 
 # 扩展波次结束

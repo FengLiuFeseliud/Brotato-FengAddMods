@@ -11,5 +11,5 @@ custom_key = "fengliu_add_stat_fron_wave_intensity"
 storage_method = 0
 effect_sign = 3
 custom_args = [  ]
-boss_wave_add_value = 3
+boss_wave_add_value = 2
 value_cap = 24
