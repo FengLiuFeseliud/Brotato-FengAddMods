@@ -206,7 +206,7 @@ func on_gold_picked_up(gold: Node, player_index: int) -> void :
 
 
 # 扩展怪物死亡后
-func _on_enemy_died(enemy: Enemy, args: Entity.DieArgs) -> void:
+func _on_enemy_died(enemy, args: Entity.DieArgs) -> void:
 	for player in _get_shuffled_live_players(): 
 		var effects = RunData.get_player_effect(effect_fengliu_killed_all_boss_wave_end, player.player_index)
 		if effects.size() > 0 and _entity_spawner.get_nb_bosses_and_elites_alive() == 1 and enemy is Boss:

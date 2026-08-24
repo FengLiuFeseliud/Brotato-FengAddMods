@@ -1,0 +1,38 @@
+[gd_resource type="Resource" load_steps=22 format=2]
+
+[ext_resource path="res://items/characters/character_data.gd" type="Script" id=1] 
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/rogue_ai/rogue_ai_icon.png" type="Texture" id=2]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/rogue_ai/appearance/rogue_ai_appearance.tres" type="Resource" id=3]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/rogue_ai/effects/rogue_ai_effect_0.tres" type="Resource" id=5]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/rogue_ai/effects/rogue_ai_effect_1.tres" type="Resource" id=6]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/rogue_ai/effects/rogue_ai_effect_2.tres" type="Resource" id=7]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/rogue_ai/effects/rogue_ai_effect_3.tres" type="Resource" id=8]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/rogue_ai/effects/rogue_ai_effect_4.tres" type="Resource" id=9]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/rogue_ai/effects/rogue_ai_effect_5.tres" type="Resource" id=10]
+[ext_resource path="res://weapons/melee/wrench/1/wrench_data.tres" type="Resource" id=11]
+[ext_resource path="res://weapons/melee/screwdriver/1/screwdriver_data.tres" type="Resource" id=12]
+
+[resource]
+script = ExtResource( 1 )
+my_id = "rogue_ai"
+unlocked_by_default = true
+can_be_looted = false
+icon = ExtResource( 2 )
+name = "ROGUE_AI"
+tier = 0 
+value = 1
+effects = [ ExtResource( 5 ), ExtResource( 6 ), ExtResource( 7 ), ExtResource( 8 ), ExtResource( 9 ), ExtResource( 10 ) ]
+tracking_text = ""
+is_lockable = false
+unlock_codex_descr_after_get_it = 1
+is_cursed = false
+curse_factor = 0.0
+max_nb = -1
+item_appearances = [ ExtResource( 3 ) ]
+tags = [ ]
+wanted_tags = [ "stat_engineering", "structure" ]
+banned_item_groups = [  ]
+banned_items = [  ]
+banned_upgrades = [  ]
+starting_weapons = [ ExtResource( 11 ), ExtResource( 12 ) ]
+starting_items = [  ]

@@ -15,6 +15,7 @@ SPEED_RUNNER,Speed Runner,速通者
 CRATE_GOBBLER,Crate Gobbler,箱子吞吞怪
 WEAPON_KEY,Key,花园钥匙
 ADAPTOR,Adaptor,适应者
+ROGUE_AI,Rogue AI,流窜AI
 WEAPON_ADAPTOR_SMG,Adaptor SMG,适应冲锋枪
 EFFECT_TWO_HAND_WEAPON_SLOT_LIMIT,Only has two hands (so can only hold two weapons),只有两只手所以只拿两个武器
 ITEM_RAT_KING_RATZILLA,Rat Subject,鼠族臣民
@@ -100,3 +101,5 @@ EFFECT_APPLY_ITEM_ALL_SECONDERY_SATAS_REVERSAL,"When acquiring an item, all effe
 EFFECT_ADD_STAT_FRON_WAVE_INTENSITY,"Gain {1} {0} when clearing a recent high-quality wave, and {2} {0} when clearing a Horde or Elite wave. Cap: {3} (High-quality wave = twice the total HP per second of the previous three waves)",你通过近期高质量波次时加{1}{0}，通过敌众或精英波次时加{2}{0}，上限：{3}（高质量波次依据为前三波波次总血量/秒数的[color=lime]2[/color]倍）
 EFFECT_WAVE_INTENSITY_DAMAGE,Your attacks deal additional damage equal to {0} of the wave's total HP per second,你的攻击附加波次每秒总血量的{0}伤害
 EFFECT_ADAPTOR_SMG_0,,高质量波次与敌众或精英波次时，投掷物[color=lime]+2[/color]
+EFFECT_NO_KILL_ENEMY,,你的{0}攻击不会致死
+EFFECT_CHARM_ENEMY,,你的{1}击中时有{0}概率魅惑敌人，敌人生命值为1时必定魅惑
