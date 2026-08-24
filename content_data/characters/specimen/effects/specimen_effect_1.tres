@@ -6,7 +6,7 @@
 script = ExtResource( 1 )
 key = "stat_max_hp"
 text_key = "EFFECT_STAT_HIT_PROTECTION"
-value = 5
+value = 10
 custom_key = "fengliu_stat_hit_protection"
 storage_method = 2
 effect_sign = 3
