@@ -6,10 +6,25 @@ const EXTENSIONS_DIR = MOD_DIR + "extensions/"
 const CONTENT_DATA_DIR = MOD_DIR + "content_data.tres"
 
 func _init():
+	_block_boss_rush_item_parent_data_extension()
 	add_translations()
 
 	ModLoaderLog.info("add extensions...", MOD_ID)
 	_install_extensions_from_dir(EXTENSIONS_DIR)
+
+
+# 强兼 The-BossRush
+func _block_boss_rush_item_parent_data_extension() -> void:
+	# 阻止 The-BossRush 扩展 item_parent_data.gd：替换该基类会破坏
+	# ItemData / CharacterData / WeaponData 的类型继承关系，导致游戏编译脚本报
+	# "item_parent_data.gd will never be an instance of ItemData"。
+	# The-BossRush 加载顺序在本 mod 之前，_init 运行时它的扩展路径已排队到
+	# ModLoaderStore.script_extensions，而 handle_script_extensions() 尚未执行。
+	for i in range(ModLoaderStore.script_extensions.size() - 1, -1, -1):
+		var ext_path: String = ModLoaderStore.script_extensions[i]
+		if "/The-BossRush/" in ext_path and ext_path.ends_with("/items/global/item_parent_data.gd"):
+			ModLoaderStore.script_extensions.remove(i)
+			ModLoaderLog.info("Blocked item_parent_data.gd extension from The-BossRush: %s" % ext_path, MOD_ID)
 
 
 func _install_extensions_from_dir(dir_path: String) -> void:
