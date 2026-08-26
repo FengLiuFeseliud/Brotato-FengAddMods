@@ -5,6 +5,7 @@ var effect_fengliu_shop_item_count = Keys.generate_hash("fengliu_shop_item_count
 var effect_fengliu_stats_stop = Keys.generate_hash("fengliu_stats_stop")
 var effect_fengliu_stats_buy_item = Keys.generate_hash("fengliu_stats_buy_item")
 var effect_fengliu_item_bought_spawn_boss = Keys.generate_hash("fengliu_item_bought_spawn_boss")
+var effect_fengliu_swap_enemie = Keys.generate_hash("fengliu_swap_enemie")
 
 
 var fengliu_shop_items_count_price = Keys.generate_hash("fengliu_shop_items_count_price")
@@ -71,6 +72,8 @@ func fill_shop_items(player_locked_items: Array, player_index: int, just_entered
 	# 无效果则走原逻辑
 	if effects.size() == 0:
 		.fill_shop_items(player_locked_items, player_index, just_entered_shop)
+		# 刷新预报道具的敌人替换
+		fengliu_roll_swap_enemies_in_shop(player_index)
 		return
 
 	var effect = effects[0]
@@ -82,10 +85,47 @@ func fill_shop_items(player_locked_items: Array, player_index: int, just_entered
 		var new_shop_item_count = ItemService.NB_SHOP_ITEMS - fengliu_get_dynamic_value(effect[2], effect[3], effect[4])
 		fengliu_set_item_count(player_locked_items, new_shop_item_count, player_index)
 
+	# 刷新预报道具的敌人替换
+	fengliu_roll_swap_enemies_in_shop(player_index)
+
 	# 无需调整价格
 	if effect[5] == 0:
 		return
 	fengliu_set_items_price_from_shop_item_count(effect[5], player_index)
+
+
+# 商店刷新时触发预报道具的敌人替换
+func fengliu_roll_swap_enemies_in_shop(player_index: int) -> void:
+	# 遍历商店道具
+	for shop_entry in _shop_items[player_index]:
+		var item = shop_entry[0]
+		if item.effects == null:
+			continue
+
+		# 查找带替换效果的预报道具
+		var has_swap_effect = false
+		for effect in item.effects:
+			if effect.custom_key_hash == effect_fengliu_swap_enemie:
+				has_swap_effect = true
+				break
+		if not has_swap_effect:
+			continue
+
+		# 深拷贝道具，避免修改原道具资源
+		var new_item = item.duplicate()
+		var new_effects = []
+		for effect in item.effects:
+			if effect.custom_key_hash == effect_fengliu_swap_enemie:
+				new_effects.append(effect.duplicate())
+			else:
+				new_effects.append(effect)
+		new_item.effects = new_effects
+		shop_entry[0] = new_item
+
+		# 随机预报下一波敌人替换
+		for effect in new_item.effects:
+			if effect.custom_key_hash == effect_fengliu_swap_enemie:
+				effect.fengliu_roll_next_wave_enemy_swap(player_index)
 
 
 # 显示精英图标

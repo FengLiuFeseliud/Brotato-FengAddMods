@@ -55,12 +55,17 @@ var effect_fengliu_wave_elites_spawn = Keys.generate_hash("fengliu_wave_elites_s
 var effect_fengliu_apply_item_not_add_all_debuff = Keys.generate_hash("fengliu_apply_item_not_add_all_debuff")
 
 
+var fengliu_item_forecast = Keys.generate_hash("item_forecast")
+
+
 var stat_after_change_wave_value_count = {}
 var all_secondary_stats_hashs = []
 var all_secondary_abs_debuff_stats_hashs = []
 var all_item_debuff_hashs = []
 var _wave_total_hp_to_durations = [1.0, 1.0, 1.0]
 var _wave_total_hp = 0
+var _wave_swap_enemies = []
+
 
 var _wave_intensity = 0
 var _current_wave_intensity = 0
@@ -102,11 +107,15 @@ func fengliu_get_wave_total_hp_to_duration() -> float:
 	return _current_wave_intensity
 
 
+# 记录下一波敌人替换（预报道具）
+func fengliu_add_wave_swap_enemies(enemies_path: String, enemies_id: String, to_enemies_path: String, to_enemies_id: String):
+	_wave_swap_enemies.append([enemies_path, enemies_id, to_enemies_path, to_enemies_id])
+
+
 # 生成波次精英
 func fengliu_wave_elites_spawn(player_data) -> void :
 	# 随机取一只精英
-	var possible_elites = ItemService.get_elites_from_zone(current_zone)
-	var new_elite_id = Utils.get_rand_element(possible_elites).my_id_hash
+	var new_elite_id = ItemService.get_random_elite_id_hash_from_zone(current_zone)
 	# 加入下一波额外敌人
 	player_data.effects[Keys.extra_enemies_next_wave_hash].append(["res://zones/common/elite/group_elite.tres", 1, new_elite_id])
 
@@ -342,8 +351,19 @@ func on_wave_end() -> void :
 		effects = get_player_effect(effect_fengliu_random_curse, player_index)
 		if effects.size() > 0:
 			fengliu_auto_curse(effects[0], player_index)
+
+		# 移除全部天气预报道具（预报在波次结束后失效）
+		while true:
+			var item_data = RunData.get_player_item(fengliu_item_forecast, player_index)
+			if item_data == null:
+				break
+
+			remove_item(item_data, player_index)
 	
+	# 清空敌人替换记录
+	_wave_swap_enemies = []
 	_restart_wave = false
+
 
 # 统一添加效果哈希
 func get_player_effect(key: int, player_index: int):
@@ -680,6 +700,7 @@ func apply_item_effects(item_data: ItemParentData, player_index: int) -> void :
 	.apply_item_effects(item_data, player_index)
 	# 还原效果
 	item_data.effects = old_effects
+
 
 # 扩展重置波次状态
 func reset_to_start_wave_state() -> void :

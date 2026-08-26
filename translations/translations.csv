@@ -17,6 +17,9 @@ WEAPON_KEY,Key,花园钥匙
 ADAPTOR,Adaptor,适应者
 ROGUE_AI,Rogue AI,流窜AI
 WEAPON_ADAPTOR_SMG,Adaptor SMG,适应冲锋枪
+ITEM_FORECAST,Forecast,天气预报
+ITEM_NO_FORECAST,No Forecast,失效的天气预报
+WEATHER_MANIAC,Weather Maniac,天气狂
 EFFECT_TWO_HAND_WEAPON_SLOT_LIMIT,Only has two hands (so can only hold two weapons),只有两只手所以只拿两个武器
 ITEM_RAT_KING_RATZILLA,Rat Subject,鼠族臣民
 EFFECT_RATZILLA_KILLER_BOSS_TEXT,Ratzilla targets and attacks bosses,鼠斯拉会锁定并攻击 boss
@@ -103,3 +106,9 @@ EFFECT_WAVE_INTENSITY_DAMAGE,Your attacks deal additional damage equal to {0} of
 EFFECT_ADAPTOR_SMG_0,"During high-quality, Horde or Elite waves, projectiles [color=lime]+2[/color]",高质量波次与敌众或精英波次时，投掷物[color=lime]+2[/color]
 EFFECT_NO_KILL_ENEMY,Your {0} attacks cannot kill enemies,你的{0}攻击不会致死
 EFFECT_CHARM_ENEMY,Your {1} attacks have a {0} chance to charm enemies on hit; enemies are always charmed at 1 HP (bosses are charmed when below {2} HP),你的{1}击中时有{0}概率魅惑敌人，敌人生命值为1时必定魅惑（Boss 生命值低于{2}时将会魅惑）
+EFFECT_SWAP_ENEMIE,"Next wave, {0} will spawn as {1} instead",下一波敌袭时将要生成的{0}改为生成{1}
+EFFECT_SWAP_ENEMIE_WAVE_END_TEXT,Can be purchased again after it expires,失效后可以重新购买
+EFFECT_GUARANTEED_SHOP_ITEMS,Shop guarantees {0} (up to its max count),商店必定出现{0}（不超过其数量上限）
+EFFECT_SWAP_ENEMIE_END_TEXT,This forecast is outdated,这个预报已经过时了
+EFFECT_CAN_SWAP_LOOTER_ENEMIES,,天气预报有{0}概率将敌人替换为战利品外星人
+EFFECT_KILL_LOOTER_SPAWN_BOSS,,击杀战利品外星人时有{0}概率生成一个 Boss

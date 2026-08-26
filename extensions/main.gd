@@ -12,6 +12,7 @@ var effect_fengliu_add_xp_gold_from_wave_time = Keys.generate_hash("fengliu_add_
 var effect_fengliu_auto_open_box = Keys.generate_hash("fengliu_auto_open_box")
 var effect_fengliu_apply_item_not_add_all_debuff = Keys.generate_hash("fengliu_apply_item_not_add_all_debuff")
 var effect_fengliu_add_stat_fron_wave_intensity = Keys.generate_hash("fengliu_add_stat_fron_wave_intensity")
+var effect_fengliu_kill_looter_spawn_boss = Keys.generate_hash("fengliu_kill_looter_spawn_boss")
 
 
 var _is_speedrun_ending: bool = false
@@ -184,6 +185,18 @@ func fengliu_respawn_boss(enemy: Enemy, effect: Array) -> void:
 	new_boss.current_stats.damage = new_speed
 
 
+func fengliu_kill_looter_spawn_boss(enemy: Enemy, chance: int) -> void:
+	if not Utils.get_chance_success(chance / 100.0):
+		return
+
+	var elite = Utils.get_rand_element(ItemService.get_elites_from_zone(RunData.current_zone))
+	if elite == null or elite.scene == null:
+		return
+		
+	var args = _entity_spawner.SpawnEntityArgs.new(enemy.global_position, EntityType.BOSS)
+	_entity_spawner.spawn_entity(elite.scene, args)
+
+
 # 扩展材料捡起后
 func on_gold_picked_up(gold: Node, player_index: int) -> void :
 	if gold.already_picked_up:
@@ -208,7 +221,12 @@ func on_gold_picked_up(gold: Node, player_index: int) -> void :
 # 扩展怪物死亡后
 func _on_enemy_died(enemy, args: Entity.DieArgs) -> void:
 	for player in _get_shuffled_live_players(): 
-		var effects = RunData.get_player_effect(effect_fengliu_killed_all_boss_wave_end, player.player_index)
+		var effects = RunData.get_player_effect(effect_fengliu_kill_looter_spawn_boss, player.player_index)
+		if effects.size() > 0 and enemy is Looter:
+			fengliu_kill_looter_spawn_boss(enemy, effects[0])
+			continue
+
+		effects = RunData.get_player_effect(effect_fengliu_killed_all_boss_wave_end, player.player_index)
 		if effects.size() > 0 and _entity_spawner.get_nb_bosses_and_elites_alive() == 1 and enemy is Boss:
 			# 若有可以杀死所有 boss 跳过波次的玩家存活时跳过波次
 			._on_enemy_died(enemy, args)
