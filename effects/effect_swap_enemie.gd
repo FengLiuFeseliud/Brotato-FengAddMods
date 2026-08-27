@@ -79,10 +79,7 @@ func fengliu_roll_next_wave_enemy_swap(player_index: int) -> void:
 
 
 func apply(player_index: int) -> void:
-	# 已预报两种敌人则记录替换
-	if wave_enemy_x_id != "" and wave_enemy_y_id != "":
-		RunData.fengliu_add_wave_swap_enemies(wave_enemy_x, wave_enemy_x_id, wave_enemy_y, wave_enemy_y_id)
-
+	# 把预报效果挂到玩家身上，下一波开始时由 WaveManager 统一收集并应用替换
 	RunData.get_player_effect(custom_key_hash ,player_index).push_back(self)
 	
 

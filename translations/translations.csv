@@ -110,5 +110,5 @@ EFFECT_SWAP_ENEMIE,"Next wave, {0} will spawn as {1} instead",下一波敌袭时
 EFFECT_SWAP_ENEMIE_WAVE_END_TEXT,Can be purchased again after it expires,失效后可以重新购买
 EFFECT_GUARANTEED_SHOP_ITEMS,Shop guarantees {0} (up to its max count),商店必定出现{0}（不超过其数量上限）
 EFFECT_SWAP_ENEMIE_END_TEXT,This forecast is outdated,这个预报已经过时了
-EFFECT_CAN_SWAP_LOOTER_ENEMIES,,天气预报有{0}概率将敌人替换为战利品外星人
-EFFECT_KILL_LOOTER_SPAWN_BOSS,,击杀战利品外星人时有{0}概率生成一个 Boss
+EFFECT_CAN_SWAP_LOOTER_ENEMIES,"Forecast has a {0} chance to replace enemies with Loot Aliens",天气预报有{0}概率将敌人替换为战利品外星人
+EFFECT_KILL_LOOTER_SPAWN_BOSS,"Killing a Loot Alien has a {0} chance to spawn a Boss",击杀战利品外星人时有{0}概率生成一个 Boss

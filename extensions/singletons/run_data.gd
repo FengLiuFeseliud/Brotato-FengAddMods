@@ -64,7 +64,6 @@ var all_secondary_abs_debuff_stats_hashs = []
 var all_item_debuff_hashs = []
 var _wave_total_hp_to_durations = [1.0, 1.0, 1.0]
 var _wave_total_hp = 0
-var _wave_swap_enemies = []
 
 
 var _wave_intensity = 0
@@ -105,11 +104,6 @@ func fengliu_get_wave_total_hp() -> float:
 # 获取当前波次每秒平均血量
 func fengliu_get_wave_total_hp_to_duration() -> float:
 	return _current_wave_intensity
-
-
-# 记录下一波敌人替换（预报道具）
-func fengliu_add_wave_swap_enemies(enemies_path: String, enemies_id: String, to_enemies_path: String, to_enemies_id: String):
-	_wave_swap_enemies.append([enemies_path, enemies_id, to_enemies_path, to_enemies_id])
 
 
 # 生成波次精英
@@ -360,8 +354,6 @@ func on_wave_end() -> void :
 
 			remove_item(item_data, player_index)
 	
-	# 清空敌人替换记录
-	_wave_swap_enemies = []
 	_restart_wave = false
 
 

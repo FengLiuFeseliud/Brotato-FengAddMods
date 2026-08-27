@@ -6,7 +6,7 @@
 script = ExtResource( 1 )
 key = ""
 text_key = "EFFECT_CAN_SWAP_LOOTER_ENEMIES"
-value = 15
+value = 20
 custom_key = "fengliu_can_swap_looter_enemies"
 storage_method = 1
 effect_sign = 0

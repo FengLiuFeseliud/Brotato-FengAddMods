@@ -185,14 +185,18 @@ func fengliu_respawn_boss(enemy: Enemy, effect: Array) -> void:
 	new_boss.current_stats.damage = new_speed
 
 
+# 击杀战利品外星人生成 Boss
 func fengliu_kill_looter_spawn_boss(enemy: Enemy, chance: int) -> void:
+	# 概率未命中则跳过
 	if not Utils.get_chance_success(chance / 100.0):
 		return
 
+	# 随机选一个当前区域的精英
 	var elite = Utils.get_rand_element(ItemService.get_elites_from_zone(RunData.current_zone))
 	if elite == null or elite.scene == null:
 		return
 		
+	# 在死亡位置生成精英 Boss
 	var args = _entity_spawner.SpawnEntityArgs.new(enemy.global_position, EntityType.BOSS)
 	_entity_spawner.spawn_entity(elite.scene, args)
 
@@ -221,8 +225,9 @@ func on_gold_picked_up(gold: Node, player_index: int) -> void :
 # 扩展怪物死亡后
 func _on_enemy_died(enemy, args: Entity.DieArgs) -> void:
 	for player in _get_shuffled_live_players(): 
+		# 击杀战利品外星人有概率生成 Boss
 		var effects = RunData.get_player_effect(effect_fengliu_kill_looter_spawn_boss, player.player_index)
-		if effects.size() > 0 and enemy is Looter:
+		if not _cleaning_up and effects.size() > 0 and enemy is Looter and not args.cleaning_up:
 			fengliu_kill_looter_spawn_boss(enemy, effects[0])
 			continue
 
