@@ -9,4 +9,4 @@ sprite = ExtResource( 2 )
 position = 0
 display_priority = 2
 depth = 900.0
-is_character_appearance = false
+is_character_appearance = true
