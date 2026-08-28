@@ -1,0 +1,14 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/effects/effect_apply_item_not_add_all_debuff.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+key = ""
+text_key = "EFFECT_CHANCE_APPLY_ITEM_NOT_ADD_ALL_DEBUFF_FROM_BOX"
+value = 15
+custom_key = "fengliu_apply_item_not_add_all_debuff"
+storage_method = 0
+effect_sign = 3
+custom_args = [  ]
+from_box = true

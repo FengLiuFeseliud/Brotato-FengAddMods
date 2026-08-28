@@ -18,6 +18,7 @@
 [ext_resource path="res://weapons/ranged/taser/1/taser_data.tres" type="Resource" id=19]
 [ext_resource path="res://weapons/ranged/slingshot/1/slingshot_data.tres" type="Resource" id=20]
 [ext_resource path="res://weapons/ranged/rail_gun/1/rail_gun_1_data.tres" type="Resource" id=21]
+[ext_resource path="res://weapons/ranged/revolver/1/revolver_data.tres" type="Resource" id=22]
 
 [resource]
 script = ExtResource( 2 )
@@ -41,5 +42,5 @@ wanted_tags = [ "stat_engineering", "structure" ]
 banned_item_groups = [  ]
 banned_items = [  ]
 banned_upgrades = [  ]
-starting_weapons = [ ExtResource( 15 ), ExtResource( 16 ), ExtResource( 17 ), ExtResource( 18 ), ExtResource( 19 ), ExtResource( 20 ), ExtResource( 21 )  ]
+starting_weapons = [ ExtResource( 15 ), ExtResource( 16 ), ExtResource( 17 ), ExtResource( 18 ), ExtResource( 19 ), ExtResource( 20 ), ExtResource( 21 ), ExtResource( 22 ) ]
 starting_items = [  ]

@@ -6,7 +6,7 @@
 script = ExtResource( 1 )
 key = "stat_curse"
 text_key = "EFFECT_STATS_BUY_ITEM"
-value = 5
+value = 3
 custom_key = "fengliu_stats_buy_item"
 storage_method = 2
 effect_sign = 3
