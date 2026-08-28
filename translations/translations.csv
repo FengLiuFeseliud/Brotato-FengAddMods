@@ -21,6 +21,7 @@ ITEM_FORECAST,Forecast,天气预报
 ITEM_NO_FORECAST,No Forecast,失效的天气预报
 WEATHER_MANIAC,Weather Maniac,天气狂
 ITEM_AUTO_OPEN_BOX,Auto Crates,自动化箱子
+ITEM_INTERDICTION,Interdiction,封杀令
 EFFECT_TWO_HAND_WEAPON_SLOT_LIMIT,Only has two hands (so can only hold two weapons),只有两只手所以只拿两个武器
 ITEM_RAT_KING_RATZILLA,Rat Subject,鼠族臣民
 EFFECT_RATZILLA_KILLER_BOSS_TEXT,Ratzilla targets and attacks bosses,鼠斯拉会锁定并攻击 boss
@@ -113,3 +114,4 @@ EFFECT_GUARANTEED_SHOP_ITEMS,Shop guarantees {0} (up to its max count),商店必
 EFFECT_SWAP_ENEMIE_END_TEXT,This forecast is outdated,这个预报已经过时了
 EFFECT_CAN_SWAP_LOOTER_ENEMIES,"Forecast has a {0} chance to replace enemies with Loot Aliens",天气预报有{0}概率将敌人替换为战利品外星人
 EFFECT_KILL_LOOTER_SPAWN_BOSS,"Killing a Loot Alien has a {0} chance to spawn a Boss",击杀战利品外星人时有{0}概率生成一个 Boss
+EFFECT_SWAP_ENEMIE_ALL_WAVE,,后续所有敌袭时将要生成的{0}改为生成{1}

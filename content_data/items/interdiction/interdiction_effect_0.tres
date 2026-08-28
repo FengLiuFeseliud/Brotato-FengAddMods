@@ -1,0 +1,13 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/effects/effect_swap_enemie.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+key = ""
+text_key = "EFFECT_SWAP_ENEMIE_ALL_WAVE"
+value = 0
+custom_key = "fengliu_swap_enemie"
+storage_method = 2
+effect_sign = 3
+custom_args = [  ]
