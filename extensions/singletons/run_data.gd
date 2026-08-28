@@ -512,20 +512,8 @@ func remove_stat(stat_hsh: int, value: int, player_index: int) -> void :
 	.remove_stat(stat_hsh, value, player_index)
 
 
-# fengliu_shop_item_count - 商店道具数效果 保留锁定数
+# fengliu_shop_item_count - 商店道具数效果（锁定上限判断已移至 UI 层 shop_item.gd）
 func lock_player_shop_item(item_data: ItemParentData, wave_value: int, player_index: int) -> void :
-	# 获取商店道具数效果
-	var effects = RunData.get_player_effect(effect_fengliu_shop_item_count, player_index)
-	# 无效果走原逻辑
-	if effects.size() == 0:
-		.lock_player_shop_item(item_data, wave_value, player_index)
-		return
-	
-	# 已达锁定上限则不锁定
-	if locked_shop_items[player_index].size() >= effects[0][6]:
-		return
-	
-	# 执行锁定
 	.lock_player_shop_item(item_data, wave_value, player_index)
 
 
