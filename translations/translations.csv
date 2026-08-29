@@ -98,6 +98,7 @@ EFFECT_ADD_XP_GOLD_FROM_WAVE_TIME,"Clearing a wave grants Materials and XP based
 EFFECT_WEAPON_KILLED_LOOT,"Grants a Crate every {0} kills (+{1} kills required per wave, up to {2} kills)",每击杀{0}敌人获取一个箱子，每波增加{1}所需击杀数（上限{2}击杀数）
 LOOT_BOX,"Crates Acquired: {0}",获取到的箱子：{0}
 EFFECT_AUTO_OPEN_BOX,"You automatically collect items from Crates",你将自动获取箱子中的道具
+AUTO_OPEN_BOX,Crates Acquired: {0},自动获取到的箱子：{0}
 EFFECT_CHANCE_APPLY_ITEM_NOT_ADD_ALL_DEBUFF_FROM_BOX,"When acquiring an item from a Crate, {0} chance to ignore all negative effects",从箱子获取道具时有{0}概率无视道具所有负面效果
 EFFECT_PICKED_UP_CONSUMABLE_ADD_SIZE,"When you pick up a Consumable, your character and weapons increase in size by {0} until the end of the wave",当捡起消耗品时你的角色与武器将放大{0}，直至敌袭结束
 EFFECT_BOX_STAT,"{0}{1} when picking up a crate",捡起一个箱子时永久{0}{1}
@@ -114,4 +115,4 @@ EFFECT_GUARANTEED_SHOP_ITEMS,Shop guarantees {0} (up to its max count),商店必
 EFFECT_SWAP_ENEMIE_END_TEXT,This forecast is outdated,这个预报已经过时了
 EFFECT_CAN_SWAP_LOOTER_ENEMIES,"Forecast has a {0} chance to replace enemies with Loot Aliens",天气预报有{0}概率将敌人替换为战利品外星人
 EFFECT_KILL_LOOTER_SPAWN_BOSS,"Killing a Loot Alien has a {0} chance to spawn a Boss",击杀战利品外星人时有{0}概率生成一个 Boss
-EFFECT_SWAP_ENEMIE_ALL_WAVE,,后续所有敌袭时将要生成的{0}改为生成{1}
+EFFECT_SWAP_ENEMIE_ALL_WAVE,"In all subsequent waves, {0} will spawn as {1} instead",后续所有敌袭时将要生成的{0}改为生成{1}

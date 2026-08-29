@@ -58,6 +58,10 @@ var effect_fengliu_apply_item_not_add_all_debuff = Keys.generate_hash("fengliu_a
 var fengliu_item_forecast = Keys.generate_hash("item_forecast")
 
 
+var fengliu_item_auto_open_box_hash = Keys.generate_hash("item_auto_open_box")
+var fengliu_crate_gobbler_hash = Keys.generate_hash("crate_gobbler")
+
+
 var stat_after_change_wave_value_count = {}
 var all_secondary_stats_hashs = []
 var all_secondary_abs_debuff_stats_hashs = []
@@ -85,6 +89,15 @@ func _ready() -> void :
 	# 生成绝对值负面属性哈希
 	for item_debuff in ALL_SECONDARY_ABS_DEBUFF_STATS:
 		all_secondary_abs_debuff_stats_hashs.append(Keys.generate_hash(item_debuff))
+
+
+# 扩展追踪效果初始化
+func init_tracked_effects() -> Dictionary:
+	var tracked = .init_tracked_effects()
+	# 初始化追踪
+	tracked[fengliu_item_auto_open_box_hash] = 0
+	tracked[fengliu_crate_gobbler_hash] = 0
+	return tracked
 
 
 func fengliu_get_high_wave_count() -> int:

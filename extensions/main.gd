@@ -15,6 +15,10 @@ var effect_fengliu_add_stat_fron_wave_intensity = Keys.generate_hash("fengliu_ad
 var effect_fengliu_kill_looter_spawn_boss = Keys.generate_hash("fengliu_kill_looter_spawn_boss")
 
 
+var fengliu_item_auto_open_box_hash = Keys.generate_hash("item_auto_open_box")
+var fengliu_crate_gobbler_hash = Keys.generate_hash("crate_gobbler")
+
+
 var _is_speedrun_ending: bool = false
 
 
@@ -271,6 +275,50 @@ func on_levelled_up(player_index: int) -> void :
 	for effect in effects:
 		# 随机升级获取属性
 		fengliu_random_stats_on_level_up(effect, player_index)
+
+
+# 自动开箱
+func fengliu_auto_open_box(consumable: Node, player_index: int) -> void:
+	# 跳过 UI 显示
+	consumable.consumable_data.to_be_processed_at_end_of_wave = false
+	# 开箱
+	var box_item_data = ItemService.process_item_box(consumable.consumable_data, RunData.current_wave, player_index)
+		
+	# 概率删除箱子道具全部负面效果
+	for effect in RunData.get_player_effect(effect_fengliu_apply_item_not_add_all_debuff, player_index):
+		if effect[1] and Utils.get_chance_success(effect[0] / 100.0):
+			fengliu_apply_item_not_add_all_debuff(box_item_data, player_index)
+		else:
+			RunData.add_item(box_item_data, player_index)
+
+	# 箱子已捡起
+	consumable.already_picked_up = true
+
+	# 处理箱子的额外道具
+	var extra_item_effects: Array = RunData.get_player_effect(Keys.extra_item_in_crate_hash, player_index)
+	for effect in extra_item_effects:
+		if not Utils.get_chance_success(effect[1] / 100.0):
+			continue
+
+		var extra_item_data
+		if effect[0] == Keys.random_hash:
+			extra_item_data = ItemService.get_rand_item_for_wave(RunData.current_wave, player_index)
+			RunData.add_tracked_value(player_index, Keys.item_treasure_map_hash, 1)
+		else:
+			extra_item_data = ItemService.get_item_from_id(effect[0]).duplicate()
+			extra_item_data.value = 1
+
+		RunData.add_item(extra_item_data, player_index)
+
+
+	# 结算箱子金币
+	var item_box_gold_effect = RunData.get_player_effect(Keys.item_box_gold_hash, player_index)
+	RunData.add_gold(item_box_gold_effect, player_index)
+	RunData.add_tracked_value(player_index, Keys.item_bag_hash, item_box_gold_effect)
+
+	# 追踪自动开箱次数
+	RunData.add_tracked_value(player_index, fengliu_item_auto_open_box_hash, 1)
+	RunData.add_tracked_value(player_index, fengliu_crate_gobbler_hash, 1)
 		
 
 # 扩展拾取消耗品
@@ -304,22 +352,10 @@ func on_consumable_picked_up(consumable: Node, player_index: int) -> void :
 		.on_consumable_picked_up(consumable, player_index)
 		return
 
+	# 自动开箱
 	effects = RunData.get_player_effect(effect_fengliu_auto_open_box, player_index)
 	if effects.size() > 0:
-		# 自动开箱
-		# 跳过 UI 显示
-		consumable.consumable_data.to_be_processed_at_end_of_wave = false
-		# 开箱
-		var box_item_data = ItemService.process_item_box(consumable.consumable_data, RunData.current_wave, player_index)
-		
-		# 概率删除箱子道具全部负面效果
-		effects = RunData.get_player_effect(effect_fengliu_apply_item_not_add_all_debuff, player_index)
-		if effects.size() > 0 and effects[0][1] and Utils.get_chance_success(effects[0][0] / 100.0):
-			fengliu_apply_item_not_add_all_debuff(box_item_data, player_index)
-		else:
-			RunData.add_item(box_item_data, player_index)
-		# 箱子已捡起
-		consumable.already_picked_up = true
+		fengliu_auto_open_box(consumable, player_index)
 
 	if not picked_box_need_cost:
 		.on_consumable_picked_up(consumable, player_index)
