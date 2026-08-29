@@ -61,12 +61,19 @@ func _fengliu_refresh_lock_buttons() -> void:
 # 达到锁定上限时，禁用未锁定道具的锁定按钮
 func manage_lock_button_visibility() -> void:
     .manage_lock_button_visibility()
+    # 物品本身不可锁定时，强制禁用并隐藏，防止刷新时被重新激活
+    if item_data == null or not item_data.is_lockable:
+        _lock_button.disable()
+        _lock_button.hide()
+        return
     if _fengliu_is_lock_limit_reached() and not _fengliu_is_item_locked():
         _lock_button.disable()
 
 
 # 达到锁定上限时禁止新增锁定，并在切换后刷新所有道具按钮
 func change_lock_status(button_pressed: bool) -> void:
+    if button_pressed and item_data != null and not item_data.is_lockable:
+        return
     if button_pressed and _fengliu_is_lock_limit_reached():
         return
     .change_lock_status(button_pressed)
