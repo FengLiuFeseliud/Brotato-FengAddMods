@@ -56,6 +56,7 @@ var effect_fengliu_apply_item_not_add_all_debuff = Keys.generate_hash("fengliu_a
 
 
 var fengliu_item_forecast = Keys.generate_hash("item_forecast")
+var fengliu_item_directed_training = Keys.generate_hash("item_directed_training")
 
 
 var fengliu_item_auto_open_box_hash = Keys.generate_hash("item_auto_open_box")
@@ -74,6 +75,12 @@ var _wave_intensity = 0
 var _current_wave_intensity = 0
 var _high_wave_count = 0
 var _restart_wave = false
+
+
+var wave_end_remove_items = [
+	fengliu_item_forecast,
+	fengliu_item_directed_training
+]
 
 
 # 扩展初始化哈希列表
@@ -359,15 +366,19 @@ func on_wave_end() -> void :
 		if effects.size() > 0:
 			fengliu_auto_curse(effects[0], player_index)
 
-		# 移除全部天气预报道具（预报在波次结束后失效）
-		while true:
-			var item_data = RunData.get_player_item(fengliu_item_forecast, player_index)
-			if item_data == null:
-				break
-
-			remove_item(item_data, player_index)
-	
 	_restart_wave = false
+
+
+# 进入商店后：移除波次结束失效的道具
+func fengliu_remove_shop_items() -> void:
+	for player_index in get_player_count():
+		for wave_end_remove_item in wave_end_remove_items:
+			while true:
+				var item_data = get_player_item(wave_end_remove_item, player_index)
+				if item_data == null:
+					break
+
+				remove_item(item_data, player_index)
 
 
 # 统一添加效果哈希

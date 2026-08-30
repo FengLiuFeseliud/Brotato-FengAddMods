@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource( 1 )
 key = ""
-text_key = "EFFECT_ITEM_WAVE_END_TEXT"
+text_key = "EFFECT_FIXED_UPGRADE_END_TEXT"
 value = 0
 custom_key = ""
 storage_method = 2

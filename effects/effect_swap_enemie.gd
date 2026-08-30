@@ -24,7 +24,7 @@ var effect_fengliu_can_swap_looter_enemies = Keys.generate_hash("fengliu_can_swa
 
 
 # 随机预报下一波敌人替换
-func fengliu_roll_next_wave_enemy_swap(player_index: int) -> void:
+func fengliu_roll_effecy(player_index: int) -> void:
 	# 获取下一波波次数据
 	var wave_data = ZoneService.get_wave_data(RunData.current_zone, RunData.current_wave + 1)
 	if wave_data == null:

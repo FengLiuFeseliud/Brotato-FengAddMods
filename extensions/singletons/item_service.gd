@@ -3,6 +3,10 @@ extends "res://singletons/item_service.gd"
 
 var effect_fengliu_can_all_drop_box = Keys.generate_hash("fengliu_can_all_drop_box")
 var effect_fengliu_guaranteed_shop_items = Keys.generate_hash("fengliu_guaranteed_shop_items")
+var effect_fengliu_get_fixed_upgrade = Keys.generate_hash("fengliu_get_fixed_upgrade")
+
+
+var _all_upgrade_ids = {}
 
 
 # 计算动态概率
@@ -86,3 +90,65 @@ func get_player_shop_items(wave: int, player_index: int, args: ItemServiceGetSho
         base_guaranteed.pop_back()
 
     return result
+
+
+func fengliu_get_all_upgrade_id_hashs() -> Array:
+    if _all_upgrade_ids.size() != 0:
+        return _all_upgrade_ids.values()
+
+    for tier in range(_tiers_data.size()):
+        for upgrade in _tiers_data[tier][TierData.UPGRADES]:
+            _all_upgrade_ids[upgrade.upgrade_id] = upgrade.upgrade_id_hash
+    return _all_upgrade_ids.values()
+
+
+func fengliu_get_fixed_upgrade_data(level: int, player_index: int, upgrade_id_hash: int) -> UpgradeData:
+    var tier = get_tier_from_wave(level, player_index)
+
+    # 原版的特殊等级规则
+    if level == 5:
+        tier = Tier.UNCOMMON
+    elif level == 10 or level == 15 or level == 20:
+        tier = Tier.RARE
+    elif level % 5 == 0:
+        tier = Tier.LEGENDARY
+
+    var upgrade_data = null
+    var pool: Array = _tiers_data[tier][TierData.UPGRADES]
+    for upgrade in pool:
+        if upgrade.upgrade_id_hash != upgrade_id_hash:
+            continue
+        upgrade_data = upgrade
+
+    if upgrade_data == null:
+        upgrade_data = Utils.get_rand_element(pool)
+    
+    var level_upgrades_modifications = RunData.get_player_effect(Keys.level_upgrades_modifications_hash, player_index)
+    if level_upgrades_modifications == 0:
+        return upgrade_data
+
+    var new_effects = []
+    upgrade_data = upgrade_data.duplicate()
+    for effect in upgrade_data.effects:
+        var new_effect = effect.duplicate()
+        new_effect.value = int(effect.value * (1.0 + level_upgrades_modifications / 100.0))
+        new_effects.push_back(new_effect)
+
+    upgrade_data.effects = new_effects
+    return upgrade_data
+
+
+func fengliu_get_fixed_upgrade(level: int, effect, player_index: int) -> Array:
+    var all_fixed_upgrade = []
+    for upgrade_id_hash in effect.all_fixed_upgrade_id_hashs:
+        all_fixed_upgrade.append(fengliu_get_fixed_upgrade_data(level, player_index, upgrade_id_hash))
+
+    return all_fixed_upgrade
+
+
+func get_upgrades(level: int, number: int, old_upgrades: Array, player_index: int) -> Array:
+    var effects = RunData.get_player_effect(effect_fengliu_get_fixed_upgrade, player_index)
+    if effects.size() > 0:
+        return fengliu_get_fixed_upgrade(level, effects[0], player_index)
+
+    return .get_upgrades(level, number, old_upgrades, player_index)

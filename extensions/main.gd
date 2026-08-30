@@ -22,6 +22,12 @@ var fengliu_crate_gobbler_hash = Keys.generate_hash("crate_gobbler")
 var _is_speedrun_ending: bool = false
 
 
+func _change_scene(path: String) -> void :
+	._change_scene(path)
+	# 进入商店后：清理波次结束失效的道具
+	RunData.fengliu_remove_shop_items()
+
+
 # 计算动态概率
 static func fengliu_get_dynamic_chance(stat_count: int, init_chance: int, add_chance: int) -> int:
 	# 基础概率 + 属性数 * 每点加成
