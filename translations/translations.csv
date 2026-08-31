@@ -25,6 +25,8 @@ ITEM_INTERDICTION,Interdiction,封杀令
 ITEM_MILK,Milk,牛奶
 ITEM_DIRECTAD_TRAINING,Directed Training,定向训练
 ITEM_NO_DIRECTAD_TRAINING,No Directed Training,失效的定向训练
+ITEM_CLOWN_FISH,Clown Fish,小丑鱼
+ITEM_CLOWN_FISH_USED,Resting Clown Fish,休息的小丑鱼
 EFFECT_TWO_HAND_WEAPON_SLOT_LIMIT,Only has two hands (so can only hold two weapons),只有两只手所以只拿两个武器
 ITEM_RAT_KING_RATZILLA,Rat Subject,鼠族臣民
 EFFECT_RATZILLA_KILLER_BOSS_TEXT,Ratzilla targets and attacks bosses,鼠斯拉会锁定并攻击 boss
@@ -121,3 +123,5 @@ EFFECT_KILL_LOOTER_SPAWN_BOSS,"Killing a Loot Alien has a {0} chance to spawn a 
 EFFECT_SWAP_ENEMIE_ALL_WAVE,"In all subsequent waves, {0} will spawn as {1} instead",后续所有敌袭时将要生成的{0}改为生成{1}
 EFFECT_GET_FIXED_UPGRADE,,下一波敌袭的所有升级属性固定为，{0}，{1}，{2}，{3}
 EFFECT_FIXED_UPGRADE_END_TEXT,This forecast is outdated,这个定向训练已经过时了
+EFFECT_UP_UPGRADE_DATA_TIER,,下一波敌袭的所有升级属性[color=lime]+1[/color]品阶
+EFFECT_UP_UPGRADE_DATA_TIER_END_TEXT,,这条小丑鱼辛苦工作了一天，正在休息

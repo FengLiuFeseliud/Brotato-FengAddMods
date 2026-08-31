@@ -8,7 +8,7 @@
 script = ExtResource( 2 )
 my_id = "item_no_directed_training"
 unlocked_by_default = true
-can_be_looted = true
+can_be_looted = false
 icon = ExtResource( 1 )
 name = "ITEM_NO_DIRECTAD_TRAINING"
 tier = 1

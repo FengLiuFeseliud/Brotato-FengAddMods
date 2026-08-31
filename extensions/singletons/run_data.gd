@@ -57,6 +57,7 @@ var effect_fengliu_apply_item_not_add_all_debuff = Keys.generate_hash("fengliu_a
 
 var fengliu_item_forecast = Keys.generate_hash("item_forecast")
 var fengliu_item_directed_training = Keys.generate_hash("item_directed_training")
+var fengliu_item_clown_fish = Keys.generate_hash("item_clown_fish")
 
 
 var fengliu_item_auto_open_box_hash = Keys.generate_hash("item_auto_open_box")
@@ -79,7 +80,8 @@ var _restart_wave = false
 
 var wave_end_remove_items = [
 	fengliu_item_forecast,
-	fengliu_item_directed_training
+	fengliu_item_directed_training,
+	fengliu_item_clown_fish
 ]
 
 
