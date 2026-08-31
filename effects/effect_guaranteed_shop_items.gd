@@ -22,6 +22,6 @@ func unapply(player_index: int) -> void:
     RunData.get_player_effects(player_index)[custom_key_hash].erase([key_hash, value])
 
 
-func get_args(_player_index: int) -> Array:
+func get_args(player_index: int) -> Array:
     # {0} = 道具名称
-    return [tr(key.to_upper())]
+    return [ .get_args(player_index)[1] ]

@@ -5,6 +5,13 @@ var effect_fengliu_can_all_drop_box = Keys.generate_hash("fengliu_can_all_drop_b
 var effect_fengliu_guaranteed_shop_items = Keys.generate_hash("fengliu_guaranteed_shop_items")
 var effect_fengliu_get_fixed_upgrade = Keys.generate_hash("fengliu_get_fixed_upgrade")
 var effect_fengliu_up_upgrade_data_tier = Keys.generate_hash("fengliu_up_upgrade_data_tier")
+var effect_fengliu_swap_enemie = Keys.generate_hash("fengliu_swap_enemie")
+
+
+var need_reroll_effect = [
+	effect_fengliu_swap_enemie,
+	effect_fengliu_get_fixed_upgrade
+]
 
 
 var _all_upgrade_ids = {}
@@ -93,6 +100,43 @@ func get_player_shop_items(wave: int, player_index: int, args: ItemServiceGetSho
     return result
 
 
+# 判断效果是否需要重新随机预报
+func _fengliu_effect_needs_reroll(effect) -> bool:
+    if effect.custom_key_hash == Keys.empty_hash and effect.custom_key != "":
+        effect.custom_key_hash = Keys.generate_hash(effect.custom_key)
+    return effect.custom_key_hash in need_reroll_effect
+
+
+# 覆写随机道具生成：让箱子开出的预报道具重随预报
+func _get_rand_item_for_wave(wave: int, player_index: int, type: int, args: GetRandItemForWaveArgs) -> ItemParentData:
+    var item = ._get_rand_item_for_wave(wave, player_index, type, args)
+    if item == null or item.effects == null:
+        return item
+
+    # 先扫描是否存在需要重新随机预报的效果
+    var has_reroll_effect = false
+    for effect in item.effects:
+        if _fengliu_effect_needs_reroll(effect):
+            has_reroll_effect = true
+            break
+
+    if not has_reroll_effect:
+        return item
+
+    # 复制 item，并逐个复制需要重随的效果，避免污染商店池里的模板资源
+    var new_item = item.duplicate()
+    var new_effects = []
+    for effect in new_item.effects:
+        if _fengliu_effect_needs_reroll(effect):
+            effect = effect.duplicate()
+            effect.fengliu_roll_effect(player_index)
+        new_effects.append(effect)
+
+    new_item.effects = new_effects
+    return new_item
+
+
+# 获取所有升级项 id 哈希
 func fengliu_get_all_upgrade_id_hashs() -> Array:
     if _all_upgrade_ids.size() != 0:
         return _all_upgrade_ids.values()
@@ -103,6 +147,7 @@ func fengliu_get_all_upgrade_id_hashs() -> Array:
     return _all_upgrade_ids.values()
 
 
+# 获取指定品阶与 id 的升级数据
 func fengliu_get_upgrade_data(tier: int, player_index: int, upgrade_id_hash: int) -> UpgradeData:
     var upgrade_data = null
     var pool: Array = _tiers_data[tier][TierData.UPGRADES]
@@ -129,6 +174,7 @@ func fengliu_get_upgrade_data(tier: int, player_index: int, upgrade_id_hash: int
     return upgrade_data
 
 
+# 获取固定升级数据（按等级定品阶）
 func fengliu_get_fixed_upgrade_data(level: int, player_index: int, upgrade_id_hash: int) -> UpgradeData:
     var tier = get_tier_from_wave(level, player_index)
 
@@ -143,6 +189,18 @@ func fengliu_get_fixed_upgrade_data(level: int, player_index: int, upgrade_id_ha
     return fengliu_get_upgrade_data(tier, player_index, upgrade_id_hash)
 
 
+# 按属性获取升级项 id 哈希
+func fengliu_get_upgrade_data_id_hash_by_stat(level: int, player_index: int, stat_hash: int) -> int:
+    var pool: Array = _tiers_data[0][TierData.UPGRADES]
+    for upgrade in pool:
+        for effect in upgrade.effects:
+            if effect.key_hash == stat_hash:
+                return upgrade.upgrade_id_hash
+
+    return Utils.get_rand_element(pool).upgrade_id_hash
+
+
+# 获取固定升级项数组
 func fengliu_get_fixed_upgrade(level: int, effect, player_index: int) -> Array:
     var all_fixed_upgrade = []
     for upgrade_id_hash in effect.all_fixed_upgrade_id_hashs:
@@ -151,11 +209,17 @@ func fengliu_get_fixed_upgrade(level: int, effect, player_index: int) -> Array:
     return all_fixed_upgrade
 
 
+# 提升升级项品阶
 func fengliu_up_upgrade_data_tier(effect: Array, upgrades: Array, player_index: int) -> Array:
     var gain_value = 0
     if effect[0] != Keys.empty_hash:
-        gain_value = RunData.get_stat(effect[0], player_index) * (effect[2] / 100.0)
-    
+        var stat_value = 0
+        if effect[0] == Keys.stat_levels_hash:
+            stat_value = RunData.get_player_level(player_index)
+        else:
+            stat_value = RunData.get_stat(effect[0], player_index)
+        gain_value = stat_value * (effect[2] / 100.0) / 100.0
+        
     var chance = effect[1] / 100.0 + gain_value
     if not Utils.get_chance_success(chance):
         return upgrades
@@ -170,13 +234,14 @@ func fengliu_up_upgrade_data_tier(effect: Array, upgrades: Array, player_index: 
     return new_upgrades
 
 
+# 扩展生成升级项
 func get_upgrades(level: int, number: int, old_upgrades: Array, player_index: int) -> Array:
     var upgrades = []
     var effects = RunData.get_player_effect(effect_fengliu_get_fixed_upgrade, player_index)
     if effects.size() > 0:
         upgrades = fengliu_get_fixed_upgrade(level, effects[0], player_index)
     else:
-        upgrades = .get_upgrades(level, number, old_upgrades, player_index)
+        upgrades =.get_upgrades(level, number, old_upgrades, player_index)
 
     for effect in RunData.get_player_effect(effect_fengliu_up_upgrade_data_tier, player_index):
         upgrades = fengliu_up_upgrade_data_tier(effect, upgrades, player_index)

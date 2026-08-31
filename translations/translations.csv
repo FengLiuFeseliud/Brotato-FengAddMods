@@ -23,10 +23,11 @@ WEATHER_MANIAC,Weather Maniac,天气狂
 ITEM_AUTO_OPEN_BOX,Auto Crates,自动化箱子
 ITEM_INTERDICTION,Interdiction,封杀令
 ITEM_MILK,Milk,牛奶
-ITEM_DIRECTAD_TRAINING,Directed Training,定向训练
-ITEM_NO_DIRECTAD_TRAINING,No Directed Training,失效的定向训练
+ITEM_DIRECTED_TRAINING,Directed Training,定向训练
+ITEM_NO_DIRECTED_TRAINING,No Directed Training,失效的定向训练
 ITEM_CLOWN_FISH,Clown Fish,小丑鱼
 ITEM_CLOWN_FISH_USED,Resting Clown Fish,休息的小丑鱼
+ATHLETE,Athlete,运动员
 EFFECT_TWO_HAND_WEAPON_SLOT_LIMIT,Only has two hands (so can only hold two weapons),只有两只手所以只拿两个武器
 ITEM_RAT_KING_RATZILLA,Rat Subject,鼠族臣民
 EFFECT_RATZILLA_KILLER_BOSS_TEXT,Ratzilla targets and attacks bosses,鼠斯拉会锁定并攻击 boss
@@ -121,7 +122,9 @@ EFFECT_SWAP_ENEMIE_END_TEXT,This forecast is outdated,这个预报已经过时�
 EFFECT_CAN_SWAP_LOOTER_ENEMIES,"Forecast has a {0} chance to replace enemies with Loot Aliens",天气预报有{0}概率将敌人替换为战利品外星人
 EFFECT_KILL_LOOTER_SPAWN_BOSS,"Killing a Loot Alien has a {0} chance to spawn a Boss",击杀战利品外星人时有{0}概率生成一个 Boss
 EFFECT_SWAP_ENEMIE_ALL_WAVE,"In all subsequent waves, {0} will spawn as {1} instead",后续所有敌袭时将要生成的{0}改为生成{1}
-EFFECT_GET_FIXED_UPGRADE,,下一波敌袭的所有升级属性固定为，{0}，{1}，{2}，{3}
+EFFECT_GET_FIXED_UPGRADE,"Next wave's upgrade options are fixed to {0}, {1}, {2}, {3}",下一波敌袭的所有升级属性项固定为，{0}，{1}，{2}，{3}
 EFFECT_FIXED_UPGRADE_END_TEXT,This forecast is outdated,这个定向训练已经过时了
-EFFECT_UP_UPGRADE_DATA_TIER,,下一波敌袭的所有升级属性[color=lime]+1[/color]品阶
-EFFECT_UP_UPGRADE_DATA_TIER_END_TEXT,,这条小丑鱼辛苦工作了一天，正在休息
+EFFECT_UP_UPGRADE_DATA_TIER,Next wave's upgrade options are [color=lime]+1[/color] tier higher,下一波敌袭的所有升级属性[color=lime]+1[/color]品阶
+EFFECT_UP_UPGRADE_DATA_TIER_END_TEXT,This Clown Fish worked hard all day and is now resting,这条小丑鱼辛苦工作了一天，正在休息
+EFFECT_GET_HIGHEST_STAT_FIXED_UPGRADE,Directed Training always includes an upgrade option for your current highest primary stat,定向训练必包含当前最高主要属性的升级项
+EFFECT_STAT_GAIN_UP_UPGRADE_DATA_TIER,Next wave's upgrade options have a {0} ({2}) chance to be [color=lime]+1[/color] tier higher,下一波敌袭的所有升级属性有{0}（{2}）概率[color=lime]+1[/color]品阶

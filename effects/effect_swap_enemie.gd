@@ -24,7 +24,7 @@ var effect_fengliu_can_swap_looter_enemies = Keys.generate_hash("fengliu_can_swa
 
 
 # 随机预报下一波敌人替换
-func fengliu_roll_effecy(player_index: int) -> void:
+func fengliu_roll_effect(player_index: int) -> void:
 	# 获取下一波波次数据
 	var wave_data = ZoneService.get_wave_data(RunData.current_zone, RunData.current_wave + 1)
 	if wave_data == null:
@@ -52,6 +52,25 @@ func fengliu_roll_effecy(player_index: int) -> void:
 				enemy_ids[unit.unit_scene.resource_path] = ""
 
 	var paths = enemies.keys()
+	# 敌人种类不足两个时，回退到关卡全敌人池，保证预报始终有内容
+	if paths.size() < 2:
+		var zone_data = ZoneService.get_zone_data(RunData.current_zone)
+		for scene in zone_data.endless_enemy_scenes:
+			if scene == null:
+				continue
+			var path = scene.resource_path
+			if enemies.has(path):
+				continue
+			enemies[path] = path
+			var inst = scene.instance()
+			if inst != null:
+				var enemy_id = inst.get("enemy_id")
+				enemy_ids[path] = enemy_id if enemy_id != null else ""
+				inst.free()
+			else:
+				enemy_ids[path] = ""
+		paths = enemies.keys()
+
 	# 敌人种类不足两个则不替换
 	if paths.size() < 2:
 		return

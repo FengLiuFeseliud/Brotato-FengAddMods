@@ -55,13 +55,13 @@ var effect_fengliu_wave_elites_spawn = Keys.generate_hash("fengliu_wave_elites_s
 var effect_fengliu_apply_item_not_add_all_debuff = Keys.generate_hash("fengliu_apply_item_not_add_all_debuff")
 
 
-var fengliu_item_forecast = Keys.generate_hash("item_forecast")
-var fengliu_item_directed_training = Keys.generate_hash("item_directed_training")
-var fengliu_item_clown_fish = Keys.generate_hash("item_clown_fish")
+var fengliu_item_forecast = Keys.generate_hash("item_forecast") # 天气预报道具哈希
+var fengliu_item_directed_training = Keys.generate_hash("item_directed_training") # 定向训练道具哈希
+var fengliu_item_clown_fish = Keys.generate_hash("item_clown_fish") # 小丑鱼道具哈希
 
 
-var fengliu_item_auto_open_box_hash = Keys.generate_hash("item_auto_open_box")
-var fengliu_crate_gobbler_hash = Keys.generate_hash("crate_gobbler")
+var fengliu_item_auto_open_box_hash = Keys.generate_hash("item_auto_open_box") # 自动化箱子道具哈希
+var fengliu_crate_gobbler_hash = Keys.generate_hash("crate_gobbler") # 箱子吞吞怪追踪哈希
 
 
 var stat_after_change_wave_value_count = {}
@@ -78,6 +78,7 @@ var _high_wave_count = 0
 var _restart_wave = false
 
 
+# 波次结束移除的道具列表
 var wave_end_remove_items = [
 	fengliu_item_forecast,
 	fengliu_item_directed_training,
@@ -315,6 +316,18 @@ func fengliu_calc_wave_total_hp_to_duration() -> float:
 	_wave_total_hp = total
 	# 返回每秒平均生命值 = 总生命值 / 波次时长
 	return total / float(max(1, wave_data.wave_duration))
+
+
+# 获取玩家最高主属性的 stat_hash
+func fengliu_get_highest_stat_hash(player_index: int) -> int:
+	var highest_stat = Keys.empty_hash
+	var highest_value = null
+	for stat_hash in primary_stats_list:
+		var value = get_stat(stat_hash, player_index)
+		if highest_value == null or value > highest_value:
+			highest_value = value
+			highest_stat = stat_hash
+	return highest_stat
 
 
 # 扩展波次开始

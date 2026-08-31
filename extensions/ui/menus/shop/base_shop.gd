@@ -128,7 +128,7 @@ func fengliu_roll_swap_enemies_in_shop(player_index: int) -> void:
 
 		for effect in new_item.effects:
 			if effect.custom_key_hash in need_reroll_effect:
-				effect.fengliu_roll_effecy(player_index)
+				effect.fengliu_roll_effect(player_index)
 
 
 # 显示精英图标
