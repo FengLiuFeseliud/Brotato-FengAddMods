@@ -154,7 +154,8 @@ func fengliu_get_upgrade_data(tier: int, player_index: int, upgrade_id_hash: int
     for upgrade in pool:
         if upgrade.upgrade_id_hash != upgrade_id_hash:
             continue
-        return upgrade
+        upgrade_data = upgrade
+        break
 
     if upgrade_data == null:
         upgrade_data = Utils.get_rand_element(pool)
@@ -236,12 +237,10 @@ func fengliu_up_upgrade_data_tier(effect: Array, upgrades: Array, player_index: 
 
 # 扩展生成升级项
 func get_upgrades(level: int, number: int, old_upgrades: Array, player_index: int) -> Array:
-    var upgrades = []
+    var upgrades = .get_upgrades(level, number, old_upgrades, player_index)
     var effects = RunData.get_player_effect(effect_fengliu_get_fixed_upgrade, player_index)
     if effects.size() > 0:
         upgrades = fengliu_get_fixed_upgrade(level, effects[0], player_index)
-    else:
-        upgrades =.get_upgrades(level, number, old_upgrades, player_index)
 
     for effect in RunData.get_player_effect(effect_fengliu_up_upgrade_data_tier, player_index):
         upgrades = fengliu_up_upgrade_data_tier(effect, upgrades, player_index)

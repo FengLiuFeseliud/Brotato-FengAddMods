@@ -28,6 +28,7 @@ ITEM_NO_DIRECTED_TRAINING,No Directed Training,失效的定向训练
 ITEM_CLOWN_FISH,Clown Fish,小丑鱼
 ITEM_CLOWN_FISH_USED,Resting Clown Fish,休息的小丑鱼
 ATHLETE,Athlete,运动员
+WEAPON_RAPHAEL,Raphael,拉斐尔
 EFFECT_TWO_HAND_WEAPON_SLOT_LIMIT,Only has two hands (so can only hold two weapons),只有两只手所以只拿两个武器
 ITEM_RAT_KING_RATZILLA,Rat Subject,鼠族臣民
 EFFECT_RATZILLA_KILLER_BOSS_TEXT,Ratzilla targets and attacks bosses,鼠斯拉会锁定并攻击 boss

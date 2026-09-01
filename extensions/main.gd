@@ -191,8 +191,8 @@ func fengliu_respawn_boss(enemy: Enemy, effect: Array) -> void:
 	new_boss.current_stats.damage = new_damage
 
 	var new_speed = old_speed + int(old_speed * gain_value)
-	new_boss.max_stats.damage = new_speed
-	new_boss.current_stats.damage = new_speed
+	new_boss.max_stats.speed = new_speed
+	new_boss.current_stats.speed = new_speed
 
 
 # 击杀战利品外星人生成 Boss

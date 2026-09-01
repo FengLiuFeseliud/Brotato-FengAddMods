@@ -6,7 +6,7 @@
 script = ExtResource( 1 )
 key = ""
 text_key = "EFFECT_BOSS_DIED_RESPAWN"
-value = 200
+value = 50
 custom_key = "fengliu_boss_died_respawn"
 storage_method = 0
 effect_sign = 3
