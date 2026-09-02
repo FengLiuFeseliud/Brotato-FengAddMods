@@ -1,4 +1,4 @@
-[gd_resource type="Resource" load_steps=6 format=2]
+[gd_resource type="Resource" load_steps=8 format=2]
 
 [ext_resource path="res://items/global/weapon_data.gd" type="Script" id=1]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/melee/raphael/4/raphael_4_stats.tres" type="Resource" id=2]
@@ -18,7 +18,7 @@ name = "WEAPON_RAPHAEL"
 tier = 3
 value = 190
 effects = [ ExtResource( 6 ), ExtResource( 7 ) ]
-tracking_text = ""
+tracking_text = "stats_gained"
 is_lockable = true
 unlock_codex_descr_after_get_it = 1
 is_cursed = false

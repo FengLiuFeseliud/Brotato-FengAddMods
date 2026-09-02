@@ -62,4 +62,3 @@ func _ready()->void:
 		ModLoaderLog.error("ContentLoader not load...", MOD_ID)
 
 	ContentLoader.load_data(CONTENT_DATA_DIR, MOD_ID)
-	call_deferred("_fix_no_forecast_data")

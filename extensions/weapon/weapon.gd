@@ -77,7 +77,7 @@ func fengliu_weapon_killed_loot(effect: NullEffect, spawn_pos: Vector2) -> void:
 	fengliu_spawn_consumable(spawn_pos)
 
 
-func fengliu_weapon_killed_health(effect: WeaponKilledHealth) -> void:
+func fengliu_weapon_killed_health(effect) -> void:
 	var chance = effect.value + Utils.get_stat(effect.key_hash, player_index) * (effect.gain_value / 100.0)
 	if not Utils.get_chance_success(chance / 100.0):
 		return
