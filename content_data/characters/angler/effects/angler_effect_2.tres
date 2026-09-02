@@ -11,4 +11,4 @@ custom_key = "fengliu_item_bought_spawn_boss"
 storage_method = 0
 effect_sign = 3
 custom_args = [  ]
-bought_add_chance = 50
+bought_add_chance = 150

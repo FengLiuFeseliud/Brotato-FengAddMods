@@ -1,4 +1,4 @@
-[gd_resource type="Resource" load_steps=5 format=2]
+[gd_resource type="Resource" load_steps=8 format=2]
 
 [ext_resource path="res://items/global/weapon_data.gd" type="Script" id=1]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/melee/pickaxe/wood/wood_pickaxe_icon.png" type="Texture" id=2]
@@ -17,7 +17,7 @@ icon = ExtResource( 2 )
 name = "WOOD_PICKAXE"
 tier = 0
 value = 20
-effects = [ ExtResource( 8 )]
+effects = [ ExtResource( 8 ) ]
 tracking_text = ""
 is_lockable = true
 unlock_codex_descr_after_get_it = 1

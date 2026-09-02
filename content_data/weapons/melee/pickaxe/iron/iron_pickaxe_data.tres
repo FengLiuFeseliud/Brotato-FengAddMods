@@ -1,4 +1,4 @@
-[gd_resource type="Resource" load_steps=5 format=2]
+[gd_resource type="Resource" load_steps=9 format=2]
 
 [ext_resource path="res://items/global/weapon_data.gd" type="Script" id=1]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/melee/pickaxe/iron/iron_pickaxe_icon.png" type="Texture" id=2]
@@ -18,7 +18,7 @@ icon = ExtResource( 2 )
 name = "IRON_PICKAXE"
 tier = 2
 value = 0
-effects = [ ExtResource( 8 ),  ExtResource( 9 ) ]
+effects = [ ExtResource( 8 ), ExtResource( 9 ) ]
 tracking_text = ""
 is_lockable = true
 unlock_codex_descr_after_get_it = 1

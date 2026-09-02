@@ -1,0 +1,17 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/effects/weapons/effect_weapon_killed_health.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+key = "stat_hp_regeneration"
+text_key = "EFFECT_WEAPON_KILLED_HEALTH"
+value = 5
+custom_key = "fengliu_weapon_killed_health"
+storage_method = 0
+effect_sign = 3
+custom_args = [  ]
+gain_value = 30
+health_value = 1
+health_gain_stat = "stat_max_hp"
+health_gain_value = 10
