@@ -113,13 +113,21 @@ func on_killed_something(_thing_killed: Node, hitbox: Hitbox) -> void :
 		if effect.custom_key_hash == effect_fengliu_gain_random_killed_stat:
 			# 杀敌获取随机值主要属性
 			fengliu_gain_random_killed_stat(effect)
+			continue
 
 		if effect.custom_key_hash == effect_fengliu_weapon_killed_loot:
 			# 杀敌获取箱子
 			fengliu_weapon_killed_loot(effect, _thing_killed.global_position)
+			continue
+
+		if effect.custom_key_hash == effect_fengliu_weapon_killed_health:
+			# 杀敌回复生命
+			fengliu_weapon_killed_health(effect)
+			continue
 
 		# 杀敌添加临时属性
 		if effect.custom_key_hash == effect_fengliu_wpapon_killed_add_temp_stat:
 			fengliu_wpapon_killed_add_temp_stat(effect)
+			continue
 
 		
