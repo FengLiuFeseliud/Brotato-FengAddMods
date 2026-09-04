@@ -1,0 +1,16 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/effects/weapons/effect_wpapon_killed_add_temp_stat.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+key = "stat_attack_speed"
+text_key = "EFFECT_WEAPON_KILLED_ADD_TEMP_STAT"
+value = 10
+custom_key = "fengliu_wpapon_killed_add_temp_stat"
+storage_method = 0
+effect_sign = 3
+custom_args = [  ]
+gain_stat = "stat_curse"
+gain_value = 10
+stat_nb = 1

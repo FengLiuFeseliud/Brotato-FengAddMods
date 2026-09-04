@@ -4,6 +4,7 @@ extends Weapon
 var effect_fengliu_gain_random_killed_stat = Keys.generate_hash("fengliu_gain_random_killed_stat")
 var effect_fengliu_weapon_killed_loot = Keys.generate_hash("fengliu_weapon_killed_loot")
 var effect_fengliu_weapon_killed_health = Keys.generate_hash("fengliu_weapon_killed_health")
+var effect_fengliu_wpapon_killed_add_temp_stat = Keys.generate_hash("fengliu_wpapon_killed_add_temp_stat")
 
 
 var wave_gain = Keys.generate_hash("wave_gain")
@@ -77,14 +78,29 @@ func fengliu_weapon_killed_loot(effect: NullEffect, spawn_pos: Vector2) -> void:
 	fengliu_spawn_consumable(spawn_pos)
 
 
+# 杀敌回复生命
 func fengliu_weapon_killed_health(effect) -> void:
+	# 计算触发概率（基础概率 + 属性倍率）
 	var chance = effect.value + Utils.get_stat(effect.key_hash, player_index) * (effect.gain_value / 100.0)
+	# 概率未命中则跳过
 	if not Utils.get_chance_success(chance / 100.0):
 		return
 	
+	# 计算回复量（基础值 + 属性倍率）
 	var health = effect.health_value + int(Utils.get_stat(effect.health_gain_stat_hash, player_index) * (effect.health_gain_value / 100.0))
+	# 对全部玩家回复生命
 	for i in RunData.get_player_count():
 		RunData.emit_signal("healing_effect", health, i, Keys.empty_hash)
+
+
+func fengliu_wpapon_killed_add_temp_stat(effect) -> void:
+	# 计算触发概率（基础概率 + 属性倍率）
+	var chance = effect.value + Utils.get_stat(effect.gain_stat_hash, player_index) * (effect.gain_value / 100.0)
+	# 概率未命中则跳过
+	if not Utils.get_chance_success(chance / 100.0):
+		return
+
+	TempStats.add_stat(effect.key_hash, effect.stat_nb, player_index)
 
 
 # 扩展杀敌处理
@@ -101,5 +117,8 @@ func on_killed_something(_thing_killed: Node, hitbox: Hitbox) -> void :
 			# 杀敌获取箱子
 			fengliu_weapon_killed_loot(effect, _thing_killed.global_position)
 
-		if effect.custom_key_hash == effect_fengliu_weapon_killed_health:
-			fengliu_weapon_killed_health(effect)
+		# 杀敌回复生命
+		if effect.custom_key_hash == effect_fengliu_wpapon_killed_add_temp_stat:
+			fengliu_wpapon_killed_add_temp_stat(effect)
+
+		

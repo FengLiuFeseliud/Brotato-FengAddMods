@@ -6,7 +6,7 @@
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/melee/raphael/raphael_icon.png" type="Texture" id=4]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/melee/raphael/4/raphae_4_effect_0.tres" type="Resource" id=6]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/melee/raphael/raphae_effect_1.tres" type="Resource" id=7]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/sets/angel/angel_set_data.tres" type="Resource" id=8]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/sets/divine/divine_set_data.tres" type="Resource" id=8]
 
 [resource]
 script = ExtResource( 1 )

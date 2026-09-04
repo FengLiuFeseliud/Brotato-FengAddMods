@@ -384,16 +384,41 @@ func on_wave_end() -> void :
 	_restart_wave = false
 
 
-# 进入商店后：移除波次结束失效的道具
+# 添加箱子获取道具 复制出独立实例并标记来源
+func fengliu_add_item_from_box(item_data, player_index: int) -> void:
+	# 仅支持来源标记（ModItemData）的道具区分来源
+	if item_data.get("is_box_get") != null:
+		item_data = item_data.duplicate()
+		item_data.is_box_get = true
+
+	add_item(item_data, player_index)
+
+
+# 进入商店后：移除波次结束失效的道具（跳过从箱子获取的道具）
 func fengliu_remove_shop_items() -> void:
 	for player_index in get_player_count():
 		for wave_end_remove_item in wave_end_remove_items:
+			# 逐个移除可失效实例，箱子获取的道具保留
 			while true:
-				var item_data = get_player_item(wave_end_remove_item, player_index)
+				var item_data = _fengliu_get_wave_end_remove_item_to_remove(wave_end_remove_item, player_index)
 				if item_data == null:
 					break
 
 				remove_item(item_data, player_index)
+
+
+# 查找待移除的波次结束道具（跳过标记为箱子来源的实例）
+func _fengliu_get_wave_end_remove_item_to_remove(item_hash: int, player_index: int):
+	for player_item in players_data[player_index].items:
+		if player_item.my_id_hash != item_hash:
+			continue
+
+		if player_item.get("is_box_get") == true:
+			continue
+
+		return player_item
+
+	return null
 
 
 # 统一添加效果哈希

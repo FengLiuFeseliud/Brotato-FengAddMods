@@ -117,7 +117,7 @@ func fengliu_get_box_cost(effect: Array) -> int:
 
 
 # 移除道具全部负面效果
-func fengliu_apply_item_not_add_all_debuff(item_data: ItemParentData, player_index: int) -> void:
+func fengliu_apply_item_not_add_all_debuff(item_data: ItemParentData, player_index: int, from_box: bool) -> void:
 	# 备份原效果
 	var old_effects = item_data.effects.duplicate()
 	var new_effects = item_data.effects.duplicate()
@@ -125,7 +125,11 @@ func fengliu_apply_item_not_add_all_debuff(item_data: ItemParentData, player_ind
 
 	# 移除负面后添加道具
 	item_data.effects = new_effects
-	RunData.add_item(item_data, player_index)
+	if from_box:
+		RunData.fengliu_add_item_from_box(item_data, player_index)
+	else:
+		RunData.add_item(item_data, player_index)
+
 	# 还原效果
 	item_data.effects = old_effects
 
@@ -293,9 +297,9 @@ func fengliu_auto_open_box(consumable: Node, player_index: int) -> void:
 	# 概率删除箱子道具全部负面效果
 	for effect in RunData.get_player_effect(effect_fengliu_apply_item_not_add_all_debuff, player_index):
 		if effect[1] and Utils.get_chance_success(effect[0] / 100.0):
-			fengliu_apply_item_not_add_all_debuff(box_item_data, player_index)
+			fengliu_apply_item_not_add_all_debuff(box_item_data, player_index, true)
 		else:
-			RunData.add_item(box_item_data, player_index)
+			RunData.fengliu_add_item_from_box(box_item_data, player_index)
 
 	# 箱子已捡起
 	consumable.already_picked_up = true
@@ -314,7 +318,7 @@ func fengliu_auto_open_box(consumable: Node, player_index: int) -> void:
 			extra_item_data = ItemService.get_item_from_id(effect[0]).duplicate()
 			extra_item_data.value = 1
 
-		RunData.add_item(extra_item_data, player_index)
+		RunData.fengliu_add_item_from_box(extra_item_data, player_index)
 
 
 	# 结算箱子金币
@@ -414,3 +418,13 @@ func clean_up_room():
 	
 	if not _end_wave_timer_timedout:
 		.clean_up_room()
+
+
+# 扩展领取箱子道具：标记来源，防止波次结束清理时将箱子道具一并失效
+func on_item_box_take_button_pressed(item_data: ItemParentData, consumable: UpgradesUI.ConsumableToProcess) -> void:
+	# 仅支持来源标记（ModItemData）的道具区分来源
+	if item_data.get("is_box_get") != null:
+		item_data = item_data.duplicate()
+		item_data.is_box_get = true
+
+	.on_item_box_take_button_pressed(item_data, consumable)

@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource( 1 )
 key = "xp_gain"
-text_key = "EFFECT_ADD_GAIN_STAT_AFTER_REMOVE_CHANGE_WAVE_MAX"
+text_key = "EFFECT_ADD_GAIN_STAT_AFTER_REMOVE_CHANGE"
 value = 10
 custom_key = "fengliu_add_stat_after_change"
 storage_method = 0

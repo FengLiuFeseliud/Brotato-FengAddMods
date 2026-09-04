@@ -29,7 +29,8 @@ ITEM_CLOWN_FISH,Clown Fish,小丑鱼
 ITEM_CLOWN_FISH_USED,Resting Clown Fish,休息的小丑鱼
 ATHLETE,Athlete,运动员
 WEAPON_RAPHAEL,Raphael,拉斐尔
-WEAPON_CLASS_ANGEL,Angel,神器
+WEAPON_CLASS_DIVINE,Divine,神器
+WEAPON_BAPHOMET,Baphomet,巴风特
 EFFECT_TWO_HAND_WEAPON_SLOT_LIMIT,Only has two hands (so can only hold two weapons),只有两只手所以只拿两个武器
 ITEM_RAT_KING_RATZILLA,Rat Subject,鼠族臣民
 EFFECT_RATZILLA_KILLER_BOSS_TEXT,Ratzilla targets and attacks bosses,鼠斯拉会锁定并攻击 boss
@@ -131,3 +132,4 @@ EFFECT_UP_UPGRADE_DATA_TIER_END_TEXT,This Clown Fish worked hard all day and is 
 EFFECT_GET_HIGHEST_STAT_FIXED_UPGRADE,Directed Training always includes an upgrade option for your current highest primary stat,定向训练必包含当前最高主要属性的升级项
 EFFECT_STAT_GAIN_UP_UPGRADE_DATA_TIER,Next wave's upgrade options have a {0} ({2}) chance to be [color=lime]+1[/color] tier higher,下一波敌袭的所有升级属性有{0}（{2}）概率[color=lime]+1[/color]品阶
 EFFECT_WEAPON_KILLED_HEALTH,,击杀敌人时有{0}（{1}）概率治疗所有玩家{2}（{3}）点血量
+EFFECT_WEAPON_KILLED_ADD_TEMP_STAT,,击杀敌人时有{0}（{1}）概率增加{2}{3}，直至敌袭结束

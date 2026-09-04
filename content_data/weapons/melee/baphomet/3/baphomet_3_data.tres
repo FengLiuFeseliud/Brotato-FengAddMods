@@ -1,0 +1,34 @@
+[gd_resource type="Resource" load_steps=10 format=2]
+
+[ext_resource path="res://items/global/weapon_data.gd" type="Script" id=1]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/melee/baphomet/3/baphomet_3_stats.tres" type="Resource" id=2]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/melee/baphomet/baphomet.tscn" type="PackedScene" id=3]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/melee/baphomet/baphomet_icon.png" type="Texture" id=4]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/melee/baphomet/4/baphomet_4_data.tres" type="Resource" id=5]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/melee/baphomet/3/baphomet_3_effect_0.tres" type="Resource" id=6]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/melee/baphomet/baphomet_effect_1.tres" type="Resource" id=7]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/sets/divine/divine_set_data.tres" type="Resource" id=9]
+[ext_resource path="res://items/sets/heavy/heavy_set_data.tres" type="Resource" id=10]
+
+[resource]
+script = ExtResource( 1 )
+my_id = "weapon_baphomet_3"
+unlocked_by_default = true
+can_be_looted = true
+icon = ExtResource( 4 )
+name = "WEAPON_BAPHOMET"
+tier = 2
+value = 100
+effects = [ ExtResource( 6 ), ExtResource( 7 ) ]
+tracking_text = "stats_gained"
+is_lockable = true
+unlock_codex_descr_after_get_it = 1
+is_cursed = false
+curse_factor = 0.0
+weapon_id = "weapon_baphomet"
+type = 0
+sets = [ ExtResource( 9 ), ExtResource( 10 ) ]
+scene = ExtResource( 3 )
+stats = ExtResource( 2 )
+upgrades_into = ExtResource( 5 )
+add_to_chars_as_starting = [  ]
