@@ -234,10 +234,10 @@ func fengliu_up_upgrade_data_tier(effect: Array, upgrades: Array, player_index: 
             stat_value = RunData.get_player_level(player_index)
         else:
             stat_value = RunData.get_stat(effect[0], player_index)
-        gain_value = stat_value * (effect[2] / 100.0) / 100.0
+        gain_value = stat_value * (effect[3] / 100.0) / 100.0
         
     # 概率未命中则保持原升级项
-    var chance = effect[1] / 100.0 + gain_value
+    var chance = effect[2] / 100.0 + gain_value
     if not Utils.get_chance_success(chance):
         return upgrades
 
@@ -249,7 +249,12 @@ func fengliu_up_upgrade_data_tier(effect: Array, upgrades: Array, player_index: 
             new_upgrades.append(upgrade)
             continue
 
-        new_upgrades.append(fengliu_get_upgrade_data(upgrade.tier + 1, player_index, upgrade.upgrade_id_hash))
+        # 提升 effect[1] 个品阶并封顶最高品阶
+        var new_tier = upgrade.tier + effect[1]
+        if new_tier > 3:
+            new_tier = 3
+
+        new_upgrades.append(fengliu_get_upgrade_data(new_tier, player_index, upgrade.upgrade_id_hash))
 
     return new_upgrades
 
