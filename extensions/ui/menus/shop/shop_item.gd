@@ -49,6 +49,7 @@ func _fengliu_is_item_locked() -> bool:
     return false
 
 
+# 刷新所有商店道具的锁定按钮状态
 func _fengliu_refresh_lock_buttons() -> void:
     var parent = get_parent()
     if parent == null:

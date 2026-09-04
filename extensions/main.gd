@@ -22,6 +22,7 @@ var fengliu_crate_gobbler_hash = Keys.generate_hash("crate_gobbler")
 var _is_speedrun_ending: bool = false
 
 
+# 扩展切换场景（进入商店后清理波次结束失效的道具）
 func _change_scene(path: String) -> void :
 	._change_scene(path)
 	# 进入商店后：清理波次结束失效的道具

@@ -28,8 +28,8 @@ var stat = ""
 
 func _generate_hashes() -> void:
 	._generate_hashes()
-	if "gain_" in key:
-		stat = key.lstrip("gain_")
+	# 目标属性：key 以 "gain_" 开头时去掉前缀；否则 key 本身就是目标属性
+	stat = key.substr("gain_".length()) if key.begins_with("gain_") else key
 	change_stat_hash = Keys.generate_hash(change_stat)
 
 
@@ -75,10 +75,11 @@ func get_args(player_index: int) -> Array:
 	
 	if gain_stat or not "stat" in key:
 		add_stat = RunData.get_player_effect(key_hash, player_index)
+		var stat_display = stat if stat != "" else key
 		return [
 			tr(change_stat.to_upper()), 
 			str(stat_scaled), 
-			tr(stat.to_upper()), 
+			tr(stat_display.to_upper()), 
 			args[0], 
 			str(wave_max_value), 
 			"[color=lime]+%s%%[/color]" % add_stat

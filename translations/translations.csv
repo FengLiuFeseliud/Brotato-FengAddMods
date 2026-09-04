@@ -43,13 +43,14 @@ EFFECT_GIN_RANDOM_KILLED_STAT,Gain {3} to {4} {1} for every {2} enemies killed w
 EFFECT_ADD_CHANCE_DEAL_DMG_WHEN_PICKUP_GOLD,{0} ({1}) chance to deal {2} ({3}) damage to a random enemy when picking up a material,拾取材料时有{0}（{1}）概率对随机1名敌人造成{2}（{3}）伤害
 EFFECT_ADD_CHANCE_DEAL_DMG_WHEN_DEATH,{0} ({1}) chance to deal {2} ({3}) damage to a random enemy when an enemy dies,敌人死亡时有{0}（{1}）概率对随机1名敌人造成{2}（{3}）伤害
 LEVELS,levels,等级
-EFFECT_ADD_STAT_CAP,{2} has a cap +{3} {2} cap for every {1} {0} [{4}],"{2}存在上限，每{1}{0}增加{3}{2}上限[{4}]"
+EFFECT_ADD_STAT_CAP,Every {1} {0} you gain increases the {2} cap by {3} (currently {5}),每获得{1}{0}，{2}上限提高{3}（当前已提高{5}）
 EFFECT_RANDOM_STAT_ON_LEVEL_UP_NO_ZERO,{0} to {1} {2} on level up (excluding 0),升级时有{0}至{1}{2}（不包含0）
-EFFECT_RANDOM_STAT_ON_LEVEL_UP_FROM_GAIN_NO_ZERO,On level up gain {0} to {1} {2} (excluding 0) effect increases for every {4} {3} [{5}],"升级时有{0}至{1}{2}（不包含0，每{4}{3}效果升级）[{5}]"
+EFFECT_RANDOM_STAT_ON_LEVEL_UP_FROM_GAIN_NO_ZERO,"On level up, gain {0} to {1} {2} (excluding 0). For every {4} {3} you have, the amount increases up to [{5}]",升级时获得{0}至{1}点{2}（不包含0），每拥有{4}点{3}提高获得量 [{5}]
 EFFECT_RANDOM_STAT_ON_LEVEL_UP,{0} to {1} {2} on level up,升级时有{0}至{1}{2}
 EFFECT_ADD_STAT_AFTER_REMOVE_CHANGE,{3} {2} permanently for every {1} {0} lost [{5}],每损失{1}{0}时永久增加{3}{2}[{5}]
-EFFECT_ADD_GAIN_STAT_AFTER_REMOVE_CHANGE,{1} {0} grants +{2} Modification Increase {3} permanently [{5}],每损失{1}{0}时永久增加{2}的修改增加{3}[{5}]
-EFFECT_ADD_GAIN_STAT_AFTER_REMOVE_CHANGE_WAVE_MAX,{1} {0} grants +{2} Modification Increase {3} permanently (Max {4} per wave) [{5}],"每损失{1}{0}时永久增加{2}的修改增加{3}，每波上限{4}[{5}]"
+EFFECT_ADD_GAIN_STAT_AFTER_REMOVE_CHANGE,"For every {1} {0} lost, permanently gain {3} {2} [{5}]",每损失{1}点{0}，永久增加{3}点{2} [{5}]
+EFFECT_ADD_GAIN_STAT_AFTER_REMOVE_CHANGE_WAVE_MAX,"For every {1} {0} lost, permanently gain {3} {2} (Max {4} per wave) [{5}]",每损失{1}点{0}，永久增加{3}点{2}（每波上限{4}）[{5}]
+EFFECT_ADD_GAIN_STAT_AFTER_REMOVE_CHANGE_WAVE_MAX_GAIN,"For every {1} {0} lost, permanently gain {3} {2} (Max {4} per wave) [{5}]",每损失{1}点{0}，永久增加{3}点{2}修改（每波上限{4}）[{5}]
 EFFECT_RANDOM_SHOP_ITEM_COUNT_PRICE,"Removes {1} to {2} items in the shop upon entering. Each removed item makes the remaining items cost {3}, and the lockable item cap is {4}","商店道具数随机减少{1}至{2}每减少一个道具剩余的道具{3}道具价格，但是可锁定道具上限为{4}"
 EFFECT_GOLD_LOW_SET_STAT_SHOP,"When lacking materials, use {1} substitute materials to purchase items ({1} replaces {0} materials)",材料不足时使用{1}替代材料购买道具（{1}替代{0}材料）
 EFFECT_THE_DESPISED_NO_SHOP,"Everyone hates you, so the shop will be empty",你被所有人厌恶商店不会有任何物品
@@ -131,5 +132,5 @@ EFFECT_UP_UPGRADE_DATA_TIER,Next wave's upgrade options are [color=lime]+1[/colo
 EFFECT_UP_UPGRADE_DATA_TIER_END_TEXT,This Clown Fish worked hard all day and is now resting,这条小丑鱼辛苦工作了一天，正在休息
 EFFECT_GET_HIGHEST_STAT_FIXED_UPGRADE,Directed Training always includes an upgrade option for your current highest primary stat,定向训练必包含当前最高主要属性的升级项
 EFFECT_STAT_GAIN_UP_UPGRADE_DATA_TIER,Next wave's upgrade options have a {0} ({2}) chance to be [color=lime]+1[/color] tier higher,下一波敌袭的所有升级属性有{0}（{2}）概率[color=lime]+1[/color]品阶
-EFFECT_WEAPON_KILLED_HEALTH,,击杀敌人时有{0}（{1}）概率治疗所有玩家{2}（{3}）点血量
-EFFECT_WEAPON_KILLED_ADD_TEMP_STAT,,击杀敌人时有{0}（{1}）概率增加{2}{3}，直至敌袭结束
+EFFECT_WEAPON_KILLED_HEALTH,"Killing an enemy has a {0} ({1}) chance to heal all players for {2} ({3}) HP",击杀敌人时有{0}（{1}）概率治疗所有玩家{2}（{3}）点血量
+EFFECT_WEAPON_KILLED_ADD_TEMP_STAT,"Killing an enemy has a {0} ({1}) chance to gain {2} {3} until the end of the wave",击杀敌人时有{0}（{1}）概率增加{2}{3}，直至敌袭结束

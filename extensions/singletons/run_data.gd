@@ -110,6 +110,7 @@ func init_tracked_effects() -> Dictionary:
 	return tracked
 
 
+# 获取高质量波次计数
 func fengliu_get_high_wave_count() -> int:
 	return _high_wave_count
 

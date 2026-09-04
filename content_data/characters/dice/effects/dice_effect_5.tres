@@ -13,4 +13,3 @@ effect_sign = 3
 custom_args = [  ]
 change_stat = "stat_luck"
 stat_scaled = 3
-wave_max_value = 500

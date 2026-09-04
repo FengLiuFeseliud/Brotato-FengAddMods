@@ -93,6 +93,7 @@ func fengliu_weapon_killed_health(effect) -> void:
 		RunData.emit_signal("healing_effect", health, i, Keys.empty_hash)
 
 
+# 杀敌添加临时属性
 func fengliu_wpapon_killed_add_temp_stat(effect) -> void:
 	# 计算触发概率（基础概率 + 属性倍率）
 	var chance = effect.value + Utils.get_stat(effect.gain_stat_hash, player_index) * (effect.gain_value / 100.0)
@@ -117,7 +118,7 @@ func on_killed_something(_thing_killed: Node, hitbox: Hitbox) -> void :
 			# 杀敌获取箱子
 			fengliu_weapon_killed_loot(effect, _thing_killed.global_position)
 
-		# 杀敌回复生命
+		# 杀敌添加临时属性
 		if effect.custom_key_hash == effect_fengliu_wpapon_killed_add_temp_stat:
 			fengliu_wpapon_killed_add_temp_stat(effect)
 
