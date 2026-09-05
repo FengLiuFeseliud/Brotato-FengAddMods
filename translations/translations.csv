@@ -33,8 +33,9 @@ WEAPON_CLASS_DIVINE,Divine,神器
 WEAPON_BAPHOMET,Baphomet,巴风特
 ITEM_FORESTRY,Forestry,林业
 ITEM_MAGNIFYING_GLASS,Magnifying Glass,放大镜
-FENGLIU_BULLET_SCALE,Bullet Scale,子弹缩放比例
+FENGLIU_BULLET_SCALE,Bullet Scale,投掷物缩放比例
 ITEM_AP_ROUND,Ap Round,破甲弹
+WEAPON_GHOST_STONE_SPEAR,,幽魂石矛
 EFFECT_TWO_HAND_WEAPON_SLOT_LIMIT,Only has two hands (so can only hold two weapons),只有两只手所以只拿两个武器
 ITEM_RAT_KING_RATZILLA,Rat Subject,鼠族臣民
 EFFECT_RATZILLA_KILLER_BOSS_TEXT,Ratzilla targets and attacks bosses,鼠斯拉会锁定并攻击 boss
@@ -138,3 +139,4 @@ EFFECT_GET_HIGHEST_STAT_FIXED_UPGRADE,Directed Training always includes an upgra
 EFFECT_STAT_GAIN_UP_UPGRADE_DATA_TIER,Next wave's upgrade options have a {0} ({2}) chance to be {1} tier higher,下一波敌袭的所有升级属性有{0}（{2}）概率{1}品阶
 EFFECT_WEAPON_KILLED_HEALTH,"Killing an enemy has a {0} ({1}) chance to heal all players for {2} ({3}) HP",击杀敌人时有{0}（{1}）概率治疗所有玩家{2}（{3}）点血量
 EFFECT_WEAPON_KILLED_ADD_TEMP_STAT,"Killing an enemy has a {0} ({1}) chance to gain {2} {3} until the end of the wave",击杀敌人时有{0}（{1}）概率增加{2}{3}，直至敌袭结束
+EFFECT_WEAPONS_NO_RECOIL,,此武器没有收回时间
