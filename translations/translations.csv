@@ -31,6 +31,7 @@ ATHLETE,Athlete,运动员
 WEAPON_RAPHAEL,Raphael,拉斐尔
 WEAPON_CLASS_DIVINE,Divine,神器
 WEAPON_BAPHOMET,Baphomet,巴风特
+ITEM_FORESTRY,Forestry,林业
 EFFECT_TWO_HAND_WEAPON_SLOT_LIMIT,Only has two hands (so can only hold two weapons),只有两只手所以只拿两个武器
 ITEM_RAT_KING_RATZILLA,Rat Subject,鼠族臣民
 EFFECT_RATZILLA_KILLER_BOSS_TEXT,Ratzilla targets and attacks bosses,鼠斯拉会锁定并攻击 boss
