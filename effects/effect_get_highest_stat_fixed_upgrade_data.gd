@@ -12,7 +12,9 @@ extends Effect
 
 # 获取最高属性对应的 UpgradeData
 func get_highest_upgrade_data(player_index: int) -> int:
+	# 取玩家当前最高主属性
 	var stat_hash = RunData.fengliu_get_highest_stat_hash(player_index)
+	# 返回包含该属性的升级项 id
 	return ItemService.fengliu_get_upgrade_data_id_hash_by_stat(RunData.get_player_level(player_index), player_index, stat_hash)
 
 

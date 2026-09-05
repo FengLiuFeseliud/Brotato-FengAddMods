@@ -12,6 +12,7 @@ const ALL_SECONDARY_STATS = [
 	"explosion_size",
 	"explosion_damage",
 	"effect_bouncing",
+	"piercing",
 	"piercing_damage",
 	"damage_against_bosses",
 	"structure_attack_speed",
@@ -32,16 +33,18 @@ const ALL_SECONDARY_STATS = [
 
 	"enemy_speed",
 	"enemy_damage",
-	"enemy_health"
+	"enemy_health",
+
+    # 子弹缩放
+    "fengliu_bullet_scale"
 ]
 
 
 # 次要属性哈希列表缓存
 var _fengliu_secondary_stats_hashs: Array = []
-var _fengliu_secondary_abs_debuff_stats_hashs: Array = []
 
 
-# 每个玩家已叠加到 effects 上的次要临时属性净值（hash -> 数值）
+# 每个玩家已叠加到 effects 上的次要临时属性净值
 var _fengliu_secondary_overlays: Array = [{}, {}, {}, {}]
 
 
@@ -72,20 +75,21 @@ func reset_player(player_index: int) -> void :
 			overlay.clear()
 			are_player_stats_dirty[player_index] = true
 			Utils.reset_stat_cache(player_index)
-            
+
 	.reset_player(player_index)
 
 
-# 把次要临时属性叠加量写进玩家 effects 字典（并刷新缓存）
+# 把次要临时属性叠加量写进玩家 effects 字典
 func _fengliu_apply_secondary_overlay(player_index: int, stat_hsh: int, delta: int) -> void :
 	var effects: Dictionary = RunData.get_player_effects(player_index)
-	if not effects.has(stat_hsh):
+	if not effects.has(stat_hsh) or not effects[stat_hsh] is int:
 		effects[stat_hsh] = 0
 	effects[stat_hsh] += delta
 	are_player_stats_dirty[player_index] = true
 	Utils.reset_stat_cache(player_index)
 
 
+# 扩展设置属性（次要属性叠加到 effects 层，其余走原逻辑）
 func set_stat(stat_hsh: int, value: int, player_index: int) -> void :
 	if not _fengliu_is_secondary_stat(stat_hsh):
 		.set_stat(stat_hsh, value, player_index)
@@ -96,6 +100,7 @@ func set_stat(stat_hsh: int, value: int, player_index: int) -> void :
 	overlay[stat_hsh] = value
 
 
+# 扩展增加属性（次要属性叠加到 effects 层）
 func add_stat(stat_hsh: int, value: int, player_index: int) -> void :
 	if not _fengliu_is_secondary_stat(stat_hsh):
 		.add_stat(stat_hsh, value, player_index)
@@ -106,6 +111,7 @@ func add_stat(stat_hsh: int, value: int, player_index: int) -> void :
 	overlay[stat_hsh] = overlay.get(stat_hsh, 0) + value
 
 
+# 扩展减少属性（次要属性从叠加层扣除）
 func remove_stat(stat_hsh: int, value: int, player_index: int) -> void :
 	if not _fengliu_is_secondary_stat(stat_hsh):
 		.remove_stat(stat_hsh, value, player_index)

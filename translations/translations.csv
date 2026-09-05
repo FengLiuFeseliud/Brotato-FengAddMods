@@ -32,6 +32,9 @@ WEAPON_RAPHAEL,Raphael,拉斐尔
 WEAPON_CLASS_DIVINE,Divine,神器
 WEAPON_BAPHOMET,Baphomet,巴风特
 ITEM_FORESTRY,Forestry,林业
+ITEM_MAGNIFYING_GLASS,Magnifying Glass,放大镜
+FENGLIU_BULLET_SCALE,Bullet Scale,子弹缩放比例
+ITEM_AP_ROUND,Ap Round,破甲弹
 EFFECT_TWO_HAND_WEAPON_SLOT_LIMIT,Only has two hands (so can only hold two weapons),只有两只手所以只拿两个武器
 ITEM_RAT_KING_RATZILLA,Rat Subject,鼠族臣民
 EFFECT_RATZILLA_KILLER_BOSS_TEXT,Ratzilla targets and attacks bosses,鼠斯拉会锁定并攻击 boss

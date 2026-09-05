@@ -40,15 +40,18 @@ func unapply(player_index: int) -> void:
 #   [1] = 提升的品阶数量（绿色 +N）
 #   [2] = 倍率属性图标文本（无倍率属性时省略）
 func get_args(player_index: int) -> Array:
+    # 无倍率属性：直接返回固定概率与品阶数
     if key_hash == Keys.empty_hash:
         return [ "[color=lime]%s%%[/color]" % int(gain_value / 100.0), "[color=lime]+%s[/color]" % value ]
 
+    # 有倍率属性：读取倍率属性值（等级取玩家等级）
     var stat_value = 0
     if key_hash != Keys.stat_levels_hash:
         stat_value = Utils.get_stat(key_hash, player_index)
     else:
         stat_value = RunData.get_player_level(player_index)
         
+    # 返回动态概率、提升品阶数与倍率图标
     return [
         "[color=lime]%s%%[/color]" % get_dynamic_chance(value, gain_value, stat_value),
         "[color=lime]+%s[/color]" % value,

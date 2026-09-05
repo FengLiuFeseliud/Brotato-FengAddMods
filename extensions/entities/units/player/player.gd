@@ -117,9 +117,9 @@ func fengliu_on_regen_hit_protection() -> void:
 func fengliu_set_scale_size(gain: float) -> void:
     # 按比例放大
     _scale_value += _scale_value * (gain / 100.0)
-    # 上限 20
-    if _scale_value > 20:
-        _scale_value = 20
+    # 上限 5
+    if _scale_value > 5:
+        _scale_value = 5
 
     scale = Vector2(_scale_value, _scale_value)
 

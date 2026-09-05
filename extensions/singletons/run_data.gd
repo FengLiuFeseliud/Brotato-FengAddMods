@@ -323,6 +323,7 @@ func fengliu_calc_wave_total_hp_to_duration() -> float:
 func fengliu_get_highest_stat_hash(player_index: int) -> int:
 	var highest_stat = Keys.empty_hash
 	var highest_value = null
+	# 遍历主属性找出最高者
 	for stat_hash in primary_stats_list:
 		var value = get_stat(stat_hash, player_index)
 		if highest_value == null or value > highest_value:

@@ -20,6 +20,7 @@ var all_fixed_upgrade_id_hashs = []
 # 随机抽取一个不重复的升级项
 func roll_fixed_upgrade():
     var upgrade_id = Utils.get_rand_element(ItemService.fengliu_get_all_upgrade_id_hashs())
+    # 已抽取过则重新抽取
     if upgrade_id in all_fixed_upgrade_id_hashs:
         roll_fixed_upgrade()
         return
@@ -29,14 +30,17 @@ func roll_fixed_upgrade():
 
 # 抽取固定升级项
 func fengliu_roll_effect(player_index: int):
+    # 有「必含最高属性」效果时先加入最高属性升级项
     var effects = RunData.get_player_effect(effect_fengliu_get_highest_stat_fixed_upgrade_data, player_index)
     if effects.size() > 0:
         all_fixed_upgrade_id_hashs.append(effects[0].get_highest_upgrade_data(player_index))
 
+        # 再随机补抽 3 个
         for _index in range(3):
             roll_fixed_upgrade()
         return
 
+    # 无该效果则直接随机抽 4 个
     for _index in range(4):
         roll_fixed_upgrade()
 
