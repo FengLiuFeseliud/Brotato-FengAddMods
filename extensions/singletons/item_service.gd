@@ -264,7 +264,7 @@ func get_upgrades(level: int, number: int, old_upgrades: Array, player_index: in
     var upgrades = .get_upgrades(level, number, old_upgrades, player_index)
     # 有固定升级项效果则替换升级项
     var effects = RunData.get_player_effect(effect_fengliu_get_fixed_upgrade, player_index)
-    if effects.size() > 0:
+    if effects.size() > 0 and effects[0].all_fixed_upgrade_id_hashs.size() >= 4:
         upgrades = fengliu_get_fixed_upgrade(level, effects[0], player_index)
 
     # 应用升级项品阶提升效果

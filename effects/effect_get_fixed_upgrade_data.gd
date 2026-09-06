@@ -46,8 +46,11 @@ func fengliu_roll_effect(player_index: int):
 
 
 func apply(player_index: int) -> void:
+	if all_fixed_upgrade_id_hashs.size() == 0:
+		fengliu_roll_effect(player_index)
+
 	RunData.get_player_effect(custom_key_hash ,player_index).push_back(self)
-	
+
 
 func unapply(player_index: int) -> void:
 	RunData.get_player_effects(player_index)[custom_key_hash].erase(self)
