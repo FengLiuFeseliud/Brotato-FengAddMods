@@ -5,6 +5,7 @@ var effect_fengliu_gain_random_killed_stat = Keys.generate_hash("fengliu_gain_ra
 var effect_fengliu_weapon_killed_loot = Keys.generate_hash("fengliu_weapon_killed_loot")
 var effect_fengliu_weapon_killed_health = Keys.generate_hash("fengliu_weapon_killed_health")
 var effect_fengliu_wpapon_killed_add_temp_stat = Keys.generate_hash("fengliu_wpapon_killed_add_temp_stat")
+var effect_fengliu_weapon_hit_slow = Keys.generate_hash("fengliu_weapon_hit_slow")
 
 
 var wave_gain = Keys.generate_hash("wave_gain")
@@ -102,6 +103,23 @@ func fengliu_wpapon_killed_add_temp_stat(effect) -> void:
 		return
 
 	TempStats.add_stat(effect.key_hash, effect.stat_nb, player_index)
+
+
+func fengliu_weapon_hit_slow(thing_hit: Node, effect) -> void:
+	if not is_instance_valid(thing_hit) or not thing_hit.has_method("add_decaying_speed"):
+		return
+	
+	var slow_value = effect.value + int(Utils.get_stat(effect.key_hash, player_index) * (effect.gain_value / 100.0))
+	thing_hit.add_decaying_speed(-slow_value)
+
+
+func on_weapon_hit_something(thing_hit: Node, damage_dealt: int, hitbox: Hitbox) -> void :
+	.on_weapon_hit_something(thing_hit, damage_dealt, hitbox)
+	
+	for effect in effects:
+		if effect.custom_key_hash == effect_fengliu_weapon_hit_slow:
+			fengliu_weapon_hit_slow(thing_hit, effect)
+			break
 
 
 # 扩展杀敌处理

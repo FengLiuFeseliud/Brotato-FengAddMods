@@ -1,0 +1,14 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/effects/weapons/effect_weapon_hit_slow.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+key = "stat_harvesting"
+text_key = "EFFECT_WEAPON_HIT_SLOW"
+value = 300
+custom_key = "fengliu_weapon_hit_slow"
+storage_method = 0
+effect_sign = 3
+custom_args = [  ]
+gain_value = 100
