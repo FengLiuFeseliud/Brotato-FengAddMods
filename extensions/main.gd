@@ -13,6 +13,7 @@ var effect_fengliu_auto_open_box = Keys.generate_hash("fengliu_auto_open_box")
 var effect_fengliu_apply_item_not_add_all_debuff = Keys.generate_hash("fengliu_apply_item_not_add_all_debuff")
 var effect_fengliu_add_stat_fron_wave_intensity = Keys.generate_hash("fengliu_add_stat_fron_wave_intensity")
 var effect_fengliu_kill_looter_spawn_boss = Keys.generate_hash("fengliu_kill_looter_spawn_boss")
+var effect_fengliu_gold_stats = Keys.generate_hash("fengliu_gold_stats")
 
 
 var fengliu_item_auto_open_box_hash = Keys.generate_hash("item_auto_open_box")
@@ -216,6 +217,17 @@ func fengliu_kill_looter_spawn_boss(enemy: Enemy, chance: int) -> void:
 	_entity_spawner.spawn_entity(elite.scene, args)
 
 
+func fengliu_gold_stats(effect: Array, player_index: int) -> void:
+	if not Utils.get_chance_success(effect[1] / 100.0):
+		return
+
+	if Utils.is_stat_key(effect[0]):
+		RunData.add_stat(effect[0], effect[2], player_index)
+		return
+
+	RunData.get_player_effects(player_index)[effect[0]] += effect[2]
+
+
 # 扩展材料捡起后
 func on_gold_picked_up(gold: Node, player_index: int) -> void :
 	if gold.already_picked_up:
@@ -225,15 +237,17 @@ func on_gold_picked_up(gold: Node, player_index: int) -> void :
 	if not player_index >= 0:
 		.on_gold_picked_up(gold, player_index)
 		return
-		
-	var effects = RunData.get_player_effect(effect_fengliu_can_add_chance_stat_damage_when_pickup_gold, player_index)
-	if effects.size() == 0:
-		.on_gold_picked_up(gold, player_index)
-		return
 	
-	# 随机造成伤害
-	effects[0] = fengliu_get_dynamic_chance_to_effect(effects[0], player_index)
-	handle_stat_damages(effects, player_index)
+	
+	var effects = RunData.get_player_effect(effect_fengliu_can_add_chance_stat_damage_when_pickup_gold, player_index)
+	if effects.size() > 0:
+		# 随机造成伤害
+		effects[0] = fengliu_get_dynamic_chance_to_effect(effects[0], player_index)
+		handle_stat_damages(effects, player_index)
+
+	for effect in RunData.get_player_effect(effect_fengliu_gold_stats, player_index):
+		fengliu_gold_stats(effect, player_index)
+
 	.on_gold_picked_up(gold, player_index)
 
 

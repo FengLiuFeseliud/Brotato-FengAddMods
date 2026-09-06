@@ -4,9 +4,9 @@
 
 [resource]
 script = ExtResource( 1 )
-key = "explosion_size"
-text_key = "EFFECT_CONSUMABLE_STAT"
-value = 100
+key = "pickup_range"
+text_key = "EFFECT_CHANCE_CONSUMABLE_STAT"
+value = 10
 custom_key = "fengliu_consumable_stats"
 custom_args = [  ]
 stat_nb = 1

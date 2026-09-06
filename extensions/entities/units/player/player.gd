@@ -127,13 +127,14 @@ func fengliu_set_scale_size(gain: float) -> void:
 # 扩展拾取消耗品结算
 func on_consumable_picked_up(consumable_data: ConsumableData) -> void :
     # 拾取消耗品加属性
-    var effects = RunData.get_player_effect(effect_fengliu_consumable_stats, player_index)
-    if effects.size() > 0:
-        for effect in effects:
-            RunData.add_stat(effect[0], effect[1], player_index)
+    for effect in RunData.get_player_effect(effect_fengliu_consumable_stats, player_index):
+        if not Utils.get_chance_success(effect[1] / 100.0):
+            continue
+            
+        RunData.add_stat(effect[0], effect[2], player_index)
 
     # 开箱加属性
-    effects = RunData.get_player_effect(effect_fengliu_effect_box_stats, player_index)
+    var effects = RunData.get_player_effect(effect_fengliu_effect_box_stats, player_index)
     if effects.size() > 0 and (consumable_data.my_id_hash == Keys.consumable_item_box_hash 
             or consumable_data.my_id_hash == Keys.consumable_legendary_item_box_hash):
         for effect in effects:

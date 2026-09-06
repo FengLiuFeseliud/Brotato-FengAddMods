@@ -1,4 +1,4 @@
-class_name ConsumableStats
+class_name GoldStats
 extends Effect
 
 
