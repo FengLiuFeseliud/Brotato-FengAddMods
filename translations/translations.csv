@@ -35,7 +35,7 @@ ITEM_FORESTRY,Forestry,林业
 ITEM_MAGNIFYING_GLASS,Magnifying Glass,放大镜
 FENGLIU_BULLET_SCALE,Bullet Scale,投掷物尺寸
 ITEM_AP_ROUND,Ap Round,破甲弹
-WEAPON_GHOST_STONE_SPEAR,,幽魂石矛
+WEAPON_GHOST_STONE_SPEAR,Ghost Stone Spear,幽魂石矛
 WEAPON_BROOM,Broom,扫帚
 WEAPON_CLASS_HOMEWARE,Homeware,家居
 ITEM_MAGNET,Magnet,磁铁
@@ -65,8 +65,8 @@ EFFECT_THE_DESPISED_NO_SHOP,"Everyone hates you, so the shop will be empty",你�
 EFFECT_CAN_ALL_DROP_BOX,"All fruit drop as Crates, with a {0} ({1}) chance to drop as Red Crates",所有果子全部掉落为箱子有{0}（{1}）概率掉落为红箱子
 EFFECT_WAVE_END_COST_GOLD_GET_STAT_OR_WEAPON,"Picking up a Crate costs {0} Materials (only heals if lacking Materials). Material cost scales with waves. When weapons can no longer be upgraded, acquiring weapons grants {1} random stat instead",每次捡起箱子需花费{0}材料获取箱子（材料不足时只回复）并且获取武器全部无法提升后随机获取{1}属性，花费材料随波次膨胀
 EFFECT_WAVE_END_NOT_PICK_CONSUMABLE,Consumables are not automatically picked up at the end of a wave,波次结束时不会自动捡起消耗品
-EFFECT_CONSUMABLE_STAT,"{0}{1} when picking up a consumable",捡起一个消耗品时永久{1}{2}
-EFFECT_CHANCE_CONSUMABLE_STAT,,捡起消耗品时有{0}概率永久{1}{2}
+EFFECT_CONSUMABLE_STAT,"Picking up a consumable permanently grants {1} {2}",捡起一个消耗品时永久{1}{2}
+EFFECT_CHANCE_CONSUMABLE_STAT,"Picking up a consumable has a {0} chance to permanently gain {1} {2}",捡起消耗品时有{0}概率永久{1}{2}
 EFFECT_RICE,Fruit Pilaf,水果焖饭
 EFFECT_PICKE_CONSUMABLE_DROP_STRUCTURE_GAIN,"When picking up a consumable, spawns {0} (+{2}) {3} dealing {4} ({5}) damage in an area",当捡起消耗品时产生{0}（{2}）个{3}，对一块区域造成{4}（{5}）伤害
 EFFECT_STAT_STOP,"Buy items with {1} instead of materials ({1} replaces {0} materials)",使用{1}替代材料购买道具（{1}替代{0}材料）
@@ -143,6 +143,6 @@ EFFECT_GET_HIGHEST_STAT_FIXED_UPGRADE,Directed Training always includes an upgra
 EFFECT_STAT_GAIN_UP_UPGRADE_DATA_TIER,Next wave's upgrade options have a {0} ({2}) chance to be {1} tier higher,下一波敌袭的所有升级属性有{0}（{2}）概率{1}品阶
 EFFECT_WEAPON_KILLED_HEALTH,"Killing an enemy has a {0} ({1}) chance to heal all players for {2} ({3}) HP",击杀敌人时有{0}（{1}）概率治疗所有玩家{2}（{3}）点血量
 EFFECT_WEAPON_KILLED_ADD_TEMP_STAT,"Killing an enemy has a {0} ({1}) chance to gain {2} {3} until the end of the wave",击杀敌人时有{0}（{1}）概率增加{2}{3}，直至敌袭结束
-EFFECT_WEAPONS_NO_RECOIL,,此武器没有收回时间
-EFFECT_WEAPON_HIT_SLOW,,击中时对敌人减速{0}（{1}）
-EFFECT_CHANCE_GOLD_STATS,,捡起材料时有{0}概率永久{1}{2}
+EFFECT_WEAPONS_NO_RECOIL,This weapon has no recovery time,此武器没有收回时间
+EFFECT_WEAPON_HIT_SLOW,"On hit, slow enemies by {0} ({1})",击中时对敌人减速{0}（{1}）
+EFFECT_CHANCE_GOLD_STATS,"Picking up a material has a {0} chance to permanently gain {1} {2}",捡起材料时有{0}概率永久{1}{2}

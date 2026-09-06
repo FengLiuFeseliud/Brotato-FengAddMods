@@ -105,14 +105,18 @@ func fengliu_wpapon_killed_add_temp_stat(effect) -> void:
 	TempStats.add_stat(effect.key_hash, effect.stat_nb, player_index)
 
 
+# 命中减速敌人
 func fengliu_weapon_hit_slow(thing_hit: Node, effect) -> void:
+	# 无法减速的目标则跳过
 	if not is_instance_valid(thing_hit) or not thing_hit.has_method("add_decaying_speed"):
 		return
 	
+	# 计算减速值（基础值 + 属性倍率）并施加
 	var slow_value = effect.value + int(Utils.get_stat(effect.key_hash, player_index) * (effect.gain_value / 100.0))
 	thing_hit.add_decaying_speed(-slow_value)
 
 
+# 扩展武器命中处理（命中触发减速）
 func on_weapon_hit_something(thing_hit: Node, damage_dealt: int, hitbox: Hitbox) -> void :
 	.on_weapon_hit_something(thing_hit, damage_dealt, hitbox)
 	

@@ -217,14 +217,18 @@ func fengliu_kill_looter_spawn_boss(enemy: Enemy, chance: int) -> void:
 	_entity_spawner.spawn_entity(elite.scene, args)
 
 
+# 捡起材料/金币触发属性加成
 func fengliu_gold_stats(effect: Array, player_index: int) -> void:
+	# 概率未命中则跳过
 	if not Utils.get_chance_success(effect[1] / 100.0):
 		return
 
+	# 主属性直接添加
 	if Utils.is_stat_key(effect[0]):
 		RunData.add_stat(effect[0], effect[2], player_index)
 		return
 
+	# 非主属性累加到增益池
 	RunData.get_player_effects(player_index)[effect[0]] += effect[2]
 
 
@@ -322,6 +326,7 @@ func fengliu_auto_open_box(consumable: Node, player_index: int) -> void:
 	# 处理箱子的额外道具
 	var extra_item_effects: Array = RunData.get_player_effect(Keys.extra_item_in_crate_hash, player_index)
 	for effect in extra_item_effects:
+	# 概率未命中则跳过
 		if not Utils.get_chance_success(effect[1] / 100.0):
 			continue
 

@@ -11,6 +11,7 @@ var _fengliu_base_sprite_scale: Vector2 = Vector2.ONE
 var _fengliu_base_hitbox_scale: Vector2 = Vector2.ONE
 
 
+# 缓存子弹场景自带的基础缩放（发射时叠加玩家体型）
 func _ready() -> void:
 	._ready()
 	if is_instance_valid(_sprite):
