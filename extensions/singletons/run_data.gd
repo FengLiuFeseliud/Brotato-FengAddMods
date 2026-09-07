@@ -45,6 +45,27 @@ const ALL_ITEM_DEBUFF = [
 ]
 
 
+# 各属性升级比例字典
+var fengliu_stat_upgrade_ratios = {
+	Keys.generate_hash("stat_max_hp"): 3,           # 最大生命
+	Keys.generate_hash("stat_armor"): 1,            # 护甲
+	Keys.generate_hash("stat_crit_chance"): 3,      # 暴击率
+	Keys.generate_hash("stat_luck"): 5,             # 幸运
+	Keys.generate_hash("stat_attack_speed"): 5,     # 攻击速度
+	Keys.generate_hash("stat_elemental_damage"): 1, # 元素伤害
+	Keys.generate_hash("stat_hp_regeneration"): 2,  # 生命回复
+	Keys.generate_hash("stat_lifesteal"): 1,        # 吸血
+	Keys.generate_hash("stat_melee_damage"): 2,     # 近战伤害
+	Keys.generate_hash("stat_percent_damage"): 5,   # 百分比伤害
+	Keys.generate_hash("stat_dodge"): 3,            # 闪避
+	Keys.generate_hash("stat_engineering"): 2,      # 工程学
+	Keys.generate_hash("stat_range"): 15,           # 射程
+	Keys.generate_hash("stat_ranged_damage"): 1,    # 远程伤害
+	Keys.generate_hash("stat_speed"): 3,            # 移动速度
+	Keys.generate_hash("stat_harvesting"): 5        # 收获
+}
+
+
 var effect_fengliu_add_stat_after_change = Keys.generate_hash("fengliu_add_stat_after_change")
 var effect_fengliu_shop_item_count = Keys.generate_hash("fengliu_shop_item_count")
 var effect_fengliu_stats_stop = Keys.generate_hash("fengliu_stats_stop")
@@ -53,6 +74,7 @@ var effect_fengliu_item_merge = Keys.generate_hash("fengliu_item_merge")
 var effect_fengliu_random_curse = Keys.generate_hash("fengliu_random_curse")
 var effect_fengliu_wave_elites_spawn = Keys.generate_hash("fengliu_wave_elites_spawn")
 var effect_fengliu_apply_item_not_add_all_debuff = Keys.generate_hash("fengliu_apply_item_not_add_all_debuff")
+var effect_fengliu_temporary_stats_stop = Keys.generate_hash("fengliu_temporary_stats_stop")
 
 
 var fengliu_item_forecast = Keys.generate_hash("item_forecast") # 天气预报道具哈希
@@ -80,9 +102,7 @@ var _restart_wave = false
 
 # 波次结束移除的道具列表
 var wave_end_remove_items = [
-	fengliu_item_forecast,
-	fengliu_item_directed_training,
-	fengliu_item_clown_fish
+	fengliu_item_forecast
 ]
 
 
@@ -425,7 +445,7 @@ func _fengliu_get_wave_end_remove_item_to_remove(item_hash: int, player_index: i
 
 # 统一添加效果哈希
 func get_player_effect(key: int, player_index: int):
-	var effects = get_player_effects(player_index)
+	var effects = .get_player_effects(player_index)
 	if not effects.has(key):
 		effects[key] = []
 	
@@ -583,10 +603,19 @@ func lock_player_shop_item(item_data: ItemParentData, wave_value: int, player_in
 	.lock_player_shop_item(item_data, wave_value, player_index)
 
 
+func fengliu_get_stat_ratios_from_price(stats_hash: int) -> int:
+	return int(60 / fengliu_stat_upgrade_ratios[stats_hash])
+
+
 # 扩展获取货币
 func get_player_currency(player_index: int) -> int:
+	var effects = RunData.get_player_effect(effect_fengliu_temporary_stats_stop, player_index)
+	if effects is int and effects > 0:
+		var stat_hash = fengliu_get_highest_stat_hash(player_index)
+		return int(get_stat(stat_hash, player_index) * fengliu_get_stat_ratios_from_price(stat_hash))
+
 	# 无代付效果走原逻辑
-	var effects = get_player_effect(effect_fengliu_stats_stop, player_index)
+	effects = get_player_effect(effect_fengliu_stats_stop, player_index)
 	if effects.size() == 0:
 		return .get_player_currency(player_index)
 
@@ -597,8 +626,14 @@ func get_player_currency(player_index: int) -> int:
 
 # 扩展移除货币
 func remove_currency(value: int, player_index: int) -> void :
+	var effects = RunData.get_player_effect(effect_fengliu_temporary_stats_stop, player_index)
+	if effects is int and effects > 0:
+		var stat_hash = fengliu_get_highest_stat_hash(player_index)
+		remove_stat(stat_hash, int(ceil(value / float(fengliu_get_stat_ratios_from_price(stat_hash)))), player_index)
+		return
+		
 	# 无代付效果走原逻辑
-	var effects = get_player_effect(effect_fengliu_stats_stop, player_index)
+	effects = get_player_effect(effect_fengliu_stats_stop, player_index)
 	if effects.size() == 0:
 		.remove_currency(value, player_index)
 		return

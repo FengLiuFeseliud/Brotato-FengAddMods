@@ -39,6 +39,7 @@ WEAPON_GHOST_STONE_SPEAR,Ghost Stone Spear,幽魂石矛
 WEAPON_BROOM,Broom,扫帚
 WEAPON_CLASS_HOMEWARE,Homeware,家居
 ITEM_MAGNET,Magnet,磁铁
+ITEM_IN_LIEN,in_lien,代偿
 EFFECT_TWO_HAND_WEAPON_SLOT_LIMIT,Only has two hands (so can only hold two weapons),只有两只手所以只拿两个武器
 ITEM_RAT_KING_RATZILLA,Rat Subject,鼠族臣民
 EFFECT_RATZILLA_KILLER_BOSS_TEXT,Ratzilla targets and attacks bosses,鼠斯拉会锁定并攻击 boss
@@ -146,3 +147,5 @@ EFFECT_WEAPON_KILLED_ADD_TEMP_STAT,"Killing an enemy has a {0} ({1}) chance to g
 EFFECT_WEAPONS_NO_RECOIL,This weapon has no recovery time,此武器没有收回时间
 EFFECT_WEAPON_HIT_SLOW,"On hit, slow enemies by {0} ({1})",击中时对敌人减速{0}（{1}）
 EFFECT_CHANCE_GOLD_STATS,"Picking up a material has a {0} chance to permanently gain {1} {2}",捡起材料时有{0}概率永久{1}{2}
+EFFECT_TEMPORARY_STATS_STOP,,后续的{0}次购买将使用你的最大主要属性代替材料（可叠加） [{1}]
+EFFECT_TEMPORARY_STATS_STOP_TEXT,,主要属性基础代替[color=lime]60[/color]材料，属性价值越低代替越少材料

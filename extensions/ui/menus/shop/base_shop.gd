@@ -7,6 +7,7 @@ var effect_fengliu_stats_buy_item = Keys.generate_hash("fengliu_stats_buy_item")
 var effect_fengliu_item_bought_spawn_boss = Keys.generate_hash("fengliu_item_bought_spawn_boss")
 var effect_fengliu_swap_enemie = Keys.generate_hash("fengliu_swap_enemie")
 var effect_fengliu_get_fixed_upgrade = Keys.generate_hash("fengliu_get_fixed_upgrade")
+var effect_fengliu_temporary_stats_stop = Keys.generate_hash("fengliu_temporary_stats_stop")
 
 
 var fengliu_shop_items_count_price = Keys.generate_hash("fengliu_shop_items_count_price")
@@ -175,8 +176,23 @@ func on_shop_item_bought(shop_item: ShopItem, player_index: int) -> void :
 		if shop_item.item_data.my_id_hash == effect[0]:
 			fengliu_add_item_bought_elite(effect, shop_item, player_index)
 
+	var effects = RunData.get_player_effect(effect_fengliu_temporary_stats_stop, player_index)
+	if effects is int and effects > 0:
+		for effect in RunData.get_player_effect(effect_fengliu_stats_buy_item, player_index):
+			RunData.add_stat(effect[0], effect[1], player_index)
+		.on_shop_item_bought(shop_item, player_index)
+		var player_effects = RunData.get_player_effects(player_index)
+		player_effects[effect_fengliu_temporary_stats_stop] -= 1
+		
+		if player_effects[effect_fengliu_temporary_stats_stop] <= 0:
+			var container = _get_shop_items_container(player_index)
+			for child in container.get_children():
+				if child is ShopItem and child.active and child.has_method("_fengliu_refresh_pay_display"):
+					child._fengliu_refresh_pay_display()
+		return
+
 	# 无代付则走原逻辑
-	var effects = RunData.get_player_effect(effect_fengliu_stats_stop, player_index)
+	effects = RunData.get_player_effect(effect_fengliu_stats_stop, player_index)
 	if effects.size() == 0 or not effects[0][2]:
 		.on_shop_item_bought(shop_item, player_index)
 		return
@@ -195,7 +211,7 @@ func on_shop_item_bought(shop_item: ShopItem, player_index: int) -> void :
 	var effect = effects[0]
 	var currency = RunData.get_player_currency(player_index)
 	var stat_value = int(ceil(shop_item.value / float(effect[1])))
-	# 属性不够则扣属性代付
+	# 货币不够则扣属性代付
 	if currency < shop_item.value:
 		RunData.remove_stat(effect[0], currency, player_index)
 		.on_shop_item_bought(shop_item, player_index)

@@ -6,29 +6,69 @@ var material_ui_icon = load("res://items/materials/material_ui.png")
 
 var effect_fengliu_stats_stop = Keys.generate_hash("fengliu_stats_stop")
 var effect_fengliu_shop_item_count = Keys.generate_hash("fengliu_shop_item_count")
+var effect_fengliu_temporary_stats_stop = Keys.generate_hash("fengliu_temporary_stats_stop")
+var fengliu_item_gold_value = 0 # 商品金币原价（hp_shop 会把 value 改成 ÷20 后的血量价）
 
 
-# 扩展属性代付显示
-func set_shop_item(p_item_data: ItemParentData, p_wave_value: int = RunData.current_wave) -> void :
-    .set_shop_item(p_item_data, p_wave_value)
-
-    # 无代付效果则跳过
-    var effects = RunData.get_player_effect(effect_fengliu_stats_stop, player_index)
-    if effects.size() == 0:
-        return
-    
-    var effect = effects[0]
-    # 金币足够且允许金币购买：保持金币显示，并还原金币图标（防止上一帧属性图标残留）
-    if RunData.get_player_gold(player_index) >= value and effect[2]:
-        _button.set_material_icon(material_ui_icon, Utils.GOLD_COLOR)
-        return
-
-    var material_icon: Image = ItemService.get_stat_icon(effect[0]).get_data()
+func _fengliu_stats_shop_item_icon(stats_hash: int, ratio: int) -> void:
+    var material_icon: Image = ItemService.get_stat_icon(stats_hash).get_data()
     var texture: = ImageTexture.new()
     texture.create_from_image(material_icon)
     # 切换为属性代付图标与价格
     _button.set_material_icon(texture)
-    _button.set_value(int(ceil(value / float(effect[1]))), int(RunData.get_stat(effect[0], player_index)))
+    _button.set_value(int(ceil(value / float(max(1, ratio)))), int(RunData.get_stat(stats_hash, player_index)))
+
+
+func fengliu_stats_stop(effect: Array) -> void:
+    # 金币足够且允许金币购买：保持金币显示，并还原金币图标
+    if RunData.get_player_gold(player_index) >= value and effect[2]:
+        _button.set_material_icon(material_ui_icon, Utils.GOLD_COLOR)
+        return
+
+    _fengliu_stats_shop_item_icon(effect[0], effect[1])
+
+
+func fengliu_temporary_stats_stop():
+    var stats_hash = RunData.fengliu_get_highest_stat_hash(player_index)
+    _fengliu_stats_shop_item_icon(stats_hash, RunData.fengliu_get_stat_ratios_from_price(stats_hash))
+
+
+# 属性代付显示
+func _fengliu_refresh_pay_display() -> void:
+    var effects = RunData.get_player_effect(effect_fengliu_temporary_stats_stop, player_index)
+    if effects is int and effects > 0:
+        # 临时代偿优先：用金币原价显示/扣除（兼容 hp_shop 的 ÷20 血量价）
+        value = fengliu_item_gold_value
+        fengliu_temporary_stats_stop()
+        return
+
+    # 普通属性代付效果
+    effects = RunData.get_player_effect(effect_fengliu_stats_stop, player_index)
+    if effects is Array and effects.size() > 0:
+        fengliu_stats_stop(effects[0])
+        return
+
+    # 原版 hp_shop
+    if RunData.get_player_effect_bool(Keys.hp_shop_hash, player_index):
+        value = fengliu_item_gold_value
+        _fengliu_stats_shop_item_icon(Keys.stat_max_hp_hash, 20)
+        value = int(ceil(fengliu_item_gold_value / 20.0))
+        return
+
+    # 无任何代付：还原金币图标与金币价格（避免残留临时属性图标）
+    _button.set_material_icon(material_ui_icon, Utils.GOLD_COLOR)
+    _button.set_value(value, RunData.get_player_currency(player_index))
+
+
+func set_shop_item(p_item_data: ItemParentData, p_wave_value: int = RunData.current_wave) -> void :
+    # 金币原价与基类同源计算（基类 hp_shop 分支会把 value 改成 ÷20 的血量价）
+    if RunData.get_player_effect_bool(Keys.hp_shop_hash, player_index):
+        fengliu_item_gold_value = ItemService.get_value(p_wave_value, p_item_data.value, player_index, true, p_item_data is WeaponData, p_item_data.my_id_hash)
+        
+    .set_shop_item(p_item_data, p_wave_value)
+    if fengliu_item_gold_value == 0:
+        fengliu_item_gold_value = value # 非 hp_shop 时 value 就是金币原价
+    _fengliu_refresh_pay_display()
 
 
 # 是否达到锁定上限
