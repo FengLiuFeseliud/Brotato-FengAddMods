@@ -6,11 +6,11 @@
 script = ExtResource( 1 )
 key = "stat_lifesteal"
 text_key = "EFFECT_WEAPON_KILLED_ADD_TEMP_STAT"
-value = 15
+value = 10
 custom_key = "fengliu_wpapon_killed_add_temp_stat"
 storage_method = 0
 effect_sign = 3
 custom_args = [  ]
 gain_stat = "stat_elemental_damage"
-gain_value = 25
+gain_value = 20
 stat_nb = 1

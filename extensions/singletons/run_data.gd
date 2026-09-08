@@ -102,7 +102,15 @@ var _restart_wave = false
 
 # 波次结束移除的道具列表
 var wave_end_remove_items = [
-	fengliu_item_forecast
+	fengliu_item_forecast,
+	fengliu_item_directed_training,
+	fengliu_item_clown_fish,
+]
+
+
+var wave_end_can_box_use_items = [
+	fengliu_item_directed_training,
+	fengliu_item_clown_fish
 ]
 
 
@@ -435,7 +443,7 @@ func _fengliu_get_wave_end_remove_item_to_remove(item_hash: int, player_index: i
 		if player_item.my_id_hash != item_hash:
 			continue
 
-		if player_item.get("is_box_get") == true:
+		if player_item.get("is_box_get") == true and not item_hash in wave_end_can_box_use_items:
 			continue
 
 		return player_item
