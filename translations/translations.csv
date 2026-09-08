@@ -42,6 +42,7 @@ ITEM_MAGNET,Magnet,磁铁
 ITEM_IN_LIEN,in_lien,代偿
 WEAPON_VAMPIRES_KISS,,吸血鬼之吻
 WEAPON_CLASS_MAGIC,Magic,魔法
+WEAPON_KETTLE,,水壶
 EFFECT_TWO_HAND_WEAPON_SLOT_LIMIT,Only has two hands (so can only hold two weapons),只有两只手所以只拿两个武器
 ITEM_RAT_KING_RATZILLA,Rat Subject,鼠族臣民
 EFFECT_RATZILLA_KILLER_BOSS_TEXT,Ratzilla targets and attacks bosses,鼠斯拉会锁定并攻击 boss
