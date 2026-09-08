@@ -33,6 +33,14 @@ func get_args(player_index: int) -> Array:
     #   [1] = 概率倍率属性图标文本
     #   [2] = 临时增加的数值（绿色 +N）
     #   [3] = 临时增加的属性名（基类 args[1]）
+    if gain_stat_hash == 0:
+        return [
+            "[color=lime]%s%%[/color]" % value, 
+            str(gain_value / 100.0),
+            "[color=lime]+%s[/color]" % str(stat_nb),
+            .get_args(player_index)[1]
+        ]  
+
     var dynamic_chance = value + (Utils.get_stat(gain_stat_hash, player_index) * (gain_value / 100.0))
     if dynamic_chance > 100:
         dynamic_chance = 100

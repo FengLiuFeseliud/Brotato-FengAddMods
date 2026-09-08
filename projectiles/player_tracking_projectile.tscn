@@ -1,0 +1,30 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://projectiles/projectile.tscn" type="PackedScene" id=1]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/projectiles/player_tracking_projectile.gd" type="Script" id=2]
+[ext_resource path="res://overlap/hitbox.tscn" type="PackedScene" id=3]
+
+[sub_resource type="CircleShape2D" id=4]
+radius = 500.0
+
+[node name="PlayerProjectile" instance=ExtResource( 1 )]
+script = ExtResource( 2 )
+rotation_speed = 0
+tracking_turn_strength = 0.08
+
+[node name="Hitbox" parent="." index="1"]
+collision_layer = 8
+
+[node name="TargetTriggerHitbox" parent="." index="3" instance=ExtResource( 3 )]
+unique_name_in_owner = true
+visible = false
+deals_damage = false
+
+[node name="Collision" parent="TargetTriggerHitbox" index="0"]
+shape = SubResource( 4 )
+
+[connection signal="critically_hit_something" from="Hitbox" to="." method="_on_Hitbox_critically_hit_something"]
+[connection signal="hit_something" from="Hitbox" to="." method="_on_Hitbox_hit_something"]
+
+[editable path="Hitbox"]
+[editable path="TargetTriggerHitbox"]

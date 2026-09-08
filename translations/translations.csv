@@ -40,6 +40,7 @@ WEAPON_BROOM,Broom,扫帚
 WEAPON_CLASS_HOMEWARE,Homeware,家居
 ITEM_MAGNET,Magnet,磁铁
 ITEM_IN_LIEN,in_lien,代偿
+WEAPON_VAMPIRES_KISS,,吸血鬼之吻
 EFFECT_TWO_HAND_WEAPON_SLOT_LIMIT,Only has two hands (so can only hold two weapons),只有两只手所以只拿两个武器
 ITEM_RAT_KING_RATZILLA,Rat Subject,鼠族臣民
 EFFECT_RATZILLA_KILLER_BOSS_TEXT,Ratzilla targets and attacks bosses,鼠斯拉会锁定并攻击 boss
@@ -149,3 +150,4 @@ EFFECT_WEAPON_HIT_SLOW,"On hit, slow enemies by {0} ({1})",击中时对敌人减
 EFFECT_CHANCE_GOLD_STATS,"Picking up a material has a {0} chance to permanently gain {1} {2}",捡起材料时有{0}概率永久{1}{2}
 EFFECT_TEMPORARY_STATS_STOP,,后续的{0}次购买将使用你的最大主要属性代替材料（可叠加） [{1}]
 EFFECT_TEMPORARY_STATS_STOP_TEXT,,主要属性基础代替[color=lime]60[/color]材料，属性价值越低代替越少材料
+EFFECT_TRACKING_PROJECTILE_TEXT,,此武器投掷物会进行追踪
