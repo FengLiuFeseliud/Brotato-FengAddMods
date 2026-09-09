@@ -39,8 +39,8 @@ shape = SubResource( 1 )
 
 [node name="ShootingBehavior" parent="." index="4"]
 script = ExtResource( 5 )
-burst_shots = 3
-burst_gap_frames = 6
+burst_shots = 2
+burst_gap_frames = 8
 burst_jitter = 0.03
 
 [editable path="Sprite/Hitbox"]
