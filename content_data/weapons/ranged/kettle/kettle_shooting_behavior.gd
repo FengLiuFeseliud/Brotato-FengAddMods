@@ -5,6 +5,7 @@ export (int) var burst_gap_frames = 6  # 每颗之间的间隔(帧, 60fps)
 export (float) var burst_jitter = 0.01  # 每发微小随机偏角，避免全部重叠成一条线
 
 
+# 覆盖射击逻辑：一轮内连发多颗弹丸（含发射间隔与随机偏角）
 func shoot(_distance: float) -> void:
 	_parent.set_shooting(true)
 

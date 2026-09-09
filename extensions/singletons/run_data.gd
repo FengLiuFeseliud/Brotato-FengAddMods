@@ -611,6 +611,7 @@ func lock_player_shop_item(item_data: ItemParentData, wave_value: int, player_in
 	.lock_player_shop_item(item_data, wave_value, player_index)
 
 
+# 按属性价值比例把属性换算为材料（基础 60 材料）
 func fengliu_get_stat_ratios_from_price(stats_hash: int) -> int:
 	return int(60 / fengliu_stat_upgrade_ratios[stats_hash])
 
