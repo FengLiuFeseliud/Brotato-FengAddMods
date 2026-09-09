@@ -1,10 +1,10 @@
 [gd_resource type="Resource" load_steps=8 format=2]
 
-[ext_resource path="res://weapons/ranged/pistol/gun_pistol_shot_05.wav" type="AudioStream" id=1]
-[ext_resource path="res://weapons/ranged/pistol/gun_pistol_shot_01.wav" type="AudioStream" id=2]
-[ext_resource path="res://weapons/ranged/pistol/gun_pistol_shot_04.wav" type="AudioStream" id=3]
-[ext_resource path="res://weapons/ranged/pistol/gun_pistol_shot_02.wav" type="AudioStream" id=4]
-[ext_resource path="res://weapons/ranged/pistol/gun_pistol_shot_03.wav" type="AudioStream" id=5]
+[ext_resource path="res://weapons/ranged/flamethrower/lighter_gas_flame_ignite_02.wav" type="AudioStream" id=1]
+[ext_resource path="res://weapons/ranged/flamethrower/gas_med_flame_ignite_02.wav" type="AudioStream" id=2]
+[ext_resource path="res://weapons/ranged/flamethrower/gas_small_flame_ignite_01.wav" type="AudioStream" id=3]
+[ext_resource path="res://weapons/ranged/flamethrower/gas_small_flame_ignite_02.wav" type="AudioStream" id=4]
+[ext_resource path="res://weapons/ranged/flamethrower/gas_med_flame_ignite_01.wav" type="AudioStream" id=5]
 [ext_resource path="res://weapons/weapon_stats/ranged_weapon_stats.gd" type="Script" id=6]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/projectiles/vampires/vampires_projectile.tscn" type="PackedScene" id=7]
 

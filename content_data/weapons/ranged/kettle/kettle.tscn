@@ -36,10 +36,11 @@ position = Vector2( 32, 0 )
 [node name="CollisionShape2D" parent="Range" index="0"]
 shape = SubResource( 1 )
 
+
 [node name="ShootingBehavior" parent="." index="4"]
 script = ExtResource( 5 )
 burst_shots = 3
-burst_gap_frames = 4
+burst_gap_frames = 6
 burst_jitter = 0.03
 
 [editable path="Sprite/Hitbox"]

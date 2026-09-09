@@ -1,7 +1,7 @@
 extends "res://weapons/shooting_behaviors/ranged_weapon_shooting_behavior.gd"
 
-export (int) var burst_shots = 5      # 一轮连发打几颗
-export (int) var burst_gap_frames = 6  # 每颗之间的间隔(帧, 60fps)
+export (int) var burst_shots = 3      # 一轮连发打几颗
+export (int) var burst_gap_frames = 10  # 每颗之间的间隔(帧, 60fps)
 export (float) var burst_jitter = 0.01  # 每发微小随机偏角，避免全部重叠成一条线
 
 

@@ -151,5 +151,5 @@ EFFECT_WEAPONS_NO_RECOIL,This weapon has no recovery time,此武器没有收回�
 EFFECT_WEAPON_HIT_SLOW,"On hit, slow enemies by {0} ({1})",击中时对敌人减速{0}（{1}）
 EFFECT_CHANCE_GOLD_STATS,"Picking up a material has a {0} chance to permanently gain {1} {2}",捡起材料时有{0}概率永久{1}{2}
 EFFECT_TEMPORARY_STATS_STOP,The next {0} purchases will use your highest primary stat instead of materials (stackable) [{1}],后续的{0}次购买将使用你的最大主要属性代替材料（可叠加） [{1}]
-EFFECT_TEMPORARY_STATS_STOP_TEXT,Primary stats substitute [color=lime]60[/color] materials by default; the lower the value, the fewer materials substituted,主要属性基础代替[color=lime]60[/color]材料，属性价值越低代替越少材料
+EFFECT_TEMPORARY_STATS_STOP_TEXT,"Primary stats substitute [color=lime]60[/color] materials by default; the lower the value, the fewer materials substituted",主要属性基础代替[color=lime]60[/color]材料，属性价值越低代替越少材料
 EFFECT_TRACKING_PROJECTILE_TEXT,This weapon's projectiles track enemies,此武器投掷物会进行追踪

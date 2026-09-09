@@ -219,3 +219,14 @@ func on_shop_item_bought(shop_item: ShopItem, player_index: int) -> void :
 
 	RunData.remove_stat(effect[0], stat_value, player_index)
 	.on_shop_item_bought(shop_item, player_index)
+
+
+# 扩展商店锁定诅咒：锁格水壶在波末被"诅咒锁定道具"逻辑诅咒后，
+# 同步还原其收获产树效果（与普通版保持一致）
+func _on_tree_exited() -> void:
+	._on_tree_exited()
+	for player_index in RunData.get_player_count():
+		var locked_items: Array = RunData.locked_shop_items[player_index]
+		for locked_item in locked_items:
+			if locked_item.size() > 0:
+				RunData.fengliu_normalize_cursed_effect(locked_item[0])

@@ -796,3 +796,47 @@ func apply_item_effects(item_data: ItemParentData, player_index: int) -> void :
 func reset_to_start_wave_state() -> void :
 	_restart_wave = true
 	.reset_to_start_wave_state()
+
+
+# 还原诅咒的上的收获产树效果（让诅咒版和普通版完全一致）
+func fengliu_normalize_cursed_effect(item_data: ItemParentData) -> void:
+	if item_data == null:
+		return
+	if not item_data.is_cursed:
+		return
+
+	var base_data = ItemService.get_element(ItemService.weapons if item_data is WeaponData else ItemService.items, item_data.my_id_hash)
+	if base_data == null:
+		return
+
+	for effect in item_data.effects:
+		if not effect is GainStatForEveryStatEffect:
+			continue
+
+		if effect.key_hash != Keys.trees_hash:
+			continue
+
+		var base_text_key: String = "EFFECT_GAIN_STAT_FOR_EVERY_STAT"
+		for base_effect in base_data.effects:
+			if not base_effect is GainStatForEveryStatEffect:
+				continue
+
+			if base_effect.key_hash != Keys.trees_hash:
+				continue
+
+			base_text_key = base_effect.text_key
+			break
+		effect.text_key = base_text_key
+
+
+# 扩展添加道具：诅咒水壶入库前先还原树效果
+func add_item(item: ItemData, player_index: int, is_selection: bool = false) -> void:
+	fengliu_normalize_cursed_effect(item)
+	.add_item(item, player_index, is_selection)
+
+
+# 扩展添加武器：诅咒水壶入库前先还原树效果
+func add_weapon(weapon: WeaponData, player_index: int, is_selection: bool = false) -> WeaponData:
+	fengliu_normalize_cursed_effect(weapon)
+	return .add_weapon(weapon, player_index, is_selection)
+

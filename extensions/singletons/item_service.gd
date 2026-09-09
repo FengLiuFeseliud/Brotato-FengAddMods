@@ -272,3 +272,12 @@ func get_upgrades(level: int, number: int, old_upgrades: Array, player_index: in
         upgrades = fengliu_up_upgrade_data_tier(effect, upgrades, player_index)
 
     return upgrades
+
+
+# 扩展道具效果修正：商店/掉落随机生成"被诅咒"的道具或武器后，
+# 若为水壶则立即还原其收获产树效果，避免被诅咒改成"另一个效果"并放大 value
+func apply_item_effect_modifications(item: ItemParentData, player_index: int) -> ItemParentData:
+    var new_item = .apply_item_effect_modifications(item, player_index)
+    RunData.fengliu_normalize_cursed_effect(new_item)
+    return new_item
+
