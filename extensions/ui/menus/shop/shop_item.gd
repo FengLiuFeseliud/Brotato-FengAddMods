@@ -38,15 +38,14 @@ func fengliu_temporary_stats_stop():
 
 # 属性代付显示
 func _fengliu_refresh_pay_display() -> void:
-    var effects = RunData.get_player_effect(effect_fengliu_temporary_stats_stop, player_index)
-    if effects is int and effects > 0:
+    if RunData.get_player_effect(effect_fengliu_temporary_stats_stop, player_index) > 0:
         # 临时代偿优先：用金币原价显示/扣除（兼容 hp_shop 的 ÷20 血量价）
         value = fengliu_item_gold_value
         fengliu_temporary_stats_stop()
         return
 
     # 普通属性代付效果
-    effects = RunData.get_player_effect(effect_fengliu_stats_stop, player_index)
+    var effects = RunData.get_player_effect(effect_fengliu_stats_stop, player_index)
     if effects is Array and effects.size() > 0:
         fengliu_stats_stop(effects[0])
         return
@@ -66,12 +65,9 @@ func _fengliu_refresh_pay_display() -> void:
 # 扩展设置商店道具（记录金币原价并刷新代付显示）
 func set_shop_item(p_item_data: ItemParentData, p_wave_value: int = RunData.current_wave) -> void :
     # 金币原价与基类同源计算（基类 hp_shop 分支会把 value 改成 ÷20 的血量价）
-    if RunData.get_player_effect_bool(Keys.hp_shop_hash, player_index):
-        fengliu_item_gold_value = ItemService.get_value(p_wave_value, p_item_data.value, player_index, true, p_item_data is WeaponData, p_item_data.my_id_hash)
+    fengliu_item_gold_value = ItemService.get_value(p_wave_value, p_item_data.value, player_index, true, p_item_data is WeaponData, p_item_data.my_id_hash)
         
     .set_shop_item(p_item_data, p_wave_value)
-    if fengliu_item_gold_value == 0:
-        fengliu_item_gold_value = value # 非 hp_shop 时 value 就是金币原价
     _fengliu_refresh_pay_display()
 
 

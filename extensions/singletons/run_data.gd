@@ -618,13 +618,12 @@ func fengliu_get_stat_ratios_from_price(stats_hash: int) -> int:
 
 # 扩展获取货币
 func get_player_currency(player_index: int) -> int:
-	var effects = RunData.get_player_effect(effect_fengliu_temporary_stats_stop, player_index)
-	if effects is int and effects > 0:
+	if get_player_effect(effect_fengliu_temporary_stats_stop, player_index) > 0:
 		var stat_hash = fengliu_get_highest_stat_hash(player_index)
 		return int(get_stat(stat_hash, player_index) * fengliu_get_stat_ratios_from_price(stat_hash))
 
 	# 无代付效果走原逻辑
-	effects = get_player_effect(effect_fengliu_stats_stop, player_index)
+	var effects = get_player_effect(effect_fengliu_stats_stop, player_index)
 	if effects.size() == 0:
 		return .get_player_currency(player_index)
 
@@ -635,14 +634,13 @@ func get_player_currency(player_index: int) -> int:
 
 # 扩展移除货币
 func remove_currency(value: int, player_index: int) -> void :
-	var effects = RunData.get_player_effect(effect_fengliu_temporary_stats_stop, player_index)
-	if effects is int and effects > 0:
+	if get_player_effect(effect_fengliu_temporary_stats_stop, player_index) > 0:
 		var stat_hash = fengliu_get_highest_stat_hash(player_index)
 		remove_stat(stat_hash, int(ceil(value / float(fengliu_get_stat_ratios_from_price(stat_hash)))), player_index)
 		return
 		
 	# 无代付效果走原逻辑
-	effects = get_player_effect(effect_fengliu_stats_stop, player_index)
+	var effects = get_player_effect(effect_fengliu_stats_stop, player_index)
 	if effects.size() == 0:
 		.remove_currency(value, player_index)
 		return

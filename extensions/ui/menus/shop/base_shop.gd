@@ -176,15 +176,15 @@ func on_shop_item_bought(shop_item: ShopItem, player_index: int) -> void :
 		if shop_item.item_data.my_id_hash == effect[0]:
 			fengliu_add_item_bought_elite(effect, shop_item, player_index)
 
-	var effects = RunData.get_player_effect(effect_fengliu_temporary_stats_stop, player_index)
-	if effects is int and effects > 0:
+	var temp_stop_count = RunData.get_player_effect(effect_fengliu_temporary_stats_stop, player_index)
+	if temp_stop_count > 0:
 		for effect in RunData.get_player_effect(effect_fengliu_stats_buy_item, player_index):
 			RunData.add_stat(effect[0], effect[1], player_index)
 		.on_shop_item_bought(shop_item, player_index)
 		var player_effects = RunData.get_player_effects(player_index)
 		player_effects[effect_fengliu_temporary_stats_stop] -= 1
 		
-		if player_effects[effect_fengliu_temporary_stats_stop] <= 0:
+		if temp_stop_count - 1 <= 0:
 			var container = _get_shop_items_container(player_index)
 			for child in container.get_children():
 				if child is ShopItem and child.active and child.has_method("_fengliu_refresh_pay_display"):
@@ -192,7 +192,7 @@ func on_shop_item_bought(shop_item: ShopItem, player_index: int) -> void :
 		return
 
 	# 无代付则走原逻辑
-	effects = RunData.get_player_effect(effect_fengliu_stats_stop, player_index)
+	var effects = RunData.get_player_effect(effect_fengliu_stats_stop, player_index)
 	if effects.size() == 0 or not effects[0][2]:
 		.on_shop_item_bought(shop_item, player_index)
 		return

@@ -11,20 +11,21 @@ extends NullEffect
 #   value  新增的代偿购买次数（可叠加）
 # ============================================================
 
-func apply(player_index: int) -> void:
-    var effect = RunData.get_player_effect(custom_key_hash ,player_index)
-    if not effect is int:
-        effect = 0
 
-    effect += value
-    RunData.get_player_effects(player_index)[custom_key_hash] = effect
+func apply(player_index: int) -> void:
+    var count = RunData.get_player_effect(custom_key_hash, player_index)
+    if not count is int:
+        count = 0
+
+    count += value
+    RunData.get_player_effects(player_index)[custom_key_hash] = count
 
 
 func get_args(player_index: int) -> Array:
     # 返回数组按顺序填充描述文本 {0}~{1} 占位符：
     #   [0] = 本次新增的代偿次数
     #   [1] = 当前累计代偿次数
-    var count = RunData.get_player_effect(custom_key_hash ,player_index)
+    var count = RunData.get_player_effect(custom_key_hash, player_index)
     if not count is int:
         count = 0
 
