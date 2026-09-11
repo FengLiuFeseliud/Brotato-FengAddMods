@@ -44,6 +44,7 @@ WEAPON_VAMPIRES_KISS,Vampire's Kiss,吸血鬼之吻
 WEAPON_CLASS_MAGIC,Magic,魔法
 WEAPON_KETTLE,Kettle,水壶
 WEAPON_MOP,Mop,拖把
+WEAPON_STRONG_SUN,Strong Sun,烈阳
 EFFECT_TWO_HAND_WEAPON_SLOT_LIMIT,Only has two hands (so can only hold two weapons),只有两只手所以只拿两个武器
 ITEM_RAT_KING_RATZILLA,Rat Subject,鼠族臣民
 EFFECT_RATZILLA_KILLER_BOSS_TEXT,Ratzilla targets and attacks bosses,鼠斯拉会锁定并攻击 boss
@@ -154,3 +155,4 @@ EFFECT_CHANCE_GOLD_STATS,"Picking up a material has a {0} chance to permanently 
 EFFECT_TEMPORARY_STATS_STOP,The next {0} purchases will use your highest primary stat instead of materials (stackable) [{1}],后续的{0}次购买将使用你的最大主要属性代替材料（可叠加） [{1}]
 EFFECT_TEMPORARY_STATS_STOP_TEXT,"Primary stats substitute [color=lime]60[/color] materials by default; the lower the value, the fewer materials substituted",主要属性基础代替[color=lime]60[/color]材料，属性价值越低代替越少材料
 EFFECT_TRACKING_PROJECTILE_TEXT,This weapon's projectiles track enemies,此武器投掷物会进行追踪
+EFFECT_STRONG_SUN_RANDOM_RAYS,This weapon fires rays in random directions,此武器向四周随机发射射线

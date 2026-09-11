@@ -38,7 +38,8 @@ func fengliu_temporary_stats_stop():
 
 # 属性代付显示
 func _fengliu_refresh_pay_display() -> void:
-    if RunData.get_player_effect(effect_fengliu_temporary_stats_stop, player_index) > 0:
+    var temporary_stats_stop_count = RunData.get_player_effect(effect_fengliu_temporary_stats_stop, player_index) 
+    if temporary_stats_stop_count is int and temporary_stats_stop_count > 0:
         # 临时代偿优先：用金币原价显示/扣除（兼容 hp_shop 的 ÷20 血量价）
         value = fengliu_item_gold_value
         fengliu_temporary_stats_stop()

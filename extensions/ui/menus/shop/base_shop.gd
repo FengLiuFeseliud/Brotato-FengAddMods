@@ -177,7 +177,7 @@ func on_shop_item_bought(shop_item: ShopItem, player_index: int) -> void :
 			fengliu_add_item_bought_elite(effect, shop_item, player_index)
 
 	var temp_stop_count = RunData.get_player_effect(effect_fengliu_temporary_stats_stop, player_index)
-	if temp_stop_count > 0:
+	if temp_stop_count is int and temp_stop_count > 0:
 		for effect in RunData.get_player_effect(effect_fengliu_stats_buy_item, player_index):
 			RunData.add_stat(effect[0], effect[1], player_index)
 		.on_shop_item_bought(shop_item, player_index)
