@@ -1,10 +1,10 @@
 [gd_scene load_steps=9 format=2]
 
 [ext_resource path="res://projectiles/bullet_particle_accelerator/particle_accelerator_projectile.gd" type="Script" id=1]
-[ext_resource path="res://projectiles/bullet_particle_accelerator/particle_accelerator_projectile.png" type="Texture" id=2]
-[ext_resource path="res://projectiles/bullet_particle_accelerator/particle_accelerator_projectile_end.png" type="Texture" id=3]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/projectiles/suns/suns_projectile.png" type="Texture" id=2]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/projectiles/suns/suns_projectile_end.png" type="Texture" id=3]
 [ext_resource path="res://overlap/hitbox.tscn" type="PackedScene" id=4]
-[ext_resource path="res://projectiles/bullet_particle_accelerator/particle_accelerator_projectile_start.png" type="Texture" id=5]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/projectiles/suns/suns_projectile_start.png" type="Texture" id=5]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 50, 22.5 )

@@ -2,7 +2,7 @@ extends "res://weapons/shooting_behaviors/ranged_weapon_shooting_behavior.gd"
 
 
 
-export (float) var front_offset_degrees = 6.0
+export (float) var front_offset_degrees = 12.0
 
 
 func shoot(distance: float) -> void :
