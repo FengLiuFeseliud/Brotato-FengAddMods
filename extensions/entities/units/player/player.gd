@@ -112,17 +112,9 @@ func on_consumable_picked_up(consumable_data: ConsumableData) -> void :
             
         RunData.add_stat(effect[0], effect[2], player_index)
 
-    # 开箱加属性
-    var effects = RunData.get_player_effect(FengLiuKeys.effect_fengliu_effect_box_stats(), player_index)
-    if effects.size() > 0 and (consumable_data.my_id_hash == Keys.consumable_item_box_hash 
-            or consumable_data.my_id_hash == Keys.consumable_legendary_item_box_hash):
-        for effect in effects:
-            RunData.add_stat(effect[0], effect[1], player_index)
-
     # 拾取加体型
-    effects = RunData.get_player_effect(FengLiuKeys.effect_fengliu_picked_up_consumable_add_size(), player_index)
-    if effects.size() > 0: 
-        fengliu_set_scale_size(effects[0][0])
+    for effect in RunData.get_player_effect(FengLiuKeys.effect_fengliu_picked_up_consumable_add_size(), player_index):
+        fengliu_set_scale_size(effect[0])
 
     .on_consumable_picked_up(consumable_data)
 

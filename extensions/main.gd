@@ -289,6 +289,10 @@ func fengliu_auto_open_box(consumable: Node, player_index: int) -> void:
 
 # 扩展拾取消耗品
 func on_consumable_picked_up(consumable: Node, player_index: int) -> void :
+	if consumable.already_picked_up:
+		.on_consumable_picked_up(consumable, player_index)
+		return
+		
 	var effects = RunData.get_player_effect(FengLiuKeys.effect_fengliu_picke_consumable_drop_structure(), player_index)
 	if effects.size() > 0:
 		# 拾取消耗品生成构造物
@@ -299,9 +303,11 @@ func on_consumable_picked_up(consumable: Node, player_index: int) -> void :
 		.on_consumable_picked_up(consumable, player_index)
 		return
 
-	if consumable.already_picked_up:
-		.on_consumable_picked_up(consumable, player_index)
-		return
+	 # 开箱加属性
+	effects = RunData.get_player_effect(FengLiuKeys.effect_fengliu_effect_box_stats(), player_index)
+	if effects.size() > 0:
+		for effect in effects:
+			RunData.add_stat(effect[0], effect[1], player_index)
 	
 	var picked_box_need_cost = false
 	var picked_box_cost_gold_effect = []
