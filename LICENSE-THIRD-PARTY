@@ -1,0 +1,47 @@
+Third-Party Content — No Claim of Rights
+
+--------------------------------------------------------------------------
+A. MINECRAFT FANWORK
+--------------------------------------------------------------------------
+
+Applies to:
+
+  - content_data/characters/creeper/**
+  - content_data/characters/steve/**
+  - zones/zone_minecreft/**
+
+Minecraft and all related characters (including Creeper and Steve), assets,
+names, and branding are the property of Mojang AB and Microsoft Corporation.
+
+The author of this repository does NOT claim any copyright or any other
+rights in the Minecraft-derived content of this project, and CANNOT grant
+any license, permission, or consent to any third party with respect to
+such content.
+
+This content is included as a non-commercial fan work, used within the
+modding ecosystem of the game Brotato, on a good-faith basis and without
+any claim of ownership.
+
+If you wish to use the Minecraft-derived content of this project, you must
+obtain permission from Mojang AB / Microsoft Corporation yourself.
+
+--------------------------------------------------------------------------
+B. BROTATO-DERIVED CONTENT
+--------------------------------------------------------------------------
+
+Applies to:
+  - content_data\characters\crate_gobbler\crate_gobbler_icon.png
+  - content_data\characters\crate_gobbler\appearance\crate_gobbler_eyes.png
+  - content_data\characters\crate_gobbler\appearance\crate_gobbler_hat.png
+  - content_data\characters\curse_fiend\curse_fiend_icon.png
+  - content_data\items\ap_round\ap_round_icon.png
+  - content_data\items\auto_open_box\auto_open_box_icon.png
+  - content_data\items\forestry\forestry_icon.png
+
+
+The game Brotato and its original assets are the property of Blobfish
+(Thomas Gervraud) and its publishers.
+
+The author of this repository does NOT claim ownership of any content
+derived from Brotato's original assets, and CANNOT grant any license or
+permission to any third party with respect to such content.

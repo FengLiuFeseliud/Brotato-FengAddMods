@@ -1,6 +1,52 @@
 MIT License
 
-Copyright (c) 2026 ✟昇天✟
+Copyright (c) 2026 FengLiuFeseliud
+
+--------------------------------------------------------------------------
+SCOPE OF THIS LICENSE / 本许可的适用范围
+--------------------------------------------------------------------------
+
+[EN] This license applies ONLY to the source code, data files, and
+     translation files of this project, namely:
+       - all source code files (*.gd)
+       - all data files (*.tres)
+       - manifest.json
+       - content_data.tres
+       - all files under translations/
+
+[中] 本许可仅适用于本项目的源代码、数据文件与翻译文件，即：
+       - 全部源代码文件（*.gd）
+       - 全部数据文件（*.tres）
+       - manifest.json
+       - content_data.tres
+       - translations/ 目录下的全部文件
+
+[EN] This license does NOT apply to any art, audio, font, or other asset
+     files. For those, see LICENSE-ASSETS and LICENSE-THIRD-PARTY.
+
+[中] 本许可不适用于任何美术、音效、字体或其他素材文件。
+     相关内容请见 LICENSE-ASSETS 与 LICENSE-THIRD-PARTY。
+
+--------------------------------------------------------------------------
+DEFAULT / FALLBACK / 兜底条款
+--------------------------------------------------------------------------
+
+[EN] Unless explicitly stated otherwise in LICENSE-ASSETS,
+     LICENSE-THIRD-PARTY, or the asset table in README.md, all content of
+     this repository that is not source code, data, or translation files is:
+         Copyright (c) 2026 ✟昇天✟. All Rights Reserved.
+
+[中] 除非在 LICENSE-ASSETS、LICENSE-THIRD-PARTY 或 README.md 的素材表中
+     另有明确说明，本仓库中一切不属于源代码、数据文件或翻译文件的内容：
+         版权所有 (c) 2026 ✟昇天✟，保留所有权利。
+
+[中] 本节中文文本仅为说明性翻译。如中英文存在歧义，以中文文本为准。
+
+--------------------------------------------------------------------------
+（以下为 MIT 许可原文，不得翻译或修改 /
+ The MIT License text below is the original English text and must not be
+ translated or modified.）
+--------------------------------------------------------------------------
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
