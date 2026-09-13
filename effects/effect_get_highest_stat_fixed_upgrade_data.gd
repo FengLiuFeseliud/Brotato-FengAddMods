@@ -19,8 +19,8 @@ func get_highest_upgrade_data(player_index: int) -> int:
 
 
 func apply(player_index: int) -> void:
-	RunData.get_player_effect(custom_key_hash ,player_index).push_back(self)
+	FengLiuUtils.bind_effect(custom_key_hash, player_index, self)
 	
 
 func unapply(player_index: int) -> void:
-	RunData.get_player_effects(player_index)[custom_key_hash].erase(self)
+	FengLiuUtils.unbind_effect(custom_key_hash, player_index, self)

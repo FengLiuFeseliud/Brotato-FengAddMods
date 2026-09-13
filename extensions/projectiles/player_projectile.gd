@@ -4,7 +4,6 @@ extends "res://projectiles/player_projectile.gd"
 # 子弹最大倍率
 const FENGLIU_BULLET_SCALE_MAX: float = 10.0
 
-var effect_fengliu_bullet_scale = Keys.generate_hash("fengliu_bullet_scale")
 
 # 子弹场景自带缩放
 var _fengliu_base_sprite_scale: Vector2 = Vector2.ONE
@@ -44,7 +43,7 @@ func _fengliu_get_player_scale_factor() -> float:
 		# 非玩家武器不缩放
 		return 1.0
 
-	var main = Utils.get_scene_node()
+	var main = FengLiuUtils.get_main()
 	var players = main.get("_players") if main != null else null
 	if players == null or player_index >= players.size():
 		return 1.0
@@ -52,7 +51,7 @@ func _fengliu_get_player_scale_factor() -> float:
 	var player = players[player_index]
 	var scale_factor: float = player.scale.x
 
-	var effect = RunData.get_player_effect(effect_fengliu_bullet_scale, player_index)
+	var effect = RunData.get_player_effect(FengLiuKeys.effect_fengliu_bullet_scale(), player_index)
 	if effect is int and effect != 0:
 		scale_factor += effect / 100.0
 

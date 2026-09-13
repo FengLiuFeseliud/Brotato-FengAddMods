@@ -20,11 +20,11 @@ var _init_stats_args_structure :=  WeaponServiceInitStatsArgs.new()
 
 
 func apply(player_index: int) -> void:
-	RunData.get_player_effect(custom_key_hash ,player_index).push_back([key_hash, value, gain_value, stucture_effect])
+	FengLiuUtils.bind_effect(custom_key_hash, player_index, [key_hash, value, gain_value, stucture_effect])
 	
 
 func unapply(player_index: int) -> void:
-	RunData.get_player_effects(player_index)[custom_key_hash].erase([key_hash, value, gain_value, stucture_effect])
+	FengLiuUtils.unbind_effect(custom_key_hash, player_index, [key_hash, value, gain_value, stucture_effect])
 
 
 func get_args(player_index: int) -> Array:

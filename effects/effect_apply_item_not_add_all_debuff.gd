@@ -16,11 +16,11 @@ export (bool) var from_box = false # true=作用于箱子开出的道具；false
 
 
 func apply(player_index: int) -> void:
-	RunData.get_player_effect(custom_key_hash ,player_index).push_back([value, from_box])
+	FengLiuUtils.bind_effect(custom_key_hash, player_index, [value, from_box])
 	
 
 func unapply(player_index: int) -> void:
-	RunData.get_player_effects(player_index)[custom_key_hash].erase([value, from_box])
+	FengLiuUtils.unbind_effect(custom_key_hash, player_index, [value, from_box])
 
 
 func get_args(player_index: int) -> Array:
@@ -28,5 +28,5 @@ func get_args(player_index: int) -> Array:
 	#   [0] = 触发概率百分比（绿色）
 	var args = .get_args(player_index)
 	return [
-		"[color=lime]%s%%[/color]" % args[0]
+		FengLiuUtils.text_percent(args[0])
 	]

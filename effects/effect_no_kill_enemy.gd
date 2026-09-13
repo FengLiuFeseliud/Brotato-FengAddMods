@@ -12,11 +12,11 @@ extends Effect
 # ============================================================
 
 func apply(player_index: int) -> void:
-	RunData.get_player_effect(custom_key_hash ,player_index).push_back([key])
+	FengLiuUtils.bind_effect(custom_key_hash, player_index, [key])
 	
 
 func unapply(player_index: int) -> void:
-	RunData.get_player_effects(player_index)[custom_key_hash].erase([key])
+	FengLiuUtils.unbind_effect(custom_key_hash, player_index, [key])
 
 
 func get_args(player_index: int) -> Array:
@@ -24,5 +24,5 @@ func get_args(player_index: int) -> Array:
 	#   [0] = 触发该效果的攻击类型名（基类 args[1]）
 	var args = .get_args(player_index)
 	return [
-		"[color=lime]%s[/color]" % args[1]
+		FengLiuUtils.text_value(args[1])
 	]

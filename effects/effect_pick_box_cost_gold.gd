@@ -23,11 +23,11 @@ func get_box_cost() -> int:
 
 
 func apply(player_index: int) -> void:
-	RunData.get_player_effect(custom_key_hash ,player_index).push_back([key_hash, value, wave_inflation_rate, random_get_stat])
+	FengLiuUtils.bind_effect(custom_key_hash, player_index, [key_hash, value, wave_inflation_rate, random_get_stat])
 	
 
 func unapply(player_index: int) -> void:
-	RunData.get_player_effects(player_index)[custom_key_hash].erase([key_hash, value, wave_inflation_rate, random_get_stat])
+	FengLiuUtils.unbind_effect(custom_key_hash, player_index, [key_hash, value, wave_inflation_rate, random_get_stat])
 
 
 func get_args(_player_index: int) -> Array:
@@ -36,5 +36,5 @@ func get_args(_player_index: int) -> Array:
 	#   [1] = 随机获取属性次数（绿色）
 	return [
 		str(get_box_cost()), 
-		"[color=lime]%s[/color]" % str(random_get_stat)
+		FengLiuUtils.text_value(str(random_get_stat))
 	]

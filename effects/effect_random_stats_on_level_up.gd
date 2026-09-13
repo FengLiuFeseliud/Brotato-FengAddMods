@@ -39,11 +39,11 @@ static func get_id() -> String:
 	
 	
 func apply(player_index: int) -> void:
-	RunData.get_player_effect(custom_key_hash ,player_index).push_back([key_hash, stat_min_value, stat_max_value, stat_no_zero, stat_gain_hash, stat_gain_value])
+	FengLiuUtils.bind_effect(custom_key_hash, player_index, [key_hash, stat_min_value, stat_max_value, stat_no_zero, stat_gain_hash, stat_gain_value])
 	
 
 func unapply(player_index: int) -> void:
-	RunData.get_player_effects(player_index)[custom_key_hash].erase([key_hash, stat_min_value, stat_max_value, stat_no_zero, stat_gain_hash, stat_gain_value])
+	FengLiuUtils.unbind_effect(custom_key_hash, player_index, [key_hash, stat_min_value, stat_max_value, stat_no_zero, stat_gain_hash, stat_gain_value])
 
 
 func get_args(player_index: int):
@@ -67,5 +67,5 @@ func get_args(player_index: int):
 		args[1], 
 		tr(stat_gain.to_upper()), 
 		str(stat_gain_value), 
-		"[color=lime]%s[/color]" % velue_text
+		FengLiuUtils.text_value(velue_text)
 	]

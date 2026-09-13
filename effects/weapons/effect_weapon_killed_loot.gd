@@ -33,7 +33,7 @@ func get_args(_player_index: int) -> Array:
         value_count = value + RunData.current_wave * gain_value
         if value_count > cap_value and cap_value > 0:
             value_count = cap_value
-        text = "[color=lime]%s[/color]" % int(gain_value)
+        text = FengLiuUtils.text_value(int(gain_value))
     else:
         text = Utils.get_scaling_stat_icon_text(key_hash, gain_value)
 

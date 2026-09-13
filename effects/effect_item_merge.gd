@@ -31,11 +31,11 @@ func _generate_hashes() -> void:
 
 
 func apply(player_index: int) -> void:
-	RunData.get_player_effect(custom_key_hash ,player_index).push_back([key_hash, value, merge_from_item_hash, merge_from_count, merge_to_item_hash, merge_to_item_count])
+	FengLiuUtils.bind_effect(custom_key_hash, player_index, [key_hash, value, merge_from_item_hash, merge_from_count, merge_to_item_hash, merge_to_item_count])
 	
 
 func unapply(player_index: int) -> void:
-	RunData.get_player_effects(player_index)[custom_key_hash].erase([key_hash, value, merge_from_item_hash, merge_from_count, merge_to_item_hash, merge_to_item_count])
+	FengLiuUtils.unbind_effect(custom_key_hash, player_index, [key_hash, value, merge_from_item_hash, merge_from_count, merge_to_item_hash, merge_to_item_count])
 
 
 func get_args(player_index: int) -> Array:

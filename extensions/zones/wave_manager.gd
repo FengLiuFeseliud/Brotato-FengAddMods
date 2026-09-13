@@ -1,9 +1,7 @@
 extends WaveManager
 
-var effect_fengliu_minecraft = Keys.generate_hash("fengliu_minecraft")
 var minecreft_zone_data = []
 
-var effect_fengliu_swap_enemie = Keys.generate_hash("fengliu_swap_enemie")
 # 下一波敌人替换记录（由本局 WaveManager 持有，退出/重建场景后自动丢弃，不会跨局残留）
 var _wave_swap_enemies = []
 
@@ -28,7 +26,7 @@ func fengliu_init_minecreft_zone(zone_data: ZoneData) -> void:
 # 扩展初始化
 func init(p_wave_timer: Timer, zone_data: ZoneData, wave_data: Resource) -> void :
     for player_index in RunData.get_player_count():
-        if RunData.get_player_effect(effect_fengliu_minecraft, player_index).size() == 0:
+        if RunData.get_player_effect(FengLiuKeys.effect_fengliu_minecraft(), player_index).size() == 0:
             continue
         
         # 向关卡注入 mc 矿石
@@ -44,7 +42,7 @@ func fengliu_apply_wave_swap_enemies() -> void:
     # 从玩家身上已购买/获得的预报道具效果（SwapEnemies）中收集本轮替换记录，
     _wave_swap_enemies.clear()
     for player_index in RunData.get_player_count():
-        for swap_effect in RunData.get_player_effect(effect_fengliu_swap_enemie, player_index):
+        for swap_effect in RunData.get_player_effect(FengLiuKeys.effect_fengliu_swap_enemie(), player_index):
             if swap_effect.wave_enemy_x_id != "" and swap_effect.wave_enemy_y_id != "":
                 _wave_swap_enemies.append([swap_effect.wave_enemy_x, swap_effect.wave_enemy_x_id, swap_effect.wave_enemy_y, swap_effect.wave_enemy_y_id])
 

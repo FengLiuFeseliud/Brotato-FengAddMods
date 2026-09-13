@@ -1,16 +1,6 @@
 extends Player
 
 
-var effect_fengliu_consumable_stats = Keys.generate_hash("fengliu_consumable_stats")
-var effect_fengliu_effect_box_stats = Keys.generate_hash("fengliu_box_stats")
-var effect_fengliu_effect_stat_hit_protection = Keys.generate_hash("fengliu_stat_hit_protection")
-var effect_fengliu_regen_hit_protection = Keys.generate_hash("fengliu_regen_hit_protection")
-var effect_fengliu_temp_stats_on_hit_protection = Keys.generate_hash("fengliu_temp_stats_on_hit_protection")
-var effect_fengliu_not_moving_explosion = Keys.generate_hash("fengliu_not_moving_explosion")
-var effect_fengliu_can_one_not_moving_explosion = Keys.generate_hash("fengliu_can_one_not_moving_explosion")
-var effect_fengliu_picked_up_consumable_add_size = Keys.generate_hash("fengliu_picked_up_consumable_add_size")
-
-
 var _max_hit_protection = 0
 var _regen_hit_protection_timer = null
 var _player_ui = null
@@ -22,34 +12,23 @@ var _exploding_on_clean_up_room
 var _scale_value = 1 
 
 
-# 计算动态概率
-static func fengliu_get_dynamic_chance(init_chance: int, add_chance: int = 0, stat_count: int = 0) -> float:
-	# 基础概率 + 属性数 * 每点加成
-	var dynamic_chance = init_chance + (stat_count * (add_chance / 100.0))
-	# 上限 100
-	if dynamic_chance > 100:
-		return 100.0 / 100
-		
-	return dynamic_chance / 100
-
-
 # 扩展防护效果初始化
 func _ready() -> void :
     # 配置防护值
-    var effects = RunData.get_player_effect(effect_fengliu_effect_stat_hit_protection, player_index)
+    var effects = RunData.get_player_effect(FengLiuKeys.effect_fengliu_effect_stat_hit_protection(), player_index)
     if effects.size() > 0:
         var effect = effects[0]
         _hit_protection += int(Utils.get_stat(effect[0], player_index) / effect[1])
         _max_hit_protection = _hit_protection
     
     # 配置防护回复
-    effects = RunData.get_player_effect(effect_fengliu_regen_hit_protection, player_index)
+    effects = RunData.get_player_effect(FengLiuKeys.effect_fengliu_regen_hit_protection(), player_index)
     if effects.size() > 0:
         _regen_hit_protection_timer = FixedTimer.new(effects[0][2])
         _regen_hit_protection = effects[0]
 
     # 配置静止爆炸
-    effects = RunData.get_player_effect(effect_fengliu_not_moving_explosion, player_index)
+    effects = RunData.get_player_effect(FengLiuKeys.effect_fengliu_not_moving_explosion(), player_index)
     if effects.size() > 0:
         _not_moving_explosion_timer = FixedTimer.new(effects[0].wait_time)
         _clean_up_room_timer = FixedTimer.new(1)
@@ -89,7 +68,7 @@ func take_damage(value: int, args: TakeDamageArgs) -> Array:
         if _regen_hit_protection_timer.is_stopped():
             _regen_hit_protection_timer.start()
 
-        for effect in RunData.get_player_effect(effect_fengliu_temp_stats_on_hit_protection, player_index):
+        for effect in RunData.get_player_effect(FengLiuKeys.effect_fengliu_temp_stats_on_hit_protection(), player_index):
             TempStats.add_stat(effect[0], effect[1], player_index)
 
     return .take_damage(value, args)
@@ -104,7 +83,7 @@ func fengliu_on_regen_hit_protection() -> void:
     
     var stat_count = Utils.get_stat(_regen_hit_protection[0], player_index)
     # 按概率回复
-    if not Utils.get_chance_success(fengliu_get_dynamic_chance(_regen_hit_protection[1], _regen_hit_protection[3], stat_count)):
+    if not Utils.get_chance_success(FengLiuUtils.get_dynamic_chance_ratio(_regen_hit_protection[1], _regen_hit_protection[3], stat_count)):
         return
 
     # 回复并刷新UI
@@ -127,21 +106,21 @@ func fengliu_set_scale_size(gain: float) -> void:
 # 扩展拾取消耗品结算
 func on_consumable_picked_up(consumable_data: ConsumableData) -> void :
     # 拾取消耗品加属性
-    for effect in RunData.get_player_effect(effect_fengliu_consumable_stats, player_index):
+    for effect in RunData.get_player_effect(FengLiuKeys.effect_fengliu_consumable_stats(), player_index):
         if not Utils.get_chance_success(effect[1] / 100.0):
             continue
             
         RunData.add_stat(effect[0], effect[2], player_index)
 
     # 开箱加属性
-    var effects = RunData.get_player_effect(effect_fengliu_effect_box_stats, player_index)
+    var effects = RunData.get_player_effect(FengLiuKeys.effect_fengliu_effect_box_stats(), player_index)
     if effects.size() > 0 and (consumable_data.my_id_hash == Keys.consumable_item_box_hash 
             or consumable_data.my_id_hash == Keys.consumable_legendary_item_box_hash):
         for effect in effects:
             RunData.add_stat(effect[0], effect[1], player_index)
 
     # 拾取加体型
-    effects = RunData.get_player_effect(effect_fengliu_picked_up_consumable_add_size, player_index)
+    effects = RunData.get_player_effect(FengLiuKeys.effect_fengliu_picked_up_consumable_add_size(), player_index)
     if effects.size() > 0: 
         fengliu_set_scale_size(effects[0][0])
 
@@ -157,12 +136,12 @@ func fengliu_on_clean_up_room():
     if not _clean_up_room_timer.is_stopped():
         _clean_up_room_timer.stop()
     
-    var main = Utils.get_scene_node()
+    var main = FengLiuUtils.get_main()
     # 无精英则正常清理
     if main._entity_spawner.get_nb_bosses_and_elites_alive() == 0:
         main.clean_up_room()
     # 有精英则扣血取消清理
-    elif RunData.get_player_effect(effect_fengliu_can_one_not_moving_explosion, player_index).size() > 0:
+    elif RunData.get_player_effect(FengLiuKeys.effect_fengliu_can_one_not_moving_explosion(), player_index).size() > 0:
         if not main._end_wave_timer.is_stopped():
             main._end_wave_timer.stop()
         main._cleaning_up = false
@@ -174,7 +153,7 @@ func fengliu_on_clean_up_room():
 
 # 静止爆炸计时触发爆炸
 func fengliu_on_moving_explosion_timeout():
-    var effects = RunData.get_player_effect(effect_fengliu_not_moving_explosion, player_index)
+    var effects = RunData.get_player_effect(FengLiuKeys.effect_fengliu_not_moving_explosion(), player_index)
     # 触发爆炸
     if effects.size() > 0 and not effects[0] is int:
         RunData.handle_explode_effect(effects[0].key_hash, global_position, player_index)

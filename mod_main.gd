@@ -4,6 +4,10 @@ const MOD_ID = "FengAddMods"
 const MOD_DIR = "res://mods-unpacked/FengLiu-FengAddMods/"
 const EXTENSIONS_DIR = MOD_DIR + "extensions/"
 const CONTENT_DATA_DIR = MOD_DIR + "content_data.tres"
+# 全局类目录下所有写了 class_name 的 .gd 都会自动注册为全局类，
+const GLOBAL_CLASSES_DIR = MOD_DIR + "global_classes/"
+const GLOBAL_CLASS_NAME_REGEX = "^class_name[ \\t]+([A-Za-z_][A-Za-z0-9_]*)"
+const GLOBAL_CLASS_EXTENDS_IDENT_REGEX = "^extends[ \\t]+([A-Za-z_][A-Za-z0-9_]*)"
 
 
 # 排除不希望自动获得 t0 mod 初始武器角色
@@ -22,11 +26,114 @@ var _fengliu_content_loader = null
 
 
 func _init():
+	_register_global_classes_from_dir(GLOBAL_CLASSES_DIR)
 	_block_boss_rush_item_parent_data_extension()
 	add_translations()
 
 	ModLoaderLog.info("add extensions...", MOD_ID)
 	_install_extensions_from_dir(EXTENSIONS_DIR)
+
+
+# 自动注册全局类
+func _register_global_classes_from_dir(dir_path: String) -> void:
+	var classes := []
+	_collect_gd_scripts(dir_path, classes)
+	if classes.empty():
+		ModLoaderLog.warning("No global class script found in: %s" % dir_path, MOD_ID)
+		return
+
+	var registered := {}
+	var global_classes = ProjectSettings.get_setting("_global_script_classes")
+	if global_classes is Array:
+		for global_class in global_classes:
+			if global_class is Dictionary and global_class.has("class"):
+				registered[global_class["class"]] = true
+
+	var seen := {}
+	var new_classes := []
+	for candidate in classes:
+		var candidate_name: String = candidate["class"]
+		if registered.has(candidate_name):
+			continue
+		if seen.has(candidate_name):
+			ModLoaderLog.warning("Duplicate class_name \"%s\" in %s and %s, kept the first one." % [candidate_name, seen[candidate_name], candidate["path"]], MOD_ID)
+			continue
+		seen[candidate_name] = candidate["path"]
+		new_classes.append(candidate)
+
+	if new_classes.empty():
+		ModLoaderLog.info("All %d global class(es) already registered, skip." % classes.size(), MOD_ID)
+		return
+
+	ModLoaderMod.register_global_classes_from_array(new_classes)
+	for new_class in new_classes:
+		ModLoaderLog.info("Global class registered: %s (base: %s) -> %s" % [new_class["class"], new_class["base"], new_class["path"]], MOD_ID)
+	ModLoaderLog.info("%d global class(es) registered, restart the game to use them." % new_classes.size(), MOD_ID)
+
+
+# 递归收集目录下所有 .gd
+func _collect_gd_scripts(dir_path: String, out: Array) -> void:
+	var dir := Directory.new()
+	if dir.open(dir_path) != OK:
+		ModLoaderLog.error("Failed to open global classes directory: %s" % dir_path, MOD_ID)
+		return
+
+	dir.list_dir_begin(true, true)
+	var file_name := dir.get_next()
+	while file_name != "":
+		var full_path := dir_path.plus_file(file_name)
+		if dir.current_is_dir():
+			_collect_gd_scripts(full_path, out)
+		elif file_name.get_extension().to_lower() == "gd":
+			var global_class := _parse_global_class_dict(full_path)
+			if not global_class.empty():
+				out.append(global_class)
+		file_name = dir.get_next()
+	dir.list_dir_end()
+
+
+func _parse_global_class_dict(path: String) -> Dictionary:
+	var file := File.new()
+	if file.open(path, File.READ) != OK:
+		ModLoaderLog.error("Failed to open global class script: %s" % path, MOD_ID)
+		return {}
+
+	var name_regex := RegEx.new()
+	name_regex.compile(GLOBAL_CLASS_NAME_REGEX)
+	var extends_regex := RegEx.new()
+	extends_regex.compile(GLOBAL_CLASS_EXTENDS_IDENT_REGEX)
+
+	var class_name_str := ""
+	var base := ""
+	while not file.eof_reached():
+		var line := file.get_line()
+		# 去掉文件开头的 UTF-8 BOM
+		if not line.empty() and line.ord_at(0) == 0xFEFF:
+			line = line.substr(1)
+		# 只看顶层语句：跳过空行、注释、缩进行（嵌套类 / 函数体内部）
+		if line.empty() or line.begins_with("#") or line.begins_with(" ") or line.begins_with("\t"):
+			continue
+		if class_name_str.empty():
+			var name_match := name_regex.search(line)
+			if name_match != null:
+				class_name_str = name_match.get_string(1)
+		if base.empty():
+			var extends_match := extends_regex.search(line)
+			if extends_match != null:
+				base = extends_match.get_string(1)
+		if not class_name_str.empty() and not base.empty():
+			break
+	file.close()
+
+	if class_name_str.empty():
+		return {}
+
+	return {
+		"base": base if not base.empty() else "Reference",
+		"class": class_name_str,
+		"language": "GDScript",
+		"path": path,
+	}
 
 
 # 强兼 The-BossRush
@@ -79,7 +186,7 @@ func _ready()->void:
 
 	ContentLoader.load_data(CONTENT_DATA_DIR, MOD_ID)
 
-	# 把本 mod 的 t0 武器注入到各可用角色的初始武器池（含本 mod 角色，见排除名单）。
+	# 把本 mod 的 t0 武器注入到各可用角色的初始武器池（含本 mod 角色）。
 	call_deferred("fengliu_inject_t0_starting_weapons")
 
 

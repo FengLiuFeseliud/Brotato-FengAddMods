@@ -35,9 +35,9 @@ func get_args(player_index: int) -> Array:
     #   [3] = 临时增加的属性名（基类 args[1]）
     if gain_stat_hash == 0:
         return [
-            "[color=lime]%s%%[/color]" % value, 
+            FengLiuUtils.text_percent(value), 
             str(gain_value / 100.0),
-            "[color=lime]+%s[/color]" % str(stat_nb),
+            FengLiuUtils.text_value_plus(str(stat_nb)),
             .get_args(player_index)[1]
         ]  
 
@@ -46,8 +46,8 @@ func get_args(player_index: int) -> Array:
         dynamic_chance = 100
 
     return [
-        "[color=lime]%s%%[/color]" % dynamic_chance, 
+        FengLiuUtils.text_percent(dynamic_chance), 
         Utils.get_scaling_stat_icon_text(gain_stat_hash, gain_value / 100.0),
-        "[color=lime]+%s[/color]" % str(stat_nb),
+        FengLiuUtils.text_value_plus(str(stat_nb)),
         .get_args(player_index)[1]
     ]  

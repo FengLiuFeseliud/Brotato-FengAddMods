@@ -19,19 +19,11 @@ var stat_hash: int = Keys.empty_hash
 
 
 func apply(player_index: int) -> void:
-	RunData.get_player_effect(custom_key_hash ,player_index).push_back([key_hash, value, chance])
+	FengLiuUtils.bind_effect(custom_key_hash, player_index, [key_hash, value, chance])
 	
 	
 func unapply(player_index: int) -> void:
-	RunData.get_player_effects(player_index)[custom_key_hash].erase([key_hash, value, chance])
-
-
-static func get_dynamic_chance(stat_count: int, init_chance: int, _add_chance: int) -> int:
-	var dynamic_chance = int(init_chance + (stat_count * (_add_chance / 100.0)))
-	if dynamic_chance > 100:
-		return 100
-		
-	return dynamic_chance
+	FengLiuUtils.unbind_effect(custom_key_hash, player_index, [key_hash, value, chance])
 
 
 func get_args(player_index: int) -> Array:
@@ -40,7 +32,7 @@ func get_args(player_index: int) -> Array:
 	#   [1] = 倍率属性图标文本
 	var stat = Utils.get_stat(key_hash, player_index)
 	return [
-		"[color=lime]%s%%[/color]" % get_dynamic_chance(stat, chance, value), 
+		FengLiuUtils.text_percent(FengLiuUtils.get_dynamic_chance(chance, value, stat)), 
 		Utils.get_scaling_stat_icon_text(key_hash, value / 100.0), 
 	]
 

@@ -4,9 +4,6 @@ extends ShopItem
 var material_ui_icon = load("res://items/materials/material_ui.png")
 
 
-var effect_fengliu_stats_stop = Keys.generate_hash("fengliu_stats_stop")
-var effect_fengliu_shop_item_count = Keys.generate_hash("fengliu_shop_item_count")
-var effect_fengliu_temporary_stats_stop = Keys.generate_hash("fengliu_temporary_stats_stop")
 var fengliu_item_gold_value = 0 # 商品金币原价（hp_shop 会把 value 改成 ÷20 后的血量价）
 
 
@@ -38,7 +35,7 @@ func fengliu_temporary_stats_stop():
 
 # 属性代付显示
 func _fengliu_refresh_pay_display() -> void:
-    var temporary_stats_stop_count = RunData.get_player_effect(effect_fengliu_temporary_stats_stop, player_index) 
+    var temporary_stats_stop_count = RunData.get_player_effect(FengLiuKeys.effect_fengliu_temporary_stats_stop(), player_index) 
     if temporary_stats_stop_count is int and temporary_stats_stop_count > 0:
         # 临时代偿优先：用金币原价显示/扣除（兼容 hp_shop 的 ÷20 血量价）
         value = fengliu_item_gold_value
@@ -46,7 +43,7 @@ func _fengliu_refresh_pay_display() -> void:
         return
 
     # 普通属性代付效果
-    var effects = RunData.get_player_effect(effect_fengliu_stats_stop, player_index)
+    var effects = RunData.get_player_effect(FengLiuKeys.effect_fengliu_stats_stop(), player_index)
     if effects is Array and effects.size() > 0:
         fengliu_stats_stop(effects[0])
         return
@@ -74,7 +71,7 @@ func set_shop_item(p_item_data: ItemParentData, p_wave_value: int = RunData.curr
 
 # 是否达到锁定上限
 func _fengliu_is_lock_limit_reached() -> bool:
-    var effects = RunData.get_player_effect(effect_fengliu_shop_item_count, player_index)
+    var effects = RunData.get_player_effect(FengLiuKeys.effect_fengliu_shop_item_count(), player_index)
     if effects.size() == 0:
         return false
     return RunData.locked_shop_items[player_index].size() >= effects[0][6]

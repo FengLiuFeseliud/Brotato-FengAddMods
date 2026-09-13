@@ -37,21 +37,13 @@ static func get_id() -> String:
 	
 
 func apply(player_index: int) -> void:
-	RunData.get_player_effect(custom_key_hash ,player_index).push_back([key_hash, value, chance, tracking_key, add_chance_stat_hash, add_chance, chance])
+	FengLiuUtils.bind_effect(custom_key_hash, player_index, [key_hash, value, chance, tracking_key, add_chance_stat_hash, add_chance, chance])
 	
 	
 func unapply(player_index: int) -> void:
-	RunData.get_player_effects(player_index)[custom_key_hash].erase([key_hash, value, chance, tracking_key, add_chance_stat_hash, add_chance, chance])
+	FengLiuUtils.unbind_effect(custom_key_hash, player_index, [key_hash, value, chance, tracking_key, add_chance_stat_hash, add_chance, chance])
 	
 	
-static func get_dynamic_chance(stat_count: int, init_chance: int, _add_chance: int) -> int:
-	var dynamic_chance = int(init_chance + (stat_count * (_add_chance / 100.0)))
-	if dynamic_chance > 100:
-		return 100
-		
-	return dynamic_chance
-
-
 func get_args(player_index: int) -> Array:
 	# 返回数组按顺序填充描述文本 {0}~{3} 占位符：
 	#   [0] = 动态触发概率百分比（绿色）
@@ -62,7 +54,7 @@ func get_args(player_index: int) -> Array:
 	var scaling_add_chance_text = Utils.get_scaling_stat_icon_text(Keys.generate_hash(add_chance_stat), add_chance / 100.0, false)
 	var stat = Utils.get_stat(add_chance_stat_hash, player_index)
 	return [
-		"[color=lime]%s%%[/color]" % get_dynamic_chance(stat, chance, add_chance), 
+		FengLiuUtils.text_percent(FengLiuUtils.get_dynamic_chance(chance, add_chance, stat)), 
 		scaling_add_chance_text, 
 		args[1], 
 		args[2]

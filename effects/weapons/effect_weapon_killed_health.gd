@@ -41,7 +41,7 @@ func get_args(player_index: int) -> Array:
     
     var health = health_value + int(Utils.get_stat(health_gain_stat_hash, player_index) * (health_gain_value / 100.0))
     return [
-        "[color=lime]%s%%[/color]" % dynamic_chance, 
+        FengLiuUtils.text_percent(dynamic_chance), 
         Utils.get_scaling_stat_icon_text(key_hash, gain_value / 100.0),
         str(health),
         Utils.get_scaling_stat_icon_text(health_gain_stat_hash, health_gain_value / 100.0)
