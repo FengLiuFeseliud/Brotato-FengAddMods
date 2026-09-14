@@ -66,6 +66,26 @@ var fengliu_stat_upgrade_ratios = {
 }
 
 
+var effect_fengliu_add_stat_after_change = Keys.generate_hash("fengliu_add_stat_after_change")
+var effect_fengliu_shop_item_count = Keys.generate_hash("fengliu_shop_item_count")
+var effect_fengliu_stats_stop = Keys.generate_hash("fengliu_stats_stop")
+var effect_fengliu_apply_item_not_add = Keys.generate_hash("fengliu_stat_not_add")
+var effect_fengliu_item_merge = Keys.generate_hash("fengliu_item_merge")
+var effect_fengliu_random_curse = Keys.generate_hash("fengliu_random_curse")
+var effect_fengliu_wave_elites_spawn = Keys.generate_hash("fengliu_wave_elites_spawn")
+var effect_fengliu_apply_item_not_add_all_debuff = Keys.generate_hash("fengliu_apply_item_not_add_all_debuff")
+var effect_fengliu_temporary_stats_stop = Keys.generate_hash("fengliu_temporary_stats_stop")
+
+
+var fengliu_item_forecast = Keys.generate_hash("item_forecast") # 天气预报道具哈希
+var fengliu_item_directed_training = Keys.generate_hash("item_directed_training") # 定向训练道具哈希
+var fengliu_item_clown_fish = Keys.generate_hash("item_clown_fish") # 小丑鱼道具哈希
+
+
+var fengliu_item_auto_open_box_hash = Keys.generate_hash("item_auto_open_box") # 自动化箱子道具哈希
+var fengliu_crate_gobbler_hash = Keys.generate_hash("crate_gobbler") # 箱子吞吞怪追踪哈希
+
+
 var stat_after_change_wave_value_count = {}
 var all_secondary_stats_hashs = []
 var all_secondary_abs_debuff_stats_hashs = []
@@ -82,15 +102,15 @@ var _restart_wave = false
 
 # 波次结束移除的道具列表
 var wave_end_remove_items = [
-	FengLiuKeys.fengliu_item_forecast(),
-	FengLiuKeys.fengliu_item_directed_training(),
-	FengLiuKeys.fengliu_item_clown_fish(),
+	fengliu_item_forecast,
+	fengliu_item_directed_training,
+	fengliu_item_clown_fish,
 ]
 
 
 var wave_end_can_box_use_items = [
-	FengLiuKeys.fengliu_item_directed_training(),
-	FengLiuKeys.fengliu_item_clown_fish()
+	fengliu_item_directed_training,
+	fengliu_item_clown_fish
 ]
 
 
@@ -113,8 +133,8 @@ func _ready() -> void :
 func init_tracked_effects() -> Dictionary:
 	var tracked = .init_tracked_effects()
 	# 初始化追踪
-	tracked[FengLiuKeys.fengliu_item_auto_open_box_hash()] = 0
-	tracked[FengLiuKeys.fengliu_crate_gobbler_hash()] = 0
+	tracked[fengliu_item_auto_open_box_hash] = 0
+	tracked[fengliu_crate_gobbler_hash] = 0
 	return tracked
 
 
@@ -144,6 +164,18 @@ func fengliu_wave_elites_spawn(player_data) -> void :
 	var new_elite_id = ItemService.get_random_elite_id_hash_from_zone(current_zone)
 	# 加入下一波额外敌人
 	player_data.effects[Keys.extra_enemies_next_wave_hash].append(["res://zones/common/elite/group_elite.tres", 1, new_elite_id])
+
+
+# 获取玩家持有道具数量
+func fengliu_get_item_count(item_hash: int, player_index: int) -> int:
+	var count = 0
+    
+	# 统计指定道具数量
+	for item in RunData.get_player_items(player_index):
+		if item.my_id_hash == item_hash:
+			count += 1
+            
+	return count
 
 
 # 合并武器
@@ -179,11 +211,11 @@ func fengliu_merge_weapon(weapon_hash: int, player_index: int) -> bool:
 # 尝试合并道具
 func fengliu_try_item_merge(item_merge_effect: Array, player_index: int) -> void:
 	# 材料不足则跳过
-	if FengLiuUtils.count_player_items(item_merge_effect[0], player_index) < item_merge_effect[1]:
+	if fengliu_get_item_count(item_merge_effect[0], player_index) < item_merge_effect[1]:
 		return
 	
 	# 第二种材料不足则跳过
-	if item_merge_effect[3] != 0 and FengLiuUtils.count_player_items(item_merge_effect[2], player_index) < item_merge_effect[3]:
+	if item_merge_effect[3] != 0 and fengliu_get_item_count(item_merge_effect[2], player_index) < item_merge_effect[3]:
 		return
 
 	var item = ItemService.get_element(ItemService.items, item_merge_effect[4])
@@ -240,7 +272,7 @@ func fengliu_curse_weapon(curse_item_effect: Array, player_index: int) -> bool:
 # 自动诅咒道具或武器
 func fengliu_auto_curse(curse_item_effect: Array, player_index: int) -> void:
 	# 无 DLC 或材料不足则跳过
-	if ProgressData.get_dlc_data("abyssal_terrors") == null or FengLiuUtils.count_player_items(curse_item_effect[0], player_index) < curse_item_effect[1]:
+	if ProgressData.get_dlc_data("abyssal_terrors") == null or fengliu_get_item_count(curse_item_effect[0], player_index) < curse_item_effect[1]:
 		return
 		
 	# 等级不足则跳过
@@ -337,7 +369,7 @@ func on_wave_start(timer: WaveTimer) -> void :
 
 	# 注入精英
 	for player_data in players_data:
-		if player_data.effects.has(FengLiuKeys.effect_fengliu_wave_elites_spawn()) and player_data.effects[FengLiuKeys.effect_fengliu_wave_elites_spawn()].size() > 0:
+		if player_data.effects.has(effect_fengliu_wave_elites_spawn) and player_data.effects[effect_fengliu_wave_elites_spawn].size() > 0:
 			fengliu_wave_elites_spawn(player_data)
 
 
@@ -369,13 +401,13 @@ func on_wave_end() -> void :
 	# 逐个玩家处理
 	for player_index in get_player_count():
 		# 处理道具合并
-		var effects = get_player_effect(FengLiuKeys.effect_fengliu_item_merge(), player_index)
+		var effects = get_player_effect(effect_fengliu_item_merge, player_index)
 		if effects.size() > 0:
 			for item_merge_effect in effects:
 				fengliu_try_item_merge(item_merge_effect, player_index)
 
 		# 处理自动诅咒
-		effects = get_player_effect(FengLiuKeys.effect_fengliu_random_curse(), player_index)
+		effects = get_player_effect(effect_fengliu_random_curse, player_index)
 		if effects.size() > 0:
 			fengliu_auto_curse(effects[0], player_index)
 
@@ -524,7 +556,7 @@ func fengliu_check_stat(stat_hsh: int, value: int, player_index: int) -> void :
 	
 	# 记录移除值
 	fengliu_remove_stat_set(stat_hsh, int(abs(value)), player_index)
-	var effects = RunData.get_player_effect(FengLiuKeys.effect_fengliu_add_stat_after_change(), player_index)
+	var effects = RunData.get_player_effect(effect_fengliu_add_stat_after_change, player_index)
 	if effects.size() == 0:
 		return 
 	
@@ -536,7 +568,7 @@ func fengliu_check_stat(stat_hsh: int, value: int, player_index: int) -> void :
 # 统计本波属性变化计数
 func fengliu_stat_after_change_wave_count(stat_effect: Array, value: int, player_index: int):
 	# 遍历追加效果
-	for effect in RunData.get_player_effect(FengLiuKeys.effect_fengliu_add_stat_after_change(), player_index):
+	for effect in RunData.get_player_effect(effect_fengliu_add_stat_after_change, player_index):
 		var max_wave_count = effect[4]
 		
 		var stat_hsh = stat_effect[0]
@@ -586,13 +618,13 @@ func fengliu_get_stat_ratios_from_price(stats_hash: int) -> int:
 
 # 扩展获取货币
 func get_player_currency(player_index: int) -> int:
-	var temporary_stats_stop_count = get_player_effect(FengLiuKeys.effect_fengliu_temporary_stats_stop(), player_index) 
+	var temporary_stats_stop_count = get_player_effect(effect_fengliu_temporary_stats_stop, player_index) 
 	if temporary_stats_stop_count is int and temporary_stats_stop_count > 0:
 		var stat_hash = fengliu_get_highest_stat_hash(player_index)
 		return int(get_stat(stat_hash, player_index) * fengliu_get_stat_ratios_from_price(stat_hash))
 
 	# 无代付效果走原逻辑
-	var effects = get_player_effect(FengLiuKeys.effect_fengliu_stats_stop(), player_index)
+	var effects = get_player_effect(effect_fengliu_stats_stop, player_index)
 	if effects.size() == 0:
 		return .get_player_currency(player_index)
 
@@ -603,14 +635,14 @@ func get_player_currency(player_index: int) -> int:
 
 # 扩展移除货币
 func remove_currency(value: int, player_index: int) -> void :
-	var temporary_stats_stop_count = get_player_effect(FengLiuKeys.effect_fengliu_temporary_stats_stop(), player_index) 
+	var temporary_stats_stop_count = get_player_effect(effect_fengliu_temporary_stats_stop, player_index) 
 	if temporary_stats_stop_count is int and temporary_stats_stop_count > 0:
 		var stat_hash = fengliu_get_highest_stat_hash(player_index)
 		remove_stat(stat_hash, int(ceil(value / float(fengliu_get_stat_ratios_from_price(stat_hash)))), player_index)
 		return
 		
 	# 无代付效果走原逻辑
-	var effects = get_player_effect(FengLiuKeys.effect_fengliu_stats_stop(), player_index)
+	var effects = get_player_effect(effect_fengliu_stats_stop, player_index)
 	if effects.size() == 0:
 		.remove_currency(value, player_index)
 		return
@@ -716,7 +748,7 @@ func apply_item_effects(item_data: ItemParentData, player_index: int) -> void :
 	var new_effects = item_data.effects.duplicate()
 
 	# 固定修改效果
-	for effect in RunData.get_player_effect(FengLiuKeys.effect_fengliu_apply_item_not_add(), player_index):
+	for effect in RunData.get_player_effect(effect_fengliu_apply_item_not_add, player_index):
 		# 移除主要属性负面
 		if effect[3]:
 			fengliu_remove_all_stats(new_effects, effect[2])
@@ -749,7 +781,7 @@ func apply_item_effects(item_data: ItemParentData, player_index: int) -> void :
 			continue
 
 	# 概率删除全部负面效果
-	var effects = RunData.get_player_effect(FengLiuKeys.effect_fengliu_apply_item_not_add_all_debuff(), player_index)
+	var effects = RunData.get_player_effect(effect_fengliu_apply_item_not_add_all_debuff, player_index)
 	if effects.size() > 0 and not effects[0][1] and Utils.get_chance_success(effects[0][0] / 100.0):
 		fengliu_remove_all_item_debuff_effects(new_effects)
 	

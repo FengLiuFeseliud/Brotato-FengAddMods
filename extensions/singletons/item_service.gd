@@ -1,12 +1,33 @@
 extends "res://singletons/item_service.gd"
 
 
+var effect_fengliu_can_all_drop_box = Keys.generate_hash("fengliu_can_all_drop_box")
+var effect_fengliu_guaranteed_shop_items = Keys.generate_hash("fengliu_guaranteed_shop_items")
+var effect_fengliu_get_fixed_upgrade = Keys.generate_hash("fengliu_get_fixed_upgrade")
+var effect_fengliu_up_upgrade_data_tier = Keys.generate_hash("fengliu_up_upgrade_data_tier")
+var effect_fengliu_swap_enemie = Keys.generate_hash("fengliu_swap_enemie")
+
+
 # 需要重新随机预报的效果列表
-var need_reroll_effect = FengLiuUtils.need_reroll_effects()
+var need_reroll_effect = [
+	effect_fengliu_swap_enemie,
+	effect_fengliu_get_fixed_upgrade
+]
 
 
 # 全部升级项 id 哈希缓存
 var _all_upgrade_ids = {}
+
+
+# 计算动态概率
+static func fengliu_get_dynamic_chance(init_chance: int, add_chance: int = 0, stat_count: int = 0) -> float:
+	# 基础概率 + 属性数 * 每点加成
+	var dynamic_chance = init_chance + (stat_count * (add_chance / 100.0))
+	# 上限 100
+	if dynamic_chance > 100:
+		return 100.0 / 100
+		
+	return dynamic_chance / 100
 
 
 # 扩展掉落传说箱子
@@ -23,7 +44,7 @@ func get_consumable_to_drop(unit: Unit, item_chance: float) -> ConsumableData:
     var player_index = 0
     # 查找持有掉箱效果的玩家
     for _player_index in RunData.get_player_count():
-        var effects = RunData.get_player_effect(FengLiuKeys.effect_fengliu_can_all_drop_box(), _player_index)
+        var effects = RunData.get_player_effect(effect_fengliu_can_all_drop_box, _player_index)
         if effects.size() == 0:
             continue
             
@@ -40,7 +61,7 @@ func get_consumable_to_drop(unit: Unit, item_chance: float) -> ConsumableData:
         stat_count = RunData.get_stat(effect[0], player_index)
 
     # 概率升级为传说箱子
-    if Utils.get_chance_success(FengLiuUtils.get_dynamic_chance_ratio(effect[2], effect[1], stat_count)):
+    if Utils.get_chance_success(fengliu_get_dynamic_chance(effect[2], effect[1], stat_count)):
         tier = Tier.LEGENDARY
     
     return get_consumable_for_tier(tier)
@@ -48,7 +69,7 @@ func get_consumable_to_drop(unit: Unit, item_chance: float) -> ConsumableData:
 
 # 扩展保证商店道具
 func get_player_shop_items(wave: int, player_index: int, args: ItemServiceGetShopItemsArgs) -> Array:
-    var custom_guaranteed = RunData.get_player_effect(FengLiuKeys.effect_fengliu_guaranteed_shop_items(), player_index)
+    var custom_guaranteed = RunData.get_player_effect(effect_fengliu_guaranteed_shop_items, player_index)
 
     # 无自定义保证道具则走原逻辑
     if custom_guaranteed.size() == 0:
@@ -242,12 +263,12 @@ func fengliu_up_upgrade_data_tier(effect: Array, upgrades: Array, player_index: 
 func get_upgrades(level: int, number: int, old_upgrades: Array, player_index: int) -> Array:
     var upgrades = .get_upgrades(level, number, old_upgrades, player_index)
     # 有固定升级项效果则替换升级项
-    var effects = RunData.get_player_effect(FengLiuKeys.effect_fengliu_get_fixed_upgrade(), player_index)
+    var effects = RunData.get_player_effect(effect_fengliu_get_fixed_upgrade, player_index)
     if effects.size() > 0 and effects[0].all_fixed_upgrade_id_hashs.size() >= 4:
         upgrades = fengliu_get_fixed_upgrade(level, effects[0], player_index)
 
     # 应用升级项品阶提升效果
-    for effect in RunData.get_player_effect(FengLiuKeys.effect_fengliu_up_upgrade_data_tier(), player_index):
+    for effect in RunData.get_player_effect(effect_fengliu_up_upgrade_data_tier, player_index):
         upgrades = fengliu_up_upgrade_data_tier(effect, upgrades, player_index)
 
     return upgrades

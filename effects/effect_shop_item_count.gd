@@ -28,11 +28,11 @@ export (int) var can_shop_locked = 0 # 保留锁定数
 
 
 func apply(player_index: int) -> void:
-	FengLiuUtils.bind_effect(custom_key_hash, player_index, [key_hash, value, stat_min_value, stat_max_value, stat_no_zero, shop_count_price, can_shop_locked])
+	RunData.get_player_effect(custom_key_hash ,player_index).push_back([key_hash, value, stat_min_value, stat_max_value, stat_no_zero, shop_count_price, can_shop_locked])
 	
 
 func unapply(player_index: int) -> void:
-	FengLiuUtils.unbind_effect(custom_key_hash, player_index, [key_hash, value, stat_min_value, stat_max_value, stat_no_zero, shop_count_price, can_shop_locked])
+	RunData.get_player_effects(player_index)[custom_key_hash].erase([key_hash, value, stat_min_value, stat_max_value, stat_no_zero, shop_count_price, can_shop_locked])
 
 
 func get_args(_player_index: int) -> Array:
@@ -42,4 +42,4 @@ func get_args(_player_index: int) -> Array:
     #   [2] = 随机减少商品数上限（绿色）
     #   [3] = 每减少 1 个商品的优惠百分比（绿色）
     #   [4] = 保留锁定数上限（绿色）
-    return [str(value), FengLiuUtils.text_value(stat_min_value), FengLiuUtils.text_value(stat_max_value), FengLiuUtils.text_percent(shop_count_price), FengLiuUtils.text_value(can_shop_locked)]
+    return [str(value), "[color=lime]%s[/color]" % stat_min_value, "[color=lime]%s[/color]" % stat_max_value, "[color=lime]%s%%[/color]" % shop_count_price, "[color=lime]%s[/color]" % can_shop_locked]

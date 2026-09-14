@@ -29,7 +29,10 @@ func _generate_hashes() -> void :
 	
 	
 func get_dynamic_value() -> int:
-	return FengLiuUtils.get_dynamic_value(stat_min_value, stat_max_value, stat_no_zero)
+	var dynamic_value = int(floor(rand_range(stat_min_value, stat_max_value + 1)))
+	if dynamic_value == 0 and stat_no_zero:
+		return get_dynamic_value()
+	return dynamic_value
 
 
 func get_args(_player_index: int) -> Array:
@@ -39,7 +42,7 @@ func get_args(_player_index: int) -> Array:
 	#   [2] = 每击杀多少敌人触发 (value)
 	#   [3] = 随机下限 (stat_min_value)
 	#   [4] = 随机上限 (stat_max_value)
-	var random_val = FengLiuUtils.get_dynamic_value(stat_min_value, stat_max_value, false)
+	var random_val = int(floor(rand_range(stat_min_value, stat_max_value + 1)))
 	return [
 		str(random_val), 
 		tr(stat.to_upper()), 

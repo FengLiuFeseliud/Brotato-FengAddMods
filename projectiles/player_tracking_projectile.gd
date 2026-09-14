@@ -98,7 +98,10 @@ func _is_valid_tracking_enemy(enemy) -> bool:
 # 从当前主场景拿到所有敌人（缓存 EntitySpawner 引用）
 func _get_all_enemies() -> Array:
 	if _entity_spawner_ref == null or not is_instance_valid(_entity_spawner_ref):
-		_entity_spawner_ref = FengLiuUtils.get_entity_spawner()
+		var main = get_tree().current_scene
+		if main == null:
+			return []
+		_entity_spawner_ref = main.get("_entity_spawner")
 	if _entity_spawner_ref == null or not is_instance_valid(_entity_spawner_ref):
 		return []
 	return _entity_spawner_ref.get_all_enemies(false)  # false = 排除被魅惑（已转友方）的敌人

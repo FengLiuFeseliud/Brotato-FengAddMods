@@ -11,6 +11,8 @@ extends Effect
 # 效果值：仅作为存在标记，key/value 不参与逻辑。
 # ============================================================
 
+var effect_fengliu_get_highest_stat_fixed_upgrade_data = Keys.generate_hash("fengliu_get_highest_stat_fixed_upgrade_data")
+
 
 var all_fixed_upgrade_id_hashs = []
 
@@ -29,7 +31,7 @@ func roll_fixed_upgrade():
 # 抽取固定升级项
 func fengliu_roll_effect(player_index: int):
     # 有「必含最高属性」效果时先加入最高属性升级项
-    var effects = RunData.get_player_effect(FengLiuKeys.effect_fengliu_get_highest_stat_fixed_upgrade_data(), player_index)
+    var effects = RunData.get_player_effect(effect_fengliu_get_highest_stat_fixed_upgrade_data, player_index)
     if effects.size() > 0:
         all_fixed_upgrade_id_hashs.append(effects[0].get_highest_upgrade_data(player_index))
 
@@ -47,21 +49,21 @@ func apply(player_index: int) -> void:
 	if all_fixed_upgrade_id_hashs.size() == 0:
 		fengliu_roll_effect(player_index)
 
-	FengLiuUtils.bind_effect(custom_key_hash, player_index, self)
+	RunData.get_player_effect(custom_key_hash ,player_index).push_back(self)
 
 
 func unapply(player_index: int) -> void:
-	FengLiuUtils.unbind_effect(custom_key_hash, player_index, self)
+	RunData.get_player_effects(player_index)[custom_key_hash].erase(self)
 
 
 # 返回数组按顺序填充描述文本 {0}~{3} 占位符：
 #   [0]~[3] = 四个固定升级项名称（绿色）
 func get_args(_player_index: int) -> Array:
     if all_fixed_upgrade_id_hashs.size() == 0:
-        return [FengLiuUtils.text_value("?"), FengLiuUtils.text_value("?"), FengLiuUtils.text_value("?"),  FengLiuUtils.text_value("?")]
+        return ["[color=lime]%s[/color]" % "?", "[color=lime]%s[/color]" % "?", "[color=lime]%s[/color]" % "?",  "[color=lime]%s[/color]" % "?"]
     
     var args = []
     for upgrade_id_hashs in all_fixed_upgrade_id_hashs:
-        args.append(FengLiuUtils.text_value(tr(Keys.hash_to_string[upgrade_id_hashs].to_upper())))
+        args.append("[color=lime]%s[/color]" % tr(Keys.hash_to_string[upgrade_id_hashs].to_upper()))
 
     return args

@@ -17,8 +17,8 @@ export (bool) var alternative_coins = false # true=金币足够时仍用金币�
 
 
 func apply(player_index: int) -> void:
-	FengLiuUtils.bind_effect(custom_key_hash, player_index, [key_hash, value, alternative_coins])
+	RunData.get_player_effect(custom_key_hash ,player_index).push_back([key_hash, value, alternative_coins])
 	
 
 func unapply(player_index: int) -> void:
-	FengLiuUtils.unbind_effect(custom_key_hash, player_index, [key_hash, value, alternative_coins])
+	RunData.get_player_effects(player_index)[custom_key_hash].erase([key_hash, value, alternative_coins])

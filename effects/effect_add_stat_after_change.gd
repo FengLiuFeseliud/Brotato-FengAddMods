@@ -36,11 +36,11 @@ func _generate_hashes() -> void:
 func apply(player_index: int) -> void:
 	if "gain_" in key:
 		gain_stat = true
-	FengLiuUtils.bind_effect(custom_key_hash, player_index, [key_hash, value, change_stat_hash, stat_scaled, wave_max_value, gain_stat])
+	RunData.get_player_effect(custom_key_hash, player_index).push_back([key_hash, value, change_stat_hash, stat_scaled, wave_max_value, gain_stat])
 	
 	
 func unapply(player_index: int) -> void:
-	FengLiuUtils.unbind_effect(custom_key_hash, player_index, [key_hash, value, change_stat_hash, stat_scaled, wave_max_value, gain_stat])
+	RunData.get_player_effects(player_index)[custom_key_hash].erase([key_hash, value, change_stat_hash, stat_scaled, wave_max_value, gain_stat])
 	
 	
 func get_args(player_index: int) -> Array:
@@ -70,7 +70,7 @@ func get_args(player_index: int) -> Array:
 			args[1], 
 			args[0], 
 			str(wave_max_value), 
-			FengLiuUtils.text_value_plus(add_stat)
+			"[color=lime]+%s[/color]" % add_stat
 		]
 	
 	if gain_stat or not "stat" in key:
@@ -82,7 +82,7 @@ func get_args(player_index: int) -> Array:
 			tr(stat_display.to_upper()), 
 			args[0], 
 			str(wave_max_value), 
-			FengLiuUtils.text_percent_plus(add_stat)
+			"[color=lime]+%s%%[/color]" % add_stat
 		]
 	
 	var remove_stat = 0
@@ -97,5 +97,5 @@ func get_args(player_index: int) -> Array:
 		args[1], 
 		args[0], 
 		str(wave_max_value), 
-		FengLiuUtils.text_value_plus(add_stat)
+		"[color=lime]+%s[/color]" % add_stat
 	]

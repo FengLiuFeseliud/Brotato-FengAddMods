@@ -23,8 +23,8 @@ export (bool) var all_item_debuff = false # 是否删除所有道具负面效果
 
 
 func apply(player_index: int) -> void:
-	FengLiuUtils.bind_effect(custom_key_hash, player_index, [key_hash, value, reversal, all_stats, all_secondary_stats, all_item_debuff])
+	RunData.get_player_effect(custom_key_hash ,player_index).push_back([key_hash, value, reversal, all_stats, all_secondary_stats, all_item_debuff])
 	
 
 func unapply(player_index: int) -> void:
-	FengLiuUtils.unbind_effect(custom_key_hash, player_index, [key_hash, value, reversal, all_stats, all_secondary_stats, all_item_debuff])
+	RunData.get_player_effects(player_index)[custom_key_hash].erase([key_hash, value, reversal, all_stats, all_secondary_stats, all_item_debuff])

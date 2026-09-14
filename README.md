@@ -107,20 +107,3 @@
 ## 关于 AI
 
 - 代码注释与 README 由 DeepSeek v4 pro 生成。
-
-## 全局类与首次启动
-
-- 本 Mod 的全局类（如 `FengLiuKeys`）由 ModLoader 在启动时写入注册表，**下次启动才生效**：
-  新增全局类后的第一次启动，可能出现两类提示：游戏内报找不到 `FengLiuKeys`（脚本解析失败），
-  编辑器或控制台报它在旧路径上已经存在（`Unique global class ... already exists at path: .../keys/fengliu_keys.gd`）。
-  **重启一次游戏即可恢复正常**；日常启动（所有类都已登记）不会再调用 ModLoader，也就不会重写 `override.cfg`。
-  开发工程若仍保留旧登记，可把 `project.godot` 里 `_global_script_classes` 中该类的 `path` 改成
-  `res://mods-unpacked/FengLiu-FengAddMods/global_classes/fengliu_keys.gd`，或直接删掉这条。
-- 新增全局类只需把带 `class_name` 的 `.gd` 脚本放进 `mods-unpacked/FengLiu-FengAddMods/global_classes/`
-  （支持子目录，脚本不必 `load` 就能被扫描），`mod_main.gd` 会自动扫描并注册，无需改动代码。
-- 公共工具类 `FengLiuUtils`（`global_classes/fengliu_utils.gd`）集中了各效果与扩展脚本重复使用的静态方法：
-  动态概率/动态值计算、效果载荷的挂载与移除、道具数量统计、主场景与实体生成器获取、消耗品掉落、绿色数值文本。
-  它同样是全局类，因此**本次更新后的第一次启动需要重启一次游戏**（原因同上一条）。
-  没有 `class_name` 的 `.gd` 会被忽略；重名时以先登记者为准（本 Mod 让位跳过，并输出 `Duplicate class_name ...` 告警），
-  因此**不要给已有全局类改名或换目录**——那种情况下旧注册记录会留在 `override.cfg` 里并且同名条目不会覆盖，
-  需要删掉游戏根目录（与 `Brotato.exe` 同级）的 `override.cfg` 后重启，让 ModLoader 重新生成。

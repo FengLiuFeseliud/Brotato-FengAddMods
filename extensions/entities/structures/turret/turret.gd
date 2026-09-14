@@ -1,20 +1,34 @@
 extends Turret
 
 
+var effect_fengliu_turret_prioriy_attack_highest_hp = Keys.generate_hash("fengliu_turret_prioriy_attack_highest_hp")
+var effect_fengliu_turret_copy = Keys.generate_hash("fengliu_turret_copy")
+
 var _hp_current_target = false
 var _entity_spawner = null
 var _data = null
 var _turret_copy_effects = []
 
 
+# 计算动态概率
+static func fengliu_get_dynamic_chance(init_chance: int, add_chance: int = 100, stat_count: int = 0) -> float:
+	# 基础概率 + 属性数 * 每点加成
+	var dynamic_chance = init_chance + (stat_count * (add_chance / 100.0))
+	# 上限 100
+	if dynamic_chance > 100:
+		return 100 / 100.0
+		
+	return dynamic_chance / 100.0
+
+
 # 扩展炮塔效果检测
 func _ready():
     # 检测玩家的炮塔相关效果
     for player_index in RunData.get_player_count():
-        if RunData.get_player_effect(FengLiuKeys.effect_fengliu_turret_prioriy_attack_highest_hp(), player_index).size() > 0:
+        if RunData.get_player_effect(effect_fengliu_turret_prioriy_attack_highest_hp, player_index).size() > 0:
             _hp_current_target = true
 
-        var effects = RunData.get_player_effect(FengLiuKeys.effect_fengliu_turret_copy(), player_index)
+        var effects = RunData.get_player_effect(effect_fengliu_turret_copy, player_index)
         if effects.size() > 0:
             _turret_copy_effects.append([effects[0], player_index])
 
@@ -64,9 +78,14 @@ func set_data(data: Resource) -> void :
 
 # 获取实体生成器
 func fengliu_get_entity_spawner() -> EntitySpawner:
-    if _entity_spawner == null:
-        _entity_spawner = FengLiuUtils.get_entity_spawner()
-
+    if _entity_spawner != null:
+        return _entity_spawner
+    
+    # 从主场景获取生成器
+    var main_scene = get_tree().current_scene
+    if main_scene and main_scene.get("_entity_spawner") != null:
+        _entity_spawner = main_scene.get("_entity_spawner")
+    
     return _entity_spawner
 
 
@@ -80,7 +99,7 @@ func fengliu_can_copy_turret(target: Node, _turret_copy_effect: Array, player_in
 
     var stat_count = Utils.get_stat(_turret_copy_effect[0], player_index)
     # 按概率判断
-    if not Utils.get_chance_success(FengLiuUtils.get_dynamic_chance_ratio(_turret_copy_effect[1], _turret_copy_effect[2], stat_count)):
+    if not Utils.get_chance_success(fengliu_get_dynamic_chance(_turret_copy_effect[1], _turret_copy_effect[2], stat_count)):
         return false
 
     return true

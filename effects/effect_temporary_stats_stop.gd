@@ -30,6 +30,6 @@ func get_args(player_index: int) -> Array:
         count = 0
 
     return [
-        FengLiuUtils.text_value(value),
-        FengLiuUtils.text_value_plus(count)
+        "[color=lime]%s[/color]" % value,
+        "[color=lime]+%s[/color]" % count
     ]

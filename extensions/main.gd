@@ -1,6 +1,26 @@
 extends Main
 
 
+var effect_fengliu_can_add_chance_stat_damage_when_pickup_gold = Keys.generate_hash("fengliu_can_add_chance_stat_damage_when_pickup_gold")
+var effect_fengliu_can_add_chance_stat_damage_when_death = Keys.generate_hash("fengliu_can_add_chance_stat_damage_when_death")
+var effect_fengliu_random_stats_on_level_up = Keys.generate_hash("fengliu_random_stats_on_level_up")
+var effect_fengliu_picked_box_cost_gold = Keys.generate_hash("fengliu_picke_box_cost_gold")
+var effect_fengliu_picke_consumable_drop_structure = Keys.generate_hash("fengliu_picke_consumable_drop_structure")
+var effect_fengliu_boss_died_respawn = Keys.generate_hash("fengliu_boss_died_respawn")
+var effect_fengliu_killed_all_boss_wave_end = Keys.generate_hash("fengliu_killed_all_boss_wave_end")
+var effect_fengliu_add_xp_gold_from_wave_time = Keys.generate_hash("fengliu_add_xp_gold_from_wave_time")
+var effect_fengliu_auto_open_box = Keys.generate_hash("fengliu_auto_open_box")
+var effect_fengliu_apply_item_not_add_all_debuff = Keys.generate_hash("fengliu_apply_item_not_add_all_debuff")
+var effect_fengliu_add_stat_fron_wave_intensity = Keys.generate_hash("fengliu_add_stat_fron_wave_intensity")
+var effect_fengliu_kill_looter_spawn_boss = Keys.generate_hash("fengliu_kill_looter_spawn_boss")
+var effect_fengliu_gold_stats = Keys.generate_hash("fengliu_gold_stats")
+var effect_fengliu_effect_box_stats = Keys.generate_hash("fengliu_box_stats")
+
+
+var fengliu_item_auto_open_box_hash = Keys.generate_hash("item_auto_open_box")
+var fengliu_crate_gobbler_hash = Keys.generate_hash("crate_gobbler")
+
+
 var _is_speedrun_ending: bool = false
 
 
@@ -9,6 +29,51 @@ func _change_scene(path: String) -> void :
 	._change_scene(path)
 	# 进入商店后：清理波次结束失效的道具
 	RunData.fengliu_remove_shop_items()
+
+
+# 计算动态概率
+static func fengliu_get_dynamic_chance(stat_count: int, init_chance: int, add_chance: int) -> int:
+	# 基础概率 + 属性数 * 每点加成
+	var dynamic_chance = int(init_chance + (stat_count * (add_chance / 100.0)))
+	# 上限 100
+	if dynamic_chance > 100:
+		return 100
+		
+	return dynamic_chance
+
+
+# 刷新效果动态概率
+static func fengliu_get_dynamic_chance_to_effect(effect: Array, player_index: int) -> Array:
+	# 根据属性刷新概率
+	var stat = Utils.get_stat(effect[4], player_index)
+	effect[2] = fengliu_get_dynamic_chance(stat, effect[-1], effect[-2])
+	return effect
+	
+
+# 随机生成动态值
+static func fengliu_get_dynamic_value(stat_min_value: int, stat_max_value: int, stat_no_zero: bool) -> int:
+	# 范围内随机取值
+	var dynamic_value = int(floor(rand_range(stat_min_value, stat_max_value + 1)))
+	# 为 0 时重新取值
+	if dynamic_value == 0 and stat_no_zero:
+		return fengliu_get_dynamic_value(stat_min_value, stat_max_value, stat_no_zero)
+	return dynamic_value
+
+
+# 计算动态值倍率
+static func fengliu_get_dynamic_value_from_gain(dynamic_value: int, stat_gain: int, stat_gain_value: int) -> int:
+	# 按属性增益放大
+	return dynamic_value * (1 + (int(stat_gain / stat_gain_value)))
+	
+
+# 计算效果动态值
+static func fengliu_get_dynamic_value_to_effect(effect: Array, player_index: int) -> int:
+	# 无增益直接随机
+	if effect[5] == 0:
+		return fengliu_get_dynamic_value(effect[1], effect[2], effect[3])
+	
+	# 按属性增益放大随机值
+	return int(fengliu_get_dynamic_value_from_gain(fengliu_get_dynamic_value(effect[1], effect[2], effect[3]), RunData.get_stat(effect[4], player_index), effect[5]))
 
 
 # 添加武器
@@ -92,7 +157,7 @@ func fengliu_add_xp_gold_from_wave_time(effect: Array, player_index: int):
 func fengliu_random_stats_on_level_up(effect: Array, player_index: int) -> void:
 	var stat_hash = effect[0]
 	# 随机计算属性值
-	var random_add_value = FengLiuUtils.get_dynamic_value_from_effect(effect, player_index)
+	var random_add_value = fengliu_get_dynamic_value_to_effect(effect, player_index) 
 	if effect[4]:
 		RunData.add_stat(stat_hash, random_add_value, player_index)
 		return
@@ -179,13 +244,13 @@ func on_gold_picked_up(gold: Node, player_index: int) -> void :
 		return
 	
 	
-	var effects = RunData.get_player_effect(FengLiuKeys.effect_fengliu_can_add_chance_stat_damage_when_pickup_gold(), player_index)
+	var effects = RunData.get_player_effect(effect_fengliu_can_add_chance_stat_damage_when_pickup_gold, player_index)
 	if effects.size() > 0:
 		# 随机造成伤害
-		effects[0] = FengLiuUtils.refresh_effect_chance(effects[0], player_index)
+		effects[0] = fengliu_get_dynamic_chance_to_effect(effects[0], player_index)
 		handle_stat_damages(effects, player_index)
 
-	for effect in RunData.get_player_effect(FengLiuKeys.effect_fengliu_gold_stats(), player_index):
+	for effect in RunData.get_player_effect(effect_fengliu_gold_stats, player_index):
 		fengliu_gold_stats(effect, player_index)
 
 	.on_gold_picked_up(gold, player_index)
@@ -195,12 +260,12 @@ func on_gold_picked_up(gold: Node, player_index: int) -> void :
 func _on_enemy_died(enemy, args: Entity.DieArgs) -> void:
 	for player in _get_shuffled_live_players(): 
 		# 击杀战利品外星人有概率生成 Boss
-		var effects = RunData.get_player_effect(FengLiuKeys.effect_fengliu_kill_looter_spawn_boss(), player.player_index)
+		var effects = RunData.get_player_effect(effect_fengliu_kill_looter_spawn_boss, player.player_index)
 		if not _cleaning_up and effects.size() > 0 and enemy is Looter and not args.cleaning_up:
 			fengliu_kill_looter_spawn_boss(enemy, effects[0])
 			continue
 
-		effects = RunData.get_player_effect(FengLiuKeys.effect_fengliu_killed_all_boss_wave_end(), player.player_index)
+		effects = RunData.get_player_effect(effect_fengliu_killed_all_boss_wave_end, player.player_index)
 		if effects.size() > 0 and _entity_spawner.get_nb_bosses_and_elites_alive() == 1 and enemy is Boss:
 			# 若有可以杀死所有 boss 跳过波次的玩家存活时跳过波次
 			._on_enemy_died(enemy, args)
@@ -212,7 +277,7 @@ func _on_enemy_died(enemy, args: Entity.DieArgs) -> void:
 			return
 
 		# 所有 boss 跳过波次优先级大于重新生成死亡的 boss
-		effects = RunData.get_player_effect(FengLiuKeys.effect_fengliu_boss_died_respawn(), player.player_index)
+		effects = RunData.get_player_effect(effect_fengliu_boss_died_respawn, player.player_index)
 		if enemy is Boss and effects.size() > 0:
 			# 重新生成死亡的 boss
 			fengliu_respawn_boss(enemy, effects[0])
@@ -223,10 +288,10 @@ func _on_enemy_died(enemy, args: Entity.DieArgs) -> void:
 	
 	for player in _get_shuffled_live_players():
 		var player_index = player.player_index
-		var effects = RunData.get_player_effect(FengLiuKeys.effect_fengliu_can_add_chance_stat_damage_when_death(), player_index)
+		var effects = RunData.get_player_effect(effect_fengliu_can_add_chance_stat_damage_when_death, player_index)
 		if effects.size() > 0:
 			# 随机造成伤害
-			effects[0] = FengLiuUtils.refresh_effect_chance(effects[0], player_index)
+			effects[0] = fengliu_get_dynamic_chance_to_effect(effects[0], player_index)
 			handle_stat_damages(effects, player_index)
 				
 	._on_enemy_died(enemy, args)
@@ -236,7 +301,7 @@ func _on_enemy_died(enemy, args: Entity.DieArgs) -> void:
 func on_levelled_up(player_index: int) -> void :
 	.on_levelled_up(player_index)
 	
-	var effects = RunData.get_player_effect(FengLiuKeys.effect_fengliu_random_stats_on_level_up(), player_index)
+	var effects = RunData.get_player_effect(effect_fengliu_random_stats_on_level_up, player_index)
 	for effect in effects:
 		# 随机升级获取属性
 		fengliu_random_stats_on_level_up(effect, player_index)
@@ -250,7 +315,7 @@ func fengliu_auto_open_box(consumable: Node, player_index: int) -> void:
 	var box_item_data = ItemService.process_item_box(consumable.consumable_data, RunData.current_wave, player_index)
 		
 	# 概率删除箱子道具全部负面效果
-	for effect in RunData.get_player_effect(FengLiuKeys.effect_fengliu_apply_item_not_add_all_debuff(), player_index):
+	for effect in RunData.get_player_effect(effect_fengliu_apply_item_not_add_all_debuff, player_index):
 		if effect[1] and Utils.get_chance_success(effect[0] / 100.0):
 			fengliu_apply_item_not_add_all_debuff(box_item_data, player_index, true)
 		else:
@@ -283,8 +348,8 @@ func fengliu_auto_open_box(consumable: Node, player_index: int) -> void:
 	RunData.add_tracked_value(player_index, Keys.item_bag_hash, item_box_gold_effect)
 
 	# 追踪自动开箱次数
-	RunData.add_tracked_value(player_index, FengLiuKeys.fengliu_item_auto_open_box_hash(), 1)
-	RunData.add_tracked_value(player_index, FengLiuKeys.fengliu_crate_gobbler_hash(), 1)
+	RunData.add_tracked_value(player_index, fengliu_item_auto_open_box_hash, 1)
+	RunData.add_tracked_value(player_index, fengliu_crate_gobbler_hash, 1)
 		
 
 # 扩展拾取消耗品
@@ -292,8 +357,8 @@ func on_consumable_picked_up(consumable: Node, player_index: int) -> void :
 	if consumable.already_picked_up:
 		.on_consumable_picked_up(consumable, player_index)
 		return
-		
-	var effects = RunData.get_player_effect(FengLiuKeys.effect_fengliu_picke_consumable_drop_structure(), player_index)
+
+	var effects = RunData.get_player_effect(effect_fengliu_picke_consumable_drop_structure, player_index)
 	if effects.size() > 0:
 		# 拾取消耗品生成构造物
 		fengliu_picke_consumable_drop_structure(effects[0], consumable, player_index)
@@ -304,7 +369,7 @@ func on_consumable_picked_up(consumable: Node, player_index: int) -> void :
 		return
 
 	 # 开箱加属性
-	effects = RunData.get_player_effect(FengLiuKeys.effect_fengliu_effect_box_stats(), player_index)
+	effects = RunData.get_player_effect(effect_fengliu_effect_box_stats, player_index)
 	if effects.size() > 0:
 		for effect in effects:
 			RunData.add_stat(effect[0], effect[1], player_index)
@@ -312,7 +377,7 @@ func on_consumable_picked_up(consumable: Node, player_index: int) -> void :
 	var picked_box_need_cost = false
 	var picked_box_cost_gold_effect = []
 	var cost_gold = 0
-	effects = RunData.get_player_effect(FengLiuKeys.effect_fengliu_picked_box_cost_gold(), player_index)
+	effects = RunData.get_player_effect(effect_fengliu_picked_box_cost_gold, player_index)
 	if effects.size() > 0:
 		# 花费开箱
 		picked_box_need_cost = true
@@ -325,7 +390,7 @@ func on_consumable_picked_up(consumable: Node, player_index: int) -> void :
 		return
 
 	# 自动开箱
-	effects = RunData.get_player_effect(FengLiuKeys.effect_fengliu_auto_open_box(), player_index)
+	effects = RunData.get_player_effect(effect_fengliu_auto_open_box, player_index)
 	if effects.size() > 0:
 		fengliu_auto_open_box(consumable, player_index)
 
@@ -368,12 +433,12 @@ func fengliu_add_stat_fron_wave_intensity(effect: Array, player_index: int) -> v
 # 扩展清理房间
 func clean_up_room():
 	for player_index in RunData.get_player_count():
-		var effects = RunData.get_player_effect(FengLiuKeys.effect_fengliu_add_xp_gold_from_wave_time(), player_index)
+		var effects = RunData.get_player_effect(effect_fengliu_add_xp_gold_from_wave_time, player_index)
 		if effects.size() > 0:
 			# 波次结束后按剩余时间加材料与经验
 			fengliu_add_xp_gold_from_wave_time(effects[0], player_index)
 
-		effects = RunData.get_player_effect(FengLiuKeys.effect_fengliu_add_stat_fron_wave_intensity(), player_index)
+		effects = RunData.get_player_effect(effect_fengliu_add_stat_fron_wave_intensity, player_index)
 		if effects.size() > 0:
 			for effect in effects:
 				fengliu_add_stat_fron_wave_intensity(effect, player_index)

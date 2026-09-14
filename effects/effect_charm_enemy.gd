@@ -20,11 +20,11 @@ export (int) var boss_charm_value = 0 # Boss/精英魅惑生命值阈值（%）
 
 
 func apply(player_index: int) -> void:
-	FengLiuUtils.bind_effect(custom_key_hash, player_index, [key, value, boss_charm, boss_charm_value])
+	RunData.get_player_effect(custom_key_hash ,player_index).push_back([key, value, boss_charm, boss_charm_value])
 	
 
 func unapply(player_index: int) -> void:
-	FengLiuUtils.unbind_effect(custom_key_hash, player_index, [key, value, boss_charm, boss_charm_value])
+	RunData.get_player_effects(player_index)[custom_key_hash].erase([key, value, boss_charm, boss_charm_value])
 
 
 func get_args(player_index: int) -> Array:
@@ -34,7 +34,7 @@ func get_args(player_index: int) -> Array:
 	#   [2] = Boss/精英魅惑生命值阈值百分比（绿色）
 	var args = .get_args(player_index)
 	return [
-        FengLiuUtils.text_percent(args[0]),
-		FengLiuUtils.text_value(args[1]),
-		FengLiuUtils.text_percent(boss_charm_value)
+        "[color=lime]%s%%[/color]" % args[0],
+		"[color=lime]%s[/color]" % args[1],
+		"[color=lime]%s%%[/color]" % boss_charm_value
 	]

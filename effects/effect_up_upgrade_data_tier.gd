@@ -19,12 +19,20 @@ export (int) var chance # 基础触发概率（%）
 export (int) var gain_value = 0 # 概率倍率：按 key 属性额外提升概率
 
 
+static func get_dynamic_chance(init_chance: int, add_chance: int = 100, stat_count: int = 0) -> int:
+	var dynamic_chance = init_chance + (stat_count * (add_chance / 100.0))
+	if dynamic_chance > 100:
+		return 100
+		
+	return dynamic_chance
+
+
 func apply(player_index: int) -> void:
-	FengLiuUtils.bind_effect(custom_key_hash, player_index, [key_hash, value, chance, gain_value])
+	RunData.get_player_effect(custom_key_hash ,player_index).push_back([key_hash, value, chance, gain_value])
 	
 
 func unapply(player_index: int) -> void:
-	FengLiuUtils.unbind_effect(custom_key_hash, player_index, [key_hash, value, chance, gain_value])
+	RunData.get_player_effects(player_index)[custom_key_hash].erase([key_hash, value, chance, gain_value])
 
 
 # 返回数组按顺序填充描述文本 {0}~{2} 占位符：
@@ -34,7 +42,7 @@ func unapply(player_index: int) -> void:
 func get_args(player_index: int) -> Array:
     # 无倍率属性：直接返回固定概率与品阶数
     if key_hash == Keys.empty_hash:
-        return [ FengLiuUtils.text_percent(int(gain_value / 100.0)), FengLiuUtils.text_value_plus(value) ]
+        return [ "[color=lime]%s%%[/color]" % int(gain_value / 100.0), "[color=lime]+%s[/color]" % value ]
 
     # 有倍率属性：读取倍率属性值（等级取玩家等级）
     var stat_value = 0
@@ -45,7 +53,7 @@ func get_args(player_index: int) -> Array:
         
     # 返回动态概率、提升品阶数与倍率图标
     return [
-        FengLiuUtils.text_percent(FengLiuUtils.get_dynamic_chance(value, gain_value, stat_value)),
-        FengLiuUtils.text_value_plus(value),
+        "[color=lime]%s%%[/color]" % get_dynamic_chance(value, gain_value, stat_value),
+        "[color=lime]+%s[/color]" % value,
         Utils.get_scaling_stat_icon_text(key_hash, gain_value / 100.0)
     ]

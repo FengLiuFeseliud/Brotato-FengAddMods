@@ -22,11 +22,11 @@ export (int) var value_cap = 0 # 属性上限
 
 
 func apply(player_index: int) -> void:
-	FengLiuUtils.bind_effect(custom_key_hash, player_index, [key_hash, value, boss_wave_add_value, value_cap, "stat_" in key])
+	RunData.get_player_effect(custom_key_hash ,player_index).push_back([key_hash, value, boss_wave_add_value, value_cap, "stat_" in key])
 	
 
 func unapply(player_index: int) -> void:
-	FengLiuUtils.unbind_effect(custom_key_hash, player_index, [key_hash, value, boss_wave_add_value, value_cap, "stat_" in key])
+	RunData.get_player_effects(player_index)[custom_key_hash].erase([key_hash, value, boss_wave_add_value, value_cap, "stat_" in key])
 
 
 func get_args(player_index: int) -> Array:

@@ -17,11 +17,11 @@ export (int) var stat_nb = 0 # 获得的数值
 
 
 func apply(player_index: int) -> void:
-	FengLiuUtils.bind_effect(custom_key_hash, player_index, [key_hash, value, stat_nb])
+	RunData.get_player_effect(custom_key_hash ,player_index).push_back([key_hash, value, stat_nb])
 
 
 func unapply(player_index: int) -> void:
-	FengLiuUtils.unbind_effect(custom_key_hash, player_index, [key_hash, value, stat_nb])
+	RunData.get_player_effects(player_index)[custom_key_hash].erase([key_hash, value, stat_nb])
 
 
 func get_args(player_index: int) -> Array:
@@ -32,7 +32,7 @@ func get_args(player_index: int) -> Array:
     var args = .get_args(player_index)
 
     return [
-        FengLiuUtils.text_percent(args[0]),
-        FengLiuUtils.text_value_plus(stat_nb) if stat_nb > 0 else FengLiuUtils.text_value(stat_nb),
+        "[color=lime]%s%%[/color]" % args[0],
+        "[color=lime]+%s[/color]" % stat_nb if stat_nb > 0 else "[color=lime]%s[/color]" % stat_nb,
         args[1]
     ]

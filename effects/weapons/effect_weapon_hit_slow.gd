@@ -21,6 +21,6 @@ func get_args(player_index: int) -> Array:
     # 计算当前减速值（基础值 + 属性倍率）
     var slow_value = value + int(Utils.get_stat(key_hash, player_index) * (gain_value / 100.0))
     return [
-        FengLiuUtils.text_value(slow_value),
+        "[color=lime]%s[/color]" % slow_value,
         Utils.get_scaling_stat_icon_text(key_hash, gain_value / 100.0)
     ]

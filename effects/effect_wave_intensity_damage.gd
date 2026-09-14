@@ -15,14 +15,14 @@ extends Effect
 # 波次强度附加伤害
 
 func apply(player_index: int) -> void:
-	FengLiuUtils.bind_effect(custom_key_hash, player_index, [value])
+	RunData.get_player_effect(custom_key_hash ,player_index).push_back([value])
 	
 
 func unapply(player_index: int) -> void:
-	FengLiuUtils.unbind_effect(custom_key_hash, player_index, [value])
+	RunData.get_player_effects(player_index)[custom_key_hash].erase([value])
 
 
 func get_args(player_index: int) -> Array:
     # 返回数组按顺序填充描述文本 {0} 占位符：
     #   [0] = 附加伤害百分比（绿色）
-    return [FengLiuUtils.text_percent(.get_args(player_index)[0])]
+    return ["[color=lime]%s%%[/color]" % .get_args(player_index)[0]]

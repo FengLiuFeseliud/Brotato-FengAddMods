@@ -1,6 +1,11 @@
 extends Enemy
 
 
+var effect_fengliu_wave_intensity_damage = Keys.generate_hash("fengliu_wave_intensity_damage")
+var effect_fengliu_no_kill_enemy = Keys.generate_hash("fengliu_no_kill_enemy")
+var effect_fengliu_charm_enemy = Keys.generate_hash("fengliu_charm_enemy")
+
+
 # 判断攻击来源是否匹配指定类型
 func fengliu_key_in_class(key: String, hitbox: Hitbox = null) -> bool:
     # 无攻击来源则不匹配
@@ -82,11 +87,12 @@ func take_damage(value: int, args: TakeDamageArgs) -> Array:
     var damage_taken = .take_damage(value, args)
 
     # 命中后触发魅惑
-    var effects = RunData.get_player_effect(FengLiuKeys.effect_fengliu_charm_enemy(), args.from_player_index)
+    var effects = RunData.get_player_effect(effect_fengliu_charm_enemy, args.from_player_index)
     if effects.size() > 0:
         fengliu_charm_enemy(effects[0], args)
 
     return damage_taken
+
 
 
 # 扩展伤害结算
@@ -95,11 +101,11 @@ func get_damage_value(dmg_value: int, from_player_index: int, armor_applied: = t
     var damage_value = .get_damage_value(dmg_value, from_player_index, armor_applied, dodgeable, is_crit, hitbox, is_burning)
 
     # 附加波次强度伤害（波次每秒总血量 × 百分比）
-    for effect in RunData.get_player_effect(FengLiuKeys.effect_fengliu_wave_intensity_damage(), from_player_index):
+    for effect in RunData.get_player_effect(effect_fengliu_wave_intensity_damage, from_player_index):
         damage_value.value += int(RunData.fengliu_get_wave_total_hp_to_duration() * (effect[0] / 100.0))
 
     # 不致死效果：将伤害压到生命值剩余 1
-    var effects = RunData.get_player_effect(FengLiuKeys.effect_fengliu_no_kill_enemy(), from_player_index)
+    var effects = RunData.get_player_effect(effect_fengliu_no_kill_enemy, from_player_index)
     if effects.size() > 0 and fengliu_no_kill_enemy(damage_value, effects[0], hitbox):
         # 生命值已为 1 则不再造成伤害
         if current_stats.health <= 1:
