@@ -12,5 +12,5 @@ custom_key = "fengliu_extra_aliens"
 storage_method = 1
 effect_sign = 0
 custom_args = [ ]
-gain_value = 1
+gain_value = 2
 aliens_group = ExtResource( 2 )
