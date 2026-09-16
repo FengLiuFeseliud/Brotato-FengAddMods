@@ -4,6 +4,7 @@ extends Enemy
 var effect_fengliu_wave_intensity_damage = Keys.generate_hash("fengliu_wave_intensity_damage")
 var effect_fengliu_no_kill_enemy = Keys.generate_hash("fengliu_no_kill_enemy")
 var effect_fengliu_charm_enemy = Keys.generate_hash("fengliu_charm_enemy")
+var effect_fengliu_stronger_aliens_on_stats = Keys.generate_hash("fengliu_stronger_aliens_on_stats")
 
 
 # 判断攻击来源是否匹配指定类型
@@ -80,6 +81,21 @@ func fengliu_charm_enemy(effect: Array, args: TakeDamageArgs) -> void:
 
     # 应用魅惑
     set_charmed(args.from_player_index)
+
+
+func init(zone_min_pos: Vector2, zone_max_pos: Vector2, p_players_ref: Array = [], entity_spawner_ref = null) -> void :
+    .init(zone_min_pos, zone_max_pos, p_players_ref, entity_spawner_ref)
+
+    var enemy_factor = 0
+    for player_index in RunData.get_player_count():
+        for effect in RunData.get_player_effect(effect_fengliu_stronger_aliens_on_stats, player_index):
+            if effect[3] != enemy_id_hash:
+                continue
+            
+            enemy_factor += effect[1] + int(Utils.get_stat(effect[0], player_index) * (effect[2] / 100.0))
+
+    if enemy_factor > 0:
+        reset_health_stat(enemy_factor)
 
 
 # 扩展受伤结算

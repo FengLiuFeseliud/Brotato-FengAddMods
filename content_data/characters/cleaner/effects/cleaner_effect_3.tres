@@ -1,0 +1,15 @@
+[gd_resource type="Resource" load_steps=3 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/effects/effect_stronger_aliens_on_stats.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+key = "stat_harvesting"
+text_key = "EFFECT_STRONGER_ALIENS_ON_ALIENS"
+value = 5
+custom_key = "fengliu_stronger_aliens_on_stats"
+storage_method = 1
+effect_sign = 0
+custom_args = [ ]
+gain_value = 25
+enemy_id = "evil_mob"

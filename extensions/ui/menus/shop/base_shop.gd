@@ -8,6 +8,7 @@ var effect_fengliu_item_bought_spawn_boss = Keys.generate_hash("fengliu_item_bou
 var effect_fengliu_swap_enemie = Keys.generate_hash("fengliu_swap_enemie")
 var effect_fengliu_get_fixed_upgrade = Keys.generate_hash("fengliu_get_fixed_upgrade")
 var effect_fengliu_temporary_stats_stop = Keys.generate_hash("fengliu_temporary_stats_stop")
+var effect_fengliu_can_rand_set_weapon = Keys.generate_hash("fengliu_can_rand_set_weapon")
 
 
 var fengliu_shop_items_count_price = Keys.generate_hash("fengliu_shop_items_count_price")
@@ -81,6 +82,8 @@ func fill_shop_items(player_locked_items: Array, player_index: int, just_entered
 		.fill_shop_items(player_locked_items, player_index, just_entered_shop)
 		# 刷新预报道具的敌人替换
 		fengliu_roll_swap_enemies_in_shop(player_index)
+		# 套装武器替换
+		fengliu_roll_rand_set_weapon_in_shop(player_locked_items, player_index)
 		return
 
 	var effect = effects[0]
@@ -94,11 +97,33 @@ func fill_shop_items(player_locked_items: Array, player_index: int, just_entered
 
 	# 刷新预报道具的敌人替换
 	fengliu_roll_swap_enemies_in_shop(player_index)
+	# 套装武器替换
+	fengliu_roll_rand_set_weapon_in_shop(player_locked_items, player_index)
 
 	# 无需调整价格
 	if effect[5] == 0:
 		return
 	fengliu_set_items_price_from_shop_item_count(effect[5], player_index)
+
+
+# 商店刷新时把非目标套装的武器替换为目标套装武器
+func fengliu_roll_rand_set_weapon_in_shop(player_locked_items: Array, player_index: int) -> void:
+	# 无效果则不处理
+	var effects = RunData.get_player_effect(effect_fengliu_can_rand_set_weapon, player_index)
+	if effects.size() == 0:
+		return
+
+	# 商店内道具 + 玩家已拥有道具，用于原版数量上限判定
+	var shop_args = ItemServiceGetShopItemsArgs.new(_shop_items, player_index)
+
+	# 商店刷新带来的品阶提升
+	var increase_tier = 0
+	for increase_tier_effect in RunData.get_player_effect(Keys.increase_tier_on_reroll_hash, player_index):
+		increase_tier = increase_tier_effect[1]
+		break
+
+	# 玩家锁定的商品保持原样
+	ItemService.fengliu_roll_set_weapon_in_shop(_shop_items[player_index], player_locked_items.size(), RunData.current_wave, player_index, shop_args.owned_and_shop_items, increase_tier)
 
 
 # 商店刷新时触发预报道具的敌人替换

@@ -10,6 +10,7 @@ const CONTENT_DATA_DIR = MOD_DIR + "content_data.tres"
 const FENGLIU_T0_INJECT_EXCLUDE_CHARACTERS := [
 	# 原版角色示例（带 character_ 前缀）
 	# "character_well_rounded",
+	"cleaner"
 ]
 
 # 排除不希望自动注入到初始武器池的 t0 mod 武器（weapon_id）
@@ -126,10 +127,8 @@ func fengliu_inject_t0_starting_weapons() -> void:
 
 			character.starting_weapons.push_back(weapon)
 			injected_count += 1
-			ModLoaderLog.info("t0 starting inject: %s -> %s" % [weapon.my_id, character.my_id], MOD_ID)
 
 		total_injected += injected_count
-		ModLoaderLog.info("t0 weapon %s injected into %d characters." % [weapon.my_id, injected_count], MOD_ID)
 
 	ModLoaderLog.info("FengAddMods t0 starting weapon injection finished, total=%d." % total_injected, MOD_ID)
 

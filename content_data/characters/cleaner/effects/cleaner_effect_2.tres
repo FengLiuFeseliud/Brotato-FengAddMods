@@ -1,0 +1,16 @@
+[gd_resource type="Resource" load_steps=3 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/effects/effect_extra_aliens.gd" type="Script" id=1]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/zones/000_evil_mob/group_evil_mob.tres" type="Resource" id=2]
+
+[resource]
+script = ExtResource( 1 )
+key = "stat_harvesting"
+text_key = "EFFECT_STATS_EXTRA_ALIENS"
+value = 2
+custom_key = "fengliu_extra_aliens"
+storage_method = 1
+effect_sign = 0
+custom_args = [ ]
+gain_value = 1
+aliens_group = ExtResource( 2 )

@@ -6,6 +6,7 @@ var effect_fengliu_guaranteed_shop_items = Keys.generate_hash("fengliu_guarantee
 var effect_fengliu_get_fixed_upgrade = Keys.generate_hash("fengliu_get_fixed_upgrade")
 var effect_fengliu_up_upgrade_data_tier = Keys.generate_hash("fengliu_up_upgrade_data_tier")
 var effect_fengliu_swap_enemie = Keys.generate_hash("fengliu_swap_enemie")
+var effect_fengliu_can_rand_set_weapon = Keys.generate_hash("fengliu_can_rand_set_weapon")
 
 
 # 需要重新随机预报的效果列表
@@ -111,10 +112,151 @@ func _fengliu_effect_needs_reroll(effect) -> bool:
     return effect.custom_key_hash in need_reroll_effect
 
 
-# 覆写随机道具生成：让箱子开出的预报道具重随预报
+func fengliu_is_duplicate_weapon(weapon, unique_weapon_ids: Dictionary) -> bool:
+    for owned_weapon in unique_weapon_ids.values():
+        if weapon.weapon_id_hash == owned_weapon.weapon_id_hash and weapon.tier < owned_weapon.tier:
+            return true
+        if weapon.my_id_hash == owned_weapon.my_id_hash and owned_weapon.upgrades_into == null:
+            return true
+
+    return false
+
+
+func fengliu_get_set_weapon_candidates(set_hash: int, player_index: int, item_tier: int, args: GetRandItemForWaveArgs) -> Array:
+    # 本波商店已出现/已锁定的物品，避免同波重复
+    var excluded_ids = []
+    for shop_item in args.excluded_items:
+        excluded_ids.append(shop_item[0].my_id_hash)
+
+    var banned_items = RunData.players_data[player_index].banned_items
+    var player_character = RunData.get_player_character(player_index)
+    var limited_items = get_limited_items(args.owned_and_shop_items)
+
+    var no_melee_weapons: bool = RunData.get_player_effect_bool(Keys.no_melee_weapons_hash, player_index)
+    var no_ranged_weapons: bool = RunData.get_player_effect_bool(Keys.no_ranged_weapons_hash, player_index)
+    var no_duplicate_weapons: bool = RunData.get_player_effect_bool(Keys.no_duplicate_weapons_hash, player_index)
+    var no_structures: bool = RunData.get_player_effect(Keys.remove_shop_items_hash, player_index).has(Keys.structure_hash)
+    var unique_weapon_ids: Dictionary = RunData.get_unique_weapon_ids(player_index)
+
+    var candidates = []
+    for weapon in get_pool(item_tier, TierData.WEAPONS):
+        # 必须是目标套装
+        if not fengliu_weapon_in_set_hashs(weapon, set_hash):
+            continue
+
+        # 本波已出现
+        if excluded_ids.has(weapon.my_id_hash):
+            continue
+
+        # 玩家禁用品（哈希或字符串 id）
+        if banned_items.has(weapon.my_id_hash) or banned_items.has(weapon.my_id):
+            continue
+
+        # 角色禁用品
+        if player_character.banned_items.has(weapon.my_id):
+            continue
+
+        # 数量上限
+        if limited_items.has(weapon.my_id_hash) and limited_items[weapon.my_id_hash][1] >= weapon.max_nb:
+            continue
+
+        # 无近战 / 无远程 / 无建筑
+        if no_melee_weapons and weapon.type == WeaponType.MELEE:
+            continue
+        if no_ranged_weapons and weapon.type == WeaponType.RANGED:
+            continue
+        if no_structures and EntityService.is_weapon_spawning_structure(weapon):
+            continue
+
+        # 禁重复武器（与基类相同判定）
+        if no_duplicate_weapons and fengliu_is_duplicate_weapon(weapon, unique_weapon_ids):
+            continue
+
+        candidates.append(weapon)
+
+    return candidates
+
+
+func fengliu_get_rand_set_weapon(set_hash: int, wave: int, player_index: int, args: GetRandItemForWaveArgs) -> ItemParentData:
+    # 无效套装直接返回，由调用方回退原版随机
+    if set_hash == Keys.empty_hash:
+        return null
+
+    var item_tier = get_tier_from_wave(wave, player_index, args.increase_tier)
+    if args.fixed_tier != -1:
+        item_tier = args.fixed_tier
+
+    var min_weapon_tier: int = RunData.get_player_effect(Keys.min_weapon_tier_hash, player_index)
+    var max_weapon_tier: int = RunData.get_player_effect(Keys.max_weapon_tier_hash, player_index)
+    item_tier = clamp(item_tier, min_weapon_tier, max_weapon_tier)
+
+    var candidates = fengliu_get_set_weapon_candidates(set_hash, player_index, item_tier, args)
+    if candidates.size() == 0:
+        return null
+
+    return apply_item_effect_modifications(Utils.get_rand_element(candidates), player_index)
+
+
+# 判断武器是否属于目标套装
+func fengliu_weapon_in_set_hashs(weapon, set_hash: int) -> bool:
+    if set_hash == Keys.empty_hash or weapon.sets == null:
+        return false
+
+    for set_item in weapon.sets:
+        if set_item != null and set_item.my_id_hash == set_hash:
+            return true
+
+    return false
+
+
+# 商店刷新后处理：把非目标套装的武器替换为目标套装武器（取不到则保留原物）
+func fengliu_roll_set_weapon_in_shop(shop_items: Array, locked_count: int, wave: int, player_index: int, owned_and_shop_items: Array, increase_tier: int = 0) -> int:
+    var replaced = 0
+    var effects = RunData.get_player_effect(effect_fengliu_can_rand_set_weapon, player_index)
+    if effects.size() <= 0:
+        return replaced
+
+    var set_hash =  effects[0][0]
+    for index in range(shop_items.size()):
+        # 玩家手动锁定的商品保持原样
+        if index < locked_count:
+            continue
+
+        var shop_entry = shop_items[index]
+        if not (shop_entry is Array) or shop_entry.size() == 0:
+            continue
+
+        var item = shop_entry[0]
+        # 只处理武器格，道具格保持原样
+        if item == null or not (item is WeaponData):
+            continue
+
+        # 已是目标套装武器则不处理
+        if fengliu_weapon_in_set_hashs(item, set_hash):
+            continue
+
+        var args = GetRandItemForWaveArgs.new()
+        args.excluded_items = shop_items
+        args.owned_and_shop_items = owned_and_shop_items
+        args.increase_tier = increase_tier
+
+        var new_weapon = fengliu_get_rand_set_weapon(set_hash, wave, player_index, args)
+        # 无候选则保留原商品，避免出现空格子
+        if new_weapon == null:
+            continue
+
+        shop_entry[0] = new_weapon
+        replaced += 1
+
+    return replaced
+
+
 func _get_rand_item_for_wave(wave: int, player_index: int, type: int, args: GetRandItemForWaveArgs) -> ItemParentData:
     var item = ._get_rand_item_for_wave(wave, player_index, type, args)
-    if item == null or item.effects == null:
+    if item == null:
+        return item
+
+    if item.effects == null:
         return item
 
     # 先扫描是否存在需要重新随机预报的效果
@@ -203,7 +345,7 @@ func fengliu_get_fixed_upgrade_data(level: int, player_index: int, upgrade_id_ha
 
 
 # 按属性获取升级项 id 哈希
-func fengliu_get_upgrade_data_id_hash_by_stat(level: int, player_index: int, stat_hash: int) -> int:
+func fengliu_get_upgrade_data_id_hash_by_stat(stat_hash: int) -> int:
     # 查找含指定属性的升级项
     var pool: Array = _tiers_data[0][TierData.UPGRADES]
     for upgrade in pool:

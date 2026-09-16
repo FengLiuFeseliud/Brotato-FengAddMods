@@ -1,9 +1,11 @@
 extends WaveManager
 
 var effect_fengliu_minecraft = Keys.generate_hash("fengliu_minecraft")
-var minecreft_zone_data = []
-
 var effect_fengliu_swap_enemie = Keys.generate_hash("fengliu_swap_enemie")
+var effect_fengliu_extra_aliens = Keys.generate_hash("fengliu_extra_aliens")
+
+
+var minecreft_zone_data = []
 # 下一波敌人替换记录（由本局 WaveManager 持有，退出/重建场景后自动丢弃，不会跨局残留）
 var _wave_swap_enemies = []
 
@@ -23,20 +25,6 @@ func fengliu_init_minecreft_zone(zone_data: ZoneData) -> void:
     # 注入全部矿石组
     for zone in minecreft_zone_data:
         zone_data.groups_data_in_all_waves.push_back(zone)
-
-
-# 扩展初始化
-func init(p_wave_timer: Timer, zone_data: ZoneData, wave_data: Resource) -> void :
-    for player_index in RunData.get_player_count():
-        if RunData.get_player_effect(effect_fengliu_minecraft, player_index).size() == 0:
-            continue
-        
-        # 向关卡注入 mc 矿石
-        fengliu_init_minecreft_zone(zone_data)
-        break
-    
-    .init(p_wave_timer, zone_data, wave_data)
-    fengliu_apply_wave_swap_enemies()
 
 
 # 应用下一波换怪：把 x 的场景替换成 y 的场景
@@ -78,3 +66,31 @@ func fengliu_apply_wave_swap_enemies() -> void:
             var new_group = group.duplicate()
             new_group.wave_units_data = new_units
             current_wave_data.groups_data[group_index] = new_group
+
+
+func fengliu_extra_aliens(player_index: int, effect: Array) -> void:
+    var extra_alien_groups = effect[2]
+    if effect[0] != Keys.empty_hash:
+        extra_alien_groups += int(Utils.get_stat(effect[0], player_index) * (effect[3] / 100.0))
+
+    for i in extra_alien_groups:
+        var new_group = effect[1].duplicate()
+        new_group.spawn_timing = rand_range(5, wave_timer.time_left - 10)
+        current_wave_data.groups_data.push_back(new_group)
+
+
+# 扩展初始化
+func init(p_wave_timer: Timer, zone_data: ZoneData, wave_data: Resource) -> void :
+    for player_index in RunData.get_player_count():
+        if RunData.get_player_effect(effect_fengliu_minecraft, player_index).size() == 0:
+            continue
+        
+        # 向关卡注入 mc 矿石
+        fengliu_init_minecreft_zone(zone_data)
+        break
+    
+    .init(p_wave_timer, zone_data, wave_data)
+    fengliu_apply_wave_swap_enemies()
+    for player_index in RunData.get_player_count():
+        for effect in RunData.get_player_effect(effect_fengliu_extra_aliens, player_index):
+            fengliu_extra_aliens(player_index, effect)
