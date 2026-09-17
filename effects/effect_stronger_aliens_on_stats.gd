@@ -2,12 +2,27 @@ class_name StrongerAliensOnStats
 extends Effect
 
 
+# ============================================================
+# 效果：指定敌人血量提升
+#   指定 enemy_id 的敌人出生时按比例提升血量。
+#   提升比例 = value + 倍率属性 × gain_value/100（%）。
+#   运行时 custom_key：fengliu_stronger_aliens_on_stats
+# ------------------------------------------------------------
+# 效果值：
+#   key        比例倍率属性
+#   value      基础血量提升比例（%）
+#   gain_value 比例倍率（每 gain_value/100 点该属性 +1% 比例）
+#   enemy_id   生效的敌人 ID（如 evil_mob）
+# ============================================================
+
+
 export (int) var gain_value = 0
 export (String) var enemy_id = ""
 var enemy_id_hash = 0
 
 
 func _generate_hashes() -> void:
+    # 预生成敌人 ID 哈希
     ._generate_hashes()
     enemy_id_hash = Keys.generate_hash(enemy_id)
 
@@ -21,6 +36,7 @@ func unapply(player_index: int) -> void:
 
 
 func get_args(player_index: int) -> Array:
+    # 血量提升比例 = 基础比例 + 倍率属性 × 倍率
     var add_hp = value + int(Utils.get_stat(key_hash, player_index) * (gain_value / 100.0))
     return [
         tr(("%s_NAME" % enemy_id).to_upper()),

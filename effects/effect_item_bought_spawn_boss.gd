@@ -17,6 +17,7 @@ export (int) var bought_add_chance = 0 # 额外概率倍率（%）：按已持�
 
 
 func get_item_count(player_index: int) -> int:
+	# 统计玩家背包中该触发道具的数量
 	var count = 0
 	for item in RunData.get_player_items(player_index):
 		if item.my_id_hash == key_hash:

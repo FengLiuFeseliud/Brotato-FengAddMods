@@ -25,6 +25,7 @@ var merge_to_item_hash = Keys.empty_hash
 
 
 func _generate_hashes() -> void:
+    # 预生成源道具与目标道具哈希
     ._generate_hashes()
     merge_from_item_hash = Keys.generate_hash(merge_from_item)
     merge_to_item_hash = Keys.generate_hash(merge_to_item)

@@ -72,6 +72,7 @@ func _physics_process(delta):
 
 # 扩展设置炮塔数据
 func set_data(data: Resource) -> void :
+    # 先走原版数据设置，再缓存数据引用
     .set_data(data)
     _data = data
 

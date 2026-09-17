@@ -28,6 +28,7 @@ var stat_gain_hash = ""
 
 func _generate_hashes() -> void:
 	._generate_hashes()
+	# 未配置倍率时不生成哈希，描述按固定随机范围显示
 	if stat_gain_value == 0:
 		return
 	

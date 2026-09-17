@@ -218,7 +218,7 @@ func fengliu_kill_looter_spawn_boss(enemy: Enemy, chance: int) -> void:
 	_entity_spawner.spawn_entity(elite.scene, args)
 
 
-# 捡起材料/金币触发属性加成
+# 捡起材料触发属性加成
 func fengliu_gold_stats(effect: Array, player_index: int) -> void:
 	# 概率未命中则跳过
 	if not Utils.get_chance_success(effect[1] / 100.0):
@@ -256,7 +256,7 @@ func on_gold_picked_up(gold: Node, player_index: int) -> void :
 	.on_gold_picked_up(gold, player_index)
 
 
-# 扩展怪物死亡后
+# 扩展敌人死亡后
 func _on_enemy_died(enemy, args: Entity.DieArgs) -> void:
 	for player in _get_shuffled_live_players(): 
 		# 击杀战利品外星人有概率生成 Boss
@@ -342,7 +342,7 @@ func fengliu_auto_open_box(consumable: Node, player_index: int) -> void:
 		RunData.fengliu_add_item_from_box(extra_item_data, player_index)
 
 
-	# 结算箱子金币
+	# 结算箱子材料
 	var item_box_gold_effect = RunData.get_player_effect(Keys.item_box_gold_hash, player_index)
 	RunData.add_gold(item_box_gold_effect, player_index)
 	RunData.add_tracked_value(player_index, Keys.item_bag_hash, item_box_gold_effect)

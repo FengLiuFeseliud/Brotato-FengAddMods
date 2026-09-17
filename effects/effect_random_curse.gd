@@ -20,6 +20,7 @@ var not_curse_item_ids_hash = []
 
 
 func _generate_hashes() -> void:
+    # 预生成排除名单中各项的哈希
     ._generate_hashes()
     for not_curse_item_id in not_curse_item_ids:
         not_curse_item_ids_hash.append(Keys.generate_hash(not_curse_item_id))

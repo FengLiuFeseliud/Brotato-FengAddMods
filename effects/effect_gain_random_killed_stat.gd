@@ -24,13 +24,16 @@ var stat_hash: int = Keys.empty_hash
 
 
 func _generate_hashes() -> void :
+	# 预生成随机属性哈希
 	._generate_hashes()
 	stat_hash = Keys.generate_hash(stat)
 	
 	
 func get_dynamic_value() -> int:
+	# 在 [下限, 上限] 内取随机整数
 	var dynamic_value = int(floor(rand_range(stat_min_value, stat_max_value + 1)))
 	if dynamic_value == 0 and stat_no_zero:
+		# 不允许 0 时重新抽取
 		return get_dynamic_value()
 	return dynamic_value
 

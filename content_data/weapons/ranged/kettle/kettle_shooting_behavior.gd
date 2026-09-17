@@ -1,5 +1,18 @@
 extends "res://weapons/shooting_behaviors/ranged_weapon_shooting_behavior.gd"
 
+
+# ============================================================
+# 效果：水壶连发
+#   一轮内连发多颗水弹，逐发播放开火音并带微小随机偏角。
+#   水壶（weapon_kettle）的射击行为脚本，非 Effect 资源。
+# ------------------------------------------------------------
+# 效果值：
+#   burst_shots       一轮连发的水弹数量
+#   burst_gap_frames  每颗之间的间隔（帧，60fps）
+#   burst_jitter      每发的随机偏角（弧度）
+# ============================================================
+
+
 export (int) var burst_shots = 3      # 一轮连发打几颗
 export (int) var burst_gap_frames = 10  # 每颗之间的间隔(帧, 60fps)
 export (float) var burst_jitter = 0.01  # 每发微小随机偏角，避免全部重叠成一条线

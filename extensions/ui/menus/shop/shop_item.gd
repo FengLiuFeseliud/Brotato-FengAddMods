@@ -7,7 +7,7 @@ var material_ui_icon = load("res://items/materials/material_ui.png")
 var effect_fengliu_stats_stop = Keys.generate_hash("fengliu_stats_stop")
 var effect_fengliu_shop_item_count = Keys.generate_hash("fengliu_shop_item_count")
 var effect_fengliu_temporary_stats_stop = Keys.generate_hash("fengliu_temporary_stats_stop")
-var fengliu_item_gold_value = 0 # 商品金币原价（hp_shop 会把 value 改成 ÷20 后的血量价）
+var fengliu_item_gold_value = 0 # 道具材料原价（hp_shop 会把 value 改成 ÷20 后的血量价）
 
 
 # 切换到指定属性的代付图标与价格
@@ -20,9 +20,9 @@ func _fengliu_stats_shop_item_icon(stats_hash: int, ratio: int) -> void:
     _button.set_value(int(ceil(value / float(max(1, ratio)))), int(RunData.get_stat(stats_hash, player_index)))
 
 
-# 属性代付：金币足够且允许时保留金币，否则用属性代付显示
+# 属性代付：材料足够且允许时保留材料，否则用属性代付显示
 func fengliu_stats_stop(effect: Array) -> void:
-    # 金币足够且允许金币购买：保持金币显示，并还原金币图标
+    # 材料足够且允许材料购买：保持材料显示，并还原材料图标
     if RunData.get_player_gold(player_index) >= value and effect[2]:
         _button.set_material_icon(material_ui_icon, Utils.GOLD_COLOR)
         return
@@ -32,6 +32,7 @@ func fengliu_stats_stop(effect: Array) -> void:
 
 # 临时代偿：用最高主属性折算代付图标与价格
 func fengliu_temporary_stats_stop():
+    # 用最高主要属性折算代付比例
     var stats_hash = RunData.fengliu_get_highest_stat_hash(player_index)
     _fengliu_stats_shop_item_icon(stats_hash, RunData.fengliu_get_stat_ratios_from_price(stats_hash))
 
@@ -40,7 +41,7 @@ func fengliu_temporary_stats_stop():
 func _fengliu_refresh_pay_display() -> void:
     var temporary_stats_stop_count = RunData.get_player_effect(effect_fengliu_temporary_stats_stop, player_index) 
     if temporary_stats_stop_count is int and temporary_stats_stop_count > 0:
-        # 临时代偿优先：用金币原价显示/扣除（兼容 hp_shop 的 ÷20 血量价）
+        # 临时代偿优先：用材料原价显示/扣除（兼容 hp_shop 的 ÷20 血量价）
         value = fengliu_item_gold_value
         fengliu_temporary_stats_stop()
         return
@@ -58,14 +59,14 @@ func _fengliu_refresh_pay_display() -> void:
         value = int(ceil(fengliu_item_gold_value / 20.0))
         return
 
-    # 无任何代付：还原金币图标与金币价格（避免残留临时属性图标）
+    # 无任何代付：还原材料图标与材料价格（避免残留临时属性图标）
     _button.set_material_icon(material_ui_icon, Utils.GOLD_COLOR)
     _button.set_value(value, RunData.get_player_currency(player_index))
 
 
-# 扩展设置商店道具（记录金币原价并刷新代付显示）
+# 扩展设置商店道具（记录材料原价并刷新代付显示）
 func set_shop_item(p_item_data: ItemParentData, p_wave_value: int = RunData.current_wave) -> void :
-    # 金币原价与基类同源计算（基类 hp_shop 分支会把 value 改成 ÷20 的血量价）
+    # 材料原价与基类同源计算（基类 hp_shop 分支会把 value 改成 ÷20 的血量价）
     fengliu_item_gold_value = ItemService.get_value(p_wave_value, p_item_data.value, player_index, true, p_item_data is WeaponData, p_item_data.my_id_hash)
         
     .set_shop_item(p_item_data, p_wave_value)
@@ -75,6 +76,7 @@ func set_shop_item(p_item_data: ItemParentData, p_wave_value: int = RunData.curr
 # 是否达到锁定上限
 func _fengliu_is_lock_limit_reached() -> bool:
     var effects = RunData.get_player_effect(effect_fengliu_shop_item_count, player_index)
+    # 无道具数效果时不限制可锁定数量
     if effects.size() == 0:
         return false
     return RunData.locked_shop_items[player_index].size() >= effects[0][6]
@@ -84,6 +86,7 @@ func _fengliu_is_lock_limit_reached() -> bool:
 func _fengliu_is_item_locked() -> bool:
     if item_data == null:
         return false
+    # 与已锁定列表逐个比对 my_id
     for entry in RunData.locked_shop_items[player_index]:
         if entry[0].my_id == item_data.my_id:
             return true
@@ -92,6 +95,7 @@ func _fengliu_is_item_locked() -> bool:
 
 # 刷新所有商店道具的锁定按钮状态
 func _fengliu_refresh_lock_buttons() -> void:
+    # 从父节点遍历同级商店道具
     var parent = get_parent()
     if parent == null:
         return
@@ -114,6 +118,7 @@ func manage_lock_button_visibility() -> void:
 
 # 达到锁定上限时禁止新增锁定，并在切换后刷新所有道具按钮
 func change_lock_status(button_pressed: bool) -> void:
+    # 不可锁定道具与已达锁定上限时不允许新增锁定
     if button_pressed and item_data != null and not item_data.is_lockable:
         return
     if button_pressed and _fengliu_is_lock_limit_reached():

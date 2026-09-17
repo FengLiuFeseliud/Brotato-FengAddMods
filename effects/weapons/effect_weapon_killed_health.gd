@@ -26,6 +26,7 @@ var health_gain_stat_hash # 治疗量倍率属性哈希
 
 func _generate_hashes() -> void:
 	._generate_hashes()
+	# 预生成治疗量倍率属性哈希
 	health_gain_stat_hash = Keys.generate_hash(health_gain_stat)
 
 

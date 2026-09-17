@@ -23,9 +23,11 @@ var _fengliu_content_loader = null
 
 
 func _init():
+	# 先排除 The-BossRush 对 item_parent_data 的扩展
 	_block_boss_rush_item_parent_data_extension()
 	add_translations()
 
+	# 安装 extensions 目录下的全部覆盖脚本
 	ModLoaderLog.info("add extensions...", MOD_ID)
 	_install_extensions_from_dir(EXTENSIONS_DIR)
 
@@ -45,11 +47,13 @@ func _block_boss_rush_item_parent_data_extension() -> void:
 
 
 func _install_extensions_from_dir(dir_path: String) -> void:
+	# 目录打不开时记录错误并放弃
 	var dir := Directory.new()
 	if dir.open(dir_path) != OK:
 		ModLoaderLog.error("Failed to open extensions directory: %s" % dir_path, MOD_ID)
 		return
 
+	# 递归子目录，逐个安装其中的扩展脚本
 	dir.list_dir_begin(true, true)
 	var file_name := dir.get_next()
 	while file_name != "":
@@ -64,6 +68,7 @@ func _install_extensions_from_dir(dir_path: String) -> void:
 
 func add_translations() -> void:
 	ModLoaderLog.info("add translations...", MOD_ID)
+	# 注册简体中文与英文两份翻译
 	ModLoaderMod.add_translation(MOD_DIR + "translations/translations.zh_Hans_CN.translation")
 	ModLoaderMod.add_translation(MOD_DIR + "translations/translations.en.translation")
 
@@ -135,10 +140,12 @@ func fengliu_inject_t0_starting_weapons() -> void:
 
 # 判断该角色是否可以接收这把 t0 武器
 func _fengliu_t0_can_inject(character, weapon) -> bool:
+	# 排除名单内的角色
 	if FENGLIU_T0_INJECT_EXCLUDE_CHARACTERS.has(character.my_id):
 		return false
 
 	var is_ranged: bool = weapon.type == WeaponData.Type.RANGED
+	# 角色效果与武器类型冲突时不注入
 	for effect in character.effects:
 		if effect == null:
 			continue
@@ -156,6 +163,7 @@ func _fengliu_t0_can_inject(character, weapon) -> bool:
 
 # 该角色初始武器池中是否已有同 id 武器
 func _fengliu_t0_character_has_weapon(character, weapon_my_id: String) -> bool:
+	# 遍历初始武器池，存在同 id 武器即视为已拥有
 	for starting_weapon in character.starting_weapons:
 		if starting_weapon != null and starting_weapon.my_id == weapon_my_id:
 			return true

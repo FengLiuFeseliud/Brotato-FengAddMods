@@ -28,6 +28,7 @@ var add_chance_stat_hash = ""
 
 
 func _generate_hashes() -> void:
+	# 预生成概率倍率属性哈希
 	._generate_hashes()
 	add_chance_stat_hash = Keys.generate_hash(add_chance_stat)
 
@@ -41,6 +42,7 @@ func apply(player_index: int) -> void:
 	
 	
 func unapply(player_index: int) -> void:
+	# 移除登记，参数顺序须与 apply 完全一致
 	RunData.get_player_effects(player_index)[custom_key_hash].erase([key_hash, value, chance, tracking_key, add_chance_stat_hash, add_chance, chance])
 	
 	

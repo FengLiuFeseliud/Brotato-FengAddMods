@@ -83,9 +83,11 @@ func fengliu_charm_enemy(effect: Array, args: TakeDamageArgs) -> void:
     set_charmed(args.from_player_index)
 
 
+# 扩展初始化：按波次强敌效果提高本敌人属性
 func init(zone_min_pos: Vector2, zone_max_pos: Vector2, p_players_ref: Array = [], entity_spawner_ref = null) -> void :
     .init(zone_min_pos, zone_max_pos, p_players_ref, entity_spawner_ref)
 
+    # 汇总所有玩家对该敌人的强敌加成
     var enemy_factor = 0
     for player_index in RunData.get_player_count():
         for effect in RunData.get_player_effect(effect_fengliu_stronger_aliens_on_stats, player_index):

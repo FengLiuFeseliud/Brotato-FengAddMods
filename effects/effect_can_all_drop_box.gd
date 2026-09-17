@@ -23,6 +23,7 @@ func apply(player_index: int) -> void:
 	
 	
 func unapply(player_index: int) -> void:
+	# 移除登记，参数须与 apply 一致
 	RunData.get_player_effects(player_index)[custom_key_hash].erase([key_hash, value, chance])
 
 

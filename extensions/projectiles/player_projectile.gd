@@ -14,6 +14,7 @@ var _fengliu_base_hitbox_scale: Vector2 = Vector2.ONE
 # 缓存子弹场景自带的基础缩放（发射时叠加玩家体型）
 func _ready() -> void:
 	._ready()
+	# 记录精灵与碰撞体的初始缩放
 	if is_instance_valid(_sprite):
 		_fengliu_base_sprite_scale = _sprite.scale
 	if is_instance_valid(_hitbox):
@@ -22,6 +23,7 @@ func _ready() -> void:
 
 # 发射时按开枪玩家的体型设置本颗子弹的大小
 func shoot() -> void:
+	# 先按玩家体型设置本颗子弹大小，再走原版发射
 	_fengliu_apply_player_scale()
 	.shoot()
 
@@ -29,9 +31,11 @@ func shoot() -> void:
 # 按玩家体型与子弹缩放属性调整本颗子弹的缩放
 func _fengliu_apply_player_scale() -> void:
 	var scale_factor: float = _fengliu_get_player_scale_factor()
+	# 缩放无效时保持原样
 	if scale_factor <= 0.0:
 		return
 
+	# 同步缩放精灵与碰撞体
 	_sprite.scale = _fengliu_base_sprite_scale * scale_factor
 	_hitbox.scale = _fengliu_base_hitbox_scale * scale_factor
 
@@ -64,6 +68,7 @@ func _fengliu_get_player_scale_factor() -> float:
 
 # 子弹回池时还原缩放，避免污染之后取用的子弹
 func _return_to_pool() -> void:
+	# 还原精灵与碰撞盒缩放
 	_sprite.scale = _fengliu_base_sprite_scale
 	_hitbox.scale = _fengliu_base_hitbox_scale
 	._return_to_pool()

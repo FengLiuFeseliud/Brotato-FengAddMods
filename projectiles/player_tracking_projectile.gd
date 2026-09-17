@@ -47,14 +47,17 @@ func _physics_process(delta: float) -> void:
 
 
 func shoot_ex(p_from: Node, pos: Vector2, p_velocity: Vector2, p_rotation: float, p_weapon_stats: WeaponStats, damage_tracking_key: int, effects: Array, hitbox_args: Hitbox.HitboxArgs, knockback_direction: Vector2) -> void:
+	# 重置追踪状态，并让首帧立即索敌
 	_tracking_target = null
 	_tracking_speed = 0.0
 	_frames_since_scan = tracking_scan_every_x_frames  # 让第一帧立即索敌
 	.shoot_ex(p_from, pos, p_velocity, p_rotation, p_weapon_stats, damage_tracking_key, effects, hitbox_args, knockback_direction)
+	# 按最终初速度确定追踪速度
 	_tracking_speed = velocity.length()
 
 
 func _return_to_pool() -> void:
+	# 回收前清空追踪状态
 	_tracking_target = null
 	_tracking_speed = 0.0
 	._return_to_pool()
@@ -63,8 +66,10 @@ func _return_to_pool() -> void:
 # 在索敌圈内找出最近的、还能追踪的敌人 没有则返回 null
 func _get_nearest_enemy_in_range() -> Node:
 	var radius_sq: float = _get_tracking_radius_sq()
+	# 无有效索敌半径则不追踪
 	if radius_sq <= 0.0:
 		return null
+	# 遍历候选敌人取最近者
 	var enemies: Array = _get_all_enemies()
 	var pos: Vector2 = global_position
 	var best: Node = null
@@ -73,6 +78,7 @@ func _get_nearest_enemy_in_range() -> Node:
 		if not _is_valid_tracking_enemy(enemy):
 			continue
 		var dist_sq: float = pos.distance_squared_to(enemy.global_position)
+		# 必须在半径内且比当前最佳更近
 		if dist_sq <= radius_sq and dist_sq < best_dist_sq:
 			best = enemy
 			best_dist_sq = dist_sq
@@ -81,6 +87,7 @@ func _get_nearest_enemy_in_range() -> Node:
 
 # 该敌人是否还能被追踪
 func _is_valid_tracking_enemy(enemy) -> bool:
+	# 排除无效对象、待删除、已死亡与已命中过的目标
 	if enemy == null or not is_instance_valid(enemy):
 		return false
 		
@@ -97,6 +104,7 @@ func _is_valid_tracking_enemy(enemy) -> bool:
 
 # 从当前主场景拿到所有敌人（缓存 EntitySpawner 引用）
 func _get_all_enemies() -> Array:
+	# 缓存 EntitySpawner 引用，取不到则返回空数组
 	if _entity_spawner_ref == null or not is_instance_valid(_entity_spawner_ref):
 		var main = get_tree().current_scene
 		if main == null:
@@ -109,11 +117,13 @@ func _get_all_enemies() -> Array:
 
 # 读取索敌半径（来自 TargetTriggerHitbox/Collision 上的圆）
 func _get_tracking_radius() -> float:
+	# 取索敌碰撞形状的半径，形状缺失或类型不符时返回 0
 	if _target_trigger_collision != null and is_instance_valid(_target_trigger_collision) and _target_trigger_collision.shape is CircleShape2D:
 		return _target_trigger_collision.shape.radius
 	return 0.0
 
 
 func _get_tracking_radius_sq() -> float:
+	# 距离比较用平方半径，省去开方
 	var radius: float = _get_tracking_radius()
 	return radius * radius

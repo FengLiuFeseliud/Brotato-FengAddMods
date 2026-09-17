@@ -439,6 +439,7 @@ func fengliu_remove_shop_items() -> void:
 
 # 查找待移除的波次结束道具（跳过标记为箱子来源的实例）
 func _fengliu_get_wave_end_remove_item_to_remove(item_hash: int, player_index: int):
+	# 遍历玩家道具，跳过箱子来源的实例
 	for player_item in players_data[player_index].items:
 		if player_item.my_id_hash != item_hash:
 			continue
@@ -454,6 +455,7 @@ func _fengliu_get_wave_end_remove_item_to_remove(item_hash: int, player_index: i
 # 统一添加效果哈希
 func get_player_effect(key: int, player_index: int):
 	var effects = .get_player_effects(player_index)
+	# 缺失时先补空数组，避免调用方越界
 	if not effects.has(key):
 		effects[key] = []
 	
@@ -794,6 +796,7 @@ func apply_item_effects(item_data: ItemParentData, player_index: int) -> void :
 
 # 扩展重置波次状态
 func reset_to_start_wave_state() -> void :
+	# 标记本次为波次重开，再走原版重置
 	_restart_wave = true
 	.reset_to_start_wave_state()
 
@@ -805,10 +808,12 @@ func fengliu_normalize_cursed_effect(item_data: ItemParentData) -> void:
 	if not item_data.is_cursed:
 		return
 
+	# 取未诅咒的原始数据作为文案基准
 	var base_data = ItemService.get_element(ItemService.weapons if item_data is WeaponData else ItemService.items, item_data.my_id_hash)
 	if base_data == null:
 		return
 
+	# 找出收获产树效果，还原为未被诅咒的文案
 	for effect in item_data.effects:
 		if not effect is GainStatForEveryStatEffect:
 			continue
@@ -831,12 +836,14 @@ func fengliu_normalize_cursed_effect(item_data: ItemParentData) -> void:
 
 # 扩展添加道具：诅咒水壶入库前先还原树效果
 func add_item(item: ItemData, player_index: int, is_selection: bool = false) -> void:
+	# 入库前先还原被诅咒水壶的收获产树效果
 	fengliu_normalize_cursed_effect(item)
 	.add_item(item, player_index, is_selection)
 
 
 # 扩展添加武器：诅咒水壶入库前先还原树效果
 func add_weapon(weapon: WeaponData, player_index: int, is_selection: bool = false) -> WeaponData:
+	# 入库前先还原被诅咒水壶的收获产树效果
 	fengliu_normalize_cursed_effect(weapon)
 	return .add_weapon(weapon, player_index, is_selection)
 

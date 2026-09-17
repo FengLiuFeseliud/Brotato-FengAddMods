@@ -122,7 +122,7 @@ func fengliu_roll_rand_set_weapon_in_shop(player_locked_items: Array, player_ind
 		increase_tier = increase_tier_effect[1]
 		break
 
-	# 玩家锁定的商品保持原样
+	# 玩家锁定的道具保持原样
 	ItemService.fengliu_roll_set_weapon_in_shop(_shop_items[player_index], player_locked_items.size(), RunData.current_wave, player_index, shop_args.owned_and_shop_items, increase_tier)
 
 
@@ -222,7 +222,7 @@ func on_shop_item_bought(shop_item: ShopItem, player_index: int) -> void :
 		.on_shop_item_bought(shop_item, player_index)
 		return
 
-	# 金币足够则正常购买
+	# 材料足够则正常购买
 	var gold = RunData.get_player_gold(player_index)
 	if gold >= shop_item.value:
 		RunData.remove_gold(shop_item.value, player_index)
@@ -250,6 +250,7 @@ func on_shop_item_bought(shop_item: ShopItem, player_index: int) -> void :
 # 同步还原其收获产树效果（与普通版保持一致）
 func _on_tree_exited() -> void:
 	._on_tree_exited()
+	# 波末锁格道具被诅咒后，同步还原其收获产树效果
 	for player_index in RunData.get_player_count():
 		var locked_items: Array = RunData.locked_shop_items[player_index]
 		for locked_item in locked_items:

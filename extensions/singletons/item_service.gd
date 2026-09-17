@@ -93,7 +93,7 @@ func get_player_shop_items(wave: int, player_index: int, args: ItemServiceGetSho
         base_guaranteed.append([item_hash, 1])
         appended += 1
 
-    # 基础逻辑会自动替换随机商品并安全截断到商店上限
+    # 基础逻辑会自动替换随机道具并安全截断到商店上限
     var result = .get_player_shop_items(wave, player_index, args)
 
     # 还原，避免污染基础效果数据
@@ -112,7 +112,9 @@ func _fengliu_effect_needs_reroll(effect) -> bool:
     return effect.custom_key_hash in need_reroll_effect
 
 
+# 判断是否重复武器（同家族低品阶 / 已满阶不可升级视为重复）
 func fengliu_is_duplicate_weapon(weapon, unique_weapon_ids: Dictionary) -> bool:
+    # 同家族低品阶、或已满阶不可升级的同名武器视为重复
     for owned_weapon in unique_weapon_ids.values():
         if weapon.weapon_id_hash == owned_weapon.weapon_id_hash and weapon.tier < owned_weapon.tier:
             return true
@@ -122,6 +124,7 @@ func fengliu_is_duplicate_weapon(weapon, unique_weapon_ids: Dictionary) -> bool:
     return false
 
 
+# 收集目标套装武器候选（排除本波已出现、禁用品、数量超限与类型禁用）
 func fengliu_get_set_weapon_candidates(set_hash: int, player_index: int, item_tier: int, args: GetRandItemForWaveArgs) -> Array:
     # 本波商店已出现/已锁定的物品，避免同波重复
     var excluded_ids = []
@@ -160,7 +163,7 @@ func fengliu_get_set_weapon_candidates(set_hash: int, player_index: int, item_ti
         if limited_items.has(weapon.my_id_hash) and limited_items[weapon.my_id_hash][1] >= weapon.max_nb:
             continue
 
-        # 无近战 / 无远程 / 无建筑
+        # 无近战 / 无远程 / 无构筑物
         if no_melee_weapons and weapon.type == WeaponType.MELEE:
             continue
         if no_ranged_weapons and weapon.type == WeaponType.RANGED:
@@ -177,6 +180,7 @@ func fengliu_get_set_weapon_candidates(set_hash: int, player_index: int, item_ti
     return candidates
 
 
+# 随机取一把目标套装武器（无有效套装或候选时返回 null）
 func fengliu_get_rand_set_weapon(set_hash: int, wave: int, player_index: int, args: GetRandItemForWaveArgs) -> ItemParentData:
     # 无效套装直接返回，由调用方回退原版随机
     if set_hash == Keys.empty_hash:
@@ -202,6 +206,7 @@ func fengliu_weapon_in_set_hashs(weapon, set_hash: int) -> bool:
     if set_hash == Keys.empty_hash or weapon.sets == null:
         return false
 
+    # 任一所属套装匹配即为目标套装
     for set_item in weapon.sets:
         if set_item != null and set_item.my_id_hash == set_hash:
             return true
@@ -218,7 +223,7 @@ func fengliu_roll_set_weapon_in_shop(shop_items: Array, locked_count: int, wave:
 
     var set_hash =  effects[0][0]
     for index in range(shop_items.size()):
-        # 玩家手动锁定的商品保持原样
+        # 玩家手动锁定的道具保持原样
         if index < locked_count:
             continue
 
@@ -241,7 +246,7 @@ func fengliu_roll_set_weapon_in_shop(shop_items: Array, locked_count: int, wave:
         args.increase_tier = increase_tier
 
         var new_weapon = fengliu_get_rand_set_weapon(set_hash, wave, player_index, args)
-        # 无候选则保留原商品，避免出现空格子
+        # 无候选则保留原道具，避免出现空格子
         if new_weapon == null:
             continue
 
@@ -251,6 +256,7 @@ func fengliu_roll_set_weapon_in_shop(shop_items: Array, locked_count: int, wave:
     return replaced
 
 
+# 扩展随机道具：命中需要重随预报的效果时返回副本
 func _get_rand_item_for_wave(wave: int, player_index: int, type: int, args: GetRandItemForWaveArgs) -> ItemParentData:
     var item = ._get_rand_item_for_wave(wave, player_index, type, args)
     if item == null:
@@ -360,6 +366,7 @@ func fengliu_get_upgrade_data_id_hash_by_stat(stat_hash: int) -> int:
 # 获取固定升级项数组
 func fengliu_get_fixed_upgrade(level: int, effect, player_index: int) -> Array:
     var all_fixed_upgrade = []
+    # 逐个取出固定升级项的数据
     for upgrade_id_hash in effect.all_fixed_upgrade_id_hashs:
         all_fixed_upgrade.append(fengliu_get_fixed_upgrade_data(level, player_index, upgrade_id_hash))
 
@@ -419,6 +426,7 @@ func get_upgrades(level: int, number: int, old_upgrades: Array, player_index: in
 # 扩展道具效果修正：商店/掉落随机生成"被诅咒"的道具或武器后，
 # 若为水壶则立即还原其收获产树效果，避免被诅咒改成"另一个效果"并放大 value
 func apply_item_effect_modifications(item: ItemParentData, player_index: int) -> ItemParentData:
+    # 先走原版的道具效果修正
     var new_item = .apply_item_effect_modifications(item, player_index)
     RunData.fengliu_normalize_cursed_effect(new_item)
     return new_item

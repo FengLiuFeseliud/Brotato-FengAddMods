@@ -34,8 +34,10 @@ func _generate_hashes() -> void:
 
 
 func apply(player_index: int) -> void:
+	# 纯增益：key 以 gain_ 开头时损失不扣减、只累加
 	if "gain_" in key:
 		gain_stat = true
+	# 登记转换参数，供波次结算读取
 	RunData.get_player_effect(custom_key_hash, player_index).push_back([key_hash, value, change_stat_hash, stat_scaled, wave_max_value, gain_stat])
 	
 	

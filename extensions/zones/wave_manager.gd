@@ -68,11 +68,14 @@ func fengliu_apply_wave_swap_enemies() -> void:
             current_wave_data.groups_data[group_index] = new_group
 
 
+# 波次内额外生成指定敌人（组数可随属性成长）
 func fengliu_extra_aliens(player_index: int, effect: Array) -> void:
     var extra_alien_groups = effect[2]
+    # 额外组数随属性提升
     if effect[0] != Keys.empty_hash:
         extra_alien_groups += int(Utils.get_stat(effect[0], player_index) * (effect[3] / 100.0))
 
+    # 复制敌人组并按随机时机插入当前波次
     for i in extra_alien_groups:
         var new_group = effect[1].duplicate()
         new_group.spawn_timing = rand_range(5, wave_timer.time_left - 10)

@@ -18,6 +18,7 @@ func apply(player_index: int) -> void:
         count = 0
 
     count += value
+    # 写回累计后的次数，供商店代偿购买读取
     RunData.get_player_effects(player_index)[custom_key_hash] = count
 
 

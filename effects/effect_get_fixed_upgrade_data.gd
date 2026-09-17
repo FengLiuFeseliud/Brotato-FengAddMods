@@ -46,6 +46,7 @@ func fengliu_roll_effect(player_index: int):
 
 
 func apply(player_index: int) -> void:
+	# 首次生效时先抽好固定升级项
 	if all_fixed_upgrade_id_hashs.size() == 0:
 		fengliu_roll_effect(player_index)
 
@@ -59,10 +60,14 @@ func unapply(player_index: int) -> void:
 # 返回数组按顺序填充描述文本 {0}~{3} 占位符：
 #   [0]~[3] = 四个固定升级项名称（绿色）
 func get_args(_player_index: int) -> Array:
+    # 尚未抽取时用问号占位
+
     if all_fixed_upgrade_id_hashs.size() == 0:
         return ["[color=lime]%s[/color]" % "?", "[color=lime]%s[/color]" % "?", "[color=lime]%s[/color]" % "?",  "[color=lime]%s[/color]" % "?"]
     
     var args = []
+    # 每项按哈希反查升级项名称，转大写翻译后上色
+
     for upgrade_id_hashs in all_fixed_upgrade_id_hashs:
         args.append("[color=lime]%s[/color]" % tr(Keys.hash_to_string[upgrade_id_hashs].to_upper()))
 

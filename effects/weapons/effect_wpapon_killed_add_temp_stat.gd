@@ -24,6 +24,7 @@ var gain_stat_hash = 0 # 概率倍率属性哈希
 
 func _generate_hashes() -> void:
 	._generate_hashes()
+	# 预生成概率倍率属性哈希
 	gain_stat_hash = Keys.generate_hash(gain_stat)
 
 

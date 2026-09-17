@@ -39,7 +39,7 @@ WEAPON_GHOST_STONE_SPEAR,Ghost Stone Spear,幽魂石矛
 WEAPON_BROOM,Broom,扫帚
 WEAPON_CLASS_HOMEWARE,Homeware,家居
 ITEM_MAGNET,Magnet,磁铁
-ITEM_IN_LIEN,in_lien,代偿
+ITEM_IN_LIEN,In Lieu,代偿
 WEAPON_VAMPIRES_KISS,Vampire's Kiss,吸血鬼之吻
 WEAPON_CLASS_MAGIC,Magic,魔法
 WEAPON_KETTLE,Kettle,水壶
@@ -49,14 +49,14 @@ CLEANER,Cleaner,清洁工
 WEAPON_PLUNGER,Plunger,马桶搋子
 EFFECT_TWO_HAND_WEAPON_SLOT_LIMIT,Only has two hands (so can only hold two weapons),只有两只手所以只拿两个武器
 ITEM_RAT_KING_RATZILLA,Rat Subject,鼠族臣民
-EFFECT_RATZILLA_KILLER_BOSS_TEXT,Ratzilla targets and attacks bosses,鼠斯拉会锁定并攻击 boss
+EFFECT_RATZILLA_KILLER_BOSS_TEXT,Ratzilla targets and attacks Bosses,鼠斯拉会锁定并攻击 boss
 EFFECT_RATZILLA_BOX_TEXT,Ratzilla stays closer to its target,鼠斯拉会更加贴近目标
 WEAPON_CLASS_DICE,Dice,骰子
 SIX_SIDED_GUN,Six Sided Gun,六面枪
 EFFECT_RANDOM_PROJECTILES_TEXT,Every 10th shot fires 1-6 projectiles of 6 random bullet types (Projectile traits scale with weapon tier),每射击10次随机1至6弹丸数并且弹丸从6种子弹类型中随机（子弹特性会随武器提升）
 EFFECT_RANDOM_COOLDOWN_DAMAGE_TEXT,More projectiles increase shooting cooldown and reduce damage (Damage / Projectiles),弹丸数越多射击伤害冷却越慢，越多伤害越低（伤害/弹丸数）
 EFFECT_GIN_RANDOM_KILLED_STAT,Gain {3} to {4} {1} for every {2} enemies killed with this weapon during a wave,使用该武器在敌袭中每击杀{2}名敌人便会{3}至{4}{1}
-EFFECT_ADD_CHANCE_DEAL_DMG_WHEN_PICKUP_GOLD,{0} ({1}) chance to deal {2} ({3}) damage to a random enemy when picking up a material,拾取材料时有{0}（{1}）概率对随机1名敌人造成{2}（{3}）伤害
+EFFECT_ADD_CHANCE_DEAL_DMG_WHEN_PICKUP_GOLD,{0} ({1}) chance to deal {2} ({3}) damage to a random enemy when picking up a Material,拾取材料时有{0}（{1}）概率对随机1名敌人造成{2}（{3}）伤害
 EFFECT_ADD_CHANCE_DEAL_DMG_WHEN_DEATH,{0} ({1}) chance to deal {2} ({3}) damage to a random enemy when an enemy dies,敌人死亡时有{0}（{1}）概率对随机1名敌人造成{2}（{3}）伤害
 LEVELS,levels,等级
 EFFECT_ADD_STAT_CAP,Every {1} {0} you gain increases the {2} cap by {3} (currently {5}),每获得{1}{0}，{2}上限提高{3}（当前已提高{5}）
@@ -66,23 +66,23 @@ EFFECT_RANDOM_STAT_ON_LEVEL_UP,{0} to {1} {2} on level up,升级时有{0}至{1}{
 EFFECT_ADD_STAT_AFTER_REMOVE_CHANGE,{3} {2} permanently for every {1} {0} lost [{5}],每损失{1}{0}时永久增加{3}{2}[{5}]
 EFFECT_ADD_GAIN_STAT_AFTER_REMOVE_CHANGE,"For every {1} {0} lost, permanently gain {3} {2} [{5}]",每损失{1}点{0}，永久增加{3}点{2} [{5}]
 EFFECT_ADD_GAIN_STAT_AFTER_REMOVE_CHANGE_WAVE_MAX,"For every {1} {0} lost, permanently gain {3} {2} (Max {4} per wave) [{5}]",每损失{1}点{0}，永久增加{3}点{2}（每波上限{4}）[{5}]
-EFFECT_ADD_GAIN_STAT_AFTER_REMOVE_CHANGE_WAVE_MAX_GAIN,"For every {1} {0} lost, permanently gain {3} {2} (Max {4} per wave) [{5}]",每损失{1}点{0}，永久增加{3}点{2}修改（每波上限{4}）[{5}]
-EFFECT_RANDOM_SHOP_ITEM_COUNT_PRICE,"Removes {1} to {2} items in the shop upon entering. Each removed item makes the remaining items cost {3}, and the lockable item cap is {4}","商店道具数随机减少{1}至{2}每减少一个道具剩余的道具{3}道具价格，但是可锁定道具上限为{4}"
-EFFECT_GOLD_LOW_SET_STAT_SHOP,"When lacking materials, use {1} substitute materials to purchase items ({1} replaces {0} materials)",材料不足时使用{1}替代材料购买道具（{1}替代{0}材料）
+EFFECT_ADD_GAIN_STAT_AFTER_REMOVE_CHANGE_WAVE_MAX_GAIN,"For every {1} {0} lost, permanently gain {3} {2} (Max {4} per wave) [{5}]",每损失{1}点{0}，永久增加{3}点{2}（每波上限{4}）[{5}]
+EFFECT_RANDOM_SHOP_ITEM_COUNT_PRICE,"Removes {1} to {2} items in the shop upon entering. Each removed item makes the remaining items cost {3}, and the lockable item cap is {4}","进入商店时随机减少{1}至{2}个道具；每减少一个道具，剩余道具价格变化{3}；可锁定道具上限为{4}"
+EFFECT_GOLD_LOW_SET_STAT_SHOP,"When lacking Materials, use {1} substitute Materials to purchase items ({1} replaces {0} Materials)",材料不足时使用{1}替代材料购买道具（{1}替代{0}材料）
 EFFECT_THE_DESPISED_NO_SHOP,"Everyone hates you, so the shop will be empty",你被所有人厌恶商店不会有任何物品
 EFFECT_CAN_ALL_DROP_BOX,"All fruit drop as Crates, with a {0} ({1}) chance to drop as Red Crates",所有果子全部掉落为箱子有{0}（{1}）概率掉落为红箱子
-EFFECT_WAVE_END_COST_GOLD_GET_STAT_OR_WEAPON,"Picking up a Crate costs {0} Materials (only heals if lacking Materials). Material cost scales with waves. When weapons can no longer be upgraded, acquiring weapons grants {1} random stat instead",每次捡起箱子需花费{0}材料获取箱子（材料不足时只回复）并且获取武器全部无法提升后随机获取{1}属性，花费材料随波次膨胀
+EFFECT_WAVE_END_COST_GOLD_GET_STAT_OR_WEAPON,"Picking up a Crate costs {0} Materials (only heals if lacking Materials). Material cost scales with waves. When weapons can no longer be upgraded, acquiring weapons grants {1} random stat instead",捡起箱子需花费{0}材料（材料不足时只回复生命）；材料花费随波次膨胀；武器全部无法提升后获取武器改为随机获得{1}属性
 EFFECT_WAVE_END_NOT_PICK_CONSUMABLE,Consumables are not automatically picked up at the end of a wave,波次结束时不会自动捡起消耗品
-EFFECT_CONSUMABLE_STAT,"Picking up a consumable permanently grants {1} {2}",捡起一个消耗品时永久{1}{2}
-EFFECT_CHANCE_CONSUMABLE_STAT,"Picking up a consumable has a {0} chance to permanently gain {1} {2}",捡起消耗品时有{0}概率永久{1}{2}
+EFFECT_CONSUMABLE_STAT,"Picking up a Consumable permanently grants {1} {2}",捡起一个消耗品时永久{1}{2}
+EFFECT_CHANCE_CONSUMABLE_STAT,"Picking up a Consumable has a {0} chance to permanently gain {1} {2}",捡起消耗品时有{0}概率永久{1}{2}
 EFFECT_RICE,Fruit Pilaf,水果焖饭
-EFFECT_PICKE_CONSUMABLE_DROP_STRUCTURE_GAIN,"When picking up a consumable, spawns {0} (+{2}) {3} dealing {4} ({5}) damage in an area",当捡起消耗品时产生{0}（{2}）个{3}，对一块区域造成{4}（{5}）伤害
-EFFECT_STAT_STOP,"Buy items with {1} instead of materials ({1} replaces {0} materials)",使用{1}替代材料购买道具（{1}替代{0}材料）
-EFFECT_STAT_HIT_PROTECTION,"+1 hit protection for every {0} {1} [{2}]",每持有{0}点{1}获取一次抵消伤害的机会[{2}]
+EFFECT_PICKE_CONSUMABLE_DROP_STRUCTURE_GAIN,"When picking up a Consumable, spawns {0} (+{2}) {3} dealing {4} ({5}) damage in an area",当捡起消耗品时产生{0}（{2}）个{3}，对一块区域造成{4}（{5}）伤害
+EFFECT_STAT_STOP,"Buy items with {1} instead of Materials ({1} replaces {0} Materials)",使用{1}替代材料购买道具（{1}替代{0}材料）
+EFFECT_STAT_HIT_PROTECTION,"+1 Hit Protection for every {0} {1} [{2}]",每持有{0}点{1}获取一次抵消伤害的机会[{2}]
 EFFECT_REGEN_HIT_PROTECTION,"{0} ({2}) chance to recover 1 Hit Protection every {1} seconds",每{1}秒有{0}（{2}）概率回复一次抵消伤害的机会
 EFFECT_TEMP_ON_HIT_PROTECTION,"{0} {1} when negating damage until the end of the wave","抵消伤害一次伤害时{0}{1}，直至敌袭结束"
 EFFECT_APPLY_ITEM_REVERSAL,"When picking up an item, removes {1}. Effects are inverted",获取道具时将扣除{1}的效果改为增加{1}
-EFFECT_STATS_BUY_ITEM,"When purchasing substitute materials, gain {0}{1}",替代材料购买时增加{0}{1}
+EFFECT_STATS_BUY_ITEM,"When purchasing substitute Materials, gain {0}{1}",替代材料购买时增加{0}{1}
 EFFECT_TURRET_PRIORITY_ATTACK_HIGHEST_HP,"Structures prioritize attacking the target with the highest health within range",构筑物优先攻击范围内生命值最高的目标
 EFFECT_STRUCTURE_ADD_RANGE,"Structure attack range is modified by {1}",构筑物攻击范围将受到{1}加成
 EFFECT_TURRET_COPY,"Structures have a {0} ({2}) chance to copy themselves upon killing a target",构筑物击杀锁定目标后有{0}（{2}）概率复制自身
@@ -109,7 +109,7 @@ ITEM_EMERALD,Emerald,绿宝石
 EFFECT_EMERALD_CAN_USE,"If you find a villager, seems to be usable for trading?",找到村民的话，好像可以用来换点什么？
 EFFECT_ITEM_MERGE,"{0} of this item and {2} {1} might be used for something?",{0}个此道具跟{2}个{1}可能可以用点什么东西？
 EFFECT_ITEM_MERGE_ONE_FROM,"{0} of this item might be used to craft something?",{0}个此道具可能可以做点什么东西？
-EFFECT_APPLY_ITEM_ALL_SATAS_REVERSAL,"When acquiring an item, all effects that decrease primary stats increase them instead",获取道具时将所有扣除主要属性的效果改为增加主要属性
+EFFECT_APPLY_ITEM_ALL_SATAS_REVERSAL,"When acquiring an item, all effects that decrease Primary stats increase them instead",获取道具时将所有扣除主要属性的效果改为增加主要属性
 EFFECT_APPLY_NOT_LOSE_HP,"When acquiring an item, ignore effects that cause HP loss per second",获取道具时无视每秒扣血效果
 EFFECT_APPLY_ITEM_REVERSAL_HP_START_WAVE,"When acquiring an item, effects that reduce HP at the start of a wave increase it instead",获取道具时将从波次开始减少血量的效果改为从波次开始增加血量
 EFFECT_APPLY_ITEM_NOT_NO_HEAL,"When acquiring an item, ignore effects that disable healing",获取道具时无视无法治疗效果
@@ -128,14 +128,14 @@ EFFECT_AUTO_OPEN_BOX,"You automatically collect items from Crates",你将自动�
 AUTO_OPEN_BOX,Crates Acquired: {0},自动获取到的箱子：{0}
 EFFECT_CHANCE_APPLY_ITEM_NOT_ADD_ALL_DEBUFF_FROM_BOX,"When acquiring an item from a Crate, {0} chance to ignore all negative effects",从箱子获取道具时有{0}概率无视道具所有负面效果
 EFFECT_PICKED_UP_CONSUMABLE_ADD_SIZE,"When you pick up a Consumable, your character and weapons increase in size by {0} until the end of the wave",当捡起消耗品时你的角色与武器将放大{0}，直至敌袭结束
-EFFECT_BOX_STAT,"{0}{1} when picking up a crate",捡起一个箱子时永久{0}{1}
+EFFECT_BOX_STAT,"{0}{1} when picking up a Crate",捡起一个箱子时永久{0}{1}
 EFFECT_APPLY_ITEM_NOT_ALL_DEBUFF,"You ignore all negative effects on items (except Shackles)",你无视道具的所有负面效果（除了脚铐）
 EFFECT_APPLY_ITEM_ALL_SECONDERY_SATAS_REVERSAL,"When acquiring an item, all effects that decrease secondary stats increase them instead (secondary stats on the stat panel and all enemy-related stats)",获取道具时将所有负面次要属性效果改为正面次要属性效果（面板上的次要属性与所有敌人相关属性）
-EFFECT_ADD_STAT_FRON_WAVE_INTENSITY,"Gain {1} {0} when clearing a recent high-quality wave, and {2} {0} when clearing a Horde or Elite wave. Cap: {3} (High-quality wave = twice the total HP per second of the previous three waves)",你通过近期高质量波次时加{1}{0}，通过敌众或精英波次时加{2}{0}，上限：{3}（高质量波次依据为前三波波次总血量/秒数的[color=lime]2[/color]倍）
+EFFECT_ADD_STAT_FRON_WAVE_INTENSITY,"Gain {1} {0} when clearing a recent high-quality wave, and {2} {0} when clearing a Horde or Elite wave. Cap: {3} (High-quality wave = [color=lime]2[/color]x the total HP per second of the previous three waves)",你通过近期高质量波次时加{1}{0}，通过敌众或精英波次时加{2}{0}，上限：{3}（高质量波次依据为前三波波次总血量/秒数的[color=lime]2[/color]倍）
 EFFECT_WAVE_INTENSITY_DAMAGE,Your attacks deal additional damage equal to {0} of the wave's total HP per second,你的攻击附加波次每秒总血量的{0}伤害
 EFFECT_ADAPTOR_SMG_0,"During high-quality, Horde or Elite waves, projectiles [color=lime]+2[/color]",高质量波次与敌众或精英波次时，投掷物[color=lime]+2[/color]
 EFFECT_NO_KILL_ENEMY,Your {0} attacks cannot kill enemies,你的{0}攻击不会致死
-EFFECT_CHARM_ENEMY,Your {1} attacks have a {0} chance to charm enemies on hit; enemies are always charmed at 1 HP (bosses are charmed when below {2} HP),你的{1}击中时有{0}概率魅惑敌人，敌人生命值为1时必定魅惑（Boss 生命值低于{2}时将会魅惑）
+EFFECT_CHARM_ENEMY,Your {1} attacks have a {0} chance to charm enemies on hit; enemies are always charmed at 1 HP (Bosses are charmed when below {2} HP),你的{1}击中时有{0}概率魅惑敌人，敌人生命值为1时必定魅惑（Boss 生命值低于{2}时将会魅惑）
 EFFECT_SWAP_ENEMIE,"Next wave, {0} will spawn as {1} instead",下一波敌袭时将要生成的{0}改为生成{1}
 EFFECT_ITEM_WAVE_END_TEXT,Can be purchased again after it expires,失效后可以重新购买
 EFFECT_GUARANTEED_SHOP_ITEMS,Shop guarantees {0} (up to its max count),商店必定出现{0}（不超过其数量上限）
@@ -147,17 +147,18 @@ EFFECT_GET_FIXED_UPGRADE,"Next wave's upgrade options are fixed to {0}, {1}, {2}
 EFFECT_FIXED_UPGRADE_END_TEXT,This forecast is outdated,这个定向训练已经过时了
 EFFECT_UP_UPGRADE_DATA_TIER,Next wave's upgrade options are {1} tier higher,下一波敌袭的所有升级属性{1}品阶
 EFFECT_UP_UPGRADE_DATA_TIER_END_TEXT,This Clown Fish worked hard all day and is now resting,这条小丑鱼辛苦工作了一天，正在休息
-EFFECT_GET_HIGHEST_STAT_FIXED_UPGRADE,Directed Training always includes an upgrade option for your current highest primary stat,定向训练必包含当前最高主要属性的升级项
+EFFECT_GET_HIGHEST_STAT_FIXED_UPGRADE,Directed Training always includes an upgrade option for your current highest Primary stat,定向训练必包含当前最高主要属性的升级项
 EFFECT_STAT_GAIN_UP_UPGRADE_DATA_TIER,Next wave's upgrade options have a {0} ({2}) chance to be {1} tier higher,下一波敌袭的所有升级属性有{0}（{2}）概率{1}品阶
 EFFECT_WEAPON_KILLED_HEALTH,"Killing an enemy has a {0} ({1}) chance to heal all players for {2} ({3}) HP",击杀敌人时有{0}（{1}）概率治疗所有玩家{2}（{3}）点血量
 EFFECT_WEAPON_KILLED_ADD_TEMP_STAT,"Killing an enemy has a {0} ({1}) chance to gain {2} {3} until the end of the wave",击杀敌人时有{0}（{1}）概率增加{2}{3}，直至敌袭结束
 EFFECT_WEAPONS_NO_RECOIL,This weapon has no recovery time,此武器没有收回时间
 EFFECT_WEAPON_HIT_SLOW,"On hit, slow enemies by {0} ({1})",击中时对敌人减速{0}（{1}）
-EFFECT_CHANCE_GOLD_STATS,"Picking up a material has a {0} chance to permanently gain {1} {2}",捡起材料时有{0}概率永久{1}{2}
-EFFECT_TEMPORARY_STATS_STOP,The next {0} purchases will use your highest primary stat instead of materials (stackable) [{1}],后续的{0}次购买将使用你的最大主要属性代替材料（可叠加） [{1}]
-EFFECT_TEMPORARY_STATS_STOP_TEXT,"Primary stats substitute [color=lime]60[/color] materials by default; the lower the value, the fewer materials substituted",主要属性基础代替[color=lime]60[/color]材料，属性价值越低代替越少材料
+EFFECT_CHANCE_GOLD_STATS,"Picking up a Material has a {0} chance to permanently gain {1} {2}",捡起材料时有{0}概率永久{1}{2}
+EFFECT_TEMPORARY_STATS_STOP,The next {0} purchases will use your highest Primary stat instead of Materials (stackable) [{1}],后续的{0}次购买将使用你的最大主要属性代替材料（可叠加） [{1}]
+EFFECT_TEMPORARY_STATS_STOP_TEXT,"Primary stats substitute [color=lime]60[/color] Materials by default; the lower the value, the fewer Materials substituted",主要属性基础代替[color=lime]60[/color]材料，属性价值越低代替越少材料
 EFFECT_TRACKING_PROJECTILE_TEXT,This weapon's projectiles track enemies,此武器投掷物会进行追踪
 EFFECT_STRONG_SUN_RANDOM_RAYS,This weapon fires rays in random directions,此武器向四周随机发射射线
-EFFECT_CAN_RAND_SET_WEAPON,,你只能装备{0}武器
-EFFECT_STATS_EXTRA_ALIENS,,每次敌袭会多出现{0}（{1}）个{2}
-EFFECT_STRONGER_ALIENS_ON_ALIENS,,敌袭內的{0}增加{1}（{2}）血量
+EFFECT_CAN_RAND_SET_WEAPON,You can only equip {0} weapons,你只能装备{0}武器
+EFFECT_STATS_EXTRA_ALIENS,Each wave spawns {0} ({1}) extra {2},每次敌袭会多出现{0}（{1}）个{2}
+EFFECT_STRONGER_ALIENS_ON_ALIENS,{0} in waves gain {1} ({2}) HP,敌袭内的{0}增加{1}（{2}）血量
+EFFECT_RANDOM_DAMAGE_TEXT,Damage is randomized by the fired bullet type,伤害随发射的子弹类型随机

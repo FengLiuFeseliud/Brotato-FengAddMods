@@ -120,6 +120,7 @@ func fengliu_weapon_hit_slow(thing_hit: Node, effect) -> void:
 func on_weapon_hit_something(thing_hit: Node, damage_dealt: int, hitbox: Hitbox) -> void :
 	.on_weapon_hit_something(thing_hit, damage_dealt, hitbox)
 	
+	# 找出本武器的命中减速效果并施加
 	for effect in effects:
 		if effect.custom_key_hash == effect_fengliu_weapon_hit_slow:
 			fengliu_weapon_hit_slow(thing_hit, effect)
