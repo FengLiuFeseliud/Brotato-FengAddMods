@@ -11,5 +11,5 @@ custom_key = "fengliu_stronger_aliens_on_stats"
 storage_method = 1
 effect_sign = 0
 custom_args = [ ]
-gain_value = 100
+gain_value = 50
 enemy_id = "evil_mob"

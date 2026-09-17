@@ -12,6 +12,7 @@
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/melee/broom/1/broom_1_data.tres" type="Resource" id=11]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/melee/mop/1/mop_1_data.tres" type="Resource" id=12]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/ranged/kettle/1/kettle_1_data.tres" type="Resource" id=13]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/ranged/plunger/1/plunger_1_data.tres" type="Resource" id=14]
 
 [resource]
 script = ExtResource(3)
@@ -35,5 +36,5 @@ wanted_tags = [ ]
 banned_item_groups = [ "pickup" ]
 banned_items = [ "item_baby_gecko", "item_sifds_relic", "item_alien_tongue" ]
 banned_upgrades = [  ]
-starting_weapons = [ ExtResource(11), ExtResource(12), ExtResource(13) ]
+starting_weapons = [ ExtResource(11), ExtResource(12), ExtResource(13), ExtResource(14) ]
 starting_items = [  ]

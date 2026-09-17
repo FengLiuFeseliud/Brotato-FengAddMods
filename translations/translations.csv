@@ -46,6 +46,7 @@ WEAPON_KETTLE,Kettle,水壶
 WEAPON_MOP,Mop,拖把
 WEAPON_STRONG_SUN,Strong Sun,烈阳
 CLEANER,Cleaner,清洁工
+WEAPON_PLUNGER,Plunger,马桶搋子
 EFFECT_TWO_HAND_WEAPON_SLOT_LIMIT,Only has two hands (so can only hold two weapons),只有两只手所以只拿两个武器
 ITEM_RAT_KING_RATZILLA,Rat Subject,鼠族臣民
 EFFECT_RATZILLA_KILLER_BOSS_TEXT,Ratzilla targets and attacks bosses,鼠斯拉会锁定并攻击 boss
