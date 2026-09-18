@@ -361,12 +361,15 @@ func fengliu_get_highest_stat_hash(player_index: int) -> int:
 	return highest_stat
 
 
+# 从玩家当前武器所属套装中随机取一个（无武器或无套装时返回 null）
 func fengliu_get_player_random_weapon_set(player_index: int) -> SetData:
+	# 汇总当前武器上出现过的所有套装（套装 ID 作键去重）
 	var sets = {}
 	for weapon in get_player_weapons(player_index):
 		for set in weapon.sets:
 			sets[set] = 0
 	
+	# 玩家没有武器或武器不属于任何套装时返回 null
 	if sets.empty():
 		return null
 		

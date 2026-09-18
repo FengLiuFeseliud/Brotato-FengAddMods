@@ -48,6 +48,7 @@ WEAPON_STRONG_SUN,Strong Sun,烈阳
 CLEANER,Cleaner,清洁工
 WEAPON_PLUNGER,Plunger,马桶搋子
 ITEM_CABLE_TIE,Cable Tie,扎带
+ITEM_ROBOT_VACUUM,Robot Vacuum,扫地机器人
 EFFECT_TWO_HAND_WEAPON_SLOT_LIMIT,Only has two hands (so can only hold two weapons),只有两只手所以只拿两个武器
 ITEM_RAT_KING_RATZILLA,Rat Subject,鼠族臣民
 EFFECT_RATZILLA_KILLER_BOSS_TEXT,Ratzilla targets and attacks Bosses,鼠斯拉会锁定并攻击 boss
@@ -59,7 +60,7 @@ EFFECT_RANDOM_COOLDOWN_DAMAGE_TEXT,More projectiles increase shooting cooldown a
 EFFECT_GIN_RANDOM_KILLED_STAT,Gain {3} to {4} {1} for every {2} enemies killed with this weapon during a wave,使用该武器在敌袭中每击杀{2}名敌人便会{3}至{4}{1}
 EFFECT_ADD_CHANCE_DEAL_DMG_WHEN_PICKUP_GOLD,{0} ({1}) chance to deal {2} ({3}) damage to a random enemy when picking up a Material,拾取材料时有{0}（{1}）概率对随机1名敌人造成{2}（{3}）伤害
 EFFECT_ADD_CHANCE_DEAL_DMG_WHEN_DEATH,{0} ({1}) chance to deal {2} ({3}) damage to a random enemy when an enemy dies,敌人死亡时有{0}（{1}）概率对随机1名敌人造成{2}（{3}）伤害
-LEVELS,levels,等级
+LEVELS,Levels,等级
 EFFECT_ADD_STAT_CAP,Every {1} {0} you gain increases the {2} cap by {3} (currently {5}),每获得{1}{0}，{2}上限提高{3}（当前已提高{5}）
 EFFECT_RANDOM_STAT_ON_LEVEL_UP_NO_ZERO,{0} to {1} {2} on level up (excluding 0),升级时有{0}至{1}{2}（不包含0）
 EFFECT_RANDOM_STAT_ON_LEVEL_UP_FROM_GAIN_NO_ZERO,"On level up, gain {0} to {1} {2} (excluding 0). For every {4} {3} you have, the amount increases up to [{5}]",升级时获得{0}至{1}点{2}（不包含0），每拥有{4}点{3}提高获得量 [{5}]
@@ -82,7 +83,7 @@ EFFECT_STAT_STOP,"Buy items with {1} instead of Materials ({1} replaces {0} Mate
 EFFECT_STAT_HIT_PROTECTION,"+1 Hit Protection for every {0} {1} [{2}]",每持有{0}点{1}获取一次抵消伤害的机会[{2}]
 EFFECT_REGEN_HIT_PROTECTION,"{0} ({2}) chance to recover 1 Hit Protection every {1} seconds",每{1}秒有{0}（{2}）概率回复一次抵消伤害的机会
 EFFECT_TEMP_ON_HIT_PROTECTION,"{0} {1} when negating damage until the end of the wave","抵消伤害一次伤害时{0}{1}，直至敌袭结束"
-EFFECT_APPLY_ITEM_REVERSAL,"When picking up an item, removes {1}. Effects are inverted",获取道具时将扣除{1}的效果改为增加{1}
+EFFECT_APPLY_ITEM_REVERSAL,"When picking up an item, effects that reduce {1} increase {1} instead",获取道具时将扣除{1}的效果改为增加{1}
 EFFECT_STATS_BUY_ITEM,"When purchasing substitute Materials, gain {0}{1}",替代材料购买时增加{0}{1}
 EFFECT_TURRET_PRIORITY_ATTACK_HIGHEST_HP,"Structures prioritize attacking the target with the highest health within range",构筑物优先攻击范围内生命值最高的目标
 EFFECT_STRUCTURE_ADD_RANGE,"Structure attack range is modified by {1}",构筑物攻击范围将受到{1}加成
@@ -163,6 +164,5 @@ EFFECT_CAN_RAND_SET_WEAPON,You can only equip {0} weapons,你只能装备{0}武�
 EFFECT_STATS_EXTRA_ALIENS,Each wave spawns {0} ({1}) extra {2},每次敌袭会多出现{0}（{1}）个{2}
 EFFECT_STRONGER_ALIENS_ON_ALIENS,{0} in waves gain {1} ({2}) HP,敌袭内的{0}增加{1}（{2}）血量
 EFFECT_RANDOM_DAMAGE_TEXT,Damage is randomized by the fired bullet type,伤害随发射的子弹类型随机
-EFFECT_RANDOM_CAN_RAND_SET_WEAPON,,商店将只能出现{0}武器
-ITEM_ROBOT_VACUUM,Robot Vacuum,扫地机器人
-EFFECT_PET_ROBOT_VACUUM,A Robot Vacuum pet that collects Materials and Consumables for you and deals {0} ({1}) damage to enemies it touches,生成一个扫地机器人宠物，会自动捡取材料与消耗品，捡取消耗品时额外获取[color=lime]3[/color]材料，碰到它的敌人会受到{0}（{1}）伤害
+EFFECT_RANDOM_CAN_RAND_SET_WEAPON,The shop will only offer {0} weapons,商店将只能出现{0}武器
+EFFECT_PET_ROBOT_VACUUM,"A Robot Vacuum pet that collects Materials and Consumables for you, grants [color=lime]3[/color] extra Materials when picking up a Consumable, and deals {0} ({1}) damage to enemies it touches",生成一个扫地机器人宠物，会自动捡取材料与消耗品，捡取消耗品时额外获取[color=lime]3[/color]材料，碰到它的敌人会受到{0}（{1}）伤害

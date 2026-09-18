@@ -124,6 +124,7 @@ func _fengliu_check_consumable_chase(delta: float) -> void :
 
 # 清空追物计时，换目标或不再追消耗品时调用
 func _fengliu_reset_chase_progress() -> void :
+	# 换目标或放弃时清空计时与最佳距离，避免新目标继承旧进度
 	_fengliu_chase_target = null
 	_fengliu_chase_time = 0.0
 	_fengliu_chase_distance = 0.0

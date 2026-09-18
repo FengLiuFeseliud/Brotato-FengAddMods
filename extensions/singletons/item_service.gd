@@ -57,10 +57,12 @@ func _fengliu_register_effect_prototypes() -> void:
 
 # 是否登记为原型：是效果类，且自带唯一 id（基类与仍继承 id 的脚本一律跳过）
 func _fengliu_is_registerable_effect(effect_script) -> bool:
+	# 实例化后确认是效果类（基类也会通过，靠 id 判定再剔除）
 	var effect_instance = effect_script.new()
 	if not (effect_instance is Effect):
 		return false
 
+	# 取基类脚本，与自身 id 不同即视为自带唯一 id
 	var base_script = effect_script.get_base_script()
 	if base_script == null:
 		return false
@@ -72,11 +74,13 @@ func _fengliu_is_registerable_effect(effect_script) -> bool:
 func _fengliu_collect_effect_script_paths(dir_path: String) -> Array:
 	var script_paths := []
 
+	# 打不开目录时记错误并返回空列表
 	var dir := Directory.new()
 	if dir.open(dir_path) != OK:
 		ModLoaderLog.error("Failed to open effects directory: %s" % dir_path, FENGLIU_MOD_ID)
 		return script_paths
 
+	# 递归子目录并排序，保证注册顺序稳定可复现
 	dir.list_dir_begin(true, true)
 	var file_name := dir.get_next()
 	while file_name != "":

@@ -28,6 +28,7 @@ func fengliu_persist_var_names() -> Array:
 # 归一化：JSON 往返会把 int 变浮点，统一转回 int，避免升级项哈希查不到
 func fengliu_on_persist_vars_restored() -> void:
 	var normalized := []
+	# 逐项转回 int，保证升级项哈希查得到
 	for upgrade_id_hash in all_fixed_upgrade_id_hashs:
 		normalized.push_back(int(upgrade_id_hash))
 	all_fixed_upgrade_id_hashs = normalized

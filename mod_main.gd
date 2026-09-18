@@ -180,10 +180,12 @@ func _fengliu_t0_character_has_weapon(character, weapon_my_id: String) -> bool:
 
 # 登记「玩家效果槽里存效果实例」的 custom_key（必须在读档之前调用）
 func _fengliu_register_effect_slot_keys() -> void:
+	# RunData 未就绪时只记错误，避免读档前崩溃
 	if not is_instance_valid(RunData):
 		ModLoaderLog.error("RunData not ready, effect slot keys not registered.", MOD_ID)
 		return
 
+	# 幂等登记：名单里已有同 key 就跳过
 	for slot_key in [
 		Keys.generate_hash("fengliu_swap_enemie"),
 		Keys.generate_hash("fengliu_get_fixed_upgrade"),

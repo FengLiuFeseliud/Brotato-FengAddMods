@@ -24,6 +24,7 @@ func fengliu_roll_effect(player_index: int) -> void:
 
 
 func apply(player_index: int) -> void:
+	# 首次生效时锁定武器类别，未锁定则先抽取
 	if key_hash == Keys.empty_hash:
 		if roll_set == null:
 			return
@@ -31,6 +32,7 @@ func apply(player_index: int) -> void:
 		key = roll_set.my_id
 		key_hash = roll_set.my_id_hash
 
+	# 登记到玩家效果槽，供商店过滤武器使用
 	RunData.get_player_effect(custom_key_hash ,player_index).push_back([key_hash])
 	
 
@@ -39,7 +41,9 @@ func unapply(player_index: int) -> void:
 
 
 func get_args(_player_index: int) -> Array:
+	# 已锁定类别取套装的翻译名（武器类别 key）
 	var key_text = tr(key.to_upper().replace("SET", "WEAPON_CLASS"))
+	# 尚未锁定类别时显示问号
 	if key_hash == Keys.empty_hash:
 		if roll_set == null:
 			return [ "[color=lime]?[/color]" ]
