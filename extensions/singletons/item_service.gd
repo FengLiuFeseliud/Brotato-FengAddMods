@@ -221,7 +221,7 @@ func fengliu_roll_set_weapon_in_shop(shop_items: Array, locked_count: int, wave:
     if effects.size() <= 0:
         return replaced
 
-    var set_hash =  effects[0][0]
+    var set_hash = effects[0][0]
     for index in range(shop_items.size()):
         # 玩家手动锁定的道具保持原样
         if index < locked_count:

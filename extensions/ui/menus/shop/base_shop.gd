@@ -16,9 +16,11 @@ var fengliu_shop_items_count_price = Keys.generate_hash("fengliu_shop_items_coun
 
 var shop_items_price = {}
 
+
 var need_reroll_effect = [
 	effect_fengliu_swap_enemie,
-	effect_fengliu_get_fixed_upgrade
+	effect_fengliu_get_fixed_upgrade,
+	effect_fengliu_can_rand_set_weapon
 ]
 
 

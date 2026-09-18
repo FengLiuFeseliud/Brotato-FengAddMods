@@ -47,6 +47,7 @@ WEAPON_MOP,Mop,拖把
 WEAPON_STRONG_SUN,Strong Sun,烈阳
 CLEANER,Cleaner,清洁工
 WEAPON_PLUNGER,Plunger,马桶搋子
+ITEM_CABLE_TIE,Cable Tie,扎带
 EFFECT_TWO_HAND_WEAPON_SLOT_LIMIT,Only has two hands (so can only hold two weapons),只有两只手所以只拿两个武器
 ITEM_RAT_KING_RATZILLA,Rat Subject,鼠族臣民
 EFFECT_RATZILLA_KILLER_BOSS_TEXT,Ratzilla targets and attacks Bosses,鼠斯拉会锁定并攻击 boss
@@ -162,3 +163,4 @@ EFFECT_CAN_RAND_SET_WEAPON,You can only equip {0} weapons,你只能装备{0}武�
 EFFECT_STATS_EXTRA_ALIENS,Each wave spawns {0} ({1}) extra {2},每次敌袭会多出现{0}（{1}）个{2}
 EFFECT_STRONGER_ALIENS_ON_ALIENS,{0} in waves gain {1} ({2}) HP,敌袭内的{0}增加{1}（{2}）血量
 EFFECT_RANDOM_DAMAGE_TEXT,Damage is randomized by the fired bullet type,伤害随发射的子弹类型随机
+EFFECT_RANDOM_CAN_RAND_SET_WEAPON,,商店将只能出现{0}武器

@@ -360,6 +360,18 @@ func fengliu_get_highest_stat_hash(player_index: int) -> int:
 	return highest_stat
 
 
+func fengliu_get_player_random_weapon_set(player_index: int) -> SetData:
+	var sets = {}
+	for weapon in get_player_weapons(player_index):
+		for set in weapon.sets:
+			sets[set] = 0
+	
+	if sets.empty():
+		return null
+		
+	return Utils.get_rand_element(sets.keys())
+
+
 # 扩展波次开始
 func on_wave_start(timer: WaveTimer) -> void :
 	# 清除波次上限
