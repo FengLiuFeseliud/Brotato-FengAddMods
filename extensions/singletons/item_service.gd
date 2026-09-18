@@ -1,6 +1,10 @@
 extends "res://singletons/item_service.gd"
 
 
+const FENGLIU_MOD_ID = "FengAddMods"
+const FENGLIU_EFFECT_PET_DAMAGE_TEXT_PATH = "res://mods-unpacked/FengLiu-FengAddMods/effects/effect_pet_damage_text.gd"
+
+
 var effect_fengliu_can_all_drop_box = Keys.generate_hash("fengliu_can_all_drop_box")
 var effect_fengliu_guaranteed_shop_items = Keys.generate_hash("fengliu_guaranteed_shop_items")
 var effect_fengliu_get_fixed_upgrade = Keys.generate_hash("fengliu_get_fixed_upgrade")
@@ -18,6 +22,24 @@ var need_reroll_effect = [
 
 # 全部升级项 id 哈希缓存
 var _all_upgrade_ids = {}
+
+
+func _enter_tree() -> void:
+	_fengliu_register_effect_prototypes()
+
+
+# 幂等注册：ResourceLoader 有缓存，同一路径拿到同一对象，has() 去重即可
+func _fengliu_register_effect_prototypes() -> void:
+	var effect_script = load(FENGLIU_EFFECT_PET_DAMAGE_TEXT_PATH)
+	if effect_script == null:
+		ModLoaderLog.error("Failed to load effect script: %s" % FENGLIU_EFFECT_PET_DAMAGE_TEXT_PATH, FENGLIU_MOD_ID)
+		return
+
+	if effects.has(effect_script):
+		return
+
+	effects.push_back(effect_script)
+	ModLoaderLog.info("Registered pet damage text effect: %s" % FENGLIU_EFFECT_PET_DAMAGE_TEXT_PATH, FENGLIU_MOD_ID)
 
 
 # 计算动态概率

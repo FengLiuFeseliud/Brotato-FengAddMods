@@ -89,6 +89,10 @@ func _ready()->void:
 	call_deferred("fengliu_inject_t0_starting_weapons")
 
 
+# 注：宠物伤害说明效果的原型注册已移入 extensions/singletons/item_service.gd 的 _enter_tree()，
+# 因为它必须早于 ContentLoader 触发的那次读档（详见该文件注释）。
+
+
 func fengliu_inject_t0_starting_weapons() -> void:
 	if not is_instance_valid(ItemService) or ItemService.characters.size() == 0 or ItemService.weapons.size() == 0:
 		ModLoaderLog.warning("ItemService.characters/weapons is empty, skip t0 starting weapon injection.", MOD_ID)

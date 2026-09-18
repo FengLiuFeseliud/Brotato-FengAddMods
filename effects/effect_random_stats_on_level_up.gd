@@ -34,10 +34,6 @@ func _generate_hashes() -> void:
 	
 	stat_gain_hash = Keys.generate_hash(stat_gain)
 
-
-static func get_id() -> String:
-	return "effect_random_stats_on_level_up"
-	
 	
 func apply(player_index: int) -> void:
 	RunData.get_player_effect(custom_key_hash ,player_index).push_back([key_hash, stat_min_value, stat_max_value, stat_no_zero, stat_gain_hash, stat_gain_value])

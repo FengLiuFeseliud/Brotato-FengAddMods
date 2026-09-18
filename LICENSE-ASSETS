@@ -13,6 +13,7 @@ APPLIES TO
   - content_data/**/*.pdn                （分层源文件，创作佐证）
   - content_data\weapons\**\*.png
   - content_data/items/**/*.png
+  - content_data/entities/**/*.png       （实体贴图）
   - effects/**                           （除脚本外的素材）
 
 不属于上述范围的其他素材，请见 LICENSE-THIRD-PARTY 与 README.md。
