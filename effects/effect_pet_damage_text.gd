@@ -11,14 +11,13 @@ extends PetEffect
 #   weapon_stats  宠物武器属性（与宠物场景引用同一份 .tres）
 # ============================================================
 
-const FENGLIU_EFFECT_ID := "fengliu_pet_damage_text"
 
 export (Resource) var weapon_stats
 
 
 static func get_id() -> String:
 	# 唯一 id：区别于原版 pet，便于日后按 id 注册为存档还原原型
-	return FENGLIU_EFFECT_ID
+	return "fengliu_pet_damage_text"
 
 
 func get_args(player_index: int) -> Array:

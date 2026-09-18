@@ -1,5 +1,5 @@
 class_name CanAddChanceStatDemageEffect
-extends ChanceStatDamageEffect
+extends ModChanceStatDamageEffect
 
 # ============================================================
 # 效果：概率触发伤害（概率可吃倍率）
@@ -27,15 +27,15 @@ export (bool) var stat_no_zero = false # 随机没有 0
 var add_chance_stat_hash = ""
 
 
+static func get_id() -> String:
+	return "fengliu_can_add_chance_stat_damage"
+
+
 func _generate_hashes() -> void:
 	# 预生成概率倍率属性哈希
 	._generate_hashes()
 	add_chance_stat_hash = Keys.generate_hash(add_chance_stat)
 
-
-static func get_id() -> String:
-	return "effect_can_add_chance_stat_damage"
-	
 
 func apply(player_index: int) -> void:
 	RunData.get_player_effect(custom_key_hash ,player_index).push_back([key_hash, value, chance, tracking_key, add_chance_stat_hash, add_chance, chance])

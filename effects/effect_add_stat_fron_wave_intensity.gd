@@ -1,5 +1,5 @@
 class_name AddStatFromWaveIntensity
-extends Effect
+extends ModEffect
 
 
 # ============================================================
@@ -19,6 +19,10 @@ extends Effect
 
 export (int) var boss_wave_add_value = 0 # 敌众/精英波次增加量
 export (int) var value_cap = 0 # 属性上限
+
+
+static func get_id() -> String:
+	return "fengliu_add_stat_fron_wave_intensity"
 
 
 func apply(player_index: int) -> void:

@@ -1,5 +1,5 @@
 class_name ItemBoughtSpawnBoss
-extends Effect
+extends ModEffect
 
 
 # ============================================================
@@ -14,6 +14,10 @@ extends Effect
 # ============================================================
 
 export (int) var bought_add_chance = 0 # 额外概率倍率（%）：按已持有数量累加
+
+
+static func get_id() -> String:
+	return "fengliu_item_bought_spawn_boss"
 
 
 func get_item_count(player_index: int) -> int:

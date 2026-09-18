@@ -1,5 +1,5 @@
 class_name ApplyItemNotAddEffect
-extends Effect
+extends ModEffect
 
 
 # ============================================================
@@ -20,6 +20,10 @@ export (bool) var reversal = false # 是否反转（false = 直接删除该效�
 export (bool) var all_stats = false # 是否删除所有主属性负面效果
 export (bool) var all_secondary_stats = false # 是否删除所有副属性负面效果
 export (bool) var all_item_debuff = false # 是否删除所有道具负面效果
+
+
+static func get_id() -> String:
+	return "fengliu_apply_item_not_add"
 
 
 func apply(player_index: int) -> void:

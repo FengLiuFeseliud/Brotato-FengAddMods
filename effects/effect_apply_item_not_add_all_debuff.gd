@@ -1,5 +1,5 @@
 class_name ApplyItemNotAddAllDebuff
-extends Effect
+extends ModEffect
 
 
 # ============================================================
@@ -13,6 +13,10 @@ extends Effect
 # ============================================================
 
 export (bool) var from_box = false # true=作用于箱子开出的道具；false=普通拾取
+
+
+static func get_id() -> String:
+	return "fengliu_apply_item_not_add_all_debuff"
 
 
 func apply(player_index: int) -> void:

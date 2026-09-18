@@ -1,5 +1,5 @@
 class_name WaveIntensityDamage
-extends Effect
+extends ModEffect
 
 
 # ============================================================
@@ -11,6 +11,10 @@ extends Effect
 # 效果值：
 #   value  附加伤害百分比（%）= 波次每秒总血量 × value%
 # ============================================================
+
+
+static func get_id() -> String:
+	return "fengliu_wave_intensity_damage"
 
 # 波次强度附加伤害
 

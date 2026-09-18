@@ -1,5 +1,5 @@
 class_name TemporaryStatsStop
-extends NullEffect
+extends ModNullEffect
 
 
 # ============================================================
@@ -10,6 +10,10 @@ extends NullEffect
 # 效果值：
 #   value  新增的代偿购买次数（可叠加）
 # ============================================================
+
+
+static func get_id() -> String:
+	return "fengliu_temporary_stats_stop"
 
 
 func apply(player_index: int) -> void:

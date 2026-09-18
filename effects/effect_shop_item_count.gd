@@ -1,5 +1,5 @@
 class_name ShopItemCountEffect
-extends Effect
+extends ModEffect
 
 # ============================================================
 # 效果：商店道具数效果
@@ -25,6 +25,9 @@ export (bool) var stat_no_zero = false # 随机没有 0
 export (int) var shop_count_price = 0 # 减少一个道具时优惠多少
 export (int) var can_shop_locked = 0 # 保留锁定数
 
+
+static func get_id() -> String:
+	return "fengliu_shop_item_count"
 
 
 func apply(player_index: int) -> void:

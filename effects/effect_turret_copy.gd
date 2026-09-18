@@ -1,5 +1,5 @@
 class_name TurretCopy
-extends Effect
+extends ModEffect
 
 
 # ============================================================
@@ -14,6 +14,10 @@ extends Effect
 # ============================================================
 
 export (int) var gain_value = 0 # 倍率：每 gain_value/100 点 key 属性 +1% 概率
+
+
+static func get_id() -> String:
+	return "fengliu_turret_copy"
 
 
 static func get_dynamic_chance(init_chance: int, add_chance: int = 100, stat_count: int = 0) -> int:

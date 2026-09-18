@@ -1,5 +1,5 @@
 class_name SwapEnemies
-extends Effect
+extends ModEffect
 
 
 # ============================================================
@@ -21,6 +21,14 @@ var wave_enemy_y_id = "" # 替换成敌人 id
 
 
 var effect_fengliu_can_swap_looter_enemies = Keys.generate_hash("fengliu_can_swap_looter_enemies")
+
+
+static func get_id() -> String:
+	return "fengliu_swap_enemie"
+
+
+func fengliu_persist_var_names() -> Array:
+	return ["wave_enemy_x", "wave_enemy_y", "wave_enemy_x_id", "wave_enemy_y_id"]
 
 
 # 随机预报下一波敌人替换

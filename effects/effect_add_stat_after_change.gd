@@ -1,5 +1,5 @@
 class_name AddStatAfterChange
-extends Effect
+extends ModEffect
 
 # ============================================================
 # 效果：损失转换属性
@@ -24,6 +24,10 @@ export (int) var wave_max_value # 波次上限
 var change_stat_hash = ""
 var gain_stat = false
 var stat = ""
+
+
+static func get_id() -> String:
+	return "fengliu_add_stat_after_change"
 
 
 func _generate_hashes() -> void:

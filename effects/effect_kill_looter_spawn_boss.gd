@@ -1,5 +1,5 @@
 class_name KillLooterSpawnBoss
-extends Effect
+extends ModEffect
 
 
 # ============================================================
@@ -10,6 +10,10 @@ extends Effect
 # 效果值：
 #   value  生成 Boss 的概率（%）
 # ============================================================
+
+
+static func get_id() -> String:
+	return "fengliu_kill_looter_spawn_boss"
 
 func apply(player_index: int) -> void:
     RunData.get_player_effect(custom_key_hash, player_index).push_back(value)

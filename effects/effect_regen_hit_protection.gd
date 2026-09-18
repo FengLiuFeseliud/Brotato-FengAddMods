@@ -1,5 +1,5 @@
 class_name RegenHitProtection
-extends Effect
+extends ModEffect
 
 
 # ============================================================
@@ -16,6 +16,10 @@ extends Effect
 
 export (int) var wait_time = 1 # 恢复间隔时间
 export (int) var gain_value = 100 # 倍率：每 gain_value/100 点 key 属性 +1% 概率
+
+
+static func get_id() -> String:
+	return "fengliu_regen_hit_protection"
 
 
 static func get_dynamic_chance(init_chance: int, add_chance: int = 100, stat_count: int = 0) -> int:

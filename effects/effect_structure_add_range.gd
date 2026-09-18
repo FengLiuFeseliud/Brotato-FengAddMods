@@ -1,5 +1,5 @@
 class_name StructureAddRange
-extends Effect
+extends ModEffect
 
 
 # ============================================================
@@ -11,6 +11,10 @@ extends Effect
 #   key    用于增加射程的属性
 #   value  （参与存储，射程 = 基础射程 + 该属性值）
 # ============================================================
+
+
+static func get_id() -> String:
+	return "fengliu_structure_add_range"
 
 func apply(player_index: int) -> void:
 	RunData.get_player_effect(custom_key_hash ,player_index).push_back([key_hash, value])

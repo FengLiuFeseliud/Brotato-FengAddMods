@@ -1,5 +1,5 @@
 class_name CharmEnemy
-extends Effect
+extends ModEffect
 
 
 # ============================================================
@@ -17,6 +17,10 @@ extends Effect
 
 export (bool) var boss_charm = false # 是否允许魅惑 Boss/精英
 export (int) var boss_charm_value = 0 # Boss/精英魅惑生命值阈值（%）
+
+
+static func get_id() -> String:
+	return "fengliu_charm_enemy"
 
 
 func apply(player_index: int) -> void:

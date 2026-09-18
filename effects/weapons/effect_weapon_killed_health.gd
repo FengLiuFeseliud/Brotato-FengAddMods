@@ -1,5 +1,5 @@
 class_name WeaponKilledHealth
-extends NullEffect
+extends ModNullEffect
 
 
 # ============================================================
@@ -22,6 +22,10 @@ export (int) var health_value = 1 # 基础治疗量
 export (String) var health_gain_stat = "" # 治疗量倍率属性
 export (int) var health_gain_value = 0 # 治疗量倍率：治疗量 += 该属性 × health_gain_value/100
 var health_gain_stat_hash # 治疗量倍率属性哈希
+
+
+static func get_id() -> String:
+	return "fengliu_weapon_killed_health"
 
 
 func _generate_hashes() -> void:

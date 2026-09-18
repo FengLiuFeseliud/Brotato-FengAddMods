@@ -129,6 +129,7 @@ func _ready() -> void :
 		all_secondary_abs_debuff_stats_hashs.append(Keys.generate_hash(item_debuff))
 
 
+
 # 扩展追踪效果初始化
 func init_tracked_effects() -> Dictionary:
 	var tracked = .init_tracked_effects()
@@ -858,4 +859,3 @@ func add_weapon(weapon: WeaponData, player_index: int, is_selection: bool = fals
 	# 入库前先还原被诅咒水壶的收获产树效果
 	fengliu_normalize_cursed_effect(weapon)
 	return .add_weapon(weapon, player_index, is_selection)
-

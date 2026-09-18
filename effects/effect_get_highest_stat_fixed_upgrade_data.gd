@@ -1,5 +1,5 @@
 class_name GetHighestStatFixedUpgradeData
-extends Effect
+extends ModEffect
 
 
 # ============================================================
@@ -9,6 +9,10 @@ extends Effect
 # ------------------------------------------------------------
 # 效果值：仅作为存在标记，key/value 不参与逻辑。
 # ============================================================
+
+
+static func get_id() -> String:
+	return "fengliu_get_highest_stat_fixed_upgrade_data"
 
 # 获取最高属性对应的 UpgradeData
 func get_highest_upgrade_data(player_index: int) -> int:

@@ -1,5 +1,5 @@
 class_name GoldStats
-extends Effect
+extends ModEffect
 
 
 # ============================================================
@@ -14,6 +14,10 @@ extends Effect
 # ============================================================
 
 export (int) var stat_nb = 0 # 获得的数值
+
+
+static func get_id() -> String:
+	return "fengliu_gold_stats"
 
 
 func apply(player_index: int) -> void:

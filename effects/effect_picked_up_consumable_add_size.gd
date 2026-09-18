@@ -1,5 +1,5 @@
 class_name PickedUpConsumableAddSize
-extends Effect
+extends ModEffect
 
 
 # ============================================================
@@ -10,6 +10,10 @@ extends Effect
 # 效果值：
 #   value  每次拾取体型增加的百分比（%）
 # ============================================================
+
+
+static func get_id() -> String:
+	return "fengliu_picked_up_consumable_add_size"
 
 func apply(player_index: int) -> void:
 	RunData.get_player_effect(custom_key_hash ,player_index).push_back([value])

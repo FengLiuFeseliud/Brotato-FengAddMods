@@ -1,5 +1,5 @@
 class_name RandomStatsOnLavalUpEffect
-extends Effect
+extends ModEffect
 
 # ============================================================
 # 效果：升级随机加属性
@@ -24,6 +24,10 @@ export (String) var stat_gain = "" # 修改倍率属性
 export (float) var stat_gain_value = 0.0 # 倍率
 var random_stat: int = 0
 var stat_gain_hash = ""
+
+
+static func get_id() -> String:
+	return "fengliu_random_stats_on_level_up"
 
 
 func _generate_hashes() -> void:

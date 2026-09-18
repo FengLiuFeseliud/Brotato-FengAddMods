@@ -1,5 +1,5 @@
 class_name AddStucture
-extends Effect
+extends ModEffect
 
 
 # ============================================================
@@ -17,6 +17,10 @@ extends Effect
 export (int) var gain_value = 0 # 倍率：每多少点 key 属性多生成 1 个构造物
 export (Resource) var stucture_effect # 要生成的构造物（StructureEffect 资源）
 var _init_stats_args_structure :=  WeaponServiceInitStatsArgs.new()
+
+
+static func get_id() -> String:
+	return "fengliu_add_structure"
 
 
 func apply(player_index: int) -> void:

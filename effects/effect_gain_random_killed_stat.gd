@@ -1,5 +1,5 @@
 class_name GainRandomStatEveryKilledEnemiesEffect
-extends NullEffect
+extends ModNullEffect
 
 # ============================================================
 # 效果：杀敌随机获得属性
@@ -21,6 +21,10 @@ export (int) var stat_min_value # 随机下限
 export (int) var stat_max_value # 随机上限
 export (bool) var stat_no_zero = false # 随机没有 0
 var stat_hash: int = Keys.empty_hash
+
+
+static func get_id() -> String:
+	return "fengliu_gain_random_killed_stat"
 
 
 func _generate_hashes() -> void :

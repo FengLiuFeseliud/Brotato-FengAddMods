@@ -1,5 +1,5 @@
 class_name NoKillEnemy
-extends Effect
+extends ModEffect
 
 
 # ============================================================
@@ -10,6 +10,10 @@ extends Effect
 # 效果值：
 #   key  触发该效果的攻击类型（如 Structure = 构造物）
 # ============================================================
+
+
+static func get_id() -> String:
+	return "fengliu_no_kill_enemy"
 
 func apply(player_index: int) -> void:
 	RunData.get_player_effect(custom_key_hash ,player_index).push_back([key])

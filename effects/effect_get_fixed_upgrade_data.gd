@@ -1,5 +1,5 @@
 class_name GetFixedUpgradeData
-extends Effect
+extends ModEffect
 
 
 # ============================================================
@@ -15,6 +15,22 @@ var effect_fengliu_get_highest_stat_fixed_upgrade_data = Keys.generate_hash("fen
 
 
 var all_fixed_upgrade_id_hashs = []
+
+
+static func get_id() -> String:
+	return "fengliu_get_fixed_upgrade_data"
+
+
+func fengliu_persist_var_names() -> Array:
+	return ["all_fixed_upgrade_id_hashs"]
+
+
+# 归一化：JSON 往返会把 int 变浮点，统一转回 int，避免升级项哈希查不到
+func fengliu_on_persist_vars_restored() -> void:
+	var normalized := []
+	for upgrade_id_hash in all_fixed_upgrade_id_hashs:
+		normalized.push_back(int(upgrade_id_hash))
+	all_fixed_upgrade_id_hashs = normalized
 
 
 # 随机抽取一个不重复的升级项

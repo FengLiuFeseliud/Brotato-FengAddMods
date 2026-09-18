@@ -1,5 +1,5 @@
 class_name WpaponKilledAddTempStat
-extends NullEffect
+extends ModNullEffect
 
 
 # ============================================================
@@ -20,6 +20,10 @@ export (String) var gain_stat = "" # 概率倍率属性
 export (int) var gain_value = 0 # 概率倍率：每 gain_value/100 点该属性 +1% 概率
 export (int) var stat_nb = 1 # 临时增加的数值
 var gain_stat_hash = 0 # 概率倍率属性哈希
+
+
+static func get_id() -> String:
+	return "fengliu_wpapon_killed_add_temp_stat"
 
 
 func _generate_hashes() -> void:

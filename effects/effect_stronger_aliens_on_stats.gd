@@ -1,5 +1,5 @@
 class_name StrongerAliensOnStats
-extends Effect
+extends ModEffect
 
 
 # ============================================================
@@ -19,6 +19,10 @@ extends Effect
 export (int) var gain_value = 0
 export (String) var enemy_id = ""
 var enemy_id_hash = 0
+
+
+static func get_id() -> String:
+	return "fengliu_stronger_aliens_on_stats"
 
 
 func _generate_hashes() -> void:

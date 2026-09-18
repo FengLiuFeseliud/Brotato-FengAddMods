@@ -1,5 +1,5 @@
 class_name StatHitProtection
-extends Effect
+extends ModEffect
 
 
 # ============================================================
@@ -11,6 +11,10 @@ extends Effect
 #   key    用于计算护盾的属性
 #   value  除数（护盾 = 该属性 / value 取整）
 # ============================================================
+
+
+static func get_id() -> String:
+	return "fengliu_stat_hit_protection"
 
 func apply(player_index: int) -> void:
 	RunData.get_player_effect(custom_key_hash ,player_index).push_back([key_hash, value])

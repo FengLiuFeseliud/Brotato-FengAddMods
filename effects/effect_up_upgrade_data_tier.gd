@@ -1,5 +1,5 @@
 class_name UpUpgradeDataTier
-extends Effect
+extends ModEffect
 
 
 # ============================================================
@@ -17,6 +17,10 @@ extends Effect
 
 export (int) var chance # 基础触发概率（%）
 export (int) var gain_value = 0 # 概率倍率：按 key 属性额外提升概率
+
+
+static func get_id() -> String:
+	return "fengliu_up_upgrade_data_tier"
 
 
 static func get_dynamic_chance(init_chance: int, add_chance: int = 100, stat_count: int = 0) -> int:

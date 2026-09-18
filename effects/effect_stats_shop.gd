@@ -1,5 +1,5 @@
 class_name StatsShop
-extends Effect
+extends ModEffect
 
 
 # ============================================================
@@ -14,6 +14,10 @@ extends Effect
 # ============================================================
 
 export (bool) var alternative_coins = false # true=金币足够时仍用金币，属性仅作替代
+
+
+static func get_id() -> String:
+	return "fengliu_stats_shop"
 
 
 func apply(player_index: int) -> void:

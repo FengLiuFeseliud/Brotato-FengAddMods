@@ -1,5 +1,5 @@
 class_name CanAllDropBoxEffect
-extends Effect
+extends ModEffect
 
 # ============================================================
 # 效果：果子改箱子（可随机出红箱）
@@ -16,6 +16,10 @@ extends Effect
 # key_hash 修改倍率属性
 export (int) var chance = 0 # 出红箱的基础概率（%）
 var stat_hash: int = Keys.empty_hash
+
+
+static func get_id() -> String:
+	return "fengliu_can_all_drop_box"
 
 
 func apply(player_index: int) -> void:

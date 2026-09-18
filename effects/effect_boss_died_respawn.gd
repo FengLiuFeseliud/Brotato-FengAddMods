@@ -1,5 +1,5 @@
 class_name BossDiedRespawn
-extends Effect
+extends ModEffect
 
 
 # ============================================================
@@ -10,6 +10,10 @@ extends Effect
 # 效果值：
 #   value  重生后 Boss 生命/伤害/速度的提升百分比（%）
 # ============================================================
+
+
+static func get_id() -> String:
+	return "fengliu_boss_died_respawn"
 
 func apply(player_index: int) -> void:
 	RunData.get_player_effect(custom_key_hash ,player_index).push_back([key_hash, value])

@@ -1,5 +1,5 @@
 class_name BoxStats
-extends Effect
+extends ModEffect
 
 
 # ============================================================
@@ -11,6 +11,10 @@ extends Effect
 #   key    获得的属性
 #   value  获得的数值
 # ============================================================
+
+
+static func get_id() -> String:
+	return "fengliu_box_stats"
 
 func apply(player_index: int) -> void:
 	RunData.get_player_effect(custom_key_hash ,player_index).push_back([key_hash, value])

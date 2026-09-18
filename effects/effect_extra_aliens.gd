@@ -1,5 +1,5 @@
 class_name ExtraAliens
-extends Effect
+extends ModEffect
 
 
 # ============================================================
@@ -18,6 +18,10 @@ extends Effect
 
 export (Resource) var aliens_group
 export (int) var gain_value = 0
+
+
+static func get_id() -> String:
+	return "fengliu_extra_aliens"
 
 
 func apply(player_index: int) -> void:

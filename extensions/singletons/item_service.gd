@@ -2,7 +2,7 @@ extends "res://singletons/item_service.gd"
 
 
 const FENGLIU_MOD_ID = "FengAddMods"
-const FENGLIU_EFFECT_PET_DAMAGE_TEXT_PATH = "res://mods-unpacked/FengLiu-FengAddMods/effects/effect_pet_damage_text.gd"
+const FENGLIU_EFFECTS_DIR = "res://mods-unpacked/FengLiu-FengAddMods/effects/"
 
 
 var effect_fengliu_can_all_drop_box = Keys.generate_hash("fengliu_can_all_drop_box")
@@ -28,18 +28,68 @@ func _enter_tree() -> void:
 	_fengliu_register_effect_prototypes()
 
 
-# 幂等注册：ResourceLoader 有缓存，同一路径拿到同一对象，has() 去重即可
+# 注册本 mod 全部效果脚本为存档还原原型（必须早于 ContentLoader 触发的那次读档）
+# 幂等：ResourceLoader 有缓存，同一路径拿到同一对象，has() 去重即可
 func _fengliu_register_effect_prototypes() -> void:
-	var effect_script = load(FENGLIU_EFFECT_PET_DAMAGE_TEXT_PATH)
-	if effect_script == null:
-		ModLoaderLog.error("Failed to load effect script: %s" % FENGLIU_EFFECT_PET_DAMAGE_TEXT_PATH, FENGLIU_MOD_ID)
-		return
+	var registered := 0
+	var skipped := 0
 
-	if effects.has(effect_script):
-		return
+	# 逐个加载效果脚本，只有自带唯一 id 的具体效果才能被读档匹配
+	for effect_path in _fengliu_collect_effect_script_paths(FENGLIU_EFFECTS_DIR):
+		var effect_script = load(effect_path)
+		if effect_script == null or not (effect_script is GDScript):
+			skipped += 1
+			ModLoaderLog.warning("Failed to load effect script: %s" % effect_path, FENGLIU_MOD_ID)
+			continue
 
-	effects.push_back(effect_script)
-	ModLoaderLog.info("Registered pet damage text effect: %s" % FENGLIU_EFFECT_PET_DAMAGE_TEXT_PATH, FENGLIU_MOD_ID)
+		if not _fengliu_is_registerable_effect(effect_script):
+			skipped += 1
+			continue
+
+		if effects.has(effect_script):
+			continue
+
+		effects.push_back(effect_script)
+		registered += 1
+
+	ModLoaderLog.info("Registered %d effect prototypes from %s (skipped %d)." % [registered, FENGLIU_EFFECTS_DIR, skipped], FENGLIU_MOD_ID)
+
+
+# 是否登记为原型：是效果类，且自带唯一 id（基类与仍继承 id 的脚本一律跳过）
+func _fengliu_is_registerable_effect(effect_script) -> bool:
+	var effect_instance = effect_script.new()
+	if not (effect_instance is Effect):
+		return false
+
+	var base_script = effect_script.get_base_script()
+	if base_script == null:
+		return false
+
+	return effect_script.get_id() != base_script.get_id()
+
+
+# 递归收集效果脚本路径（排序，保证注册顺序稳定可复现）
+func _fengliu_collect_effect_script_paths(dir_path: String) -> Array:
+	var script_paths := []
+
+	var dir := Directory.new()
+	if dir.open(dir_path) != OK:
+		ModLoaderLog.error("Failed to open effects directory: %s" % dir_path, FENGLIU_MOD_ID)
+		return script_paths
+
+	dir.list_dir_begin(true, true)
+	var file_name := dir.get_next()
+	while file_name != "":
+		var full_path := dir_path.plus_file(file_name)
+		if dir.current_is_dir():
+			script_paths.append_array(_fengliu_collect_effect_script_paths(full_path))
+		elif file_name.get_extension() == "gd":
+			script_paths.push_back(full_path)
+		file_name = dir.get_next()
+	dir.list_dir_end()
+
+	script_paths.sort()
+	return script_paths
 
 
 # 计算动态概率

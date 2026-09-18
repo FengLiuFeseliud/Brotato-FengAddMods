@@ -1,5 +1,5 @@
 class_name AddXpGoldFromWaveTime
-extends Effect
+extends ModEffect
 
 
 # ============================================================
@@ -14,6 +14,10 @@ extends Effect
 # ============================================================
 
 export (float) var gain_value = 0.0 # 倍率：额外 = 属性(或等级) × gain_value
+
+
+static func get_id() -> String:
+	return "fengliu_add_xp_gold_from_wave_time"
 
 
 func apply(player_index: int) -> void:

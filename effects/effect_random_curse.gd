@@ -1,5 +1,5 @@
 class_name RandomCurse
-extends Effect
+extends ModEffect
 
 
 # ============================================================
@@ -17,6 +17,10 @@ extends Effect
 export (int) var need_level = 0 # 需要达到的等级
 export (Array) var not_curse_item_ids = [] # 不可被诅咒的道具 ID 排除列表
 var not_curse_item_ids_hash = []
+
+
+static func get_id() -> String:
+	return "fengliu_random_curse"
 
 
 func _generate_hashes() -> void:

@@ -1,5 +1,5 @@
 class_name GuaranteedShopItems
-extends Effect
+extends ModEffect
 
 
 # ============================================================
@@ -12,6 +12,10 @@ extends Effect
 #   key    要保证的道具 id，上限取自该道具的 max_nb
 #   value  未使用
 # ============================================================
+
+
+static func get_id() -> String:
+	return "fengliu_guaranteed_shop_items"
 
 
 func apply(player_index: int) -> void:

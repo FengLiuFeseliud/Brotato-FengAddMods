@@ -1,5 +1,5 @@
 class_name ItemMerge
-extends Effect
+extends ModEffect
 
 
 # ============================================================
@@ -22,6 +22,10 @@ export (String) var merge_to_item # 合成目标道具/武器
 export (int) var merge_to_item_count = 1 # 合成的目标数量
 var merge_from_item_hash = Keys.empty_hash
 var merge_to_item_hash = Keys.empty_hash
+
+
+static func get_id() -> String:
+	return "fengliu_item_merge"
 
 
 func _generate_hashes() -> void:

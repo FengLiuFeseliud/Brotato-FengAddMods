@@ -1,5 +1,5 @@
 class_name WeaponKilledLoot
-extends NullEffect
+extends ModNullEffect
 
 
 # ============================================================
@@ -18,6 +18,10 @@ extends NullEffect
 
 export (float) var gain_value = 0.0 # 成长倍率
 export (float) var cap_value = 0.0 # 击杀数上限
+
+
+static func get_id() -> String:
+	return "fengliu_weapon_killed_loot"
 
 
 func get_args(_player_index: int) -> Array:

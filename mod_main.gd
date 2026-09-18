@@ -83,6 +83,10 @@ func _ready()->void:
 	if ContentLoader == null:
 		ModLoaderLog.error("ContentLoader not load...", MOD_ID)
 
+	# 玩家效果槽里存的是效果实例的 custom_key 必须登记进原版全量序列化名单，
+	# 且必须在 ContentLoader 触发读档之前完成（否则槽位会被原样序列化写成字典）
+	_fengliu_register_effect_slot_keys()
+
 	ContentLoader.load_data(CONTENT_DATA_DIR, MOD_ID)
 
 	# 把本 mod 的 t0 武器注入到各可用角色的初始武器池（含本 mod 角色，见排除名单）。
@@ -172,3 +176,20 @@ func _fengliu_t0_character_has_weapon(character, weapon_my_id: String) -> bool:
 		if starting_weapon != null and starting_weapon.my_id == weapon_my_id:
 			return true
 	return false
+
+
+# 登记「玩家效果槽里存效果实例」的 custom_key（必须在读档之前调用）
+func _fengliu_register_effect_slot_keys() -> void:
+	if not is_instance_valid(RunData):
+		ModLoaderLog.error("RunData not ready, effect slot keys not registered.", MOD_ID)
+		return
+
+	for slot_key in [
+		Keys.generate_hash("fengliu_swap_enemie"),
+		Keys.generate_hash("fengliu_get_fixed_upgrade"),
+		Keys.generate_hash("fengliu_get_highest_stat_fixed_upgrade_data")
+	]:
+		if not RunData.effect_keys_full_serialization.has(slot_key):
+			RunData.effect_keys_full_serialization.push_back(slot_key)
+
+	ModLoaderLog.info("Registered effect slot keys, total=%d." % RunData.effect_keys_full_serialization.size(), MOD_ID)

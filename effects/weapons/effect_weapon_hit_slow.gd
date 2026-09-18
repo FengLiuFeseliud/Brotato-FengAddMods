@@ -1,5 +1,5 @@
 class_name WeaponHitSlowEffect
-extends NullEffect
+extends ModNullEffect
 
 
 # ============================================================
@@ -15,6 +15,10 @@ extends NullEffect
 # ============================================================
 
 export (int) var gain_value = 0 # 减速倍率：减速值 += 该属性 × gain_value/100
+
+
+static func get_id() -> String:
+	return "fengliu_weapon_hit_slow"
 
 
 func get_args(player_index: int) -> Array:

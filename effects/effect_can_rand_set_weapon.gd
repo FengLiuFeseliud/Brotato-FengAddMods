@@ -1,5 +1,5 @@
 class_name CanRandSetWeapon
-extends Effect
+extends ModEffect
 
 
 # ============================================================
@@ -13,6 +13,10 @@ extends Effect
 # ============================================================
 
 var roll_set: SetData
+
+
+static func get_id() -> String:
+	return "fengliu_can_rand_set_weapon"
 
 
 func fengliu_roll_effect(player_index: int) -> void:

@@ -1,5 +1,5 @@
 class_name PickBoxCostGold
-extends Effect
+extends ModEffect
 
 
 # ============================================================
@@ -16,6 +16,10 @@ extends Effect
 
 export (float) var wave_inflation_rate # 每波通胀率
 export (int) var random_get_stat = 0 # 随机获取属性（无法升级武器时的补偿次数）
+
+
+static func get_id() -> String:
+	return "fengliu_pick_box_cost_gold"
 
 
 func get_box_cost() -> int:
