@@ -1,5 +1,5 @@
 class_name AddStatAfterChange
-extends ModEffect
+extends "res://mods-unpacked/FengLiu-FengAddMods/effects/global/mod_effect.gd"
 
 # ============================================================
 # 效果：损失转换属性

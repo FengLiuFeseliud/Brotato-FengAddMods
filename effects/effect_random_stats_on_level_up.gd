@@ -1,5 +1,5 @@
 class_name RandomStatsOnLavalUpEffect
-extends ModEffect
+extends "res://mods-unpacked/FengLiu-FengAddMods/effects/global/mod_effect.gd"
 
 # ============================================================
 # 效果：升级随机加属性

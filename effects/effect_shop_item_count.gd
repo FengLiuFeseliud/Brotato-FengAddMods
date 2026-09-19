@@ -1,5 +1,5 @@
 class_name ShopItemCountEffect
-extends ModEffect
+extends "res://mods-unpacked/FengLiu-FengAddMods/effects/global/mod_effect.gd"
 
 # ============================================================
 # 效果：商店道具数效果

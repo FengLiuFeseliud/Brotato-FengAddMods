@@ -1,5 +1,5 @@
 class_name CanAllDropBoxEffect
-extends ModEffect
+extends "res://mods-unpacked/FengLiu-FengAddMods/effects/global/mod_effect.gd"
 
 # ============================================================
 # 效果：果子改箱子（可随机出红箱）

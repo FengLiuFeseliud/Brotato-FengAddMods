@@ -1,5 +1,5 @@
 class_name CanAddChanceStatDemageEffect
-extends ModChanceStatDamageEffect
+extends "res://mods-unpacked/FengLiu-FengAddMods/effects/global/mod_chance_stat_damage_effect.gd"
 
 # ============================================================
 # 效果：概率触发伤害（概率可吃倍率）

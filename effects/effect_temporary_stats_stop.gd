@@ -1,5 +1,5 @@
 class_name TemporaryStatsStop
-extends ModNullEffect
+extends "res://mods-unpacked/FengLiu-FengAddMods/effects/global/mod_null_effect.gd"
 
 
 # ============================================================

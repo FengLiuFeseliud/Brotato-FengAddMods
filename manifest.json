@@ -1,7 +1,7 @@
 {
 	"name": "FengAddMods",
 	"namespace": "FengLiu",
-	"version_number": "1.9.8",
+	"version_number": "1.9.10",
 	"description": "FengLing Add Mods",
 	"website_url": "",
 	"dependencies": [

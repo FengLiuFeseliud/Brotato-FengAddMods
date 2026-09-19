@@ -1,5 +1,5 @@
 class_name SwapEnemies
-extends ModEffect
+extends "res://mods-unpacked/FengLiu-FengAddMods/effects/global/mod_effect.gd"
 
 
 # ============================================================

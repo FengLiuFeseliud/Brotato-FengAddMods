@@ -1,5 +1,7 @@
-class_name ModChanceStatDamageEffect
 extends ChanceStatDamageEffect
+
+# 按路径 preload 基类：玩家版游戏没有本 mod 自定义 class_name 的全局注册
+const ModEffectScript = preload("res://mods-unpacked/FengLiu-FengAddMods/effects/global/mod_effect.gd")
 
 
 # ============================================================
@@ -20,12 +22,12 @@ func fengliu_persist_var_names() -> Array:
 # 先存基类字段，再存自定义导出字段与白名单非导出变量
 func serialize() -> Dictionary:
 	var serialized = .serialize()
-	serialized[ModEffect.FENGLIU_CUSTOM_FIELDS_KEY] = ModEffect.serialize_custom_fields(self)
+	serialized[ModEffectScript.FENGLIU_CUSTOM_FIELDS_KEY] = ModEffectScript.serialize_custom_fields(self)
 
 	# 只有声明了白名单的脚本才写这一项
-	var persist_vars = ModEffect.serialize_persist_vars(self)
+	var persist_vars = ModEffectScript.serialize_persist_vars(self)
 	if persist_vars.size() > 0:
-		serialized[ModEffect.FENGLIU_PERSIST_VARS_KEY] = persist_vars
+		serialized[ModEffectScript.FENGLIU_PERSIST_VARS_KEY] = persist_vars
 
 	return serialized
 
@@ -34,11 +36,11 @@ func serialize() -> Dictionary:
 func deserialize_and_merge(serialized: Dictionary) -> void:
 	.deserialize_and_merge(serialized)
 
-	if serialized.has(ModEffect.FENGLIU_CUSTOM_FIELDS_KEY):
-		ModEffect.deserialize_custom_fields(self, serialized[ModEffect.FENGLIU_CUSTOM_FIELDS_KEY])
+	if serialized.has(ModEffectScript.FENGLIU_CUSTOM_FIELDS_KEY):
+		ModEffectScript.deserialize_custom_fields(self, serialized[ModEffectScript.FENGLIU_CUSTOM_FIELDS_KEY])
 
 	# 未声明白名单的存档没有这一项，直接跳过
-	if not serialized.has(ModEffect.FENGLIU_PERSIST_VARS_KEY):
+	if not serialized.has(ModEffectScript.FENGLIU_PERSIST_VARS_KEY):
 		return
 
-	ModEffect.deserialize_persist_vars(self, serialized[ModEffect.FENGLIU_PERSIST_VARS_KEY])
+	ModEffectScript.deserialize_persist_vars(self, serialized[ModEffectScript.FENGLIU_PERSIST_VARS_KEY])

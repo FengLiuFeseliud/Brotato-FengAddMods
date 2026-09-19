@@ -1,5 +1,5 @@
 class_name GainRandomStatEveryKilledEnemiesEffect
-extends ModNullEffect
+extends "res://mods-unpacked/FengLiu-FengAddMods/effects/global/mod_null_effect.gd"
 
 # ============================================================
 # 效果：杀敌随机获得属性
