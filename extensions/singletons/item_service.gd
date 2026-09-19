@@ -13,10 +13,11 @@ var effect_fengliu_swap_enemie = Keys.generate_hash("fengliu_swap_enemie")
 var effect_fengliu_can_rand_set_weapon = Keys.generate_hash("fengliu_can_rand_set_weapon")
 
 
-# 需要重新随机预报的效果列表
+# 需要重新随机的效果列表
 var need_reroll_effect = [
 	effect_fengliu_swap_enemie,
-	effect_fengliu_get_fixed_upgrade
+	effect_fengliu_get_fixed_upgrade,
+    effect_fengliu_can_rand_set_weapon
 ]
 
 

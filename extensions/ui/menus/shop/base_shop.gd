@@ -5,23 +5,13 @@ var effect_fengliu_shop_item_count = Keys.generate_hash("fengliu_shop_item_count
 var effect_fengliu_stats_stop = Keys.generate_hash("fengliu_stats_stop")
 var effect_fengliu_stats_buy_item = Keys.generate_hash("fengliu_stats_buy_item")
 var effect_fengliu_item_bought_spawn_boss = Keys.generate_hash("fengliu_item_bought_spawn_boss")
-var effect_fengliu_swap_enemie = Keys.generate_hash("fengliu_swap_enemie")
-var effect_fengliu_get_fixed_upgrade = Keys.generate_hash("fengliu_get_fixed_upgrade")
 var effect_fengliu_temporary_stats_stop = Keys.generate_hash("fengliu_temporary_stats_stop")
-var effect_fengliu_can_rand_set_weapon = Keys.generate_hash("fengliu_can_rand_set_weapon")
 
 
 var fengliu_shop_items_count_price = Keys.generate_hash("fengliu_shop_items_count_price")
 
 
 var shop_items_price = {}
-
-
-var need_reroll_effect = [
-	effect_fengliu_swap_enemie,
-	effect_fengliu_get_fixed_upgrade,
-	effect_fengliu_can_rand_set_weapon
-]
 
 
 # 随机生成动态值
@@ -111,7 +101,7 @@ func fill_shop_items(player_locked_items: Array, player_index: int, just_entered
 # 商店刷新时把非目标套装的武器替换为目标套装武器
 func fengliu_roll_rand_set_weapon_in_shop(player_locked_items: Array, player_index: int) -> void:
 	# 无效果则不处理
-	var effects = RunData.get_player_effect(effect_fengliu_can_rand_set_weapon, player_index)
+	var effects = RunData.get_player_effect(RunData.effect_fengliu_can_rand_set_weapon, player_index)
 	if effects.size() == 0:
 		return
 
@@ -138,7 +128,7 @@ func fengliu_roll_swap_enemies_in_shop(player_index: int) -> void:
 
 		var has_swap_effect = false
 		for effect in item.effects:
-			if effect.custom_key_hash in need_reroll_effect:
+			if effect.custom_key_hash in RunData.fengliu_need_reroll_effect:
 				has_swap_effect = true
 				break
 		if not has_swap_effect:
@@ -147,7 +137,7 @@ func fengliu_roll_swap_enemies_in_shop(player_index: int) -> void:
 		var new_item = item.duplicate()
 		var new_effects = []
 		for effect in item.effects:
-			if effect.custom_key_hash in need_reroll_effect:
+			if effect.custom_key_hash in RunData.fengliu_need_reroll_effect:
 				new_effects.append(effect.duplicate())
 			else:
 				new_effects.append(effect)
@@ -155,7 +145,7 @@ func fengliu_roll_swap_enemies_in_shop(player_index: int) -> void:
 		shop_entry[0] = new_item
 
 		for effect in new_item.effects:
-			if effect.custom_key_hash in need_reroll_effect:
+			if effect.custom_key_hash in RunData.fengliu_need_reroll_effect:
 				effect.fengliu_roll_effect(player_index)
 
 

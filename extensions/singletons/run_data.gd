@@ -75,6 +75,16 @@ var effect_fengliu_random_curse = Keys.generate_hash("fengliu_random_curse")
 var effect_fengliu_wave_elites_spawn = Keys.generate_hash("fengliu_wave_elites_spawn")
 var effect_fengliu_apply_item_not_add_all_debuff = Keys.generate_hash("fengliu_apply_item_not_add_all_debuff")
 var effect_fengliu_temporary_stats_stop = Keys.generate_hash("fengliu_temporary_stats_stop")
+var effect_fengliu_swap_enemie = Keys.generate_hash("fengliu_swap_enemie")
+var effect_fengliu_get_fixed_upgrade = Keys.generate_hash("fengliu_get_fixed_upgrade")
+var effect_fengliu_can_rand_set_weapon = Keys.generate_hash("fengliu_can_rand_set_weapon")
+
+
+var fengliu_need_reroll_effect = [
+	effect_fengliu_swap_enemie,
+	effect_fengliu_get_fixed_upgrade,
+	effect_fengliu_can_rand_set_weapon
+]
 
 
 var fengliu_item_forecast = Keys.generate_hash("item_forecast") # 天气预报道具哈希
@@ -622,11 +632,6 @@ func remove_stat(stat_hsh: int, value: int, player_index: int) -> void :
 	# 变化检查后调用原逻辑
 	fengliu_check_stat(stat_hsh, -value, player_index)
 	.remove_stat(stat_hsh, value, player_index)
-
-
-# fengliu_shop_item_count - 商店道具数效果（锁定上限判断已移至 UI 层 shop_item.gd）
-func lock_player_shop_item(item_data: ItemParentData, wave_value: int, player_index: int) -> void :
-	.lock_player_shop_item(item_data, wave_value, player_index)
 
 
 # 按属性价值比例把属性换算为材料（基础 60 材料）
