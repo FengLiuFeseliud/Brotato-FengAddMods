@@ -6,6 +6,7 @@ var effect_fengliu_weapon_killed_loot = Keys.generate_hash("fengliu_weapon_kille
 var effect_fengliu_weapon_killed_health = Keys.generate_hash("fengliu_weapon_killed_health")
 var effect_fengliu_wpapon_killed_add_temp_stat = Keys.generate_hash("fengliu_wpapon_killed_add_temp_stat")
 var effect_fengliu_weapon_hit_slow = Keys.generate_hash("fengliu_weapon_hit_slow")
+var effect_fengliu_waepon_shop_empty_slot_add_damage = Keys.generate_hash("fengliu_waepon_shop_empty_slot_add_damage")
 
 
 var wave_gain = Keys.generate_hash("wave_gain")
@@ -114,6 +115,21 @@ func fengliu_weapon_hit_slow(thing_hit: Node, effect) -> void:
 	# 计算减速值（基础值 + 属性倍率）并施加
 	var slow_value = effect.value + int(Utils.get_stat(effect.key_hash, player_index) * (effect.gain_value / 100.0))
 	thing_hit.add_decaying_speed(-slow_value)
+
+
+func init_stats(at_wave_begin: bool = true) -> void :
+	var add_damage = 0
+
+	for effect in effects:
+		if effect.custom_key_hash == effect_fengliu_waepon_shop_empty_slot_add_damage:
+			add_damage += effect.get_add_damage(player_index)
+
+	if add_damage < 0:
+		add_damage = 0
+
+	stats.damage += add_damage
+	.init_stats(at_wave_begin)
+	stats.damage -= add_damage
 
 
 # 扩展武器命中处理（命中触发减速）

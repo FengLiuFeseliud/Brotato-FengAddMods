@@ -1,0 +1,13 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/effects/weapons/effect_waepon_shop_empty_slot_add_damage.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+key = ""
+text_key = "EFFECT_WEAPON_SHOP_EMPTY_SLOT_ADD_DAMEGE"
+value = 10
+custom_key = "fengliu_waepon_shop_empty_slot_add_damage"
+storage_method = 0
+effect_sign = 3
+custom_args = [  ]

@@ -50,7 +50,7 @@ func fengliu_set_item_count(player_locked_items: Array, item_count: int, player_
 	var new_items = []
 	for index in range(item_count):
 		new_items.append(_shop_items[player_index][index])
-	
+		
 	_shop_items[player_index] = new_items
 
 
