@@ -117,16 +117,20 @@ func fengliu_weapon_hit_slow(thing_hit: Node, effect) -> void:
 	thing_hit.add_decaying_speed(-slow_value)
 
 
+# 扩展武器属性初始化（计入商店空位增伤）
 func init_stats(at_wave_begin: bool = true) -> void :
+	# 累加各效果提供的增伤
 	var add_damage = 0
 
 	for effect in effects:
 		if effect.custom_key_hash == effect_fengliu_waepon_shop_empty_slot_add_damage:
 			add_damage += effect.get_add_damage(player_index)
 
+	# 拿不到商店数据时按 0 处理
 	if add_damage < 0:
 		add_damage = 0
 
+	# 临时并入基础伤害，让父类结算的缩放属性也作用于这份增伤
 	stats.damage += add_damage
 	.init_stats(at_wave_begin)
 	stats.damage -= add_damage
