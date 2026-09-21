@@ -50,6 +50,8 @@ WEAPON_PLUNGER,Plunger,马桶搋子
 ITEM_CABLE_TIE,Cable Tie,扎带
 ITEM_ROBOT_VACUUM,Robot Vacuum,扫地机器人
 WEAPON_SHOP_SWEEP,Shop Sweep,商店大扫荡
+ITEM_WOODPILE,Woodpile,木料堆
+ITEM_BUSHES,Bushes,灌木
 EFFECT_TWO_HAND_WEAPON_SLOT_LIMIT,Only has two hands (so can only hold two weapons),只有两只手所以只拿两个武器
 ITEM_RAT_KING_RATZILLA,Rat Subject,鼠族臣民
 EFFECT_RATZILLA_KILLER_BOSS_TEXT,Ratzilla targets and attacks Bosses,鼠斯拉会锁定并攻击 boss
@@ -168,3 +170,6 @@ EFFECT_RANDOM_DAMAGE_TEXT,Damage is randomized by the fired bullet type,伤害�
 EFFECT_RANDOM_CAN_RAND_SET_WEAPON,The shop will only offer {0} weapons,商店将只能出现{0}武器
 EFFECT_PET_ROBOT_VACUUM,"A Robot Vacuum pet that collects Materials and Consumables for you, grants [color=lime]3[/color] extra Materials when picking up a Consumable, and deals {0} ({1}) damage to enemies it touches",生成一个扫地机器人宠物，会自动捡取材料与消耗品，捡取消耗品时额外获取[color=lime]3[/color]材料，碰到它的敌人会受到{0}（{1}）伤害
 EFFECT_WEAPON_SHOP_EMPTY_SLOT_ADD_DAMEGE,"Before the wave starts, each empty shop slot adds {0} base damage [+{1}]",开始敌袭前商店每有一个空位加{0}基础伤害 [+{1}]
+FENGLIU_TREE_DROP_DOUBLE,%Double Tree Drops,%树木掉落翻倍
+EFFECT_TREE_DROP_DOUBLE_VALUE,{0} %Double Tree Drops,{0} %树木掉落翻倍
+EFFECT_TREE_VALUE,{0} Trees,增加{0}点树木

@@ -21,7 +21,10 @@ const ALL_SECONDARY_STATS = [
 	"number_of_enemies",
 
 	"hp_start_wave",
-	"hp_start_next_wave"
+	"hp_start_next_wave",
+
+	"fengliu_bullet_scale",
+	"fengliu_tree_drop_double"
 ]
 
 
@@ -42,6 +45,21 @@ const ALL_ITEM_DEBUFF = [
 	"minimum_weapon_cooldowns",
 	"hp_cap",
 	"lock_current_weapons"
+]
+
+
+# 自定义次要属性
+const FENGLIU_EXTRA_SECONDARY_STAT_KEYS = [
+	"fengliu_bullet_scale",
+	"fengliu_tree_drop_double"
+]
+
+
+# 原版「树」系道具（item_tree / 隐者 / 探索者 / steve）被诅咒后，
+# 原版会把整句文案换成 EFFECT_TREES_PLURAL（生成更大量的树木）；
+# 这些 key 属于原版逻辑，还原时不得用普通版文案覆盖
+const FENGLIU_VANILLA_TREES_TEXT_KEYS = [
+	"effect_trees"
 ]
 
 
@@ -100,6 +118,7 @@ var stat_after_change_wave_value_count = {}
 var all_secondary_stats_hashs = []
 var all_secondary_abs_debuff_stats_hashs = []
 var all_item_debuff_hashs = []
+var _fengliu_extra_stat_hashs: Array = []
 var _wave_total_hp_to_durations = [1.0, 1.0, 1.0]
 var _wave_total_hp = 0
 
@@ -137,6 +156,50 @@ func _ready() -> void :
 	# 生成绝对值负面属性哈希
 	for item_debuff in ALL_SECONDARY_ABS_DEBUFF_STATS:
 		all_secondary_abs_debuff_stats_hashs.append(Keys.generate_hash(item_debuff))
+
+
+# 扩展读取玩家效果字典：保证本 mod 次要属性的槽位存在（新开档 / 读档 / 旧档都兜底）
+func get_player_effects(player_index: int) -> Dictionary:
+	var effects = .get_player_effects(player_index)
+	# 假玩家与越界索引不处理，保持原版行为
+	if player_index == DUMMY_PLAYER_INDEX or player_index >= players_data.size():
+		return effects
+
+	fengliu_ensure_extra_stat_slots(player_index)
+	return effects
+
+
+# 扩展重建玩家数据：effects 被重建后补回次要属性槽位
+func reset_players_data_stats_and_effects() -> void :
+	.reset_players_data_stats_and_effects()
+	fengliu_ensure_extra_stat_slots()
+
+
+# 补齐树木型次要属性槽位（幂等，只补缺失的键；player_index 为 -1 时处理全部玩家）
+func fengliu_ensure_extra_stat_slots(player_index: int = - 1) -> void :
+	_fengliu_init_extra_stat_hashs()
+
+	for index in players_data.size():
+		# 指定玩家时跳过其他玩家
+		if player_index != - 1 and index != player_index:
+			continue
+		var player_data = players_data[index]
+		if player_data == null:
+			continue
+
+		for stat_hsh in _fengliu_extra_stat_hashs:
+			if not player_data.effects.has(stat_hsh):
+				player_data.effects[stat_hsh] = 0
+
+
+# 懒生成次要属性哈希列表
+func _fengliu_init_extra_stat_hashs() -> void :
+	# 已生成则直接复用
+	if not _fengliu_extra_stat_hashs.empty():
+		return
+
+	for stat_key in FENGLIU_EXTRA_SECONDARY_STAT_KEYS:
+		_fengliu_extra_stat_hashs.append(Keys.generate_hash(stat_key))
 
 
 
@@ -822,10 +885,12 @@ func reset_to_start_wave_state() -> void :
 	.reset_to_start_wave_state()
 
 
-# 还原诅咒的上的收获产树效果（让诅咒版和普通版完全一致）
+# 还原树效果（只还原 mod 自己带收获/数值描述的复合树效果，
+# 原版「树」系道具保留原版诅咒文案，见 FENGLIU_VANILLA_TREES_TEXT_KEYS）
 func fengliu_normalize_cursed_effect(item_data: ItemParentData) -> void:
 	if item_data == null:
 		return
+
 	if not item_data.is_cursed:
 		return
 
@@ -834,24 +899,23 @@ func fengliu_normalize_cursed_effect(item_data: ItemParentData) -> void:
 	if base_data == null:
 		return
 
-	# 找出收获产树效果，还原为未被诅咒的文案
-	for effect in item_data.effects:
-		if not effect is GainStatForEveryStatEffect:
+	# 找出原版对应树效果的文案键
+	var base_text_key: String = ""
+	for base_effect in base_data.effects:
+		if base_effect.key_hash != Keys.trees_hash or base_effect.text_key == "":
 			continue
 
+		base_text_key = base_effect.text_key
+		break
+
+	if base_text_key == "" or base_text_key.to_lower() in FENGLIU_VANILLA_TREES_TEXT_KEYS:
+		return
+
+	# 还原为未被诅咒的文案
+	for effect in item_data.effects:
 		if effect.key_hash != Keys.trees_hash:
 			continue
 
-		var base_text_key: String = "EFFECT_GAIN_STAT_FOR_EVERY_STAT"
-		for base_effect in base_data.effects:
-			if not base_effect is GainStatForEveryStatEffect:
-				continue
-
-			if base_effect.key_hash != Keys.trees_hash:
-				continue
-
-			base_text_key = base_effect.text_key
-			break
 		effect.text_key = base_text_key
 
 

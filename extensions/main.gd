@@ -21,6 +21,9 @@ var fengliu_item_auto_open_box_hash = Keys.generate_hash("item_auto_open_box")
 var fengliu_crate_gobbler_hash = Keys.generate_hash("crate_gobbler")
 
 
+var fengliu_tree_drop_double = Keys.generate_hash("fengliu_tree_drop_double")
+
+
 var _is_speedrun_ending: bool = false
 
 
@@ -455,3 +458,48 @@ func on_item_box_take_button_pressed(item_data: ItemParentData, consumable: Upgr
 		item_data.is_box_get = true
 
 	.on_item_box_take_button_pressed(item_data, consumable)
+
+
+# 扩展掉落
+func spawn_loot(unit: Unit, entity_type: int, args: Entity.DieArgs) -> void:
+	# 其它单位走原版
+	if not unit is Neutral:
+		.spawn_loot(unit, entity_type, args)
+		return
+
+	# 不掉落消耗品的单位直接走原版
+	if not unit.stats.can_drop_consumables:
+		.spawn_loot(unit, entity_type, args)
+		return
+
+	var player_index = unit.get("fengliu_killed_by_player_index")
+	if player_index == null or player_index < 0:
+		player_index = unit._die_args_unit.killed_by_player_index
+
+	if player_index < 0:
+		.spawn_loot(unit, entity_type, args)
+		return
+
+	var tree_drop_double: float = RunData.get_player_effect(fengliu_tree_drop_double, player_index) / 100.0
+	var can_tree_drop_count = int(tree_drop_double)
+	var tree_drop_double_chance = tree_drop_double - can_tree_drop_count
+
+	# 负值：按概率关掉本次消耗品掉落（材料照常掉落）
+	if tree_drop_double < 0 and Utils.get_chance_success(abs(tree_drop_double)):
+		var new_unit_stats = unit.stats.duplicate()
+		var old_unit_stats = unit.stats
+
+		new_unit_stats.can_drop_consumables = false
+		unit.stats = new_unit_stats
+		.spawn_loot(unit, entity_type, args)
+		unit.stats = old_unit_stats
+		return
+
+	# 正值：必掉份数 + 小数概率补一份
+	for _i in can_tree_drop_count:
+		spawn_consumables(unit)
+
+	if Utils.get_chance_success(tree_drop_double_chance):
+		spawn_consumables(unit)
+
+	.spawn_loot(unit, entity_type, args)

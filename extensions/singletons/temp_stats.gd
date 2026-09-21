@@ -36,7 +36,8 @@ const ALL_SECONDARY_STATS = [
 	"enemy_health",
 
     # 子弹缩放
-    "fengliu_bullet_scale"
+    "fengliu_bullet_scale",
+	"fengliu_tree_drop_double"
 ]
 
 
