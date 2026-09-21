@@ -6,7 +6,7 @@
 script = ExtResource( 1 )
 key = "fengliu_rekindling"
 text_key = "EFFECT_REKINDLING_VALUE"
-value = 10
+value = 25
 custom_key = ""
 storage_method = 0
 effect_sign = 3
