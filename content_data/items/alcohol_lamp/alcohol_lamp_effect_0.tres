@@ -4,9 +4,9 @@
 
 [resource]
 script = ExtResource( 1 )
-key = "fengliu_tree_drop_double"
-text_key = "EFFECT_TREE_DROP_DOUBLE_VALUE"
-value = -10
+key = "fengliu_rekindling"
+text_key = "EFFECT_REKINDLING_VALUE"
+value = 10
 custom_key = ""
 storage_method = 0
 effect_sign = 3

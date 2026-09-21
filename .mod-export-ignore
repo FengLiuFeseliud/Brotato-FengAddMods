@@ -1,0 +1,4 @@
+# mod_tool 打包排除清单
+AI_TASKBOOK.md
+README.md
+.gitignore

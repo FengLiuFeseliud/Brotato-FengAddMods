@@ -173,6 +173,7 @@ func get_player_effects(player_index: int) -> Dictionary:
 # 扩展重建玩家数据：effects 被重建后补回次要属性槽位
 func reset_players_data_stats_and_effects() -> void :
 	.reset_players_data_stats_and_effects()
+	# 重建后补回本 mod 次要属性槽位
 	fengliu_ensure_extra_stat_slots()
 
 
@@ -201,7 +202,6 @@ func _fengliu_init_extra_stat_hashs() -> void :
 
 	for stat_key in FENGLIU_EXTRA_SECONDARY_STAT_KEYS:
 		_fengliu_extra_stat_hashs.append(Keys.generate_hash(stat_key))
-
 
 
 # 扩展追踪效果初始化

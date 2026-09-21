@@ -9,5 +9,5 @@ text_key = ""
 value = -8
 custom_key = ""
 storage_method = 0
-effect_sign = 1
+effect_sign = 3
 custom_args = [  ]
