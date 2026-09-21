@@ -51,7 +51,8 @@ const ALL_ITEM_DEBUFF = [
 # 自定义次要属性
 const FENGLIU_EXTRA_SECONDARY_STAT_KEYS = [
 	"fengliu_bullet_scale",
-	"fengliu_tree_drop_double"
+	"fengliu_tree_drop_double",
+	"fengliu_rekindling"
 ]
 
 
