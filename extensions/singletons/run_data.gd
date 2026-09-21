@@ -64,6 +64,16 @@ const FENGLIU_VANILLA_TREES_TEXT_KEYS = [
 ]
 
 
+# 次要属性叠加台账
+const FENGLIU_SECONDARY_LEDGER_KEY := "fengliu_secondary_ledger"
+const FENGLIU_TEMP_LEDGER_KEY := "fengliu_secondary_ledger_temp"
+const FENGLIU_LINKED_LEDGER_KEY := "fengliu_secondary_ledger_linked"
+
+
+# 每个玩家是否需要「旧档 rebase」（读档时判定，取用后即清；仅 linked 层使用）
+var fengliu_legacy_rebase_pending := [false, false, false, false]
+
+
 # 各属性升级比例字典
 var fengliu_stat_upgrade_ratios = {
 	Keys.generate_hash("stat_max_hp"): 3,           # 最大生命
@@ -175,6 +185,189 @@ func reset_players_data_stats_and_effects() -> void :
 	.reset_players_data_stats_and_effects()
 	# 重建后补回本 mod 次要属性槽位
 	fengliu_ensure_extra_stat_slots()
+
+
+# 台账键哈希（is_linked_layer 区分层：true = StatLink 层，false = TempStats 层）
+func fengliu_secondary_ledger_key_hash(is_linked_layer: bool = false) -> int:
+	return Keys.generate_hash(FENGLIU_LINKED_LEDGER_KEY if is_linked_layer else FENGLIU_TEMP_LEDGER_KEY)
+
+
+# 上一版单台账键（只用于读档迁移）
+func fengliu_legacy_ledger_key_hash() -> int:
+	return Keys.generate_hash(FENGLIU_SECONDARY_LEDGER_KEY)
+
+
+# 读取并清除某玩家的旧档 rebase 标记
+func fengliu_take_legacy_rebase(player_index: int) -> bool:
+	# 越界索引视为无标记
+	if player_index < 0 or player_index >= fengliu_legacy_rebase_pending.size():
+		return false
+	# 取用即清，保证每次读档只 rebase 一轮
+	var pending: bool = fengliu_legacy_rebase_pending[player_index]
+	fengliu_legacy_rebase_pending[player_index] = false
+	return pending
+
+
+# 清空全部旧档 rebase 标记
+func fengliu_clear_legacy_rebase() -> void :
+	# 新局 / 重开时不会有烘焙值残留
+	for index in fengliu_legacy_rebase_pending.size():
+		fengliu_legacy_rebase_pending[index] = false
+
+
+# 按待读入的存档标记「台账缺失」的玩家
+func fengliu_mark_legacy_rebase(state: Dictionary) -> void :
+	# 每次都先清空，避免上一份存档的标记串到本次
+	fengliu_clear_legacy_rebase()
+	if not state.has("players_data"):
+		return
+
+	# 判定依据：该玩家 effects 里有没有 linked 层台账号（只有它会随存档烘焙）
+	var ledger_hash: int = fengliu_secondary_ledger_key_hash(true)
+	var players = state.players_data
+	for index in players.size():
+		if index >= fengliu_legacy_rebase_pending.size():
+			break
+		var player_data = players[index]
+		if player_data == null or not player_data is PlayerRunData:
+			continue
+		fengliu_legacy_rebase_pending[index] = not player_data.effects.has(ledger_hash)
+
+
+# 扩展读档：先标记旧档（无台账）玩家，再把 JSON 浮点归一化为 int，其余交给原逻辑
+func resume_from_state(state: Dictionary) -> void :
+	# 两步都必须在原版读档前完成（原版末段会立刻重算 LinkedStats）
+	fengliu_mark_legacy_rebase(state)
+	fengliu_normalize_state_effects(state)
+	.resume_from_state(state)
+
+
+# 读档前把 effects 里的数字归一化为 int
+#   存档是 JSON，数字会读成 float：原版 LinkedStats 有 `assert(x is int)`、多处用哈希当字典键，
+#   本 mod 也有 `is int` 判断；不归一化会被误判为类型不符（清零）或让断言/查表失败
+func fengliu_normalize_state_effects(state: Dictionary) -> void :
+	# 没有玩家数据（空档）直接跳过
+	if not state.has("players_data"):
+		return
+	# 先把上一版单台账迁到 linked 层，再做数字归一化
+	fengliu_migrate_legacy_ledger(state)
+	for player_data in state.players_data:
+		if player_data == null or not player_data is PlayerRunData:
+			continue
+		player_data.effects = fengliu_normalize_effect_values(player_data.effects)
+
+
+# 把上一版单台账迁到 linked 层后清掉旧键
+func fengliu_migrate_legacy_ledger(state: Dictionary) -> void :
+	# 旧键里的量是「上次重算后 effects 被叠加的部分」，按 linked 层处理最安全
+	var legacy_hash: int = fengliu_legacy_ledger_key_hash()
+	var linked_hash: int = fengliu_secondary_ledger_key_hash(true)
+	for player_data in state.players_data:
+		if player_data == null or not player_data is PlayerRunData:
+			continue
+		# 新键已存在时直接丢弃旧键，避免两本账并存
+		if player_data.effects.has(legacy_hash) and not player_data.effects.has(linked_hash):
+			player_data.effects[linked_hash] = player_data.effects[legacy_hash]
+		player_data.effects.erase(legacy_hash)
+
+
+# 递归归一化效果容器：数字转 int（整值浮点），数组递归，其余原样
+func fengliu_normalize_effect_values(value):
+	# 整值浮点转 int；非整值保留原样（避免丢精度）
+	if value is float:
+		return int(value) if value == int(value) else value
+	# 字典与数组递归处理（stat_links 这类嵌套数组里的哈希/数值都要求 int）
+	if value is Dictionary:
+		var normalized := {}
+		for key in value.keys():
+			normalized[key] = fengliu_normalize_effect_values(value[key])
+		return normalized
+	if value is Array:
+		var normalized_array := []
+		for element in value:
+			normalized_array.push_back(fengliu_normalize_effect_values(element))
+		return normalized_array
+	return value
+
+
+# 扩展新局 / 重开：effects 全新重建，不存在需要 rebase 的烘焙值
+func reset(restart: bool = false) -> void :
+	# 先清标记再走原版重置，避免旧档标记影响新局
+	fengliu_clear_legacy_rebase()
+	.reset(restart)
+
+
+# 通用台账读取（is_linked_layer 区分层）
+func fengliu_read_secondary_ledger(player_index: int, is_linked_layer: bool) -> Dictionary:
+	var effects: Dictionary = get_player_effects(player_index)
+	var ledger_hash: int = fengliu_secondary_ledger_key_hash(is_linked_layer)
+	var ledger := {}
+	# 无台账键 / 结构不符都视为空台账
+	if not effects.has(ledger_hash):
+		return ledger
+	var raw = effects[ledger_hash]
+	if not raw is Array:
+		return ledger
+	# 逐条归一化（读档后键与值可能是字符串/浮点）
+	for entry in raw:
+		if entry is Array and entry.size() >= 2:
+			ledger[int(entry[0])] = int(entry[1])
+	return ledger
+
+
+# 读取某玩家的 StatLink 层台账（{stat_hash: amount}）
+func fengliu_secondary_link_ledger(player_index: int) -> Dictionary:
+	return fengliu_read_secondary_ledger(player_index, true)
+
+
+# 读取某玩家的 TempStats 层台账（诊断用；波内临时量，原版会自行回收）
+func fengliu_secondary_temp_ledger(player_index: int) -> Dictionary:
+	return fengliu_read_secondary_ledger(player_index, false)
+
+
+# 旧档残值报告（修复前每次读档都会多叠一份链接层数值，需按份数校正）
+func fengliu_secondary_link_residue_report(player_index: int) -> String:
+	var effects: Dictionary = get_player_effects(player_index)
+	var ledger: Dictionary = fengliu_secondary_link_ledger(player_index)
+	# 头部：linked 层是否已有台账 + 记账条目数 + temp 层条目数 + 旧单台账是否残留
+	var report := "player=%d linked_present=%s entries=%d temp_entries=%d legacy_present=%s" % [
+		player_index,
+		str(effects.has(fengliu_secondary_ledger_key_hash(true))),
+		ledger.size(),
+		fengliu_secondary_temp_ledger(player_index).size(),
+		str(effects.has(fengliu_legacy_ledger_key_hash()))
+	]
+	# 逐条列出「现值 / 本层记账量 / 减掉一份后的值」
+	for stat_hsh in ledger.keys():
+		var stat_name: String = Keys.hash_to_string[stat_hsh] if Keys.hash_to_string.has(stat_hsh) else str(stat_hsh)
+		report += "\n  %s now=%s link_total=%s after_trim1=%s" % [
+			stat_name,
+			str(effects.get(stat_hsh, "<none>")),
+			str(ledger[stat_hsh]),
+			str(int(effects.get(stat_hsh, 0)) - int(ledger[stat_hsh]))
+		]
+	return report
+
+
+# 旧档残值校正：把修复前每次读档多叠的链接层数值减掉（copies＝要减掉的份数）
+#   注意：调用后应按正常流程再跑一次 LinkedStats.reset_player（例如进一次商店），
+#   台账仍记录「本层应叠加量」，下次重算会按当前属性刷新，不会把减掉的量加回来。
+func fengliu_trim_secondary_link_residue(player_index: int, copies: int = 1) -> int:
+	if copies <= 0:
+		return 0
+	var effects: Dictionary = get_player_effects(player_index)
+	var ledger: Dictionary = fengliu_secondary_link_ledger(player_index)
+	var trimmed := 0
+	for stat_hsh in ledger.keys():
+		if not effects.has(stat_hsh):
+			continue
+		# 读档后可能是 float，统一按 int 处理
+		effects[stat_hsh] = int(effects[stat_hsh]) - copies * int(ledger[stat_hsh])
+		trimmed += 1
+	if trimmed > 0:
+		_are_player_stats_dirty[player_index] = true
+		Utils.reset_stat_cache(player_index)
+	return trimmed
 
 
 # 补齐树木型次要属性槽位（幂等，只补缺失的键；player_index 为 -1 时处理全部玩家）
