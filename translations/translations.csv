@@ -54,6 +54,7 @@ ITEM_WOODPILE,Woodpile,木料堆
 ITEM_BUSHES,Bushes,灌木
 ITEM_ACCELERANT,Accelerant,助燃剂
 ITEM_ALCOHOL_LAMP,Alcohol Lamp,酒精灯
+WEAPON_MOLOTOV,Molotov,燃烧瓶
 EFFECT_TWO_HAND_WEAPON_SLOT_LIMIT,Only has two hands (so can only hold two weapons),只有两只手所以只拿两个武器
 ITEM_RAT_KING_RATZILLA,Rat Subject,鼠族臣民
 EFFECT_RATZILLA_KILLER_BOSS_TEXT,Ratzilla targets and attacks Bosses,鼠斯拉会锁定并攻击 boss
@@ -177,3 +178,4 @@ EFFECT_TREE_DROP_DOUBLE_VALUE,{0} % Double Tree Drops,{0} %树木掉落翻倍
 EFFECT_TREE_VALUE,Gain {0} Trees,增加{0}点树木
 FENGLIU_REKINDLING,% Multi Burn,%多重燃烧
 EFFECT_REKINDLING_VALUE,{0} % Multi Burn,{0} %多重燃烧
+WEAPON_CLASS_BURN,Burn,燃烧
