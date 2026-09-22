@@ -14,6 +14,6 @@ effect_sign = 0
 custom_args = [  ]
 chance = 1.0
 explosion_scene = ExtResource( 3 )
-scale = 2.0
+scale = 1.65
 base_smoke_amount = 5
 sound_db_mod = -20
