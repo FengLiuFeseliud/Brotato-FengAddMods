@@ -179,3 +179,4 @@ EFFECT_TREE_VALUE,Gain {0} Trees,增加{0}点树木
 FENGLIU_REKINDLING,% Multi Burn,%多重燃烧
 EFFECT_REKINDLING_VALUE,{0} % Multi Burn,{0} %多重燃烧
 WEAPON_CLASS_BURN,Burn,燃烧
+EFFECT_FIRE_EXPLODING,,击中时{0}爆炸并留下持续{1}秒的火焰区域

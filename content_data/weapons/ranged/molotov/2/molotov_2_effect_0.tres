@@ -1,12 +1,12 @@
 [gd_resource type="Resource" load_steps=3 format=2]
 
-[ext_resource path="res://effects/weapons/exploding_effect.gd" type="Script" id=1]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/effects/weapons/effect_fire_exploding.gd" type="Script" id=1]
 [ext_resource path="res://projectiles/explosion.tscn" type="PackedScene" id=3]
 
 [resource]
 script = ExtResource( 1 )
 key = "effect_explode_custom"
-text_key = ""
+text_key = "EFFECT_FIRE_EXPLODING"
 value = 0
 custom_key = ""
 storage_method = 0
@@ -14,6 +14,10 @@ effect_sign = 0
 custom_args = [  ]
 chance = 1.0
 explosion_scene = ExtResource( 3 )
-scale = 1.35
+scale = 1.25
 base_smoke_amount = 5
 sound_db_mod = -20
+fire_scale = 1.0
+fire_duration = 2.0
+fire_tick_interval = 0.5
+fire_particle_count = 8
