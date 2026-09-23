@@ -123,7 +123,7 @@ var fengliu_item_clown_fish = Keys.generate_hash("item_clown_fish") # 小丑鱼�
 
 var fengliu_item_auto_open_box_hash = Keys.generate_hash("item_auto_open_box") # 自动化箱子道具哈希
 var fengliu_crate_gobbler_hash = Keys.generate_hash("crate_gobbler") # 箱子吞吞怪追踪哈希
-
+var fengliu_item_kebab_hash = Keys.generate_hash("item_kebab")
 
 var stat_after_change_wave_value_count = {}
 var all_secondary_stats_hashs = []
@@ -325,51 +325,6 @@ func fengliu_secondary_temp_ledger(player_index: int) -> Dictionary:
 	return fengliu_read_secondary_ledger(player_index, false)
 
 
-# 旧档残值报告（修复前每次读档都会多叠一份链接层数值，需按份数校正）
-func fengliu_secondary_link_residue_report(player_index: int) -> String:
-	var effects: Dictionary = get_player_effects(player_index)
-	var ledger: Dictionary = fengliu_secondary_link_ledger(player_index)
-	# 头部：linked 层是否已有台账 + 记账条目数 + temp 层条目数 + 旧单台账是否残留
-	var report := "player=%d linked_present=%s entries=%d temp_entries=%d legacy_present=%s" % [
-		player_index,
-		str(effects.has(fengliu_secondary_ledger_key_hash(true))),
-		ledger.size(),
-		fengliu_secondary_temp_ledger(player_index).size(),
-		str(effects.has(fengliu_legacy_ledger_key_hash()))
-	]
-	# 逐条列出「现值 / 本层记账量 / 减掉一份后的值」
-	for stat_hsh in ledger.keys():
-		var stat_name: String = Keys.hash_to_string[stat_hsh] if Keys.hash_to_string.has(stat_hsh) else str(stat_hsh)
-		report += "\n  %s now=%s link_total=%s after_trim1=%s" % [
-			stat_name,
-			str(effects.get(stat_hsh, "<none>")),
-			str(ledger[stat_hsh]),
-			str(int(effects.get(stat_hsh, 0)) - int(ledger[stat_hsh]))
-		]
-	return report
-
-
-# 旧档残值校正：把修复前每次读档多叠的链接层数值减掉（copies＝要减掉的份数）
-#   注意：调用后应按正常流程再跑一次 LinkedStats.reset_player（例如进一次商店），
-#   台账仍记录「本层应叠加量」，下次重算会按当前属性刷新，不会把减掉的量加回来。
-func fengliu_trim_secondary_link_residue(player_index: int, copies: int = 1) -> int:
-	if copies <= 0:
-		return 0
-	var effects: Dictionary = get_player_effects(player_index)
-	var ledger: Dictionary = fengliu_secondary_link_ledger(player_index)
-	var trimmed := 0
-	for stat_hsh in ledger.keys():
-		if not effects.has(stat_hsh):
-			continue
-		# 读档后可能是 float，统一按 int 处理
-		effects[stat_hsh] = int(effects[stat_hsh]) - copies * int(ledger[stat_hsh])
-		trimmed += 1
-	if trimmed > 0:
-		_are_player_stats_dirty[player_index] = true
-		Utils.reset_stat_cache(player_index)
-	return trimmed
-
-
 # 补齐树木型次要属性槽位（幂等，只补缺失的键；player_index 为 -1 时处理全部玩家）
 func fengliu_ensure_extra_stat_slots(player_index: int = - 1) -> void :
 	_fengliu_init_extra_stat_hashs()
@@ -403,6 +358,8 @@ func init_tracked_effects() -> Dictionary:
 	# 初始化追踪
 	tracked[fengliu_item_auto_open_box_hash] = 0
 	tracked[fengliu_crate_gobbler_hash] = 0
+	# 追踪键须与道具 id 哈希一致，否则道具描述读不到计数
+	tracked[fengliu_item_kebab_hash] = 0
 	return tracked
 
 

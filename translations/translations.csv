@@ -179,4 +179,7 @@ EFFECT_TREE_VALUE,Gain {0} Trees,增加{0}点树木
 FENGLIU_REKINDLING,% Multi Burn,%多重燃烧
 EFFECT_REKINDLING_VALUE,{0} % Multi Burn,{0} %多重燃烧
 WEAPON_CLASS_BURN,Burn,燃烧
-EFFECT_FIRE_EXPLODING,,击中时{0}爆炸并留下持续{1}秒的火焰区域
+EFFECT_FIRE_EXPLODING,"On hit, {0} chance to explode and leave a fire area for {1} seconds",击中时{0}爆炸并留下持续{1}秒的火焰区域
+ITEM_KEBAB,Kebab,烤串
+EFFECT_BURNING_KILL_EXTRA_MATERIAL,Killing an enemy with burning drops {1} Materials with a {0} Multi Burn chance; every 100% Multi Burn drops {1} extra Materials,燃烧击杀敌人时{0}多重燃烧概率掉落{1}材料，每100%多重燃烧额外掉落{1}材料
+MATERIALS_GAINED_KEBAB,Materials dropped from burning kills: {0},燃烧击杀掉落材料：{0}

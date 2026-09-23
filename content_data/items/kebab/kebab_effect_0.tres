@@ -1,0 +1,13 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/effects/effect_burning_kill_extra_material.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+key = ""
+text_key = "EFFECT_BURNING_KILL_EXTRA_MATERIAL"
+value = 1
+custom_key = "fengliu_burning_kill_extra_material"
+storage_method = 0
+effect_sign = 3
+custom_args = [  ]

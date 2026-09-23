@@ -15,13 +15,16 @@ var effect_fengliu_add_stat_fron_wave_intensity = Keys.generate_hash("fengliu_ad
 var effect_fengliu_kill_looter_spawn_boss = Keys.generate_hash("fengliu_kill_looter_spawn_boss")
 var effect_fengliu_gold_stats = Keys.generate_hash("fengliu_gold_stats")
 var effect_fengliu_effect_box_stats = Keys.generate_hash("fengliu_box_stats")
+var effect_fengliu_burning_kill_extra_material = Keys.generate_hash("fengliu_burning_kill_extra_material")
 
 
 var fengliu_item_auto_open_box_hash = Keys.generate_hash("item_auto_open_box")
 var fengliu_crate_gobbler_hash = Keys.generate_hash("crate_gobbler")
+var fengliu_item_kebab_hash = Keys.generate_hash("item_kebab")
 
 
 var fengliu_tree_drop_double = Keys.generate_hash("fengliu_tree_drop_double")
+var fengliu_rekindling_hash = Keys.generate_hash("fengliu_rekindling")
 
 
 var _is_speedrun_ending: bool = false
@@ -261,6 +264,9 @@ func on_gold_picked_up(gold: Node, player_index: int) -> void :
 
 # 扩展敌人死亡后
 func _on_enemy_died(enemy, args: Entity.DieArgs) -> void:
+	# 燃烧击杀额外掉落材料
+	fengliu_burning_kill_extra_material(enemy, args)
+
 	for player in _get_shuffled_live_players(): 
 		# 击杀战利品外星人有概率生成 Boss
 		var effects = RunData.get_player_effect(effect_fengliu_kill_looter_spawn_boss, player.player_index)
@@ -298,6 +304,43 @@ func _on_enemy_died(enemy, args: Entity.DieArgs) -> void:
 			handle_stat_damages(effects, player_index)
 				
 	._on_enemy_died(enemy, args)
+
+
+# 燃烧击杀额外掉落材料：每 100% 多重燃烧追加 1 个，余数按概率追加
+func fengliu_burning_kill_extra_material(enemy: Enemy, args: Entity.DieArgs) -> void:
+	# 清理阶段、非玩家击杀一律不掉落
+	if _cleaning_up or args.cleaning_up or not args.enemy_killed_by_player:
+		return
+
+	# 只有燃烧击杀才算
+	if not args.is_burning:
+		return
+
+	var player_index: int = args.killed_by_player_index
+	if player_index < 0:
+		return
+
+	var effects = RunData.get_player_effect(effect_fengliu_burning_kill_extra_material, player_index)
+	if effects.size() == 0:
+		return
+
+	# 多重燃烧：每 100% 追加 1 个，余数按概率追加
+	var rekindling = RunData.get_player_effect(fengliu_rekindling_hash, player_index) / 100.0
+	var count = int(rekindling)
+	var extra_count = 0
+
+	for effect in effects:
+		extra_count += count + effect[0]
+
+		if Utils.get_chance_success(rekindling - int(rekindling)):
+			extra_count += effect[0]
+
+	# 数量不足时不生成
+	if extra_count <= 0:
+		return
+
+	spawn_gold(extra_count, enemy.global_position, 0)
+	RunData.add_tracked_value(player_index, fengliu_item_kebab_hash, extra_count)
 
 
 # 扩展升级提升
