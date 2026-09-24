@@ -10,7 +10,8 @@ const CONTENT_DATA_DIR = MOD_DIR + "content_data.tres"
 const FENGLIU_T0_INJECT_EXCLUDE_CHARACTERS := [
 	# 原版角色示例（带 character_ 前缀）
 	# "character_well_rounded",
-	"cleaner"
+	"cleaner",
+	"baked_potato"
 ]
 
 # 排除不希望自动注入到初始武器池的 t0 mod 武器（weapon_id）

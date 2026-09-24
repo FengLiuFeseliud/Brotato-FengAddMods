@@ -55,6 +55,7 @@ ITEM_BUSHES,Bushes,灌木
 ITEM_ACCELERANT,Accelerant,助燃剂
 ITEM_ALCOHOL_LAMP,Alcohol Lamp,酒精灯
 WEAPON_MOLOTOV,Molotov,燃烧瓶
+BAKED_POTATO,Baked Potato,烤土豆
 EFFECT_TWO_HAND_WEAPON_SLOT_LIMIT,Only has two hands (so can only hold two weapons),只有两只手所以只拿两个武器
 ITEM_RAT_KING_RATZILLA,Rat Subject,鼠族臣民
 EFFECT_RATZILLA_KILLER_BOSS_TEXT,Ratzilla targets and attacks Bosses,鼠斯拉会锁定并攻击 boss
@@ -183,3 +184,5 @@ EFFECT_FIRE_EXPLODING,"On hit, {0} chance to explode and leave a fire area for {
 ITEM_KEBAB,Kebab,烤串
 EFFECT_BURNING_KILL_EXTRA_MATERIAL,Killing an enemy with burning drops {1} Materials with a {0} Multi Burn chance; every 100% Multi Burn drops {1} extra Materials,燃烧击杀敌人时{0}多重燃烧概率掉落{1}材料，每100%多重燃烧额外掉落{1}材料
 MATERIALS_GAINED_KEBAB,Materials dropped from burning kills: {0},燃烧击杀掉落材料：{0}
+EFFECT_BURNING_SLOW,"On dealing burn damage, slow enemies by {0} ({1})",造成燃烧伤害时对敌人减速{0}（{1}）
+EFFECT_WEAPON_BURN_DAMAGE,"Burning damage is replaced by the total burn damage of your weapons",燃烧伤害改为你的武器燃烧伤害总和

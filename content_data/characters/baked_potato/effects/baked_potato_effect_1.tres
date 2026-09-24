@@ -1,0 +1,15 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/effects/effect_random_stats_on_level_up.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+key = "fengliu_rekindling"
+text_key = "EFFECT_RANDOM_STAT_ON_LEVEL_UP"
+value = 10
+custom_key = "fengliu_random_stats_on_level_up"
+storage_method = 1
+effect_sign = 3
+custom_args = [  ]
+stat_min_value = 5
+stat_max_value = 10

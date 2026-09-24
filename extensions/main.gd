@@ -164,11 +164,14 @@ func fengliu_random_stats_on_level_up(effect: Array, player_index: int) -> void:
 	var stat_hash = effect[0]
 	# 随机计算属性值
 	var random_add_value = fengliu_get_dynamic_value_to_effect(effect, player_index) 
-	if effect[4]:
+	# 主属性
+	if Utils.is_stat_key(stat_hash):
 		RunData.add_stat(stat_hash, random_add_value, player_index)
 		return
-			
-	RunData.add_stat(stat_hash, random_add_value, player_index)
+
+	# 非主属性
+	RunData.get_player_effects(player_index)[stat_hash] += random_add_value
+	Utils.reset_stat_cache(player_index)
 
 
 # 复活 boss
@@ -330,7 +333,7 @@ func fengliu_burning_kill_extra_material(enemy: Enemy, args: Entity.DieArgs) -> 
 	var extra_count = 0
 
 	for effect in effects:
-		extra_count += count + effect[0]
+		extra_count += count * effect[0]
 
 		if Utils.get_chance_success(rekindling - int(rekindling)):
 			extra_count += effect[0]
