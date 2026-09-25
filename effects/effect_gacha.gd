@@ -6,6 +6,8 @@ export(int) var boss_chance = 0
 export(int) var legendary_chance = 0
 export(int) var cost_gold = 0
 export(float) var wave_inflation_rate
+# 商店背包刷新排队标记
+var _fengliu_shop_refresh_queued := {}
 
 
 static func get_id() -> String:
@@ -40,7 +42,46 @@ func add_item(tier: int, player_index: int):
     args.fixed_tier = tier
 
     RunData.add_item(ItemService._get_rand_item_for_wave(RunData.current_wave, player_index, ItemService.TierData.ITEMS, args), player_index)
+    # 抽到的道具需要立刻显示在商店背包里
+    _fengliu_refresh_shop_items(player_index)
     RunData.add_tracked_value(player_index, RunData.fengliu_item_gacha_hash, 1)
+
+
+# 当前商店节点（非商店场景返回 null）
+func _fengliu_get_shop():
+    var tree = RunData.get_tree()
+    if tree == null:
+        return null
+
+    var scene = tree.current_scene
+    if scene != null and scene.has_method("_get_gear_container"):
+        return scene
+
+    return null
+
+
+# 请求刷新商店背包（非商店场景静默跳过）
+func _fengliu_refresh_shop_items(player_index: int) -> void:
+    var shop = _fengliu_get_shop()
+    if shop == null:
+        return
+        
+    if _fengliu_shop_refresh_queued.get(player_index, false):
+        return
+
+    _fengliu_shop_refresh_queued[player_index] = true
+    call_deferred("_fengliu_do_refresh_shop_items", player_index)
+
+
+func _fengliu_do_refresh_shop_items(player_index: int) -> void:
+    _fengliu_shop_refresh_queued[player_index] = false
+
+    var shop = _fengliu_get_shop()
+    if shop == null:
+        return
+
+    # 商店自己的 _get_gear_container 已处理单机/联机分玩家容器
+    shop._get_gear_container(player_index).set_items_data(RunData.get_player_items(player_index))
 
 
 func apply(player_index: int) -> void:
