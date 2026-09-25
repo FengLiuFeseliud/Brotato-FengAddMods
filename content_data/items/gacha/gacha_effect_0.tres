@@ -1,0 +1,17 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/effects/effect_gacha.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+key = ""
+text_key = "EFFECT_GACHA"
+value = 5
+custom_key = "fengliu_gacha"
+storage_method = 0
+effect_sign = 3
+custom_args = [  ]
+boss_chance = 2
+legendary_chance = 2
+cost_gold = 20
+wave_inflation_rate = 0.2

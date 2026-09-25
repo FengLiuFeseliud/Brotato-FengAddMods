@@ -124,6 +124,7 @@ var fengliu_item_clown_fish = Keys.generate_hash("item_clown_fish") # 小丑鱼�
 var fengliu_item_auto_open_box_hash = Keys.generate_hash("item_auto_open_box") # 自动化箱子道具哈希
 var fengliu_crate_gobbler_hash = Keys.generate_hash("crate_gobbler") # 箱子吞吞怪追踪哈希
 var fengliu_item_kebab_hash = Keys.generate_hash("item_kebab")
+var fengliu_item_gacha_hash = Keys.generate_hash("item_gacha") # 抽卡道具追踪哈希
 
 var stat_after_change_wave_value_count = {}
 var all_secondary_stats_hashs = []
@@ -360,6 +361,7 @@ func init_tracked_effects() -> Dictionary:
 	tracked[fengliu_crate_gobbler_hash] = 0
 	# 追踪键须与道具 id 哈希一致，否则道具描述读不到计数
 	tracked[fengliu_item_kebab_hash] = 0
+	tracked[fengliu_item_gacha_hash] = 0
 	return tracked
 
 

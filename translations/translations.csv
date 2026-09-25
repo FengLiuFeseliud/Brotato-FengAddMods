@@ -186,3 +186,6 @@ EFFECT_BURNING_KILL_EXTRA_MATERIAL,Killing an enemy with burning drops {1} Mater
 MATERIALS_GAINED_KEBAB,Materials dropped from burning kills: {0},燃烧击杀掉落材料：{0}
 EFFECT_BURNING_SLOW,"On dealing burn damage, slow enemies by {0} ({1})",造成燃烧伤害时对敌人减速{0}（{1}）
 EFFECT_WEAPON_BURN_DAMAGE,"Burning damage is replaced by the total burn damage of your weapons",燃烧伤害改为你的武器燃烧伤害总和
+ITEM_GACHA,Gacha Machine,抽卡
+EFFECT_GACHA,"Draw {1} time(s) for {0} materials: {2}% chance for a Red Crate, {3}% chance for a Boss",消耗{0}材料抽取{1}次道具，{2}%额外概率出红（幸运越高越容易），{3}%概率出boss
+GACHA_ITEMS_DRAWN,"Items drawn: {0}",已抽到道具：{0}
