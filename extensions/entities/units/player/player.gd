@@ -25,6 +25,13 @@ var _scale_value = 1
 var fengliu_shield = 0
 var fengliu_shield_absorb: int = 0
 
+var fengliu_shield_regen_delay: float = 3.0
+var fengliu_shield_regen_tick: float = 1.0
+var fengliu_shield_regen_rate: float = 0.1
+
+var _fengliu_shield_regen_timer: = FixedTimer.new(3.0)
+var _fengliu_shield_regen_pool: float = 0.0
+
 
 # 计算动态概率
 static func fengliu_get_dynamic_chance(init_chance: int, add_chance: int = 0, stat_count: int = 0) -> float:
@@ -59,6 +66,7 @@ func _ready() -> void :
         _clean_up_room_timer = FixedTimer.new(1)
         _can_not_moving_explosio = false
         _exploding_on_clean_up_room = effects[0].exploding_on_clean_up_room
+    
     # 配置盾值
     fengliu_shield = Utils.get_stat(fengliu_shield_hash, player_index)
 
@@ -86,6 +94,11 @@ func _physics_process(delta: float) -> void :
     # 清理房间计时
     if _clean_up_room_timer != null and _clean_up_room_timer.try_loop(delta) > 0:
         fengliu_on_clean_up_room()
+
+    # 回盾计时：满 3 秒静默后开始，之后每秒一跳
+    var shield_regen_loop: int = _fengliu_shield_regen_timer.try_loop(delta)
+    if shield_regen_loop > 0:
+        fengliu_on_shield_regen(shield_regen_loop)
     
 
 # 扩展受伤防护
@@ -124,10 +137,15 @@ func take_damage(value: int, args: TakeDamageArgs) -> Array:
         # 被闪避的伤害不吃盾
         if damage_taken.size() > 2 and damage_taken[2]:
             fengliu_shield = min(fengliu_shield + shield_absorbed, Utils.get_stat(fengliu_shield_hash, player_index))
+        else:
+            # 受击后重新开始回盾静默计时
+            fengliu_restart_shield_regen_delay(shield_absorbed, damage_taken)
 
         return damage_taken
 
-    return .take_damage(value, args)
+    var damage_taken_without_shield = .take_damage(value, args)
+    fengliu_restart_shield_regen_delay(0, damage_taken_without_shield)
+    return damage_taken_without_shield
 
 
 func fengliu_consume_shield_absorb() -> int:
@@ -151,6 +169,39 @@ func fengliu_can_shield_take_damage(value: int, args: TakeDamageArgs) -> bool:
         return false
 
     return true
+
+
+# 受击后重新开始回盾静默计时
+func fengliu_restart_shield_regen_delay(shield_absorbed: int, damage_taken: Array) -> void:
+    if not (shield_absorbed > 0 or (damage_taken.size() > 1 and damage_taken[1] > 0)):
+        return
+
+    _fengliu_shield_regen_pool = 0.0
+    _fengliu_shield_regen_timer.wait_time = fengliu_shield_regen_delay
+    _fengliu_shield_regen_timer.start()
+
+
+# 回盾：每跳回盾上限的 10%（严格 10%/秒、零头累积），回满即停
+func fengliu_on_shield_regen(loop_count: int) -> void:
+    var max_shield: float = Utils.get_stat(fengliu_shield_hash, player_index)
+    if dead or cleaning_up or max_shield <= 0.0 or fengliu_shield >= max_shield:
+        _fengliu_shield_regen_timer.stop()
+        _fengliu_shield_regen_pool = 0.0
+        return
+
+    _fengliu_shield_regen_pool += max_shield * fengliu_shield_regen_rate * loop_count
+    if _fengliu_shield_regen_pool >= 1.0:
+        fengliu_shield = min(fengliu_shield + int(_fengliu_shield_regen_pool), max_shield)
+        _fengliu_shield_regen_pool -= int(_fengliu_shield_regen_pool)
+
+    if fengliu_shield >= max_shield:
+        _fengliu_shield_regen_timer.stop()
+        _fengliu_shield_regen_pool = 0.0
+        return
+
+    # 3 秒静默后的首跳起，改为每秒一跳
+    _fengliu_shield_regen_timer.wait_time = fengliu_shield_regen_tick
+    _fengliu_shield_regen_timer.start()
 
 
 # 回复防护值

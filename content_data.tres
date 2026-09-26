@@ -1,4 +1,4 @@
-[gd_resource type="Resource" load_steps=103 format=2]
+[gd_resource type="Resource" load_steps=107 format=2]
 
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/rat_king/rat_king_data.tres" type="Resource" id=1]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/rat_king_ratzilla/rat_king_ratzilla.tres" type="Resource" id=2]
@@ -118,6 +118,10 @@
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/kebab/kebab_data.tres" type="Resource" id=116]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/baked_potato/baked_potato_data.tres" type="Resource" id=117]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/gacha/gacha_data.tres" type="Resource" id=118]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/upgrades/fengliu_shield/1/fengliu_shield_1_data.tres" type="Resource" id=119]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/upgrades/fengliu_shield/2/fengliu_shield_2_data.tres" type="Resource" id=120]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/upgrades/fengliu_shield/3/fengliu_shield_3_data.tres" type="Resource" id=121]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/upgrades/fengliu_shield/4/fengliu_shield_4_data.tres" type="Resource" id=122]
 
 [resource]
 script = ExtResource( 3 )
@@ -127,7 +131,7 @@ weapons = [ ExtResource( 5 ), ExtResource( 7 ), ExtResource( 9 ), ExtResource( 8
 weapons_characters = [ ]
 sets = [ ExtResource( 6 ), ExtResource( 60 ), ExtResource( 76 ), ExtResource( 83 ), ExtResource( 112 ) ]
 challenges = [  ]
-upgrades = [  ]
+upgrades = [ ExtResource( 119 ), ExtResource( 120 ), ExtResource( 121 ), ExtResource( 122 ) ]
 consumables = [  ]
 elites = [  ]
 difficulties = [  ]
