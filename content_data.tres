@@ -118,10 +118,10 @@
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/kebab/kebab_data.tres" type="Resource" id=116]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/baked_potato/baked_potato_data.tres" type="Resource" id=117]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/gacha/gacha_data.tres" type="Resource" id=118]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/upgrades/fengliu_shield/1/fengliu_shield_1_data.tres" type="Resource" id=119]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/upgrades/fengliu_shield/2/fengliu_shield_2_data.tres" type="Resource" id=120]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/upgrades/fengliu_shield/3/fengliu_shield_3_data.tres" type="Resource" id=121]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/upgrades/fengliu_shield/4/fengliu_shield_4_data.tres" type="Resource" id=122]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/upgrades/shield/1/fengliu_shield_1_data.tres" type="Resource" id=119]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/upgrades/shield/2/fengliu_shield_2_data.tres" type="Resource" id=120]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/upgrades/shield/3/fengliu_shield_3_data.tres" type="Resource" id=121]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/upgrades/shield/4/fengliu_shield_4_data.tres" type="Resource" id=122]
 
 [resource]
 script = ExtResource( 3 )

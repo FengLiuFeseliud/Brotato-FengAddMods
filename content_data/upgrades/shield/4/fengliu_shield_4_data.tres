@@ -2,16 +2,16 @@
 
 [ext_resource path="res://items/upgrades/upgrade_data.gd" type="Script" id=1]
 [ext_resource path="res://items/stats/armor.png" type="Texture" id=2]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/upgrades/fengliu_shield/1/fengliu_shield_1_effect.tres" type="Resource" id=3]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/upgrades/shield/4/fengliu_shield_4_effect.tres" type="Resource" id=3]
 
 [resource]
 script = ExtResource( 1 )
-my_id = "upgrade_fengliu_shield_1"
+my_id = "upgrade_fengliu_shield_4"
 unlocked_by_default = true
 can_be_looted = true
 icon = ExtResource( 2 )
 name = "UPGRADE_FENGLIU_SHIELD"
-tier = 0
+tier = 3
 value = 1
 effects = [ ExtResource( 3 ) ]
 tracking_text = ""
