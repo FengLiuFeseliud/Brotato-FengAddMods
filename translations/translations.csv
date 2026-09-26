@@ -195,3 +195,6 @@ INFO_POS_STAT_FENGLIU_SHIELD,{0} Shield. Absorbs damage before HP (1 Shield bloc
 INFO_NEG_STAT_FENGLIU_SHIELD,{0} Shield. Absorbs damage before HP (1 Shield blocks 1 damage; armor does not apply); regenerates 10% of max Shield per second after 3s without taking a hit,{0} 盾上限。受击时优先代替生命承受伤害（1点盾值抵消1点伤害，不受护甲影响），3秒内未再受伤则每秒恢复上限的10%
 STAT_FENGLIU_SHIELD,Shield,盾
 UPGRADE_FENGLIU_SHIELD,Shield,盾
+ITEM_BALLOON,Balloon,气球
+EFFECT_EXPLODE_ON_SHIELD_BROKEN,Explode for {1} ({2}) damage when your Shield is depleted,破盾时爆炸，造成{1}（{2}）伤害
+

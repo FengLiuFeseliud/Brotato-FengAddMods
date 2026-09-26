@@ -9,6 +9,7 @@ var effect_fengliu_temp_stats_on_hit_protection = Keys.generate_hash("fengliu_te
 var effect_fengliu_not_moving_explosion = Keys.generate_hash("fengliu_not_moving_explosion")
 var effect_fengliu_can_one_not_moving_explosion = Keys.generate_hash("fengliu_can_one_not_moving_explosion")
 var effect_fengliu_picked_up_consumable_add_size = Keys.generate_hash("fengliu_picked_up_consumable_add_size")
+var effect_fengliu_explode_on_shield_broken: int = Keys.generate_hash("fengliu_explode_on_shield_broken")
 
 var fengliu_shield_hash: int = Keys.generate_hash("stat_fengliu_shield")
 
@@ -117,6 +118,7 @@ func take_damage(value: int, args: TakeDamageArgs) -> Array:
     if fengliu_can_shield_take_damage(value, args):
         var previous_armor_applied: bool = args.armor_applied
         var incoming_damage: int = value
+        var shield_broken: bool = false
 
         fengliu_shield -= value
         if fengliu_shield > 0:
@@ -127,6 +129,7 @@ func take_damage(value: int, args: TakeDamageArgs) -> Array:
             # 打穿
             value = int(abs(fengliu_shield))
             fengliu_shield = 0
+            shield_broken = true
 
         var shield_absorbed: int = incoming_damage - value
         fengliu_shield_absorb = shield_absorbed
@@ -140,6 +143,9 @@ func take_damage(value: int, args: TakeDamageArgs) -> Array:
         else:
             # 受击后重新开始回盾静默计时
             fengliu_restart_shield_regen_delay(shield_absorbed, damage_taken)
+            # 破盾触发的效果
+            if shield_broken and args.from != self:
+                fengliu_on_shield_broken()
 
         return damage_taken
 
@@ -152,6 +158,14 @@ func fengliu_consume_shield_absorb() -> int:
     var count = fengliu_shield_absorb
     fengliu_shield_absorb = 0
     return count
+
+
+# 破盾触发
+func fengliu_on_shield_broken() -> void:
+    if RunData.get_player_effect(effect_fengliu_explode_on_shield_broken, player_index).size() == 0:
+        return
+
+    RunData.handle_explode_effect(effect_fengliu_explode_on_shield_broken, global_position, player_index)
 
 
 # 盾能否吃下这次伤害

@@ -1,0 +1,23 @@
+[gd_resource type="Resource" load_steps=4 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/effects/effect_explode_on_shield_broken.gd" type="Script" id=1]
+[ext_resource path="res://projectiles/explosion.tscn" type="PackedScene" id=2]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/balloon/balloon_explosion_stats.tres" type="Resource" id=3]
+
+[resource]
+script = ExtResource( 1 )
+key = ""
+text_key = "EFFECT_EXPLODE_ON_SHIELD_BROKEN"
+value = 0
+custom_key = "fengliu_explode_on_shield_broken"
+storage_method = 2
+effect_sign = 3
+custom_args = [  ]
+chance = 1.0
+explosion_scene = ExtResource( 2 )
+scale = 1.75
+base_smoke_amount = 20
+sound_db_mod = -13
+stats = ExtResource( 3 )
+tracking_key = "item_balloon"
+scale_with_missing_health = false

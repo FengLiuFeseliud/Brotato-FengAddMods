@@ -156,6 +156,10 @@ var wave_end_can_box_use_items = [
 
 
 # 扩展初始化哈希列表
+func _enter_tree() -> void:
+	init_tracked_items[Keys.generate_hash("item_balloon")] = 0
+
+
 func _ready() -> void :
 	# 生成次要属性哈希
 	for secondary_stat in ALL_SECONDARY_STATS:
