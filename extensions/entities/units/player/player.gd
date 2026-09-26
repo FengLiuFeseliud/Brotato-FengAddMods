@@ -10,6 +10,7 @@ var effect_fengliu_not_moving_explosion = Keys.generate_hash("fengliu_not_moving
 var effect_fengliu_can_one_not_moving_explosion = Keys.generate_hash("fengliu_can_one_not_moving_explosion")
 var effect_fengliu_picked_up_consumable_add_size = Keys.generate_hash("fengliu_picked_up_consumable_add_size")
 
+var fengliu_shield_hash: int = Keys.generate_hash("stat_fengliu_shield")
 
 var _max_hit_protection = 0
 var _regen_hit_protection_timer = null
@@ -20,6 +21,9 @@ var _can_not_moving_explosio = false
 var _clean_up_room_timer
 var _exploding_on_clean_up_room
 var _scale_value = 1 
+
+var fengliu_shield = 0
+var fengliu_shield_absorb: int = 0
 
 
 # 计算动态概率
@@ -55,6 +59,8 @@ func _ready() -> void :
         _clean_up_room_timer = FixedTimer.new(1)
         _can_not_moving_explosio = false
         _exploding_on_clean_up_room = effects[0].exploding_on_clean_up_room
+    # 配置盾值
+    fengliu_shield = Utils.get_stat(fengliu_shield_hash, player_index)
 
 
 # 获取玩家 UI
@@ -92,7 +98,59 @@ func take_damage(value: int, args: TakeDamageArgs) -> Array:
         for effect in RunData.get_player_effect(effect_fengliu_temp_stats_on_hit_protection, player_index):
             TempStats.add_stat(effect[0], effect[1], player_index)
 
+    fengliu_shield_absorb = 0
+
+    # 盾优先吃这次伤害
+    if fengliu_can_shield_take_damage(value, args):
+        var previous_armor_applied: bool = args.armor_applied
+        var incoming_damage: int = value
+
+        fengliu_shield -= value
+        if fengliu_shield > 0:
+            # 全吸收
+            value = 0
+            args.armor_applied = false
+        else:
+            # 打穿
+            value = int(abs(fengliu_shield))
+            fengliu_shield = 0
+
+        var shield_absorbed: int = incoming_damage - value
+        fengliu_shield_absorb = shield_absorbed
+
+        var damage_taken = .take_damage(value, args)
+        args.armor_applied = previous_armor_applied
+
+        # 被闪避的伤害不吃盾
+        if damage_taken.size() > 2 and damage_taken[2]:
+            fengliu_shield = min(fengliu_shield + shield_absorbed, Utils.get_stat(fengliu_shield_hash, player_index))
+
+        return damage_taken
+
     return .take_damage(value, args)
+
+
+func fengliu_consume_shield_absorb() -> int:
+    var count = fengliu_shield_absorb
+    fengliu_shield_absorb = 0
+    return count
+
+
+# 盾能否吃下这次伤害
+func fengliu_can_shield_take_damage(value: int, args: TakeDamageArgs) -> bool:
+    if value <= 0 or dead or fengliu_shield <= 0:
+        return false
+
+    if _hit_protection != 0:
+        return false
+
+    if args.hitbox != null and args.hitbox.is_healing:
+        return false
+
+    if not _invincibility_timer.is_stopped() and not args.bypass_invincibility:
+        return false
+
+    return true
 
 
 # 回复防护值
@@ -163,6 +221,7 @@ func fengliu_on_clean_up_room():
         _take_damage_args.bypass_invincibility = true
         _take_damage_args.from = self
         var _dmg_taken = take_damage(int(Utils.get_stat(Keys.stat_max_hp_hash, player_index)), _take_damage_args)
+
 
 # 静止爆炸计时触发爆炸
 func fengliu_on_moving_explosion_timeout():

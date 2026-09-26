@@ -189,3 +189,7 @@ EFFECT_WEAPON_BURN_DAMAGE,"Burning damage is replaced by the total burn damage o
 ITEM_GACHA,Gacha Machine,抽卡
 EFFECT_GACHA,"Draw {1} time(s) for {0} materials: {2}% chance for a Red Crate, {3}% chance for a Boss",消耗{0}材料抽取{1}次道具，{2}%额外概率出红（幸运越高越容易），{3}%概率出boss
 GACHA_ITEMS_DRAWN,"Items drawn: {0}",已抽到道具：{0}
+FENGLIU_SHIELD,Shield,盾值
+INFO_POS_STAT_FENGLIU_SHIELD,{0} Shield,{0} 盾值
+INFO_NEG_STAT_FENGLIU_SHIELD,-{0} Shield,-{0} 盾值
+STAT_FENGLIU_SHIELD,Shield,盾值

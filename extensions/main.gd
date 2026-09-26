@@ -1,6 +1,17 @@
 extends Main
 
 
+const FENGLIU_STATUS_REFRESH_INTERVAL: = 0.1
+const FENGLIU_STATUS_COLOR_SHIELD: = Color(0.25, 0.6, 1.0, 1.0)   # 蓝色
+# 为「血条上方的同尺寸盾条」在**上排生命容器内部**预留的高度（血条高 48 + 间隔 4 = 52）；
+# 只塞进 LifeContainerP1/P2 的 VBox 里，不动 UI/HUD 本身 ⇒ 波次文本等其它 HUD 元素位置不变
+const FENGLIU_HUD_TOP_SPACER_HEIGHT: = 52
+
+var fengliu_shield_hash = Keys.generate_hash("stat_fengliu_shield")
+var _fengliu_status_refresh_timer: float = 0.0
+var _fengliu_shield_wave_max: = [0.0, 0.0, 0.0, 0.0]
+
+
 var effect_fengliu_can_add_chance_stat_damage_when_pickup_gold = Keys.generate_hash("fengliu_can_add_chance_stat_damage_when_pickup_gold")
 var effect_fengliu_can_add_chance_stat_damage_when_death = Keys.generate_hash("fengliu_can_add_chance_stat_damage_when_death")
 var effect_fengliu_random_stats_on_level_up = Keys.generate_hash("fengliu_random_stats_on_level_up")
@@ -28,6 +39,41 @@ var fengliu_rekindling_hash = Keys.generate_hash("fengliu_rekindling")
 
 
 var _is_speedrun_ending: bool = false
+
+
+func _ready() -> void :
+	# 生命周期回调由引擎按继承链自动调用，不要再 ._ready()
+	fengliu_reserve_shield_space()
+
+
+# 在上排生命容器内部最前面插入空占位节点，为血条上方的同尺寸盾条腾出空间。
+# 不改 UI/HUD 的边距 ⇒ 波次文本（UI/HUD/WaveContainer）等其它 HUD 元素位置不变；
+# 下排 P3/P4 是 SHRINK_END（贴底向上生长），上方本来就够，不需要占位。
+func fengliu_reserve_shield_space() -> void :
+	for idx in [1, 2]:
+		var container = get_node_or_null("UI/HUD/LifeContainerP%d" % idx)
+		if container == null:
+			continue
+
+		# 幂等：已有占位就跳过
+		if container.get_node_or_null("FengliuShieldSpace") != null:
+			continue
+
+		var spacer: = Control.new()
+		spacer.name = "FengliuShieldSpace"
+		spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		spacer.rect_min_size = Vector2(0.0, FENGLIU_HUD_TOP_SPACER_HEIGHT)
+		container.add_child(spacer)
+		container.move_child(spacer, 0)
+
+
+func _process(delta: float) -> void :
+	_fengliu_status_refresh_timer += delta
+	if _fengliu_status_refresh_timer < FENGLIU_STATUS_REFRESH_INTERVAL:
+		return
+	_fengliu_status_refresh_timer = 0.0
+
+	fengliu_update_player_status_bars()
 
 
 # 扩展切换场景（进入商店后清理波次结束失效的道具）
@@ -481,6 +527,8 @@ func fengliu_add_stat_fron_wave_intensity(effect: Array, player_index: int) -> v
 
 # 扩展清理房间
 func clean_up_room():
+	# 波末重置盾值条的满格基准
+	_fengliu_shield_wave_max = [0.0, 0.0, 0.0, 0.0]
 	for player_index in RunData.get_player_count():
 		var effects = RunData.get_player_effect(effect_fengliu_add_xp_gold_from_wave_time, player_index)
 		if effects.size() > 0:
@@ -549,3 +597,79 @@ func spawn_loot(unit: Unit, entity_type: int, args: Entity.DieArgs) -> void:
 		spawn_consumables(unit)
 
 	.spawn_loot(unit, entity_type, args)
+
+
+# 把盾值推给 HUD 血条与头顶血条
+func fengliu_update_player_status_bars() -> void :
+	for player_index in _players.size():
+		if player_index >= _players_ui.size():
+			continue
+
+		var player: Player = _players[player_index]
+		if not is_instance_valid(player) or player.dead:
+			fengliu_set_player_status_bars(player_index, [])
+			continue
+
+		fengliu_set_player_status_bars(player_index, fengliu_get_player_status_items(player, player_index))
+
+
+# 组装状态项[[ratio, Color, 文本], ...]
+# 没盾（shield <= 0）时也推一条空条（ratio = 0），让血条上方始终画着盾条
+func fengliu_get_player_status_items(player: Player, player_index: int) -> Array:
+	var items: = []
+
+	var shield: float = player.fengliu_shield
+	var basis: float = Utils.get_stat(fengliu_shield_hash, player_index)
+	var ratio: float = 0.0
+	if shield > 0.0 and basis > 0.0:
+		ratio = clamp(shield / basis, 0.0, 1.0)
+
+	items.push_back([ratio, FENGLIU_STATUS_COLOR_SHIELD, fengliu_get_shield_text(shield, basis)])
+
+	return items
+
+
+# 盾值数值文本
+func fengliu_get_shield_text(shield: float, basis: float) -> String:
+	return str(int(round(shield))) + " / " + str(int(round(basis)))
+
+
+func fengliu_set_player_status_bars(player_index: int, items: Array) -> void :
+	if player_index >= _players_ui.size():
+		return
+	var player_ui = _players_ui[player_index]
+	if player_ui == null:
+		return
+
+	var life_bar = player_ui.life_bar
+	if life_bar != null and life_bar.has_method("set_status_items"):
+		life_bar.set_status_items(items)
+
+	var player_life_bar = player_ui.player_life_bar
+	if player_life_bar != null and player_life_bar.has_method("set_status_items"):
+		player_life_bar.set_status_items(items)
+
+
+# 覆盖: 头顶血条 → 盾不满时也照常显示（原版只在血量不满时显示）
+func _on_player_health_updated(player: Player, current_val: int, max_val: int) -> void :
+	._on_player_health_updated(player, current_val, max_val)
+
+	var player_index = player.player_index
+	if player_index >= _players_ui.size():
+		return
+
+	var player_ui = _players_ui[player_index]
+	if player_ui == null:
+		return
+
+	var player_life_bar = player_ui.player_life_bar
+	if player_life_bar == null:
+		return
+
+	# 原版只看血量：血满但盾不满时，头顶血条会连带上方的盾条一起被收起
+	var shield_not_full: bool = player.fengliu_shield < Utils.get_stat(fengliu_shield_hash, player_index)
+	player_life_bar.visible = ProgressData.settings.hp_bar_on_character and (current_val != max_val or shield_not_full) and not player.dead
+
+	# 被这里重新点亮时原版跳过了数值刷新，补一次，避免血满时填充还是旧的
+	if player_life_bar.visible:
+		player_life_bar.update_value(current_val, max_val)

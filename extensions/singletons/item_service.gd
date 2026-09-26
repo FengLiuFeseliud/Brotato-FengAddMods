@@ -3,6 +3,7 @@ extends "res://singletons/item_service.gd"
 
 const FENGLIU_MOD_ID = "FengAddMods"
 const FENGLIU_EFFECTS_DIR = "res://mods-unpacked/FengLiu-FengAddMods/effects/"
+const FENGLIU_STATS_DIR = "res://mods-unpacked/FengLiu-FengAddMods/content_data/stats/"
 
 
 var effect_fengliu_can_all_drop_box = Keys.generate_hash("fengliu_can_all_drop_box")
@@ -27,6 +28,36 @@ var _all_upgrade_ids = {}
 
 func _enter_tree() -> void:
 	_fengliu_register_effect_prototypes()
+	_fengliu_register_stats()
+
+
+# 注册本 mod 的自定义属性资源
+func _fengliu_register_stats() -> void:
+	var dir := Directory.new()
+	# 打不开目录时直接放弃
+	if dir.open(FENGLIU_STATS_DIR) != OK:
+		return
+        
+	# 逐个登记目录下的 .tres 属性资源（同名属性只登记一次）
+	dir.list_dir_begin(true, true)
+	var file_name := dir.get_next()
+	while file_name.length() > 0:
+		if not dir.current_is_dir() and file_name.get_extension() == "tres":
+			var stat_resource = load(FENGLIU_STATS_DIR.plus_file(file_name))
+			if stat_resource is StatData and not _fengliu_has_custom_stat(stat_resource.stat_name):
+				# 属性哈希默认是 call_deferred 生成，这里立即补算
+				stat_resource.generate_hashes()
+				stats.push_back(stat_resource)
+		file_name = dir.get_next()
+	dir.list_dir_end()
+
+
+# 判断自定义属性是否已登记
+func _fengliu_has_custom_stat(stat_name: String) -> bool:
+	for existing_stat in stats:
+		if existing_stat is StatData and existing_stat.stat_name == stat_name:
+			return true
+	return false
 
 
 # 注册本 mod 全部效果脚本为存档还原原型（必须早于 ContentLoader 触发的那次读档）

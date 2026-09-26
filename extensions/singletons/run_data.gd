@@ -186,6 +186,10 @@ func reset_players_data_stats_and_effects() -> void :
 	.reset_players_data_stats_and_effects()
 	# 重建后补回本 mod 次要属性槽位
 	fengliu_ensure_extra_stat_slots()
+	# 重建后补回基础盾值（详见 extensions/singletons/player_run_data.gd）
+	for player_data in players_data:
+		if player_data is PlayerRunData:
+			player_data.fengliu_apply_base_shield()
 
 
 # 台账键哈希（is_linked_layer 区分层：true = StatLink 层，false = TempStats 层）
