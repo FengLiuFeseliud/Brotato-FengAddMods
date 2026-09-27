@@ -10,13 +10,15 @@ extends "res://mods-unpacked/FengLiu-FengAddMods/effects/global/mod_effect.gd"
 #   运行时 custom_key：fengliu_no_hit_material
 # ------------------------------------------------------------
 # 效果值：
-#   wait_time     未受伤多久算一轮（秒）
-#   value         每轮获得的材料数
-#   tracking_key  追踪键（填道具 id，空则不累计）
+#   wait_time      未受伤多久算一轮（秒）
+#   value          每轮获得的材料数
+#   tracking_key   追踪键（填道具 id，空则不累计）
+#   disable_on_hit 受伤一次后本波不再触发
 # ============================================================
 
 export (int) var wait_time = 10
 export (String) var tracking_key = ""
+export (bool) var disable_on_hit = false
 
 
 static func get_id() -> String:

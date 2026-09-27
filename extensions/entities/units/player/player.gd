@@ -37,6 +37,7 @@ var _fengliu_shield_regen_timer: = FixedTimer.new(3.0)
 var _fengliu_shield_regen_pool: float = 0.0
 var _fengliu_no_hit_material_effects: Array = []
 var _fengliu_no_hit_material_timers: Array = []
+var _fengliu_no_hit_material_disabled: Array = []
 
 
 # 计算动态概率
@@ -122,6 +123,9 @@ func _physics_process(delta: float) -> void :
     # 未受伤计时：每个效果实例各自计时，满一轮结算一次材料（先同步槽位变化）
     fengliu_sync_no_hit_material_timers()
     for i in _fengliu_no_hit_material_timers.size():
+        # 受伤后本波失效的实例不再计时
+        if i < _fengliu_no_hit_material_disabled.size() and _fengliu_no_hit_material_disabled[i]:
+            continue
         var no_hit_material_loop: int = _fengliu_no_hit_material_timers[i].try_loop(delta)
         if no_hit_material_loop > 0:
             fengliu_on_no_hit_material(_fengliu_no_hit_material_effects[i], no_hit_material_loop)
@@ -168,9 +172,9 @@ func take_damage(value: int, args: TakeDamageArgs) -> Array:
         else:
             # 受击后重新开始回盾静默计时
             fengliu_restart_shield_regen_delay(shield_absorbed, damage_taken)
-            # 破盾触发的效果
-            if shield_broken and args.from != self:
-                fengliu_on_shield_broken()
+            # 破盾触发：材料计时失效（+ 破盾爆炸，不含自伤）
+            if shield_broken:
+                fengliu_on_shield_broken(args.from != self)
 
         return damage_taken
 
@@ -185,9 +189,11 @@ func fengliu_consume_shield_absorb() -> int:
     return count
 
 
-# 破盾触发
-func fengliu_on_shield_broken() -> void:
-    if RunData.get_player_effect(effect_fengliu_explode_on_shield_broken, player_index).size() == 0:
+# 破盾触发：材料计时失效 + 破盾爆炸（爆炸仅在非自伤时触发）
+func fengliu_on_shield_broken(can_explode: bool = true) -> void:
+    fengliu_no_hit_material()
+
+    if not can_explode or RunData.get_player_effect(effect_fengliu_explode_on_shield_broken, player_index).size() == 0:
         return
 
     RunData.handle_explode_effect(effect_fengliu_explode_on_shield_broken, global_position, player_index)
@@ -216,12 +222,19 @@ func fengliu_restart_shield_regen_delay(shield_absorbed: int, damage_taken: Arra
         return
 
     _fengliu_shield_regen_pool = 0.0
-    # 同一次「真受伤」也重置未受伤奖励材料计时（每个实例各自重计）
-    for no_hit_material_timer in _fengliu_no_hit_material_timers:
-        no_hit_material_timer.start()
-
     _fengliu_shield_regen_timer.wait_time = fengliu_shield_regen_delay
     _fengliu_shield_regen_timer.start()
+
+
+# 材料计时开了 disable_on_hit 的实例本波失效，其余重新计时
+func fengliu_no_hit_material() -> void:
+    for i in _fengliu_no_hit_material_timers.size():
+        if i < _fengliu_no_hit_material_effects.size() and _fengliu_no_hit_material_effects[i].disable_on_hit:
+            if i < _fengliu_no_hit_material_disabled.size():
+                _fengliu_no_hit_material_disabled[i] = true
+            _fengliu_no_hit_material_timers[i].stop()
+            continue
+        _fengliu_no_hit_material_timers[i].start()
 
 
 # 回盾：每跳回盾上限的 10%（严格 10%/秒、零头累积），回满即停
@@ -263,6 +276,7 @@ func fengliu_sync_no_hit_material_timers() -> void:
 
     var new_effects := []
     var new_timers := []
+    var new_disabled := []
     # 记录已占用的旧索引：同一实例被压下两次时也能各自配对到一个计时器
     var used_indexs := {}
     for effect in effects:
@@ -283,6 +297,7 @@ func fengliu_sync_no_hit_material_timers() -> void:
                 kept_timer.start()
             new_effects.push_back(effect)
             new_timers.push_back(kept_timer)
+            new_disabled.push_back(_fengliu_no_hit_material_disabled[matched_index])
             continue
 
         # 新实例补一个计时器
@@ -290,9 +305,11 @@ func fengliu_sync_no_hit_material_timers() -> void:
         new_timer.start()
         new_effects.push_back(effect)
         new_timers.push_back(new_timer)
+        new_disabled.push_back(false)
 
     _fengliu_no_hit_material_effects = new_effects
     _fengliu_no_hit_material_timers = new_timers
+    _fengliu_no_hit_material_disabled = new_disabled
 
 
 # 未受伤满一轮：按该效果实例的值加材料，并按追踪键累计

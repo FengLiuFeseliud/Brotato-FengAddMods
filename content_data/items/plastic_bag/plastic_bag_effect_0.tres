@@ -13,3 +13,4 @@ effect_sign = 3
 custom_args = [  ]
 wait_time = 5
 tracking_key = "item_plastic_bag"
+disable_on_hit = true

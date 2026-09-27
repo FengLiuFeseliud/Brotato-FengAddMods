@@ -31,3 +31,12 @@ func apply(player_index: int) -> void:
 
 func unapply(player_index: int) -> void:
 	RunData.get_player_effect(custom_key_hash, player_index).erase(self)
+
+
+func get_args(player_index: int) -> Array:
+	var args = .get_args(player_index)
+
+	if args.size() > 1:
+		args[1] = "[color=lime]%s[/color]" % args[1]
+
+	return args
