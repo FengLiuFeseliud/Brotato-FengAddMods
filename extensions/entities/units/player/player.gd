@@ -253,8 +253,11 @@ func on_consumable_picked_up(consumable_data: ConsumableData) -> void :
     for effect in RunData.get_player_effect(effect_fengliu_consumable_stats, player_index):
         if not Utils.get_chance_success(effect[1] / 100.0):
             continue
-            
-        RunData.add_stat(effect[0], effect[2], player_index)
+        
+        if Utils.is_stat_key(effect[0]):
+            RunData.add_stat(effect[0], effect[2], player_index)
+        else:
+            RunData.get_player_effects(player_index)[effect[0]] += effect[2]
 
     # 拾取加体型
     for effect in RunData.get_player_effect(effect_fengliu_picked_up_consumable_add_size, player_index):

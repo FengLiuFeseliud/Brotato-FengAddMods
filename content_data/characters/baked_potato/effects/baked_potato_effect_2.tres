@@ -4,9 +4,9 @@
 
 [resource]
 script = ExtResource( 1 )
-key = "xp_gain"
+key = "fengliu_rekindling"
 text_key = "EFFECT_CONSUMABLE_STAT"
 value = 100
 custom_key = "fengliu_consumable_stats"
 custom_args = [  ]
-stat_nb = 3
+stat_nb = 5

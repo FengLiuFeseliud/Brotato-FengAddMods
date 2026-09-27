@@ -122,7 +122,7 @@
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/upgrades/shield/2/fengliu_shield_2_data.tres" type="Resource" id=120]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/upgrades/shield/3/fengliu_shield_3_data.tres" type="Resource" id=121]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/upgrades/shield/4/fengliu_shield_4_data.tres" type="Resource" id=122]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/bubble_wrap/bubble_wrap_data.tres" type="Resource" id=123]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/preservation_film/preservation_film_data.tres" type="Resource" id=123]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/balloon/balloon_data.tres" type="Resource" id=124]
 
 [resource]
