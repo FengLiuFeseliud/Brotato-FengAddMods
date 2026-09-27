@@ -1,4 +1,4 @@
-[gd_resource type="Resource" load_steps=16 format=2]
+[gd_resource type="Resource" load_steps=13 format=2]
 
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/baked_potato/baked_potato_icon.png" type="Texture" id=1]
 [ext_resource path="res://items/characters/character_data.gd" type="Script" id=3]
@@ -14,7 +14,7 @@
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/ranged/strong_sun/1/strong_sun_1_data.tres" type="Resource" id=15]
 
 [resource]
-script = ExtResource(3)
+script = ExtResource( 3 )
 my_id = "baked_potato"
 unlocked_by_default = true
 can_be_looted = false
@@ -22,7 +22,7 @@ icon = ExtResource( 1 )
 name = "BAKED_POTATO"
 tier = 0
 value = 1
-effects = [ ExtResource( 9 ), ExtResource( 10 ), ExtResource( 6 ), ExtResource( 7 ), ExtResource( 8 )]
+effects = [ ExtResource( 9 ), ExtResource( 10 ), ExtResource( 6 ), ExtResource( 7 ), ExtResource( 8 ) ]
 tracking_text = ""
 is_lockable = false
 unlock_codex_descr_after_get_it = 1
@@ -32,7 +32,7 @@ max_nb = -1
 item_appearances = [ ExtResource( 11 ) ]
 tags = [  ]
 wanted_tags = [ "stat_elemental_damage", "stat_fengliu_shield" ]
-banned_item_groups = [ ]
+banned_item_groups = [  ]
 banned_items = [  ]
 banned_upgrades = [  ]
 starting_weapons = [ ExtResource( 12 ), ExtResource( 13 ), ExtResource( 14 ), ExtResource( 15 ) ]

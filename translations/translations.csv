@@ -57,6 +57,7 @@ ITEM_ALCOHOL_LAMP,Alcohol Lamp,酒精灯
 WEAPON_MOLOTOV,Molotov,燃烧瓶
 BAKED_POTATO,Baked Potato,烤土豆
 ITEM_PRESERVATION_FILM,Preservation Film,保鲜膜
+ITEM_CORNER_GUARD,Corner Guard,防撞角
 EFFECT_TWO_HAND_WEAPON_SLOT_LIMIT,Only has two hands (so can only hold two weapons),只有两只手所以只拿两个武器
 ITEM_RAT_KING_RATZILLA,Rat Subject,鼠族臣民
 EFFECT_RATZILLA_KILLER_BOSS_TEXT,Ratzilla targets and attacks Bosses,鼠斯拉会锁定并攻击 boss
@@ -197,4 +198,3 @@ STAT_FENGLIU_SHIELD,Shield,护盾
 UPGRADE_FENGLIU_SHIELD,Skin,皮肤
 ITEM_BALLOON,Balloon,气球
 EFFECT_EXPLODE_ON_SHIELD_BROKEN,Explode for {1} ({2}) damage when your Shield is depleted,穿透护盾时爆炸，造成{1}（{2}）伤害
-
