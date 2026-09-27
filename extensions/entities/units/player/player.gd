@@ -29,6 +29,8 @@ var fengliu_shield_absorb: int = 0
 var fengliu_shield_regen_delay: float = 3.0
 var fengliu_shield_regen_tick: float = 1.0
 var fengliu_shield_regen_rate: float = 0.1
+var fengliu_shield_regen_shield_per_step: float = 20.0
+var fengliu_shield_regen_tick_per_step: float = 1.0
 
 var _fengliu_shield_regen_timer: = FixedTimer.new(3.0)
 var _fengliu_shield_regen_pool: float = 0.0
@@ -43,6 +45,16 @@ static func fengliu_get_dynamic_chance(init_chance: int, add_chance: int = 0, st
 		return 100.0 / 100
 		
 	return dynamic_chance / 100
+
+
+# 计算回盾间隔：基础 1 秒 + 每 20 点护盾上限加 1 秒（上限不足 20 或为负时按 0 步计）
+static func fengliu_get_shield_regen_tick(base_tick: float, max_shield: float, shield_per_step: float, tick_per_step: float) -> float:
+    var steps = int(floor(max_shield / shield_per_step))
+    # 上限为负时本项不生效，避免间隔被压到 0（FixedTimer 会除零放大 loop_count）
+    if steps < 0:
+        steps = 0
+
+    return base_tick + (steps * tick_per_step)
 
 
 # 扩展防护效果初始化
@@ -96,7 +108,7 @@ func _physics_process(delta: float) -> void :
     if _clean_up_room_timer != null and _clean_up_room_timer.try_loop(delta) > 0:
         fengliu_on_clean_up_room()
 
-    # 回盾计时：满 3 秒静默后开始，之后每秒一跳
+    # 回盾计时：满 3 秒静默后开始，之后每「1 秒 + 每 20 护盾上限 1 秒」一跳
     var shield_regen_loop: int = _fengliu_shield_regen_timer.try_loop(delta)
     if shield_regen_loop > 0:
         fengliu_on_shield_regen(shield_regen_loop)
@@ -213,8 +225,8 @@ func fengliu_on_shield_regen(loop_count: int) -> void:
         _fengliu_shield_regen_pool = 0.0
         return
 
-    # 3 秒静默后的首跳起，改为每秒一跳
-    _fengliu_shield_regen_timer.wait_time = fengliu_shield_regen_tick
+    # 3 秒静默后的首跳起，改为「1 秒 + 每 20 护盾上限 1 秒」一跳
+    _fengliu_shield_regen_timer.wait_time = fengliu_get_shield_regen_tick(fengliu_shield_regen_tick, max_shield, fengliu_shield_regen_shield_per_step, fengliu_shield_regen_tick_per_step)
     _fengliu_shield_regen_timer.start()
 
 
