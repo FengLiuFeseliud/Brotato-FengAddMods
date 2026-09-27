@@ -198,3 +198,6 @@ STAT_FENGLIU_SHIELD,Shield,护盾
 UPGRADE_FENGLIU_SHIELD,Skin,皮肤
 ITEM_BALLOON,Balloon,气球
 EFFECT_EXPLODE_ON_SHIELD_BROKEN,Explode for {1} ({2}) damage when your Shield is depleted,穿透护盾时爆炸，造成{1}（{2}）伤害
+ITEM_PLASTIC_BAG,Plastic Bag,塑料袋
+EFFECT_NO_HIT_MATERIAL,Gain {1} Materials for every {0} seconds without taking a hit,每{0}秒未受伤则获得{1}材料
+MATERIALS_GAINED_PLASTIC_BAG,Materials gained: {0},已获得材料：{0}

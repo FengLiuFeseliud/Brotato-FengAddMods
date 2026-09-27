@@ -10,6 +10,7 @@ var effect_fengliu_not_moving_explosion = Keys.generate_hash("fengliu_not_moving
 var effect_fengliu_can_one_not_moving_explosion = Keys.generate_hash("fengliu_can_one_not_moving_explosion")
 var effect_fengliu_picked_up_consumable_add_size = Keys.generate_hash("fengliu_picked_up_consumable_add_size")
 var effect_fengliu_explode_on_shield_broken: int = Keys.generate_hash("fengliu_explode_on_shield_broken")
+var effect_fengliu_no_hit_material: int = Keys.generate_hash("fengliu_no_hit_material")
 
 var fengliu_shield_hash: int = Keys.generate_hash("stat_fengliu_shield")
 
@@ -34,6 +35,8 @@ var fengliu_shield_regen_tick_per_step: float = 1.0
 
 var _fengliu_shield_regen_timer: = FixedTimer.new(3.0)
 var _fengliu_shield_regen_pool: float = 0.0
+var _fengliu_no_hit_material_effects: Array = []
+var _fengliu_no_hit_material_timers: Array = []
 
 
 # 计算动态概率
@@ -83,6 +86,9 @@ func _ready() -> void :
     # 配置盾值
     fengliu_shield = Utils.get_stat(fengliu_shield_hash, player_index)
 
+    # 配置未受伤奖励材料（逐实例计时器）
+    fengliu_sync_no_hit_material_timers()
+
 
 # 获取玩家 UI
 func fengliu_get_player_ui() -> PlayerUIElements:
@@ -112,6 +118,13 @@ func _physics_process(delta: float) -> void :
     var shield_regen_loop: int = _fengliu_shield_regen_timer.try_loop(delta)
     if shield_regen_loop > 0:
         fengliu_on_shield_regen(shield_regen_loop)
+
+    # 未受伤计时：每个效果实例各自计时，满一轮结算一次材料（先同步槽位变化）
+    fengliu_sync_no_hit_material_timers()
+    for i in _fengliu_no_hit_material_timers.size():
+        var no_hit_material_loop: int = _fengliu_no_hit_material_timers[i].try_loop(delta)
+        if no_hit_material_loop > 0:
+            fengliu_on_no_hit_material(_fengliu_no_hit_material_effects[i], no_hit_material_loop)
     
 
 # 扩展受伤防护
@@ -203,6 +216,10 @@ func fengliu_restart_shield_regen_delay(shield_absorbed: int, damage_taken: Arra
         return
 
     _fengliu_shield_regen_pool = 0.0
+    # 同一次「真受伤」也重置未受伤奖励材料计时（每个实例各自重计）
+    for no_hit_material_timer in _fengliu_no_hit_material_timers:
+        no_hit_material_timer.start()
+
     _fengliu_shield_regen_timer.wait_time = fengliu_shield_regen_delay
     _fengliu_shield_regen_timer.start()
 
@@ -228,6 +245,72 @@ func fengliu_on_shield_regen(loop_count: int) -> void:
     # 3 秒静默后的首跳起，改为「1 秒 + 每 20 护盾上限 1 秒」一跳
     _fengliu_shield_regen_timer.wait_time = fengliu_get_shield_regen_tick(fengliu_shield_regen_tick, max_shield, fengliu_shield_regen_shield_per_step, fengliu_shield_regen_tick_per_step)
     _fengliu_shield_regen_timer.start()
+
+
+# 同步「未受伤奖励材料」的逐实例计时器：新增补一个、移除的丢弃、已存在的保留进度
+func fengliu_sync_no_hit_material_timers() -> void:
+    var effects = RunData.get_player_effect(effect_fengliu_no_hit_material, player_index)
+
+    # 槽内容与缓存一致时直接返回，避免每帧重建
+    if effects.size() == _fengliu_no_hit_material_effects.size():
+        var unchanged := true
+        for i in effects.size():
+            if effects[i] != _fengliu_no_hit_material_effects[i]:
+                unchanged = false
+                break
+        if unchanged:
+            return
+
+    var new_effects := []
+    var new_timers := []
+    # 记录已占用的旧索引：同一实例被压下两次时也能各自配对到一个计时器
+    var used_indexs := {}
+    for effect in effects:
+        var matched_index := -1
+        for i in _fengliu_no_hit_material_effects.size():
+            if used_indexs.has(i) or _fengliu_no_hit_material_effects[i] != effect:
+                continue
+            matched_index = i
+            break
+
+        var wait_time: float = max(0.1, float(effect.wait_time))
+        # 已存在的实例沿用原计时器（保留进度），只有间隔变了才重设
+        if matched_index >= 0:
+            used_indexs[matched_index] = true
+            var kept_timer = _fengliu_no_hit_material_timers[matched_index]
+            if kept_timer.wait_time != wait_time:
+                kept_timer.wait_time = wait_time
+                kept_timer.start()
+            new_effects.push_back(effect)
+            new_timers.push_back(kept_timer)
+            continue
+
+        # 新实例补一个计时器
+        var new_timer := FixedTimer.new(wait_time)
+        new_timer.start()
+        new_effects.push_back(effect)
+        new_timers.push_back(new_timer)
+
+    _fengliu_no_hit_material_effects = new_effects
+    _fengliu_no_hit_material_timers = new_timers
+
+
+# 未受伤满一轮：按该效果实例的值加材料，并按追踪键累计
+func fengliu_on_no_hit_material(effect, loop_count: int) -> void:
+    # 死亡或清理房间时不结算
+    if dead or cleaning_up:
+        return
+
+    var gained: int = int(effect.value) * loop_count
+    if gained <= 0:
+        return
+
+    RunData.add_gold(gained, player_index)
+
+    # 有追踪键时累计到道具追踪（填道具 id，同 key 的多个实例汇总到同一条）
+    var tracking_key: String = effect.tracking_key
+    if tracking_key != "":
+        RunData.add_tracked_value(player_index, Keys.generate_hash(tracking_key), gained)
 
 
 # 回复防护值
