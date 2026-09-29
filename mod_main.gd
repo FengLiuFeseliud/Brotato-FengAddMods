@@ -191,7 +191,8 @@ func _fengliu_register_effect_slot_keys() -> void:
 		Keys.generate_hash("fengliu_swap_enemie"),
 		Keys.generate_hash("fengliu_get_fixed_upgrade"),
 		Keys.generate_hash("fengliu_get_highest_stat_fixed_upgrade_data"),
-		Keys.generate_hash("fengliu_no_hit_material")
+		Keys.generate_hash("fengliu_no_hit_material"),
+		Keys.generate_hash("fengliu_full_shield_stat_link")
 	]:
 		if not RunData.effect_keys_full_serialization.has(slot_key):
 			RunData.effect_keys_full_serialization.push_back(slot_key)

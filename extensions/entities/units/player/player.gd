@@ -11,6 +11,7 @@ var effect_fengliu_can_one_not_moving_explosion = Keys.generate_hash("fengliu_ca
 var effect_fengliu_picked_up_consumable_add_size = Keys.generate_hash("fengliu_picked_up_consumable_add_size")
 var effect_fengliu_explode_on_shield_broken: int = Keys.generate_hash("fengliu_explode_on_shield_broken")
 var effect_fengliu_no_hit_material: int = Keys.generate_hash("fengliu_no_hit_material")
+var effect_fengliu_full_shield_stat_link: int = Keys.generate_hash("fengliu_full_shield_stat_link")
 
 var fengliu_shield_hash: int = Keys.generate_hash("stat_fengliu_shield")
 
@@ -30,14 +31,14 @@ var fengliu_shield_absorb: int = 0
 var fengliu_shield_regen_delay: float = 3.0
 var fengliu_shield_regen_tick: float = 1.0
 var fengliu_shield_regen_rate: float = 0.1
-var fengliu_shield_regen_shield_per_step: float = 20.0
-var fengliu_shield_regen_tick_per_step: float = 1.0
 
 var _fengliu_shield_regen_timer: = FixedTimer.new(3.0)
 var _fengliu_shield_regen_pool: float = 0.0
 var _fengliu_no_hit_material_effects: Array = []
 var _fengliu_no_hit_material_timers: Array = []
 var _fengliu_no_hit_material_disabled: Array = []
+var _fengliu_full_shield_link_active: bool = false
+var _fengliu_full_shield_link_effects: Array = []
 
 
 # 计算动态概率
@@ -49,16 +50,6 @@ static func fengliu_get_dynamic_chance(init_chance: int, add_chance: int = 0, st
 		return 100.0 / 100
 		
 	return dynamic_chance / 100
-
-
-# 计算回盾间隔：基础 1 秒 + 每 20 点护盾上限加 1 秒（上限不足 20 或为负时按 0 步计）
-static func fengliu_get_shield_regen_tick(base_tick: float, max_shield: float, shield_per_step: float, tick_per_step: float) -> float:
-    var steps = int(floor(max_shield / shield_per_step))
-    # 上限为负时本项不生效，避免间隔被压到 0（FixedTimer 会除零放大 loop_count）
-    if steps < 0:
-        steps = 0
-
-    return base_tick + (steps * tick_per_step)
 
 
 # 扩展防护效果初始化
@@ -89,6 +80,9 @@ func _ready() -> void :
 
     # 配置未受伤奖励材料（逐实例计时器）
     fengliu_sync_no_hit_material_timers()
+
+    # 配置满盾联动（初始盾值即按满/不满判定）
+    fengliu_sync_full_shield_stat_link()
 
 
 # 获取玩家 UI
@@ -129,6 +123,7 @@ func _physics_process(delta: float) -> void :
         var no_hit_material_loop: int = _fengliu_no_hit_material_timers[i].try_loop(delta)
         if no_hit_material_loop > 0:
             fengliu_on_no_hit_material(_fengliu_no_hit_material_effects[i], no_hit_material_loop)
+
     
 
 # 扩展受伤防护
@@ -162,6 +157,8 @@ func take_damage(value: int, args: TakeDamageArgs) -> Array:
 
         var shield_absorbed: int = incoming_damage - value
         fengliu_shield_absorb = shield_absorbed
+        # 盾被消耗 → 立即同步（多半转为不满）
+        fengliu_sync_full_shield_stat_link()
 
         var damage_taken = .take_damage(value, args)
         args.armor_applied = previous_armor_applied
@@ -169,6 +166,8 @@ func take_damage(value: int, args: TakeDamageArgs) -> Array:
         # 被闪避的伤害不吃盾
         if damage_taken.size() > 2 and damage_taken[2]:
             fengliu_shield = min(fengliu_shield + shield_absorbed, Utils.get_stat(fengliu_shield_hash, player_index))
+            # 闪避退还后可能回满 → 立即同步
+            fengliu_sync_full_shield_stat_link()
         else:
             # 受击后重新开始回盾静默计时
             fengliu_restart_shield_regen_delay(shield_absorbed, damage_taken)
@@ -180,6 +179,9 @@ func take_damage(value: int, args: TakeDamageArgs) -> Array:
 
     var damage_taken_without_shield = .take_damage(value, args)
     fengliu_restart_shield_regen_delay(0, damage_taken_without_shield)
+    # 无盾可破时，被普通攻击掉血同样算受伤（闪避不会走到这里）
+    if damage_taken_without_shield.size() > 1 and damage_taken_without_shield[1] > 0:
+        fengliu_no_hit_material()
     return damage_taken_without_shield
 
 
@@ -237,6 +239,102 @@ func fengliu_no_hit_material() -> void:
         _fengliu_no_hit_material_timers[i].start()
 
 
+# 满盾联动：护盾满时挂上「每 N 点属性加 M 点属性」，不满时摘下
+func fengliu_sync_full_shield_stat_link() -> void:
+    var shield_cap: float = Utils.get_stat(fengliu_shield_hash, player_index)
+    var is_full: bool = shield_cap > 0.0 and fengliu_shield >= shield_cap
+    var effects: Array = RunData.get_player_effect(effect_fengliu_full_shield_stat_link, player_index)
+
+    # 轻量守卫：满盾状态与槽内容都没变就什么都不做（每帧只花这两行）
+    if is_full == _fengliu_full_shield_link_active and effects == _fengliu_full_shield_link_effects:
+        return
+
+    # 期望条数：满盾时 = 同签名实例数；不满盾 = 0
+    var wanted := {}
+    for effect in effects:
+        # value 为 0 会除零，不参与联动
+        if effect.value <= 0:
+            continue
+        var effect_sig: String = fengliu_stat_link_signature(effect)
+        wanted[effect_sig] = wanted.get(effect_sig, 0) + 1
+    if not is_full:
+        for effect_sig in wanted:
+            wanted[effect_sig] = 0
+
+    # 关心集合 = 槽内签名 ∪ 上一次挂过的签名（道具被移除时靠它收尾）
+    var sigs := {}
+    for effect_sig in wanted:
+        sigs[effect_sig] = true
+    for old_effect in _fengliu_full_shield_link_effects:
+        if old_effect.value > 0:
+            sigs[fengliu_stat_link_signature(old_effect)] = true
+
+    var player_effects: Dictionary = RunData.get_player_effects(player_index)
+    # 原版联动表可能尚未建立，先补空
+    if not player_effects.has(Keys.stat_links_hash):
+        player_effects[Keys.stat_links_hash] = []
+    var stat_links: Array = player_effects[Keys.stat_links_hash]
+
+    # 多退少补（仅在翻转或槽变化时执行）
+    var changed: bool = false
+    for effect_sig in sigs:
+        var wanted_nb: int = wanted.get(effect_sig, 0)
+        while fengliu_count_stat_link_signature(stat_links, effect_sig) > wanted_nb:
+            fengliu_erase_stat_link_signature(stat_links, effect_sig)
+            changed = true
+        while fengliu_count_stat_link_signature(stat_links, effect_sig) < wanted_nb:
+            stat_links.push_back(fengliu_find_stat_link_tuple(effects, effect_sig))
+            changed = true
+
+    _fengliu_full_shield_link_active = is_full
+    _fengliu_full_shield_link_effects = effects.duplicate()
+
+    # 联动增删后必须触发 LinkedStats 重算：只清缓存不会重算
+    if changed:
+        LinkedStats.reset_player(player_index)
+        Utils.reset_stat_cache(player_index)
+
+# 效果实例对应的联动签名（数值化，兼容读档后的浮点）
+func fengliu_stat_link_signature(effect) -> String:
+    return fengliu_stat_link_signature_of(int(effect.key_hash), int(effect.value), int(effect.stat_scaled_hash), int(effect.nb_stat_scaled))
+
+
+# 联动条目对应的签名
+func fengliu_tuple_signature(tuple: Array) -> String:
+    if tuple.size() < 4:
+        return ""
+    return fengliu_stat_link_signature_of(int(tuple[0]), int(tuple[1]), int(tuple[2]), int(tuple[3]))
+
+
+# 签名文本：四项都用数值，读档回来的浮点也能对上
+func fengliu_stat_link_signature_of(key_hash: int, value: int, stat_scaled_hash: int, nb_stat_scaled: int) -> String:
+    return str(key_hash) + ":" + str(value) + ":" + str(stat_scaled_hash) + ":" + str(nb_stat_scaled)
+
+
+func fengliu_count_stat_link_signature(stat_links: Array, sig: String) -> int:
+    var count: int = 0
+    for link in stat_links:
+        if link is Array and fengliu_tuple_signature(link) == sig:
+            count += 1
+    return count
+
+
+# 摘掉联动表里第一条该签名的条目
+func fengliu_erase_stat_link_signature(stat_links: Array, sig: String) -> void:
+    for i in range(stat_links.size() - 1, -1, -1):
+        if fengliu_tuple_signature(stat_links[i]) == sig:
+            stat_links.remove(i)
+            return
+
+
+# 找一个该签名的槽内实例并生成联动条目
+func fengliu_find_stat_link_tuple(slot_effects: Array, sig: String) -> Array:
+    for effect in slot_effects:
+        if effect.value > 0 and fengliu_stat_link_signature(effect) == sig:
+            return [effect.key_hash, effect.value, effect.stat_scaled_hash, effect.nb_stat_scaled, effect.perm_stats_only]
+    return []
+
+
 # 回盾：每跳回盾上限的 10%（严格 10%/秒、零头累积），回满即停
 func fengliu_on_shield_regen(loop_count: int) -> void:
     var max_shield: float = Utils.get_stat(fengliu_shield_hash, player_index)
@@ -253,10 +351,12 @@ func fengliu_on_shield_regen(loop_count: int) -> void:
     if fengliu_shield >= max_shield:
         _fengliu_shield_regen_timer.stop()
         _fengliu_shield_regen_pool = 0.0
+        # 回满 → 立即启用满盾联动
+        fengliu_sync_full_shield_stat_link()
         return
 
     # 3 秒静默后的首跳起，改为「1 秒 + 每 20 护盾上限 1 秒」一跳
-    _fengliu_shield_regen_timer.wait_time = fengliu_get_shield_regen_tick(fengliu_shield_regen_tick, max_shield, fengliu_shield_regen_shield_per_step, fengliu_shield_regen_tick_per_step)
+    _fengliu_shield_regen_timer.wait_time = fengliu_shield_regen_tick
     _fengliu_shield_regen_timer.start()
 
 

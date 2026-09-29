@@ -850,6 +850,9 @@ func add_stat(stat_hsh: int, value: int, player_index: int) -> void :
 	# 变化检查后调用原逻辑
 	fengliu_check_stat(stat_hsh, value, player_index)
 	.add_stat(stat_hsh, value, player_index)
+	# 护盾上限变化：满盾联动需要重新判定
+	if stat_hsh == Keys.generate_hash("stat_fengliu_shield"):
+		fengliu_notify_full_shield_link(player_index)
 
 
 # 扩展移除属性
@@ -857,6 +860,9 @@ func remove_stat(stat_hsh: int, value: int, player_index: int) -> void :
 	# 变化检查后调用原逻辑
 	fengliu_check_stat(stat_hsh, -value, player_index)
 	.remove_stat(stat_hsh, value, player_index)
+	# 护盾上限变化：满盾联动需要重新判定
+	if stat_hsh == Keys.generate_hash("stat_fengliu_shield"):
+		fengliu_notify_full_shield_link(player_index)
 
 
 # 按属性价值比例把属性换算为材料（基础 60 材料）
@@ -1086,6 +1092,8 @@ func add_item(item: ItemData, player_index: int, is_selection: bool = false) -> 
 	# 入库前先还原被诅咒水壶的收获产树效果
 	fengliu_normalize_cursed_effect(item)
 	.add_item(item, player_index, is_selection)
+	# 满盾联动：道具变化后重新判定
+	fengliu_notify_full_shield_link(player_index)
 
 
 # 扩展添加武器：诅咒水壶入库前先还原树效果
@@ -1093,3 +1101,22 @@ func add_weapon(weapon: WeaponData, player_index: int, is_selection: bool = fals
 	# 入库前先还原被诅咒水壶的收获产树效果
 	fengliu_normalize_cursed_effect(weapon)
 	return .add_weapon(weapon, player_index, is_selection)
+
+
+# 满盾联动事件钩子：道具移除时通知玩家重新判定（不再每帧轮询）
+func remove_item(item: ItemData, player_index: int, by_id: bool = false) -> void :
+	.remove_item(item, player_index, by_id)
+	fengliu_notify_full_shield_link(player_index)
+
+
+# 通知玩家重新判定满盾联动（按 player_index 取 Main._players）
+func fengliu_notify_full_shield_link(player_index: int) -> void :
+	var main = Utils.get_scene_node()
+	if main == null or player_index < 0:
+		return
+	var players = main.get("_players")
+	if players == null or player_index >= players.size():
+		return
+	var player = players[player_index]
+	if player != null and player.has_method("fengliu_sync_full_shield_stat_link"):
+		player.fengliu_sync_full_shield_stat_link()

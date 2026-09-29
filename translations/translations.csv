@@ -58,6 +58,7 @@ WEAPON_MOLOTOV,Molotov,燃烧瓶
 BAKED_POTATO,Baked Potato,烤土豆
 ITEM_PRESERVATION_FILM,Preservation Film,保鲜膜
 ITEM_CORNER_GUARD,Corner Guard,防撞角
+ITEM_MINERAL_WATER,Mineral Water,瓶装水
 EFFECT_TWO_HAND_WEAPON_SLOT_LIMIT,Only has two hands (so can only hold two weapons),只有两只手所以只拿两个武器
 ITEM_RAT_KING_RATZILLA,Rat Subject,鼠族臣民
 EFFECT_RATZILLA_KILLER_BOSS_TEXT,Ratzilla targets and attacks Bosses,鼠斯拉会锁定并攻击 boss
@@ -192,8 +193,8 @@ ITEM_GACHA,Gacha Machine,抽卡
 EFFECT_GACHA,"Draw {1} time(s) for {0} materials: {2}% chance for a Red Crate, {3}% chance for a Boss",消耗{0}材料抽取{1}次道具，{2}%额外概率出红（幸运越高越容易），{3}%概率出boss
 GACHA_ITEMS_DRAWN,"Items drawn: {0}",已抽到道具：{0}
 FENGLIU_SHIELD,Shield,护盾
-INFO_POS_STAT_FENGLIU_SHIELD,"{0} Shield. Absorbs damage before HP (1 Shield blocks 1 damage; armor does not apply); after 3s without taking a hit, regenerates 10% of max Shield per tick; the interval is 1s plus 1s for every 20 max Shield",{0} 护盾上限。受击时优先代替生命承受伤害（1点护盾抵消1点伤害，不受护甲影响），3秒内未再受伤则开始恢复，每跳恢复上限的10%，基础间隔1秒，每20点护盾上限使间隔加1秒
-INFO_NEG_STAT_FENGLIU_SHIELD,"{0} Shield. Absorbs damage before HP (1 Shield blocks 1 damage; armor does not apply); after 3s without taking a hit, regenerates 10% of max Shield per tick; the interval is 1s plus 1s for every 20 max Shield",{0} 护盾上限。受击时优先代替生命承受伤害（1点护盾抵消1点伤害，不受护甲影响），3秒内未再受伤则开始恢复，每跳恢复上限的10%，基础间隔1秒，每20点护盾上限使间隔加1秒
+INFO_POS_STAT_FENGLIU_SHIELD,"{0} Shield. Absorbs damage before HP (1 Shield blocks 1 damage; armor does not apply); after 3s without taking a hit, regenerates 10% of max Shield per tick",{0} 护盾上限。受击时优先代替生命承受伤害（1点护盾抵消1点伤害，不受护甲影响），3秒内未再受伤则开始恢复，每跳恢复上限的10%，基础间隔1秒
+INFO_NEG_STAT_FENGLIU_SHIELD,"{0} Shield. Absorbs damage before HP (1 Shield blocks 1 damage; armor does not apply); after 3s without taking a hit, regenerates 10% of max Shield per tick",{0} 护盾上限。受击时优先代替生命承受伤害（1点护盾抵消1点伤害，不受护甲影响），3秒内未再受伤则开始恢复，每跳恢复上限的10%，基础间隔1秒
 STAT_FENGLIU_SHIELD,Shield,护盾
 UPGRADE_FENGLIU_SHIELD,Skin,皮肤
 ITEM_BALLOON,Balloon,气球
@@ -202,3 +203,6 @@ ITEM_PLASTIC_BAG,Plastic Bag,塑料袋
 EFFECT_NO_HIT_MATERIAL,Gain {1} Materials for every {0} seconds without losing HP or breaking your Shield,未受到伤害时每{0}秒则获得{1}材料
 MATERIALS_GAINED_PLASTIC_BAG,Materials gained: {0},已获得材料：{0}
 EFFECT_NO_HIT_MATERIAL_DISABLE_ON_HIT,Stops triggering for the rest of the wave after losing HP or breaking your Shield,受到伤害后本波不再触发
+EFFECT_GAIN_STAT_FOR_EVERY_STAT_FULL_SHIELD,While your Shield is full: {0} {1} for every {2} {3} you have [{4}],在满护盾时每{2}{3}会{0}{1} [{4}]
+ITEM_INFUSION_BAG,Infusion Bag,输液袋
+EFFECT_CONVERT_STAT_ON_APPLY,Convert {0}% of your {1} into {2} (every {3} {1} converts {4} {2}),将{0}%的{1}转换为{2}（每{3}点{1}转换{4}点{2}）

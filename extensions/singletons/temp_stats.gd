@@ -219,6 +219,9 @@ func set_stat(stat_hsh: int, value: int, player_index: int) -> void :
 	# 非次要属性交回原版逻辑
 	if not _fengliu_is_secondary_stat(stat_hsh):
 		.set_stat(stat_hsh, value, player_index)
+		# 护盾上限变化：通知玩家重新判定满盾联动
+		if stat_hsh == Keys.generate_hash("stat_fengliu_shield"):
+			RunData.fengliu_notify_full_shield_link(player_index)
 		return
 	# 只叠加与当前台账值的差值（台账即为「本层已叠加量」）
 	var effects: Dictionary = RunData.get_player_effects(player_index)
@@ -232,6 +235,9 @@ func add_stat(stat_hsh: int, value: int, player_index: int) -> void :
 	# 非次要属性交回原版逻辑
 	if not _fengliu_is_secondary_stat(stat_hsh):
 		.add_stat(stat_hsh, value, player_index)
+		# 护盾上限变化：通知玩家重新判定满盾联动
+		if stat_hsh == Keys.generate_hash("stat_fengliu_shield"):
+			RunData.fengliu_notify_full_shield_link(player_index)
 		return
 
 	# 叠加量由 _fengliu_apply_secondary_overlay 记进台账
@@ -243,6 +249,9 @@ func remove_stat(stat_hsh: int, value: int, player_index: int) -> void :
 	# 次要属性从叠加层扣除，其余交给原版
 	if not _fengliu_is_secondary_stat(stat_hsh):
 		.remove_stat(stat_hsh, value, player_index)
+		# 护盾上限变化：通知玩家重新判定满盾联动
+		if stat_hsh == Keys.generate_hash("stat_fengliu_shield"):
+			RunData.fengliu_notify_full_shield_link(player_index)
 		return
 
 	_fengliu_apply_secondary_overlay(player_index, stat_hsh, -value)
