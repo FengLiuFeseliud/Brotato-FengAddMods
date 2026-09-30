@@ -14,6 +14,7 @@ var effect_fengliu_no_hit_material: int = Keys.generate_hash("fengliu_no_hit_mat
 var effect_fengliu_full_shield_stat_link: int = Keys.generate_hash("fengliu_full_shield_stat_link")
 
 var fengliu_shield_hash: int = Keys.generate_hash("stat_fengliu_shield")
+var fengliu_reduce_shield_damage_hash = Keys.generate_hash("fengliu_reduce_shield_damage")
 
 var _max_hit_protection = 0
 var _regen_hit_protection_timer = null
@@ -34,6 +35,7 @@ var fengliu_shield_regen_rate: float = 0.1
 
 var _fengliu_shield_regen_timer: = FixedTimer.new(3.0)
 var _fengliu_shield_regen_pool: float = 0.0
+var _fengliu_shield_reduce_pool: float = 0.0
 var _fengliu_no_hit_material_effects: Array = []
 var _fengliu_no_hit_material_timers: Array = []
 var _fengliu_no_hit_material_disabled: Array = []
@@ -143,22 +145,38 @@ func take_damage(value: int, args: TakeDamageArgs) -> Array:
         var previous_armor_applied: bool = args.armor_applied
         var incoming_damage: int = value
         var shield_broken: bool = false
+        var reduce_shield_damage = RunData.get_player_effect(fengliu_reduce_shield_damage_hash, player_index)
 
-        fengliu_shield -= value
+        if reduce_shield_damage < 0:
+            reduce_shield_damage = 0
+
+        var reduce = abs(100 - reduce_shield_damage) / 100.0
+        var shield_before: float = fengliu_shield
+        var pool_before: float = _fengliu_shield_reduce_pool
+        
+        var shield_spent: float = value * reduce + _fengliu_shield_reduce_pool
+        var shield_spent_int: int = int(floor(shield_spent))
+        _fengliu_shield_reduce_pool = shield_spent - shield_spent_int
+        
+        fengliu_shield = shield_before - shield_spent_int
+        
         if fengliu_shield > 0:
             # 全吸收
             value = 0
             args.armor_applied = false
         else:
             # 打穿
-            value = int(abs(fengliu_shield))
+            var absorbed_damage: int = int(round(max(0.0, shield_before - pool_before) / reduce))
+            value = incoming_damage - absorbed_damage
             fengliu_shield = 0
             shield_broken = true
+            _fengliu_shield_reduce_pool = 0.0
+            if value <= 0:
+                args.armor_applied = false
 
-        var shield_absorbed: int = incoming_damage - value
+        # 记账＝盾条上可见的实际扣减（蓝字与闪避退还同源，减伤下与盾条一致）
+        var shield_absorbed: int = int(round(shield_before)) - int(round(fengliu_shield))
         fengliu_shield_absorb = shield_absorbed
-        # 盾被消耗 → 立即同步（多半转为不满）
-        fengliu_sync_full_shield_stat_link()
 
         var damage_taken = .take_damage(value, args)
         args.armor_applied = previous_armor_applied
@@ -166,8 +184,7 @@ func take_damage(value: int, args: TakeDamageArgs) -> Array:
         # 被闪避的伤害不吃盾
         if damage_taken.size() > 2 and damage_taken[2]:
             fengliu_shield = min(fengliu_shield + shield_absorbed, Utils.get_stat(fengliu_shield_hash, player_index))
-            # 闪避退还后可能回满 → 立即同步
-            fengliu_sync_full_shield_stat_link()
+            _fengliu_shield_reduce_pool = pool_before
         else:
             # 受击后重新开始回盾静默计时
             fengliu_restart_shield_regen_delay(shield_absorbed, damage_taken)
@@ -175,6 +192,7 @@ func take_damage(value: int, args: TakeDamageArgs) -> Array:
             if shield_broken:
                 fengliu_on_shield_broken(args.from != self)
 
+        fengliu_sync_full_shield_stat_link()
         return damage_taken
 
     var damage_taken_without_shield = .take_damage(value, args)

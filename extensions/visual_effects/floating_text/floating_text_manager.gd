@@ -21,8 +21,8 @@ func _on_unit_took_damage(unit: Unit, value: int, knockback_direction: Vector2, 
 	if absorbed > 0 and ProgressData.settings.damage_display:
 		display("-" + str(absorbed), unit.global_position + FENGLIU_SHIELD_TEXT_OFFSET, FENGLIU_SHIELD_TEXT_COLOR, null, duration, true, direction, false)
 
-	# 全吸收时盾已替玩家吃下
-	if absorbed > 0 and value <= 0:
+	# 盾吃下这一击时都不再走原版显示
+	if value <= 0 and not is_protected:
 		return
 
 	._on_unit_took_damage(unit, value, knockback_direction, is_crit, is_dodge, is_protected, armor_did_something, args, hit_type, is_one_shot)

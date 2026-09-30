@@ -24,7 +24,9 @@ const ALL_SECONDARY_STATS = [
 	"hp_start_next_wave",
 
 	"fengliu_bullet_scale",
-	"fengliu_tree_drop_double"
+	"fengliu_tree_drop_double",
+	"fengliu_rekindling",
+	"fengliu_reduce_shield_damage"
 ]
 
 
@@ -52,7 +54,8 @@ const ALL_ITEM_DEBUFF = [
 const FENGLIU_EXTRA_SECONDARY_STAT_KEYS = [
 	"fengliu_bullet_scale",
 	"fengliu_tree_drop_double",
-	"fengliu_rekindling"
+	"fengliu_rekindling",
+	"fengliu_reduce_shield_damage"
 ]
 
 
