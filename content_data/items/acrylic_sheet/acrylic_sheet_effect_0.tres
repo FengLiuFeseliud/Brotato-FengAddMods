@@ -6,7 +6,7 @@
 script = ExtResource( 1 )
 key = "fengliu_reduce_shield_damage"
 text_key = "EFFECT_REDUCE_SHIELD_DAMAGE_VALUE"
-value = 25
+value = 20
 custom_key = ""
 storage_method = 0
 effect_sign = 3
