@@ -213,3 +213,4 @@ EFFECT_REDUCE_SHIELD_DAMAGE_VALUE,{0} % Shield Damage Reduction,{0} %护盾减�
 EFFECT_CONVERT_STAT_ON_APPLY,Convert {0}% of your {1} into {2} (every {3} {1} converts {4} {2}),将{0}%的{1}转换为{2}（每{3}点{1}转换{4}点{2}）
 ITEM_PLASTIC_FRUIT_FORK,Plastic Fruit Fork,塑料果叉
 EFFECT_CONSUMABLE_SHIELD_REGEN_VALUE,,使用消耗品恢复{0}护盾
+ITEM_TITRATION_SOLUTION,Titration Solution,滴定液

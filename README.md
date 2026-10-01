@@ -62,7 +62,7 @@
 
 ## 物品
 
-本 Mod 共新增 36 件物品：
+本 Mod 共新增 37 件物品：
 
 | 中文名 | 英文名 | 说明 |
 | --- | --- | --- |
@@ -102,6 +102,7 @@
 | 加厚保鲜膜 | Thickened Preservation Film | 护盾 +8；生命回复 -2；速度 -2 |
 | 亚克力板 | Acrylic Sheet | 护盾减伤 +25%；护盾 +2；速度 -2 |
 | 塑料果叉 | Plastic Fruit Fork | 拾取消耗品时回复 1 点护盾 |
+| 滴定液 | Titration Solution | 升级时护盾 +1；速度 -2 |
 
 ## 套装
 
