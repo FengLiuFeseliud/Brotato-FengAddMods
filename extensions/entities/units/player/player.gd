@@ -28,7 +28,6 @@ var _exploding_on_clean_up_room
 var _scale_value = 1 
 
 var fengliu_shield = 0
-var fengliu_shield_absorb: int = 0
 
 var fengliu_shield_regen_delay: float = 3.0
 var fengliu_shield_regen_tick: float = 1.0
@@ -46,6 +45,8 @@ var _fengliu_full_shield_link_effects: Array = []
 
 # 盾恢复信号
 signal fengliu_shield_gained(value, player_index)
+# 盾扣减信号
+signal fengliu_shield_lost(value, player_index)
 
 
 # 计算动态概率
@@ -131,7 +132,6 @@ func _physics_process(delta: float) -> void :
         if no_hit_material_loop > 0:
             fengliu_on_no_hit_material(_fengliu_no_hit_material_effects[i], no_hit_material_loop)
 
-    
 
 # 扩展受伤防护
 func take_damage(value: int, args: TakeDamageArgs) -> Array:
@@ -142,8 +142,6 @@ func take_damage(value: int, args: TakeDamageArgs) -> Array:
 
         for effect in RunData.get_player_effect(effect_fengliu_temp_stats_on_hit_protection, player_index):
             TempStats.add_stat(effect[0], effect[1], player_index)
-
-    fengliu_shield_absorb = 0
 
     # 盾优先吃这次伤害
     if fengliu_can_shield_take_damage(value, args):
@@ -162,9 +160,8 @@ func take_damage(value: int, args: TakeDamageArgs) -> Array:
         var shield_spent: float = value * reduce + _fengliu_shield_reduce_pool
         var shield_spent_int: int = int(floor(shield_spent))
         _fengliu_shield_reduce_pool = shield_spent - shield_spent_int
-        
-        fengliu_shield = shield_before - shield_spent_int
-        
+
+        var shield_lost: int = _fengliu_take_shield(shield_spent_int)
         if fengliu_shield > 0:
             # 全吸收
             value = 0
@@ -173,26 +170,23 @@ func take_damage(value: int, args: TakeDamageArgs) -> Array:
             # 打穿
             var absorbed_damage: int = int(round(max(0.0, shield_before - pool_before) / reduce))
             value = incoming_damage - absorbed_damage
-            fengliu_shield = 0
             shield_broken = true
-            _fengliu_shield_reduce_pool = 0.0
             if value <= 0:
                 args.armor_applied = false
-
-        # 记账＝盾条上可见的实际扣减（蓝字与闪避退还同源，减伤下与盾条一致）
-        var shield_absorbed: int = int(round(shield_before)) - int(round(fengliu_shield))
-        fengliu_shield_absorb = shield_absorbed
 
         var damage_taken = .take_damage(value, args)
         args.armor_applied = previous_armor_applied
 
-        # 被闪避的伤害不吃盾
+        # 被闪避的伤害不吃盾：退还（静默，不飘 -x）
         if damage_taken.size() > 2 and damage_taken[2]:
-            fengliu_shield = min(fengliu_shield + shield_absorbed, Utils.get_stat(fengliu_shield_hash, player_index))
+            fengliu_shield = min(fengliu_shield + shield_lost, Utils.get_stat(fengliu_shield_hash, player_index))
             _fengliu_shield_reduce_pool = pool_before
         else:
+            if shield_lost > 0:
+                emit_signal("fengliu_shield_lost", shield_lost, player_index)
+                
             # 受击后重新开始回盾静默计时
-            fengliu_restart_shield_regen_delay(shield_absorbed, damage_taken)
+            fengliu_restart_shield_regen_delay(shield_lost, damage_taken)
             # 破盾触发：材料计时失效（+ 破盾爆炸，不含自伤）
             if shield_broken:
                 fengliu_on_shield_broken(args.from != self)
@@ -208,10 +202,32 @@ func take_damage(value: int, args: TakeDamageArgs) -> Array:
     return damage_taken_without_shield
 
 
-func fengliu_consume_shield_absorb() -> int:
-    var count = fengliu_shield_absorb
-    fengliu_shield_absorb = 0
-    return count
+# 扣盾
+func fengliu_deduct_shield(amount: int) -> int:
+    var lost: int = _fengliu_take_shield(amount)
+    if lost > 0:
+        emit_signal("fengliu_shield_lost", lost, player_index)
+        fengliu_sync_full_shield_stat_link()
+
+    return lost
+
+
+# 盾值扣减
+func _fengliu_take_shield(amount: int) -> int:
+    if amount <= 0 or dead or fengliu_shield <= 0:
+        return 0
+
+    var shield_before: float = fengliu_shield
+    fengliu_shield = max(0.0, shield_before - amount)
+    var lost: int = int(round(shield_before)) - int(round(fengliu_shield))
+    if lost <= 0:
+        return 0
+
+    # 打穿时零头池一并结算
+    if fengliu_shield <= 0.0:
+        _fengliu_shield_reduce_pool = 0.0
+
+    return lost
 
 
 # 破盾触发：材料计时失效 + 破盾爆炸（爆炸仅在非自伤时触发）
