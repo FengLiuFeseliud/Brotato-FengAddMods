@@ -44,6 +44,10 @@ var _fengliu_full_shield_link_active: bool = false
 var _fengliu_full_shield_link_effects: Array = []
 
 
+# 盾恢复信号
+signal fengliu_shield_gained(value, player_index)
+
+
 # 计算动态概率
 static func fengliu_get_dynamic_chance(init_chance: int, add_chance: int = 0, stat_count: int = 0) -> float:
 	# 基础概率 + 属性数 * 每点加成
@@ -354,21 +358,30 @@ func fengliu_find_stat_link_tuple(slot_effects: Array, sig: String) -> Array:
     return []
 
 
-func fengliu_shield_regen(regen: int) -> void:
-    if regen == 0:
-        return
+# 盾恢复
+func fengliu_shield_regen(regen: int) -> int:
+    if regen <= 0:
+        return 0
     
     var max_shield: float = Utils.get_stat(fengliu_shield_hash, player_index)
-    if fengliu_shield >= max_shield:
-        return
+    if max_shield <= 0.0 or fengliu_shield >= max_shield:
+        return 0
 
-    fengliu_shield = min(fengliu_shield + regen, max_shield)
+    var shield_before: float = fengliu_shield
+    fengliu_shield = min(shield_before + regen, max_shield)
+    var gained: int = int(round(fengliu_shield - shield_before))
+
+    # +x 恢复显示
+    if gained > 0:
+        emit_signal("fengliu_shield_gained", gained, player_index)
     if fengliu_shield >= max_shield:
         if not _fengliu_shield_regen_timer.is_stopped():
             _fengliu_shield_regen_timer.stop()
             _fengliu_shield_regen_pool = 0.0
         
         fengliu_sync_full_shield_stat_link()
+
+    return gained
 
 
 # 回盾：每跳回盾上限的 10%（严格 10%/秒、零头累积），回满即停
@@ -381,15 +394,9 @@ func fengliu_on_shield_regen(loop_count: int) -> void:
 
     _fengliu_shield_regen_pool += max_shield * fengliu_shield_regen_rate * loop_count
     if _fengliu_shield_regen_pool >= 1.0:
-        fengliu_shield = min(fengliu_shield + int(_fengliu_shield_regen_pool), max_shield)
-        _fengliu_shield_regen_pool -= int(_fengliu_shield_regen_pool)
-
-    if fengliu_shield >= max_shield:
-        _fengliu_shield_regen_timer.stop()
-        _fengliu_shield_regen_pool = 0.0
-        # 回满 → 立即启用满盾联动
-        fengliu_sync_full_shield_stat_link()
-        return
+        var pool_gain: int = int(_fengliu_shield_regen_pool)
+        _fengliu_shield_regen_pool -= pool_gain
+        fengliu_shield_regen(pool_gain)
 
     # 3 秒静默后的首跳起，改为「1 秒 + 每 20 护盾上限 1 秒」一跳
     _fengliu_shield_regen_timer.wait_time = fengliu_shield_regen_tick

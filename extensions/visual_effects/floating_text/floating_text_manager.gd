@@ -26,3 +26,11 @@ func _on_unit_took_damage(unit: Unit, value: int, knockback_direction: Vector2, 
 		return
 
 	._on_unit_took_damage(unit, value, knockback_direction, is_crit, is_dodge, is_protected, armor_did_something, args, hit_type, is_one_shot)
+
+
+# 盾恢复：+x 蓝字（与盾吸收的 -x 同色同位；不看伤害数字开关，对齐原版回血）
+func fengliu_on_player_shield_gained(value: int, player_index: int) -> void :
+	if value <= 0 or player_index < 0 or player_index >= players.size():
+		return
+
+	display("+" + str(value), players[player_index].global_position + FENGLIU_SHIELD_TEXT_OFFSET, FENGLIU_SHIELD_TEXT_COLOR, null, duration, true, direction, false)

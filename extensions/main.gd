@@ -76,6 +76,19 @@ func _process(delta: float) -> void :
 	fengliu_update_player_status_bars()
 
 
+# 覆盖: 玩家生成时把「盾恢复」信号接到飘字管理器（与原版 healed 的连接方式一致）
+func _on_EntitySpawner_players_spawned(players: Array) -> void :
+	._on_EntitySpawner_players_spawned(players)
+
+	var text_manager = _floating_text_manager
+	if text_manager == null or not text_manager.has_method("fengliu_on_player_shield_gained"):
+		return
+
+	for player in _players:
+		if player != null and player.has_signal("fengliu_shield_gained") and not player.is_connected("fengliu_shield_gained", text_manager, "fengliu_on_player_shield_gained"):
+			var _error = player.connect("fengliu_shield_gained", text_manager, "fengliu_on_player_shield_gained")
+
+
 # 扩展切换场景（进入商店后清理波次结束失效的道具）
 func _change_scene(path: String) -> void :
 	._change_scene(path)
