@@ -3,11 +3,9 @@ extends Main
 
 const FENGLIU_STATUS_REFRESH_INTERVAL: = 0.1
 const FENGLIU_STATUS_COLOR_SHIELD: = Color(0.25, 0.6, 1.0, 1.0)   # 蓝色
-# 为「血条上方的同尺寸盾条」在**上排生命容器内部**预留的高度（血条高 48 + 间隔 4 = 52）；
-# 只塞进 LifeContainerP1/P2 的 VBox 里，不动 UI/HUD 本身 ⇒ 波次文本等其它 HUD 元素位置不变
+# 盾条预留的高度（血条高 48 + 间隔 4 = 52）
 const FENGLIU_HUD_TOP_SPACER_HEIGHT: = 52
 
-var fengliu_shield_hash = Keys.generate_hash("stat_fengliu_shield")
 var _fengliu_status_refresh_timer: float = 0.0
 var _fengliu_shield_wave_max: = [0.0, 0.0, 0.0, 0.0]
 
@@ -27,11 +25,15 @@ var effect_fengliu_kill_looter_spawn_boss = Keys.generate_hash("fengliu_kill_loo
 var effect_fengliu_gold_stats = Keys.generate_hash("fengliu_gold_stats")
 var effect_fengliu_effect_box_stats = Keys.generate_hash("fengliu_box_stats")
 var effect_fengliu_burning_kill_extra_material = Keys.generate_hash("fengliu_burning_kill_extra_material")
+var effect_fengliu_add_stat_fron_alive_trees = Keys.generate_hash("fengliu_add_stat_fron_alive_trees")
 
 
 var fengliu_item_auto_open_box_hash = Keys.generate_hash("item_auto_open_box")
 var fengliu_crate_gobbler_hash = Keys.generate_hash("crate_gobbler")
 var fengliu_item_kebab_hash = Keys.generate_hash("item_kebab")
+
+
+var fengliu_shield_hash = Keys.generate_hash("stat_fengliu_shield")
 
 
 var fengliu_tree_drop_double = Keys.generate_hash("fengliu_tree_drop_double")
@@ -42,13 +44,11 @@ var _is_speedrun_ending: bool = false
 
 
 func _ready() -> void :
-	# 生命周期回调由引擎按继承链自动调用，不要再 ._ready()
 	fengliu_reserve_shield_space()
 
 
 # 在上排生命容器内部最前面插入空占位节点，为血条上方的同尺寸盾条腾出空间。
-# 不改 UI/HUD 的边距 ⇒ 波次文本（UI/HUD/WaveContainer）等其它 HUD 元素位置不变；
-# 下排 P3/P4 是 SHRINK_END（贴底向上生长），上方本来就够，不需要占位。
+# 不改 UI/HUD 的边距 ⇒ 波次文本（UI/HUD/WaveContainer）等其它 HUD 元素位置不变
 func fengliu_reserve_shield_space() -> void :
 	for idx in [1, 2]:
 		var container = get_node_or_null("UI/HUD/LifeContainerP%d" % idx)
@@ -597,7 +597,7 @@ func spawn_loot(unit: Unit, entity_type: int, args: Entity.DieArgs) -> void:
 		spawn_consumables(unit)
 
 	.spawn_loot(unit, entity_type, args)
-
+	
 
 # 把盾值推给 HUD 血条与头顶血条
 func fengliu_update_player_status_bars() -> void :

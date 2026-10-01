@@ -214,3 +214,5 @@ EFFECT_CONVERT_STAT_ON_APPLY,Convert {0}% of your {1} into {2} (every {3} {1} co
 ITEM_PLASTIC_FRUIT_FORK,Plastic Fruit Fork,塑料果叉
 EFFECT_CONSUMABLE_SHIELD_REGEN_VALUE,,使用消耗品恢复{0}护盾
 ITEM_TITRATION_SOLUTION,Titration Solution,滴定液
+ITEM_BARK,Bark,树皮
+EFFECT_GAIN_STAT_FOR_EVERY_LIVING_TREE,{0} {1} for every living tree [{4}],每存活一棵树会{0}{1} [{4}]

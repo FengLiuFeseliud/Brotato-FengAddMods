@@ -10,7 +10,8 @@ var fengliu_keys_needing_operator = [
 	"effect_tree_drop_double_value",
 	"effect_rekindling_value",
 	"effect_reduce_shield_damage_value",
-	"effect_gain_stat_for_every_stat_full_shield"
+	"effect_gain_stat_for_every_stat_full_shield",
+	"effect_gain_stat_for_every_living_tree"
 ]
 
 
