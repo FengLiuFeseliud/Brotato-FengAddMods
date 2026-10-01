@@ -39,7 +39,8 @@ const ALL_SECONDARY_STATS = [
     "fengliu_bullet_scale",
 	"fengliu_tree_drop_double",
 	"fengliu_rekindling",
-	"fengliu_reduce_shield_damage"
+	"fengliu_reduce_shield_damage",
+	"fengliu_consumable_shield_regen"
 ]
 
 

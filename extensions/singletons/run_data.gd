@@ -26,7 +26,8 @@ const ALL_SECONDARY_STATS = [
 	"fengliu_bullet_scale",
 	"fengliu_tree_drop_double",
 	"fengliu_rekindling",
-	"fengliu_reduce_shield_damage"
+	"fengliu_reduce_shield_damage",
+	"fengliu_consumable_shield_regen"
 ]
 
 
@@ -55,7 +56,8 @@ const FENGLIU_EXTRA_SECONDARY_STAT_KEYS = [
 	"fengliu_bullet_scale",
 	"fengliu_tree_drop_double",
 	"fengliu_rekindling",
-	"fengliu_reduce_shield_damage"
+	"fengliu_reduce_shield_damage",
+	"fengliu_consumable_shield_regen"
 ]
 
 
@@ -1070,6 +1072,10 @@ func fengliu_normalize_cursed_effect(item_data: ItemParentData) -> void:
 	if base_data == null:
 		return
 
+	# 转换类效果：value 是「每多少点算一组」的除数量级，原版诅咒放大它反而更弱，
+	# 这里还原 value 并把强化额度改记到 to_value（口径见 fengliu_normalize_cursed_convert_effect）
+	fengliu_normalize_cursed_convert_effect(item_data, base_data)
+
 	# 找出原版对应树效果的文案键
 	var base_text_key: String = ""
 	for base_effect in base_data.effects:
@@ -1088,6 +1094,31 @@ func fengliu_normalize_cursed_effect(item_data: ItemParentData) -> void:
 			continue
 
 		effect.text_key = base_text_key
+
+
+# 修正被诅咒的转换类效果（ConvertStatEffect 系）：
+#   这类效果的 value 是「每多少点源属性算一组」的除数量级（见 utils.gd::convert_stats），
+#   而原版诅咒对所有正效果统一按「值越大越强」放大 value ⇒ 组距变大 ⇒ 效果反而更弱；
+#   这里把 value 还原为未诅咒值，并把诅咒的强化额度改记到 to_value（每组的产量）上。
+func fengliu_normalize_cursed_convert_effect(item_data: ItemParentData, base_data: ItemParentData) -> void:
+	for i in item_data.effects.size():
+		var effect = item_data.effects[i]
+		if not (effect is ConvertStatEffect):
+			continue
+
+		# 与未诅咒原型按序号对齐；来源/目标属性对不上就不动
+		if i >= base_data.effects.size():
+			continue
+		var base_effect = base_data.effects[i]
+		if not (base_effect is ConvertStatEffect):
+			continue
+		if base_effect.key_hash != effect.key_hash or base_effect.to_stat_hash != effect.to_stat_hash:
+			continue
+
+		# value 是除数量级：诅咒放大它等于削弱，还原为原始组距
+		effect.value = base_effect.value
+		# 诅咒强度改记到每组产量：倍率口径同原版 _boost_effect_value_positively 的正效果分支
+		effect.to_value = int(ceil(base_effect.to_value * (1.0 + item_data.curse_factor)))
 
 
 # 扩展添加道具：诅咒水壶入库前先还原树效果

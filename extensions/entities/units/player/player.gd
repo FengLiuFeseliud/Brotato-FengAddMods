@@ -15,6 +15,7 @@ var effect_fengliu_full_shield_stat_link: int = Keys.generate_hash("fengliu_full
 
 var fengliu_shield_hash: int = Keys.generate_hash("stat_fengliu_shield")
 var fengliu_reduce_shield_damage_hash = Keys.generate_hash("fengliu_reduce_shield_damage")
+var fengliu_consumable_shield_regen_hash = Keys.generate_hash("fengliu_consumable_shield_regen")
 
 var _max_hit_protection = 0
 var _regen_hit_protection_timer = null
@@ -353,6 +354,23 @@ func fengliu_find_stat_link_tuple(slot_effects: Array, sig: String) -> Array:
     return []
 
 
+func fengliu_shield_regen(regen: int) -> void:
+    if regen == 0:
+        return
+    
+    var max_shield: float = Utils.get_stat(fengliu_shield_hash, player_index)
+    if fengliu_shield >= max_shield:
+        return
+
+    fengliu_shield = min(fengliu_shield + regen, max_shield)
+    if fengliu_shield >= max_shield:
+        if not _fengliu_shield_regen_timer.is_stopped():
+            _fengliu_shield_regen_timer.stop()
+            _fengliu_shield_regen_pool = 0.0
+        
+        fengliu_sync_full_shield_stat_link()
+
+
 # 回盾：每跳回盾上限的 10%（严格 10%/秒、零头累积），回满即停
 func fengliu_on_shield_regen(loop_count: int) -> void:
     var max_shield: float = Utils.get_stat(fengliu_shield_hash, player_index)
@@ -479,6 +497,8 @@ func fengliu_set_scale_size(gain: float) -> void:
 
 # 扩展拾取消耗品结算
 func on_consumable_picked_up(consumable_data: ConsumableData) -> void :
+    fengliu_shield_regen(RunData.get_player_effect(fengliu_consumable_shield_regen_hash, player_index))
+
     # 拾取消耗品加属性
     for effect in RunData.get_player_effect(effect_fengliu_consumable_stats, player_index):
         if not Utils.get_chance_success(effect[1] / 100.0):

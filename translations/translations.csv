@@ -66,6 +66,7 @@ ITEM_INFUSION_BAG,Infusion Bag,输液袋
 ITEM_GACHA,Gacha Machine,抽卡
 ITEM_THICK_PRESERVATION_FILM,Thickened Preservation Film,加厚保鲜膜
 FENGLIU_REDUCE_SHIELD_DAMAGE,% Shield Damage Reduction,%护盾减伤
+FENGLIU_CONSUMABLE_SHIELD_REGEN,Consumable Shield Regen,消耗性回盾
 EFFECT_TWO_HAND_WEAPON_SLOT_LIMIT,Only has two hands (so can only hold two weapons),只有两只手所以只拿两个武器
 ITEM_RAT_KING_RATZILLA,Rat Subject,鼠族臣民
 EFFECT_RATZILLA_KILLER_BOSS_TEXT,Ratzilla targets and attacks Bosses,鼠斯拉会锁定并攻击 boss
@@ -210,3 +211,5 @@ EFFECT_GAIN_STAT_FOR_EVERY_STAT_FULL_SHIELD,While your Shield is full: {0} {1} f
 ITEM_ACRYLIC_SHEET,Acrylic Sheet,亚克力板
 EFFECT_REDUCE_SHIELD_DAMAGE_VALUE,{0} % Shield Damage Reduction,{0} %护盾减伤
 EFFECT_CONVERT_STAT_ON_APPLY,Convert {0}% of your {1} into {2} (every {3} {1} converts {4} {2}),将{0}%的{1}转换为{2}（每{3}点{1}转换{4}点{2}）
+ITEM_PLASTIC_FRUIT_FORK,Plastic Fruit Fork,塑料果叉
+EFFECT_CONSUMABLE_SHIELD_REGEN_VALUE,,使用消耗品恢复{0}护盾
