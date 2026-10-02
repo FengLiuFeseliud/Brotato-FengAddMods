@@ -9,46 +9,6 @@ extends  "res://mods-unpacked/FengLiu-FengAddMods/effects/global/mod_effect.gd"
 # ============================================================
 
 
-const ALL_ITEM_TAG = [
-	# ---------------- 数值属性类（18）----------------
-	"stat_max_hp",           # 30（26 / 2 / 2）
-	"stat_elemental_damage", # 27（24 / 0 / 3）
-	"stat_engineering",      # 26（25 / 1 / 0）
-	"stat_percent_damage",   # 26（20 / 6 / 0）
-	"stat_hp_regeneration",  # 25（21 / 4 / 0）
-	"stat_melee_damage",     # 22（19 / 3 / 0）
-	"stat_ranged_damage",    # 21（18 / 3 / 0）
-	"stat_luck",             # 18（16 / 2 / 0）
-	"stat_crit_chance",      # 16（15 / 1 / 0）
-	"stat_lifesteal",        # 14（14 / 0 / 0）
-	"stat_dodge",            # 13（12 / 1 / 0）
-	"stat_range",            # 13（10 / 3 / 0）
-	"stat_speed",            # 13（11 / 2 / 0）
-	"stat_attack_speed",     # 12（9 / 3 / 0）
-	"stat_armor",            # 11（11 / 0 / 0）
-	"stat_harvesting",       # 11（10 / 1 / 0）
-	"stat_fengliu_shield",   # 11（0 / 0 / 11）本 mod 专属
-	"stat_curse",            # 5（0 / 5 / 0）DLC1 专属
-
-	# ---------------- 玩法机制类（15）----------------
-	"pet",                # 14（11 / 0 / 3）
-	"structure",          # 13（13 / 0 / 0）
-	"pickup",             # 11（9 / 1 / 1）
-	"explosive",          # 10（8 / 2 / 0）
-	"knockback",          # 10（9 / 1 / 0）
-	"economy",            # 8（7 / 0 / 1）
-	"xp_gain",            # 8（6 / 1 / 1）
-	"exploration",        # 7（4 / 0 / 3）
-	"consumable",         # 6（4 / 1 / 1）
-	"stand_still",        # 4（3 / 1 / 0）
-	"more_enemies",       # 3（2 / 1 / 0）
-	"less_enemy_speed",   # 3（3 / 0 / 0）
-	"less_enemies",       # 2（2 / 0 / 0）
-	"number_of_enemies",  # 1（1 / 0 / 0）
-	"lock",               # 1（0 / 1 / 0）DLC1 专属，无代码读取
-]
-
-
 var roll_tags: String = ""
 
 
@@ -70,12 +30,12 @@ func fengliu_roll_effect(player_index: int):
 	for tag in RunData.get_player_effect(custom_key_hash, player_index):
 		taken[str(tag)] = true
 
-	if taken.size() >= ALL_ITEM_TAG.size():
-		roll_tags = Utils.get_rand_element(ALL_ITEM_TAG)
+	if taken.size() >= RunData.all_item_tags.size():
+		roll_tags = Utils.get_rand_element(RunData.all_item_tags)
 		return
 
 	while true:
-		roll_tags = Utils.get_rand_element(ALL_ITEM_TAG)
+		roll_tags = Utils.get_rand_element(RunData.all_item_tags)
 		if not taken.has(roll_tags):
 			break
 
@@ -86,7 +46,7 @@ func apply(player_index: int) -> void:
         if roll_tags == "":
             return
     
-    RunData.get_player_effect(custom_key_hash ,player_index).push_back(roll_tags)
+    RunData.get_player_effect(custom_key_hash ,player_index).push_font(roll_tags)
 
 
 func unapply(player_index: int) -> void:

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/effects/effect_random_extra_wanted_item_tag.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+key = ""
+text_key = "EFFECT_RANDOM_EXTRA_WANTED_ITEM_TAG"
+value = 1
+custom_key = "fengliu_random_extra_wanted_item_tag"
+storage_method = 0
+effect_sign = 3
+custom_args = [  ]

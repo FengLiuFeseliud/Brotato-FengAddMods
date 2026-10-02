@@ -101,6 +101,46 @@ var fengliu_stat_upgrade_ratios = {
 }
 
 
+var all_item_tags = [
+	# ---------------- 数值属性类（18）----------------
+	"stat_max_hp",           # 30（26 / 2 / 2）
+	"stat_elemental_damage", # 27（24 / 0 / 3）
+	"stat_engineering",      # 26（25 / 1 / 0）
+	"stat_percent_damage",   # 26（20 / 6 / 0）
+	"stat_hp_regeneration",  # 25（21 / 4 / 0）
+	"stat_melee_damage",     # 22（19 / 3 / 0）
+	"stat_ranged_damage",    # 21（18 / 3 / 0）
+	"stat_luck",             # 18（16 / 2 / 0）
+	"stat_crit_chance",      # 16（15 / 1 / 0）
+	"stat_lifesteal",        # 14（14 / 0 / 0）
+	"stat_dodge",            # 13（12 / 1 / 0）
+	"stat_range",            # 13（10 / 3 / 0）
+	"stat_speed",            # 13（11 / 2 / 0）
+	"stat_attack_speed",     # 12（9 / 3 / 0）
+	"stat_armor",            # 11（11 / 0 / 0）
+	"stat_harvesting",       # 11（10 / 1 / 0）
+	"stat_fengliu_shield",   # 11（0 / 0 / 11）本 mod 专属
+	"stat_curse",            # 5（0 / 5 / 0）DLC1 专属
+
+	# ---------------- 玩法机制类（15）----------------
+	"pet",                # 14（11 / 0 / 3）
+	"structure",          # 13（13 / 0 / 0）
+	"pickup",             # 11（9 / 1 / 1）
+	"explosive",          # 10（8 / 2 / 0）
+	"knockback",          # 10（9 / 1 / 0）
+	"economy",            # 8（7 / 0 / 1）
+	"xp_gain",            # 8（6 / 1 / 1）
+	"exploration",        # 7（4 / 0 / 3）
+	"consumable",         # 6（4 / 1 / 1）
+	"stand_still",        # 4（3 / 1 / 0）
+	"more_enemies",       # 3（2 / 1 / 0）
+	"less_enemy_speed",   # 3（3 / 0 / 0）
+	"less_enemies",       # 2（2 / 0 / 0）
+	"number_of_enemies",  # 1（1 / 0 / 0）
+	"lock",               # 1（0 / 1 / 0）DLC1 专属，无代码读取
+]
+
+
 var effect_fengliu_add_stat_after_change = Keys.generate_hash("fengliu_add_stat_after_change")
 var effect_fengliu_shop_item_count = Keys.generate_hash("fengliu_shop_item_count")
 var effect_fengliu_stats_stop = Keys.generate_hash("fengliu_stats_stop")
@@ -114,6 +154,7 @@ var effect_fengliu_swap_enemie = Keys.generate_hash("fengliu_swap_enemie")
 var effect_fengliu_get_fixed_upgrade = Keys.generate_hash("fengliu_get_fixed_upgrade")
 var effect_fengliu_can_rand_set_weapon = Keys.generate_hash("fengliu_can_rand_set_weapon")
 var effect_fengliu_extra_wanted_item_tag = Keys.generate_hash("fengliu_extra_wanted_item_tag")
+var effect_fengliu_random_extra_wanted_item_tag = Keys.generate_hash("fengliu_random_extra_wanted_item_tag")
 
 
 var fengliu_need_reroll_effect = [
@@ -621,16 +662,20 @@ func fengliu_get_player_random_weapon_set(player_index: int) -> SetData:
 
 # 扩展波次开始
 func on_wave_start(timer: WaveTimer) -> void :
+	
 	# 清除波次上限
 	for value_keys in stat_after_change_wave_value_count.keys():
 		stat_after_change_wave_value_count[value_keys] = 0
 	.on_wave_start(timer)
 
-	# 注入精英
 	for player_data in players_data:
+		# 注入精英
 		if player_data.effects.has(effect_fengliu_wave_elites_spawn) and player_data.effects[effect_fengliu_wave_elites_spawn].size() > 0:
 			fengliu_wave_elites_spawn(player_data)
-
+		
+		if player_data.effects.has(effect_fengliu_random_extra_wanted_item_tag) and player_data.effects.has(effect_fengliu_extra_wanted_item_tag):
+			for _i in player_data.effects[effect_fengliu_random_extra_wanted_item_tag]:
+				player_data.effects[effect_fengliu_extra_wanted_item_tag].remove(player_data.effects[effect_fengliu_extra_wanted_item_tag].size() - 1)
 
 	# 精英/敌众波次或重开波次时不更新强度统计
 	if is_elite_wave(EliteType.ELITE) or is_elite_wave(EliteType.HORDE) or _restart_wave:
@@ -657,18 +702,24 @@ func on_wave_start(timer: WaveTimer) -> void :
 # 扩展波次结束
 func on_wave_end() -> void :
 	.on_wave_end()
+
 	# 逐个玩家处理
-	for player_index in get_player_count():
+	for player_data in players_data:
 		# 处理道具合并
-		var effects = get_player_effect(effect_fengliu_item_merge, player_index)
-		if effects.size() > 0:
-			for item_merge_effect in effects:
-				fengliu_try_item_merge(item_merge_effect, player_index)
+		if player_data.effects.has(effect_fengliu_item_merge):
+			for item_merge_effect in player_data.effects[effect_fengliu_item_merge]:
+				fengliu_try_item_merge(item_merge_effect, player_data.player_index)
 
 		# 处理自动诅咒
-		effects = get_player_effect(effect_fengliu_random_curse, player_index)
-		if effects.size() > 0:
-			fengliu_auto_curse(effects[0], player_index)
+		if player_data.effects.has(effect_fengliu_random_curse):
+			fengliu_auto_curse(player_data.effects[effect_fengliu_random_curse][0], player_data.player_index)
+
+		if player_data.effects.has(effect_fengliu_random_extra_wanted_item_tag):
+			if not player_data.effects.has(effect_fengliu_extra_wanted_item_tag):
+				player_data.effects[effect_fengliu_extra_wanted_item_tag] = []
+				
+			for _i in player_data.effects[effect_fengliu_random_extra_wanted_item_tag]:
+				player_data.effects[effect_fengliu_extra_wanted_item_tag].append(Utils.get_rand_element(all_item_tags))
 
 	_restart_wave = false
 

@@ -65,10 +65,11 @@ ITEM_PLASTIC_BAG,Plastic Bag,塑料袋
 ITEM_INFUSION_BAG,Infusion Bag,输液袋
 ITEM_GACHA,Gacha Machine,抽卡
 ITEM_THICK_PRESERVATION_FILM,Thickened Preservation Film,加厚保鲜膜
-FENGLIU_REDUCE_SHIELD_DAMAGE,% Shield Damage Reduction,%护盾减伤
+FENGLIU_REDUCE_SHIELD_DAMAGE,% Shield Damage Reduction,%护盾减伤-
 FENGLIU_CONSUMABLE_SHIELD_REGEN,Consumable Shield Regen,消耗性回盾
-FENGLIU_WANTED_ITEM_TAG_CHANCE,,%标签道具概率
+FENGLIU_WANTED_ITEM_TAG_CHANCE,% Wanted Item Tag Chance,%标签道具概率
 ITEM_TAG,,吊牌
+STOCKER,Stocker,理货员
 EFFECT_TWO_HAND_WEAPON_SLOT_LIMIT,Only has two hands (so can only hold two weapons),只有两只手所以只拿两个武器
 ITEM_RAT_KING_RATZILLA,Rat Subject,鼠族臣民
 EFFECT_RATZILLA_KILLER_BOSS_TEXT,Ratzilla targets and attacks Bosses,鼠斯拉会锁定并攻击 boss
@@ -229,3 +230,4 @@ LESS_ENEMIES,Fewer Enemies,敌人更少
 MORE_ENEMIES,More Enemies,敌人更多
 LESS_ENEMY_SPEED,Slower Enemies,敌人减速
 LOCK,Lock,锁定
+EFFECT_RANDOM_EXTRA_WANTED_ITEM_TAG,Gain {0} random tag every wave [{1}],每波商店随机额外出现{0}种道具 [{1}]
