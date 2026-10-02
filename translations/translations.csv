@@ -67,6 +67,8 @@ ITEM_GACHA,Gacha Machine,抽卡
 ITEM_THICK_PRESERVATION_FILM,Thickened Preservation Film,加厚保鲜膜
 FENGLIU_REDUCE_SHIELD_DAMAGE,% Shield Damage Reduction,%护盾减伤
 FENGLIU_CONSUMABLE_SHIELD_REGEN,Consumable Shield Regen,消耗性回盾
+FENGLIU_WANTED_ITEM_TAG_CHANCE,,%标签道具概率
+ITEM_TAG,,吊牌
 EFFECT_TWO_HAND_WEAPON_SLOT_LIMIT,Only has two hands (so can only hold two weapons),只有两只手所以只拿两个武器
 ITEM_RAT_KING_RATZILLA,Rat Subject,鼠族臣民
 EFFECT_RATZILLA_KILLER_BOSS_TEXT,Ratzilla targets and attacks Bosses,鼠斯拉会锁定并攻击 boss
@@ -216,3 +218,14 @@ EFFECT_CONSUMABLE_SHIELD_REGEN_VALUE,,使用消耗品恢复{0}护盾
 ITEM_TITRATION_SOLUTION,Titration Solution,滴定液
 ITEM_BARK,Bark,树皮
 EFFECT_GAIN_STAT_FOR_EVERY_LIVING_TREE,{0} {1} for every living tree [{4}],每存活一棵树会{0}{1} [{4}]
+EFFECT_EXTRA_WANTAD_ITEM_TAG,,商店有概率额外出现{0}道具 [{1}]
+CONSUMABLE,Consumable,消耗品
+PICKUP,Pickup,拾取
+ECONOMY,Economy,经济
+EXPLOSIVE,Explosive,爆炸物
+EXPLORATION,Exploration,探索
+STAND_STILL,Stand Still,静止不动
+LESS_ENEMIES,Fewer Enemies,敌人更少
+MORE_ENEMIES,More Enemies,敌人更多
+LESS_ENEMY_SPEED,Slower Enemies,敌人减速
+LOCK,Lock,锁定

@@ -57,7 +57,8 @@ const FENGLIU_EXTRA_SECONDARY_STAT_KEYS = [
 	"fengliu_tree_drop_double",
 	"fengliu_rekindling",
 	"fengliu_reduce_shield_damage",
-	"fengliu_consumable_shield_regen"
+	"fengliu_consumable_shield_regen",
+	"fengliu_wanted_item_tag_chance"
 ]
 
 
@@ -112,12 +113,14 @@ var effect_fengliu_temporary_stats_stop = Keys.generate_hash("fengliu_temporary_
 var effect_fengliu_swap_enemie = Keys.generate_hash("fengliu_swap_enemie")
 var effect_fengliu_get_fixed_upgrade = Keys.generate_hash("fengliu_get_fixed_upgrade")
 var effect_fengliu_can_rand_set_weapon = Keys.generate_hash("fengliu_can_rand_set_weapon")
+var effect_fengliu_extra_wanted_item_tag = Keys.generate_hash("fengliu_extra_wanted_item_tag")
 
 
 var fengliu_need_reroll_effect = [
 	effect_fengliu_swap_enemie,
 	effect_fengliu_get_fixed_upgrade,
-	effect_fengliu_can_rand_set_weapon
+	effect_fengliu_can_rand_set_weapon,
+	effect_fengliu_extra_wanted_item_tag
 ]
 
 

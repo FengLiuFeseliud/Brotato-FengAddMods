@@ -40,7 +40,8 @@ const ALL_SECONDARY_STATS = [
 	"fengliu_tree_drop_double",
 	"fengliu_rekindling",
 	"fengliu_reduce_shield_damage",
-	"fengliu_consumable_shield_regen"
+	"fengliu_consumable_shield_regen",
+	"fengliu_wanted_item_tag_chance"
 ]
 
 
