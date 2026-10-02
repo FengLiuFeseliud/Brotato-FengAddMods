@@ -188,8 +188,8 @@ EFFECT_RANDOM_DAMAGE_TEXT,Damage is randomized by the fired bullet type,伤害�
 EFFECT_RANDOM_CAN_RAND_SET_WEAPON,The shop will only offer {0} weapons,商店将只能出现{0}武器
 EFFECT_PET_ROBOT_VACUUM,"A Robot Vacuum pet that collects Materials and Consumables for you, grants [color=lime]3[/color] extra Materials when picking up a Consumable, and deals {0} ({1}) damage to enemies it touches",生成一个扫地机器人宠物，会自动捡取材料与消耗品，捡取消耗品时额外获取[color=lime]3[/color]材料，碰到它的敌人会受到{0}（{1}）伤害
 EFFECT_WEAPON_SHOP_EMPTY_SLOT_ADD_DAMEGE,"Before the wave starts, each empty shop slot adds {0} base damage [+{1}]",开始敌袭前商店每有一个空位加{0}基础伤害 [+{1}]
-FENGLIU_TREE_DROP_DOUBLE,% Double Tree Drops,%树木掉落翻倍
-EFFECT_TREE_DROP_DOUBLE_VALUE,{0} % Double Tree Drops,{0} %树木掉落翻倍
+FENGLIU_TREE_DROP_DOUBLE,% Double Tree Drops,%树木掉落消耗品翻倍
+EFFECT_TREE_DROP_DOUBLE_VALUE,{0} % Double Tree Drops,{0} %树木掉落消耗品翻倍
 EFFECT_TREE_VALUE,Gain {0} Trees,增加{0}点树木
 FENGLIU_REKINDLING,% Multi Burn,%多重燃烧
 EFFECT_REKINDLING_VALUE,{0} % Multi Burn,{0} %多重燃烧
@@ -219,7 +219,7 @@ EFFECT_CONSUMABLE_SHIELD_REGEN_VALUE,,使用消耗品恢复{0}护盾
 ITEM_TITRATION_SOLUTION,Titration Solution,滴定液
 ITEM_BARK,Bark,树皮
 EFFECT_GAIN_STAT_FOR_EVERY_LIVING_TREE,{0} {1} for every living tree [{4}],每存活一棵树会{0}{1} [{4}]
-EFFECT_EXTRA_WANTAD_ITEM_TAG,,商店有概率额外出现{0}道具 [{1}]
+EFFECT_EXTRA_WANTAD_ITEM_TAG,,商店有概率额外出现{0}标签道具 [{1}]
 CONSUMABLE,Consumable,消耗品
 PICKUP,Pickup,拾取
 ECONOMY,Economy,经济
@@ -230,4 +230,4 @@ LESS_ENEMIES,Fewer Enemies,敌人更少
 MORE_ENEMIES,More Enemies,敌人更多
 LESS_ENEMY_SPEED,Slower Enemies,敌人减速
 LOCK,Lock,锁定
-EFFECT_RANDOM_EXTRA_WANTED_ITEM_TAG,Gain {0} random tag every wave [{1}],每波商店随机额外出现{0}种道具 [{1}]
+EFFECT_RANDOM_EXTRA_WANTED_ITEM_TAG,Gain {0} random tag every wave [{1}],每波商店随机额外出现{0}种标签道具 [{1}]

@@ -648,7 +648,7 @@ func fengliu_get_rand_item_for_wave(wave: int, player_index: int, type: int, arg
 			wanted_item_tag_chance = BOOSTED_WANTED_ITEM_TAG
 
         # 修改道具 tags 
-		wanted_item_tag_chance += RunData.get_player_effect(fengliu_wanted_item_tag_chance_hash, player_index)
+		wanted_item_tag_chance += RunData.get_player_effect(fengliu_wanted_item_tag_chance_hash, player_index) / 100.0
 		var wanted_tags: Array = player_character.wanted_tags.duplicate()
 		wanted_tags.append_array(RunData.get_player_effect(effect_fengliu_extra_wanted_item_tag, player_index))
 

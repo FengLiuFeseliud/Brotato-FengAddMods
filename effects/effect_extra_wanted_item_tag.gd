@@ -46,7 +46,7 @@ func apply(player_index: int) -> void:
         if roll_tags == "":
             return
     
-    RunData.get_player_effect(custom_key_hash ,player_index).push_font(roll_tags)
+    RunData.get_player_effect(custom_key_hash ,player_index).push_front(roll_tags)
 
 
 func unapply(player_index: int) -> void:
