@@ -709,15 +709,16 @@ func on_wave_end() -> void :
 	.on_wave_end()
 
 	# 逐个玩家处理
-	for player_data in players_data:
+	for player_index in players_data.size():
+		var player_data = players_data[player_index]
 		# 处理道具合并
 		if player_data.effects.has(effect_fengliu_item_merge):
 			for item_merge_effect in player_data.effects[effect_fengliu_item_merge]:
-				fengliu_try_item_merge(item_merge_effect, player_data.player_index)
+				fengliu_try_item_merge(item_merge_effect, player_index)
 
 		# 处理自动诅咒
 		if player_data.effects.has(effect_fengliu_random_curse):
-			fengliu_auto_curse(player_data.effects[effect_fengliu_random_curse][0], player_data.player_index)
+			fengliu_auto_curse(player_data.effects[effect_fengliu_random_curse][0], player_index)
 
 		if player_data.effects.has(effect_fengliu_random_extra_wanted_item_tag):
 			if not player_data.effects.has(effect_fengliu_extra_wanted_item_tag):
