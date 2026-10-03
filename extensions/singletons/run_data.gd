@@ -27,7 +27,9 @@ const ALL_SECONDARY_STATS = [
 	"fengliu_tree_drop_double",
 	"fengliu_rekindling",
 	"fengliu_reduce_shield_damage",
-	"fengliu_consumable_shield_regen"
+	"fengliu_consumable_shield_regen",
+	"fengliu_wanted_item_tag_chance",
+	"fengliu_hit_shield_drop_consumable"
 ]
 
 
@@ -58,7 +60,8 @@ const FENGLIU_EXTRA_SECONDARY_STAT_KEYS = [
 	"fengliu_rekindling",
 	"fengliu_reduce_shield_damage",
 	"fengliu_consumable_shield_regen",
-	"fengliu_wanted_item_tag_chance"
+	"fengliu_wanted_item_tag_chance",
+	"fengliu_hit_shield_drop_consumable"
 ]
 
 
@@ -174,6 +177,7 @@ var fengliu_item_auto_open_box_hash = Keys.generate_hash("item_auto_open_box") #
 var fengliu_crate_gobbler_hash = Keys.generate_hash("crate_gobbler") # 箱子吞吞怪追踪哈希
 var fengliu_item_kebab_hash = Keys.generate_hash("item_kebab")
 var fengliu_item_gacha_hash = Keys.generate_hash("item_gacha") # 抽卡道具追踪哈希
+var fengliu_item_plastic_fruit_basket_hash = Keys.generate_hash("item_plastic_fruit_basket")
 
 var stat_after_change_wave_value_count = {}
 var all_secondary_stats_hashs = []
@@ -420,6 +424,7 @@ func init_tracked_effects() -> Dictionary:
 	# 追踪键须与道具 id 哈希一致，否则道具描述读不到计数
 	tracked[fengliu_item_kebab_hash] = 0
 	tracked[fengliu_item_gacha_hash] = 0
+	tracked[fengliu_item_plastic_fruit_basket_hash] = 0
 	return tracked
 
 

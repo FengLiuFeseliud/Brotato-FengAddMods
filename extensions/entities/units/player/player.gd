@@ -21,6 +21,10 @@ var effect_fengliu_shield_hp_together = Keys.generate_hash("fengliu_shield_hp_to
 var fengliu_shield_hash: int = Keys.generate_hash("stat_fengliu_shield")
 var fengliu_reduce_shield_damage_hash = Keys.generate_hash("fengliu_reduce_shield_damage")
 var fengliu_consumable_shield_regen_hash = Keys.generate_hash("fengliu_consumable_shield_regen")
+var fengliu_hit_shield_drop_consumable_hash = Keys.generate_hash("fengliu_hit_shield_drop_consumable")
+
+
+var fengliu_item_plastic_fruit_basket_hash = Keys.generate_hash("item_plastic_fruit_basket")
 
 
 var _max_hit_protection = 0
@@ -96,6 +100,23 @@ func _ready() -> void :
 
     # 配置满盾联动（初始盾值即按满/不满判定）
     fengliu_sync_full_shield_stat_link()
+
+
+# 生成一个消耗品模拟树
+func _fengliu_drop_consumable() -> void:
+    var main = get_tree().current_scene
+
+    var old_stats = stats
+    var tree_stats = stats.duplicate()
+    tree_stats.can_drop_consumables = true
+    tree_stats.base_drop_chance = 1.0
+    tree_stats.item_drop_chance = 0.2
+    tree_stats.min_consumable_tier = Tier.COMMON
+    tree_stats.max_consumable_tier = Tier.COMMON
+    stats = tree_stats
+
+    main.spawn_consumables(self)
+    stats = old_stats
 
 
 # 获取玩家 UI
@@ -252,6 +273,24 @@ func fengliu_deduct_shield(amount: int) -> int:
     return lost
 
 
+func fengliu_hit_shield_drop_consumable() -> void:
+    var hit_shield_drop_consumable = RunData.get_player_effect(fengliu_hit_shield_drop_consumable_hash, player_index) / 100.0
+    if hit_shield_drop_consumable <= 0:
+        return
+
+    var hit_shield_drop_consumable_count = int(hit_shield_drop_consumable)
+    var hit_shield_drop_consumable_chance = hit_shield_drop_consumable - hit_shield_drop_consumable_count
+
+    # 必掉份数 + 小数概率补一份
+    for _i in hit_shield_drop_consumable_count:
+        _fengliu_drop_consumable()
+        RunData.add_tracked_value(player_index, fengliu_item_plastic_fruit_basket_hash, 1)
+        
+    if Utils.get_chance_success(hit_shield_drop_consumable_chance):
+        _fengliu_drop_consumable()
+        RunData.add_tracked_value(player_index, fengliu_item_plastic_fruit_basket_hash, 1)
+
+
 # 盾值扣减
 func _fengliu_take_shield(amount: int) -> int:
     if amount <= 0 or dead or fengliu_shield <= 0:
@@ -260,6 +299,7 @@ func _fengliu_take_shield(amount: int) -> int:
     var shield_before: float = fengliu_shield
     fengliu_shield = max(0.0, shield_before - amount)
     var lost: int = int(round(shield_before)) - int(round(fengliu_shield))
+
     if lost <= 0:
         return 0
 
@@ -267,6 +307,7 @@ func _fengliu_take_shield(amount: int) -> int:
     if fengliu_shield <= 0.0:
         _fengliu_shield_reduce_pool = 0.0
 
+    fengliu_hit_shield_drop_consumable()
     return lost
 
 

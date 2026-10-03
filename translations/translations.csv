@@ -65,7 +65,7 @@ ITEM_PLASTIC_BAG,Plastic Bag,塑料袋
 ITEM_INFUSION_BAG,Infusion Bag,输液袋
 ITEM_GACHA,Gacha Machine,抽卡
 ITEM_THICK_PRESERVATION_FILM,Thickened Preservation Film,加厚保鲜膜
-FENGLIU_REDUCE_SHIELD_DAMAGE,% Shield Damage Reduction,%护盾减伤-
+FENGLIU_REDUCE_SHIELD_DAMAGE,% Shield Damage Reduction,%护盾减伤
 FENGLIU_CONSUMABLE_SHIELD_REGEN,Consumable Shield Regen,消耗性回盾
 FENGLIU_WANTED_ITEM_TAG_CHANCE,% Wanted Item Tag Chance,%标签道具概率
 ITEM_TAG,,吊牌
@@ -238,3 +238,7 @@ EFFECT_SHIELD_SET_HIT_PROTECTION,Consumes {0} Shield to nullify a hit,受击时�
 EFFECT_SHIELD_NOT_REGEN,Your Shield no longer regenerates,护盾不再恢复
 ITEM_WATER_PIPE,Water Pipe,水管
 EFFECT_SHIELD_HP_TOGETHER,Your Shield and HP share the damage taken,护盾与生命将共同承伤
+ITEM_PLASTIC_FRUIT_BASKET,Plastic Fruit Basket,塑料果篮
+EFFECT_HIT_SHIELD_DROP_CONSUMABLE_VALUE,{0}% chance to drop a Consumable when your Shield takes a hit,护盾受击时有{0}%概率掉落一份消耗品
+CONSUMABLE_COUNT,Consumables dropped: {0},已掉落消耗品：{0}
+FENGLIU_HIT_SHIELD_DROP_CONSUMABLE,%Consumable on Shield Hit,%护盾受击掉消耗品
