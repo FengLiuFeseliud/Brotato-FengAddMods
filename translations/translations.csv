@@ -231,3 +231,5 @@ MORE_ENEMIES,More Enemies,敌人更多
 LESS_ENEMY_SPEED,Slower Enemies,敌人减速
 LOCK,Lock,锁定
 EFFECT_RANDOM_EXTRA_WANTED_ITEM_TAG,Gain {0} random tag every wave [{1}],每波商店随机额外出现{0}种标签道具 [{1}]
+ITEM_LIFEBUOY,Lifebuoy,救生圈
+EFFECT_SHIELD_TO_HIT_PROTECTION_FRONT,Your Shield absorbs damage before Hit Protection,护盾优先于抵消伤害的机会承受伤害

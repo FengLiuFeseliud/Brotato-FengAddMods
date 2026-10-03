@@ -1,0 +1,13 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/effects/shield_to_hit_protection_front.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+key = ""
+text_key = "EFFECT_SHIELD_TO_HIT_PROTECTION_FRONT"
+value = 0
+custom_key = "fengliu_shield_to_hit_protection_front"
+storage_method = 0
+effect_sign = 3
+custom_args = [  ]

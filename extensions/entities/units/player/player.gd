@@ -12,6 +12,7 @@ var effect_fengliu_picked_up_consumable_add_size = Keys.generate_hash("fengliu_p
 var effect_fengliu_explode_on_shield_broken: int = Keys.generate_hash("fengliu_explode_on_shield_broken")
 var effect_fengliu_no_hit_material: int = Keys.generate_hash("fengliu_no_hit_material")
 var effect_fengliu_full_shield_stat_link: int = Keys.generate_hash("fengliu_full_shield_stat_link")
+var effect_fengliu_shield_to_hit_protection_front = Keys.generate_hash("fengliu_shield_to_hit_protection_front")
 
 var fengliu_shield_hash: int = Keys.generate_hash("stat_fengliu_shield")
 var fengliu_reduce_shield_damage_hash = Keys.generate_hash("fengliu_reduce_shield_damage")
@@ -174,9 +175,17 @@ func take_damage(value: int, args: TakeDamageArgs) -> Array:
             if value <= 0:
                 args.armor_applied = false
 
-        var damage_taken = .take_damage(value, args)
-        args.armor_applied = previous_armor_applied
+        # 盾全吸收时临时清空抵消次数
+        var shield_full_absorb: bool = value <= 0
+        var hit_protection_before: int = _hit_protection
+        if shield_full_absorb:
+            _hit_protection = 0
 
+        var damage_taken = .take_damage(value, args)
+        if shield_full_absorb:
+            _hit_protection = hit_protection_before
+
+        args.armor_applied = previous_armor_applied
         # 被闪避的伤害不吃盾：退还（静默，不飘 -x）
         if damage_taken.size() > 2 and damage_taken[2]:
             fengliu_shield = min(fengliu_shield + shield_lost, Utils.get_stat(fengliu_shield_hash, player_index))
@@ -246,7 +255,11 @@ func fengliu_can_shield_take_damage(value: int, args: TakeDamageArgs) -> bool:
         return false
 
     if _hit_protection != 0:
-        return false
+        var effect = RunData.get_player_effect(effect_fengliu_shield_to_hit_protection_front, player_index)
+        if not effect is int:
+            return false
+            
+        return effect > 0
 
     if args.hitbox != null and args.hitbox.is_healing:
         return false
