@@ -236,3 +236,5 @@ EFFECT_SHIELD_TO_HIT_PROTECTION_FRONT,Your Shield absorbs damage before Hit Prot
 ITEM_PILL_BOX,Pill Box,分装药盒
 EFFECT_SHIELD_SET_HIT_PROTECTION,Consumes {0} Shield to nullify a hit,受击时消耗{0}点护盾抵消该次伤害
 EFFECT_SHIELD_NOT_REGEN,Your Shield no longer regenerates,护盾不再恢复
+ITEM_WATER_PIPE,Water Pipe,水管
+EFFECT_SHIELD_HP_TOGETHER,Your Shield and HP share the damage taken,护盾与生命将共同承伤
