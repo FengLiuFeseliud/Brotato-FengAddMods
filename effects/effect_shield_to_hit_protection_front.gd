@@ -6,12 +6,9 @@ extends "res://mods-unpacked/FengLiu-FengAddMods/effects/global/mod_effect.gd"
 # 效果：护盾优先于防护
 #   拥有后，护盾插到「抵消伤害的机会」前面承伤：
 #   玩家还有抵消伤害的机会时，这一击也先由护盾吃下。
-#   判定点见扩展脚本 extensions/entities/units/player/player.gd 的
-#   fengliu_can_shield_take_damage。
 #   运行时 custom_key：fengliu_shield_to_hit_protection_front
 # ------------------------------------------------------------
 # 效果值：仅作为存在标记，key/value 不参与逻辑；
-#   槽位存整数计数，供 RunData.get_player_effect_bool 判定（> 0 即生效）。
 # ============================================================
 
 
