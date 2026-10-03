@@ -13,10 +13,14 @@ var effect_fengliu_explode_on_shield_broken: int = Keys.generate_hash("fengliu_e
 var effect_fengliu_no_hit_material: int = Keys.generate_hash("fengliu_no_hit_material")
 var effect_fengliu_full_shield_stat_link: int = Keys.generate_hash("fengliu_full_shield_stat_link")
 var effect_fengliu_shield_to_hit_protection_front = Keys.generate_hash("fengliu_shield_to_hit_protection_front")
+var effect_fengliu_shield_set_hit_protection = Keys.generate_hash("fengliu_shield_set_hit_protection")
+var effect_fengliu_shield_not_regen = Keys.generate_hash("fengliu_shield_not_regen")
+
 
 var fengliu_shield_hash: int = Keys.generate_hash("stat_fengliu_shield")
 var fengliu_reduce_shield_damage_hash = Keys.generate_hash("fengliu_reduce_shield_damage")
 var fengliu_consumable_shield_regen_hash = Keys.generate_hash("fengliu_consumable_shield_regen")
+
 
 var _max_hit_protection = 0
 var _regen_hit_protection_timer = null
@@ -29,7 +33,6 @@ var _exploding_on_clean_up_room
 var _scale_value = 1 
 
 var fengliu_shield = 0
-
 var fengliu_shield_regen_delay: float = 3.0
 var fengliu_shield_regen_tick: float = 1.0
 var fengliu_shield_regen_rate: float = 0.1
@@ -154,11 +157,20 @@ func take_damage(value: int, args: TakeDamageArgs) -> Array:
         if reduce_shield_damage < 0:
             reduce_shield_damage = 0
 
+        # 抵消型护盾：持有份数即每次受击固定消耗的护盾点数
+        var shield_effect = RunData.get_player_effect(effect_fengliu_shield_set_hit_protection, player_index)
+        var shield_hit_protection_damage: int = 0
+        if shield_effect is int:
+            shield_hit_protection_damage = shield_effect
+
         var reduce = abs(100 - reduce_shield_damage) / 100.0
         var shield_before: float = fengliu_shield
         var pool_before: float = _fengliu_shield_reduce_pool
         
         var shield_spent: float = value * reduce + _fengliu_shield_reduce_pool
+        if shield_hit_protection_damage > 0 and shield_before >= shield_hit_protection_damage:
+            shield_spent = shield_hit_protection_damage
+
         var shield_spent_int: int = int(floor(shield_spent))
         _fengliu_shield_reduce_pool = shield_spent - shield_spent_int
 
@@ -170,10 +182,13 @@ func take_damage(value: int, args: TakeDamageArgs) -> Array:
         else:
             # 打穿
             var absorbed_damage: int = int(round(max(0.0, shield_before - pool_before) / reduce))
-            value = incoming_damage - absorbed_damage
-            shield_broken = true
-            if value <= 0:
-                args.armor_applied = false
+            if shield_before >= shield_hit_protection_damage and shield_hit_protection_damage > 0:
+                value = 0
+            else:
+                value = incoming_damage - absorbed_damage
+                shield_broken = true
+                if value <= 0:
+                    args.armor_applied = false
 
         # 盾全吸收时临时清空抵消次数
         var shield_full_absorb: bool = value <= 0
@@ -389,6 +404,10 @@ func fengliu_find_stat_link_tuple(slot_effects: Array, sig: String) -> Array:
 
 # 盾恢复
 func fengliu_shield_regen(regen: int) -> int:
+    var effect = RunData.get_player_effect(effect_fengliu_shield_not_regen, player_index)
+    if effect is int and effect > 0:
+        return 0
+
     if regen <= 0:
         return 0
     
