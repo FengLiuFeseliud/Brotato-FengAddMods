@@ -16,6 +16,7 @@ var effect_fengliu_shield_to_hit_protection_front = Keys.generate_hash("fengliu_
 var effect_fengliu_shield_set_hit_protection = Keys.generate_hash("fengliu_shield_set_hit_protection")
 var effect_fengliu_shield_not_regen = Keys.generate_hash("fengliu_shield_not_regen")
 var effect_fengliu_shield_hp_together = Keys.generate_hash("fengliu_shield_hp_together")
+var effect_fengliu_random_primary_stats_on_shield_broken = Keys.generate_hash("fengliu_random_primary_stats_on_shield_broken")
 
 
 var fengliu_shield_hash: int = Keys.generate_hash("stat_fengliu_shield")
@@ -25,6 +26,7 @@ var fengliu_hit_shield_drop_consumable_hash = Keys.generate_hash("fengliu_hit_sh
 
 
 var fengliu_item_plastic_fruit_basket_hash = Keys.generate_hash("item_plastic_fruit_basket")
+var fengliu_item_plastic_candy_jar_hash = Keys.generate_hash("item_plastic_candy_jar")
 
 
 var _max_hit_protection = 0
@@ -314,7 +316,12 @@ func _fengliu_take_shield(amount: int) -> int:
 # 破盾触发：材料计时失效 + 破盾爆炸（爆炸仅在非自伤时触发）
 func fengliu_on_shield_broken(can_explode: bool = true) -> void:
     fengliu_no_hit_material()
-
+    
+    for effect in RunData.get_player_effect(effect_fengliu_random_primary_stats_on_shield_broken, player_index):
+        for _i in effect[0]:
+            RunData.add_stat(RunData.get_random_primary_stats(), 1, player_index)
+            RunData.add_tracked_value(player_index, fengliu_item_plastic_candy_jar_hash, 1)
+            
     if not can_explode or RunData.get_player_effect(effect_fengliu_explode_on_shield_broken, player_index).size() == 0:
         return
 

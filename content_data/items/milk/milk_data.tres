@@ -23,4 +23,4 @@ is_cursed = false
 curse_factor = 0.0
 max_nb = -1
 item_appearances = [  ]
-tags = [ "xp_gain" ]
+tags = [ "xp_gain", "stat_percent_damage", "stat_speed" ]

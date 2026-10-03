@@ -178,6 +178,7 @@ var fengliu_crate_gobbler_hash = Keys.generate_hash("crate_gobbler") # 箱子吞
 var fengliu_item_kebab_hash = Keys.generate_hash("item_kebab")
 var fengliu_item_gacha_hash = Keys.generate_hash("item_gacha") # 抽卡道具追踪哈希
 var fengliu_item_plastic_fruit_basket_hash = Keys.generate_hash("item_plastic_fruit_basket")
+var fengliu_item_plastic_candy_jar_hash = Keys.generate_hash("item_plastic_candy_jar")
 
 var stat_after_change_wave_value_count = {}
 var all_secondary_stats_hashs = []
@@ -425,6 +426,7 @@ func init_tracked_effects() -> Dictionary:
 	tracked[fengliu_item_kebab_hash] = 0
 	tracked[fengliu_item_gacha_hash] = 0
 	tracked[fengliu_item_plastic_fruit_basket_hash] = 0
+	tracked[fengliu_item_plastic_candy_jar_hash] = 0
 	return tracked
 
 
