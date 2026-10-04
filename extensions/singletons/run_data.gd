@@ -78,8 +78,8 @@ const FENGLIU_SECONDARY_LEDGER_KEY := "fengliu_secondary_ledger"
 const FENGLIU_TEMP_LEDGER_KEY := "fengliu_secondary_ledger_temp"
 const FENGLIU_LINKED_LEDGER_KEY := "fengliu_secondary_ledger_linked"
 
-# 能量护盾效果脚本（玩家版不注册 mod class_name，只能按脚本对象比较）
-const FENGLIU_ENERGY_SHIELD_EFFECT_SCRIPT = preload("res://mods-unpacked/FengLiu-FengAddMods/effects/effect_energy_shield.gd")
+# 护盾发生器效果脚本（玩家版不注册 mod class_name，只能按脚本对象比较）
+const FENGLIU_SHIELD_GENERATOR_EFFECT_SCRIPT = preload("res://mods-unpacked/FengLiu-FengAddMods/effects/structures/effect_shield_generator.gd")
 
 
 # 每个玩家是否需要「旧档 rebase」（读档时判定，取用后即清；仅 linked 层使用）
@@ -1141,8 +1141,8 @@ func fengliu_normalize_cursed_effect(item_data: ItemParentData) -> void:
 	# 这里还原 value 并把强化额度改记到 to_value（口径见 fengliu_normalize_cursed_convert_effect）
 	fengliu_normalize_cursed_convert_effect(item_data, base_data)
 
-	# 能量护盾：诅咒按强度放大区域范围与回盾量
-	fengliu_normalize_cursed_energy_shield(item_data, base_data)
+	# 护盾发生器：诅咒按强度放大区域范围与回盾量
+	fengliu_normalize_cursed_shield_generator(item_data, base_data)
 
 	# 找出原版对应树效果的文案键
 	var base_text_key: String = ""
@@ -1189,20 +1189,20 @@ func fengliu_normalize_cursed_convert_effect(item_data: ItemParentData, base_dat
 		effect.to_value = int(ceil(base_effect.to_value * (1.0 + item_data.curse_factor)))
 
 
-# 能量护盾：诅咒按强度放大区域范围与回盾量
+# 护盾发生器：诅咒按强度放大区域范围与回盾量
 #   口径同原版正效果：×(1 + 诅咒强度) 向上取整；两处都以未诅咒原型为基准绝对赋值，
 #   保证钩子被多次调用也不叠加。
-func fengliu_normalize_cursed_energy_shield(item_data: ItemParentData, base_data: ItemParentData) -> void:
+func fengliu_normalize_cursed_shield_generator(item_data: ItemParentData, base_data: ItemParentData) -> void:
 	for i in item_data.effects.size():
 		var effect = item_data.effects[i]
-		if effect.get_script() != FENGLIU_ENERGY_SHIELD_EFFECT_SCRIPT:
+		if effect.get_script() != FENGLIU_SHIELD_GENERATOR_EFFECT_SCRIPT:
 			continue
 
 		# 与未诅咒原型按序号对齐；类型对不上就不动
 		if i >= base_data.effects.size():
 			continue
 		var base_effect = base_data.effects[i]
-		if base_effect.get_script() != FENGLIU_ENERGY_SHIELD_EFFECT_SCRIPT:
+		if base_effect.get_script() != FENGLIU_SHIELD_GENERATOR_EFFECT_SCRIPT:
 			continue
 
 		# 诅咒强度倍率

@@ -1,4 +1,4 @@
-class_name EnergyShield
+class_name ShieldGenerator
 extends Structure
 
 
@@ -10,11 +10,11 @@ const AREA_ALPHA: = 0.25
 const AURA_TEXTURE_RADIUS: = 125.0
 # 每次攻击给区域内玩家回复的护盾值（默认值；被诅咒时由效果资源给出更大的值）
 const SHIELD_REGEN_DEFAULT: = 1
-# 关闭前的基础攻击次数（实际＝基础 + 每 1 点工程学 +10%，至少 1 次）
+# 关闭前的基础攻击次数（默认值；实际由效果资源给出）
 const CLOSE_AFTER_ATTACKS_BASE: = 5
-# 每 1 点工程学增加的攻击次数比例
+# 每 1 点工程学增加的攻击次数比例（默认值）
 const ENGINEERING_ATTACK_RATE: = 0.1
-# 关闭区域后的冷却时长（秒）
+# 关闭区域后的冷却时长（秒，默认值）
 const CLOSE_DURATION: = 3.0
 
 onready var _shield_shape: CollisionShape2D = $ShieldArea / CollisionShape2D
@@ -37,6 +37,10 @@ var _attacks_before_close: int = CLOSE_AFTER_ATTACKS_BASE
 var _attacks_done: int = 0
 # 关闭剩余时间（秒），大于 0 表示正在冷却
 var _close_time_left: float = 0.0
+# 关闭机制参数（来自效果资源，缺失时用常量默认值）
+var _close_after_attacks_base: int = CLOSE_AFTER_ATTACKS_BASE
+var _engineering_attack_rate: float = ENGINEERING_ATTACK_RATE
+var _close_duration: float = CLOSE_DURATION
 var _hitbox_args: = Hitbox.HitboxArgs.new()
 
 
@@ -46,12 +50,18 @@ func set_data(data: Resource) -> void:
 	.set_data(data)
 	apply_area_visual()
 	_apply_hitbox_stats()
-	# 回盾量来自效果资源（被诅咒时更大），效果未带该字段时用默认值
+	# 回盾量与关闭机制参数来自效果资源，缺失时用默认值
 	var regen = data.get("shield_regen") if data != null else null
 	_shield_regen = int(regen) if regen != null else SHIELD_REGEN_DEFAULT
-	# 关闭阈值：基础 5 次 + 每 1 点工程学 +10%，至少 1 次
+	var base_attacks = data.get("close_after_attacks_base") if data != null else null
+	_close_after_attacks_base = int(base_attacks) if base_attacks != null else CLOSE_AFTER_ATTACKS_BASE
+	var attack_rate = data.get("engineering_attack_rate") if data != null else null
+	_engineering_attack_rate = float(attack_rate) if attack_rate != null else ENGINEERING_ATTACK_RATE
+	var duration = data.get("close_duration") if data != null else null
+	_close_duration = float(duration) if duration != null else CLOSE_DURATION
+	# 关闭阈值：基础次数 + 每 1 点工程学 × 比例，至少 1 次
 	var engineering: float = Utils.get_stat(Keys.stat_engineering_hash, player_index)
-	_attacks_before_close = max(1, CLOSE_AFTER_ATTACKS_BASE + int(engineering * ENGINEERING_ATTACK_RATE))
+	_attacks_before_close = max(1, _close_after_attacks_base + int(engineering * _engineering_attack_rate))
 	# 新生成即处于开启态
 	_attacks_done = 0
 	_close_time_left = 0.0
@@ -151,7 +161,7 @@ func _physics_process(delta: float) -> void:
 	_attacks_done += 1
 	if _attacks_done >= _attacks_before_close:
 		_attacks_done = 0
-		_close_time_left = CLOSE_DURATION
+		_close_time_left = _close_duration
 		_set_area_closed(true)
 
 

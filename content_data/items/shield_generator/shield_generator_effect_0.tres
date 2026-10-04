@@ -1,0 +1,27 @@
+[gd_resource type="Resource" load_steps=4 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/effects/structures/effect_shield_generator.gd" type="Script" id=1]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/entities/structures/shield_generator/shield_generator.tscn" type="PackedScene" id=2]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/entities/structures/shield_generator/shield_generator_stats.tres" type="Resource" id=3]
+
+[resource]
+script = ExtResource( 1 )
+key = ""
+text_key = "EFFECT_SHIELD_GENERATOR"
+value = 1
+custom_key = ""
+storage_method = 0
+effect_sign = 3
+custom_args = [  ]
+spawn_cooldown = -1
+scene = ExtResource( 2 )
+stats = ExtResource( 3 )
+effects = [  ]
+spawn_in_center = -1
+spawn_around_player = 200
+can_be_grouped = true
+is_pet = false
+shield_regen = 1
+close_after_attacks_base = 5
+engineering_attack_rate = 0.1
+close_duration = 3.0

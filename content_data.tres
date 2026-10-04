@@ -140,7 +140,7 @@
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/water_pipe/water_pipe_data.tres" type="Resource" id=138]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/plastic_fruit_basket/plastic_fruit_basket_data.tres" type="Resource" id=139]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/plastic_candy_jar/plastic_candy_jar_data.tres" type="Resource" id=140]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/energy_shield/energy_shield_data.tres" type="Resource" id=141]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/shield_generator/shield_generator_data.tres" type="Resource" id=141]
 
 [resource]
 script = ExtResource( 3 )
