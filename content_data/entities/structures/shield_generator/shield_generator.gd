@@ -16,22 +16,25 @@ const CLOSE_AFTER_ATTACKS_BASE: = 5
 const ENGINEERING_ATTACK_RATE: = 0.1
 # 关闭区域后的冷却时长（秒，默认值）
 const CLOSE_DURATION: = 3.0
+# 伤害追踪键：固定指向「护盾发生器」道具，伤害累计显示在该道具提示里
+const DAMAGE_TRACKING_KEY: = "item_shield_generator"
 
 onready var _shield_shape: CollisionShape2D = $ShieldArea / CollisionShape2D
 onready var _aura: Sprite = $ShieldArea / Aura
 onready var _center_icon: Sprite = $ShieldArea / CenterIcon
 onready var _icon_anim: AnimationPlayer = $ShieldArea / IconAnimationPlayer
+onready var _attack_bar: UIProgressBar = $AttackBar
 onready var _hitbox: Hitbox = $Hitbox
 
 # 当前停留在区域内的敌人（进入入队、离开出队）
 var _enemies_in_area: Array = []
 # 当前停留在区域内的玩家（进入入队、离开出队）
 var _players_in_area: Array = []
-# 每次攻击给区域内玩家回复的护盾值（来自效果资源，被诅咒时更大）
+# 每次攻击给区域内玩家回复的护盾值
 var _shield_regen: int = SHIELD_REGEN_DEFAULT
 # 攻击冷却（tick，60 tick = 1 秒）
 var _cooldown: float = 0.0
-# 本次开启能打多少次（按工程学算，见 set_data）
+# 本次开启能打多少次
 var _attacks_before_close: int = CLOSE_AFTER_ATTACKS_BASE
 # 本次开启已打次数
 var _attacks_done: int = 0
@@ -59,15 +62,24 @@ func set_data(data: Resource) -> void:
 	_engineering_attack_rate = float(attack_rate) if attack_rate != null else ENGINEERING_ATTACK_RATE
 	var duration = data.get("close_duration") if data != null else null
 	_close_duration = float(duration) if duration != null else CLOSE_DURATION
-	# 关闭阈值：基础次数 + 每 1 点工程学 × 比例，至少 1 次
+	# 关闭阈值
 	var engineering: float = Utils.get_stat(Keys.stat_engineering_hash, player_index)
 	_attacks_before_close = max(1, _close_after_attacks_base + int(engineering * _engineering_attack_rate))
 	# 新生成即处于开启态
 	_attacks_done = 0
 	_close_time_left = 0.0
 	_set_area_closed(false)
-	# 进场后可立即攻击一次（首个 tick 不必等冷却）
 	_cooldown = 0.0
+
+	# 被诅咒时的光效：紫色诅咒粒子 + 中心图标紫色描边
+	if is_cursed and not is_instance_valid(curse_particle_instance):
+		curse_particle_instance = curse_particles.instance()
+		add_child(curse_particle_instance)
+		_apply_curse_outline()
+
+	# 伤害追踪
+	_hitbox.damage_tracking_key_hash = Keys.generate_hash(DAMAGE_TRACKING_KEY)
+	_hitbox.from = self
 
 
 # 把盾条配色写到光环上，并按射程确定区域半径
@@ -131,6 +143,9 @@ func _physics_process(delta: float) -> void:
 	if dead or stats == null:
 		return
 
+	# 剩余攻击次数条随状态刷新
+	_update_attack_bar()
+
 	# 关闭期间：只倒计时，不结算任何效果
 	if _close_time_left > 0.0:
 		_close_time_left -= delta
@@ -140,23 +155,21 @@ func _physics_process(delta: float) -> void:
 			_cooldown = 0.0
 		return
 
-	# 冷却按 tick 递减（60 tick / 秒）
 	_cooldown -= 60.0 * delta
 	if _cooldown > 0.0:
 		return
 
-	# 攻击间隔吃「构造物攻击速度」（与炮塔同一换算口径）
 	_cooldown = WeaponService.apply_structure_attack_speed_effects(stats.cooldown, player_index)
 	# 同一次攻击：对区域内敌人结算伤害，并给区域内玩家回盾
 	# 必须分开调用：用 or 连写会短路，后者不会被执行
 	var has_enemies: bool = _damage_enemies_in_area()
 	var has_players: bool = _regen_players_in_area()
 
-	# 区域内无人：本次不算一次攻击（不计数、不播动画、不关闭）
+	# 区域内无人
 	if not has_enemies and not has_players:
 		return
 
-	# 有目标才算一次攻击：播放图标攻击动画并累计次数
+	# 有目标才算一次攻击
 	_icon_anim.play("attack")
 	_attacks_done += 1
 	if _attacks_done >= _attacks_before_close:
@@ -167,7 +180,6 @@ func _physics_process(delta: float) -> void:
 
 # 对区域内所有敌人结算一次伤害（返回区域内是否有有效敌人）
 func _damage_enemies_in_area() -> bool:
-	# 先剔除已死亡 / 已释放 / 被魅惑（友方）的单位
 	var targets: = []
 	for enemy in _enemies_in_area:
 		if not is_instance_valid(enemy) or enemy.dead:
@@ -180,11 +192,13 @@ func _damage_enemies_in_area() -> bool:
 	if targets.size() == 0:
 		return false
 
-	# 同一帧共用一个命中判定，逐个结算（与原版爆炸同款做法）
+	# 同一帧共用一个命中判定
 	for enemy in targets:
 		var args: = TakeDamageArgs.new(player_index, _hitbox)
 		args.from = self
-		enemy.take_damage(_hitbox.damage, args)
+		var dmg_taken: Array = enemy.take_damage(_hitbox.damage, args)
+		# 直接结算不经过命中判定重叠链路，这里补上命中回报，伤害才会计入道具追踪
+		_hitbox.hit_something(enemy, dmg_taken[1])
 
 	return true
 
@@ -212,3 +226,26 @@ func _set_area_closed(closed: bool) -> void:
 	_aura.visible = not closed
 	_center_icon.visible = true
 
+
+# 剩余攻击次数条
+func _update_attack_bar() -> void:
+	# 关闭期间显示空条
+	if _attack_bar == null:
+		return
+
+	var total: float = float(max(1, _attacks_before_close))
+	var remaining: float = 0.0 if _close_time_left > 0.0 else max(0.0, total - float(_attacks_done))
+	_attack_bar.value = remaining / total * 100.0
+
+
+# 给中心图标套上诅咒紫色描边
+func _apply_curse_outline() -> void:
+	# 自建描边材质
+	var mat: = ShaderMaterial.new()
+	mat.shader = outline_material.shader
+	mat.set_shader_param("texture_size", _center_icon.texture.get_size())
+	mat.set_shader_param("width", 3.0)
+	mat.set_shader_param("alpha", 1.0)
+	mat.set_shader_param("desaturation", 0.0)
+	mat.set_shader_param("outline_color_0", Utils.CURSE_COLOR)
+	_center_icon.material = mat

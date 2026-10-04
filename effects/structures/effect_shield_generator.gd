@@ -37,6 +37,7 @@ func get_args(player_index: int) -> Array:
 	_init_stats_args_shield.effects = effects
 	var init_stats = WeaponService.init_structure_stats(stats, player_index, _init_stats_args_shield)
 	var engineering: float = Utils.get_stat(Keys.stat_engineering_hash, player_index)
+	# 攻击次数随工程学成长，下限 1 次
 	var attacks_before_close: int = max(1, close_after_attacks_base + int(engineering * engineering_attack_rate))
 
 	return [
@@ -50,6 +51,7 @@ func get_args(player_index: int) -> Array:
 
 
 func serialize() -> Dictionary:
+	# 新增的 3 个数值一并存档（旧档缺字段时由反序列化补默认值）
 	var serialized = .serialize()
 	serialized.shield_regen = shield_regen
 	serialized.close_after_attacks_base = close_after_attacks_base
@@ -59,6 +61,7 @@ func serialize() -> Dictionary:
 
 
 func deserialize_and_merge(serialized: Dictionary) -> void:
+	# 旧存档没有这些字段时保持默认值
 	.deserialize_and_merge(serialized)
 	if serialized.has("shield_regen"):
 		shield_regen = serialized.shield_regen

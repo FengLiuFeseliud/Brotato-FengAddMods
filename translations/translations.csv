@@ -245,5 +245,5 @@ FENGLIU_HIT_SHIELD_DROP_CONSUMABLE,%Consumable on Shield Hit,%护盾受击掉消
 ITEM_PLASTIC_CANDY_JAR,Plastic Candy Jar,塑料糖果罐
 EFFECT_RANDOM_PRIMARY_STATS_ON_SHIELD_BROKEN,Gain {0} random Primary stat when your Shield is broken,穿透护盾时随机获得{0}点主要属性
 ITEM_SHIELD_GENERATOR,Shield Generator,护盾发生器
-EFFECT_SHIELD_GENERATOR,"Summons a Shield Generator that deals {0} ({4}) damage to all enemies in the area and restores {1} Shield to players inside; closes the area for {3} seconds after every {2} ({5}) uses",生成一个护盾发生器，对区域内所有敌人造成{0}（{4}）点伤害并给区域内玩家回{1}点护盾，每使用{2}（{5}）后关闭区域{3}秒
+EFFECT_SHIELD_GENERATOR,"Summons a Shield Generator that deals {0} ({4}) damage to all enemies in the area and restores {1} Shield to players inside; closes the area for {3} seconds after every {2} ({5}) uses",生成一个护盾发生器，对区域内所有敌人造成{0}（{4}）点伤害并给区域内玩家回复{1}点护盾，每使用{2}（{5}）次后关闭区域{3}秒
 WEAPON_CLAW_HAMMER,Claw Hammer,羊角锤

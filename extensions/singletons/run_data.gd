@@ -78,7 +78,6 @@ const FENGLIU_SECONDARY_LEDGER_KEY := "fengliu_secondary_ledger"
 const FENGLIU_TEMP_LEDGER_KEY := "fengliu_secondary_ledger_temp"
 const FENGLIU_LINKED_LEDGER_KEY := "fengliu_secondary_ledger_linked"
 
-# 护盾发生器效果脚本（玩家版不注册 mod class_name，只能按脚本对象比较）
 const FENGLIU_SHIELD_GENERATOR_EFFECT_SCRIPT = preload("res://mods-unpacked/FengLiu-FengAddMods/effects/structures/effect_shield_generator.gd")
 
 
@@ -214,8 +213,10 @@ var wave_end_can_box_use_items = [
 
 # 扩展初始化哈希列表
 func _enter_tree() -> void:
+	# 预登记追踪键：道具一入手，伤害表就有对应的行可累加
 	init_tracked_items[Keys.generate_hash("item_balloon")] = 0
 	init_tracked_items[Keys.generate_hash("item_plastic_bag")] = 0
+	init_tracked_items[Keys.generate_hash("item_shield_generator")] = 0
 
 
 func _ready() -> void :
@@ -1138,10 +1139,9 @@ func fengliu_normalize_cursed_effect(item_data: ItemParentData) -> void:
 		return
 
 	# 转换类效果：value 是「每多少点算一组」的除数量级，原版诅咒放大它反而更弱，
-	# 这里还原 value 并把强化额度改记到 to_value（口径见 fengliu_normalize_cursed_convert_effect）
 	fengliu_normalize_cursed_convert_effect(item_data, base_data)
 
-	# 护盾发生器：诅咒按强度放大区域范围与回盾量
+	# 护盾发生器
 	fengliu_normalize_cursed_shield_generator(item_data, base_data)
 
 	# 找出原版对应树效果的文案键
@@ -1164,10 +1164,7 @@ func fengliu_normalize_cursed_effect(item_data: ItemParentData) -> void:
 		effect.text_key = base_text_key
 
 
-# 修正被诅咒的转换类效果（ConvertStatEffect 系）：
-#   这类效果的 value 是「每多少点源属性算一组」的除数量级（见 utils.gd::convert_stats），
-#   而原版诅咒对所有正效果统一按「值越大越强」放大 value ⇒ 组距变大 ⇒ 效果反而更弱；
-#   这里把 value 还原为未诅咒值，并把诅咒的强化额度改记到 to_value（每组的产量）上。
+# 修正被诅咒的转换类效果
 func fengliu_normalize_cursed_convert_effect(item_data: ItemParentData, base_data: ItemParentData) -> void:
 	for i in item_data.effects.size():
 		var effect = item_data.effects[i]
@@ -1189,9 +1186,7 @@ func fengliu_normalize_cursed_convert_effect(item_data: ItemParentData, base_dat
 		effect.to_value = int(ceil(base_effect.to_value * (1.0 + item_data.curse_factor)))
 
 
-# 护盾发生器：诅咒按强度放大区域范围与回盾量
-#   口径同原版正效果：×(1 + 诅咒强度) 向上取整；两处都以未诅咒原型为基准绝对赋值，
-#   保证钩子被多次调用也不叠加。
+# 诅咒按强度放大区域范围与回盾量
 func fengliu_normalize_cursed_shield_generator(item_data: ItemParentData, base_data: ItemParentData) -> void:
 	for i in item_data.effects.size():
 		var effect = item_data.effects[i]

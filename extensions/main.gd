@@ -5,8 +5,11 @@ const FENGLIU_STATUS_REFRESH_INTERVAL: = 0.1
 const FENGLIU_STATUS_COLOR_SHIELD: = Color(0.25, 0.6, 1.0, 1.0)   # 蓝色
 # 盾条预留的高度（血条高 48 + 间隔 4 = 52）
 const FENGLIU_HUD_TOP_SPACER_HEIGHT: = 52
+# 伤害表源同步的检查间隔（秒）
+const FENGLIU_DAMAGE_METER_SYNC_INTERVAL: = 1.0
 
 var _fengliu_status_refresh_timer: float = 0.0
+var _fengliu_damage_meter_sync_timer: float = 0.0
 var _fengliu_shield_wave_max: = [0.0, 0.0, 0.0, 0.0]
 
 
@@ -68,6 +71,12 @@ func fengliu_reserve_shield_space() -> void :
 
 
 func _process(delta: float) -> void :
+	# 伤害表源同步：单独按较慢的节流计时（中途买到羊角锤也能补挂道具行）
+	_fengliu_damage_meter_sync_timer += delta
+	if _fengliu_damage_meter_sync_timer >= FENGLIU_DAMAGE_METER_SYNC_INTERVAL:
+		_fengliu_damage_meter_sync_timer = 0.0
+		fengliu_sync_damage_meter_source()
+
 	_fengliu_status_refresh_timer += delta
 	if _fengliu_status_refresh_timer < FENGLIU_STATUS_REFRESH_INTERVAL:
 		return
@@ -689,3 +698,34 @@ func _on_player_health_updated(player: Player, current_val: int, max_val: int) -
 	# 被这里重新点亮时原版跳过了数值刷新，补一次，避免血满时填充还是旧的
 	if player_life_bar.visible:
 		player_life_bar.update_value(current_val, max_val)
+
+
+# 玩家是否持有羊角锤（按武器家族判定，1~4 阶通用）
+func fengliu_player_has_claw_hammer(player_index: int) -> bool:
+	# 只认武器家族 id，1~4 阶（含商店里的任意阶）都算持有
+	for weapon_data in RunData.get_player_weapons_ref(player_index):
+		if weapon_data != null and weapon_data.weapon_id == "weapon_claw_hammer":
+			return true
+	return false
+
+
+# 让第三方伤害表在羊角锤 build 里也显示「护盾发生器」道具行
+# （发生器造成的伤害本就记在该道具的追踪键上，锤子生成的发生器同样计入；
+# 未装该 mod、或对方改版后取不到节点/方法/属性时，一律静默跳过）
+func fengliu_sync_damage_meter_source() -> void:
+	for player_index in RunData.get_player_count():
+		if not fengliu_player_has_claw_hammer(player_index):
+			continue
+
+		var container = get_node_or_null("UI/HUD/LifeContainerP" + str(player_index + 1) + "/CaveGlobalDamageMeterContainer")
+		if container == null or not container.has_method("add_element"):
+			continue
+
+		# 属性用 get() 取，避免对方改版后字段缺失直接报错
+		var meter_items = container.get("items")
+		if (meter_items is Array) and meter_items.has("item_shield_generator"):
+			continue
+
+		var item = ItemService.get_item_from_id(Keys.generate_hash("item_shield_generator"))
+		if item != null:
+			container.add_element(item)
