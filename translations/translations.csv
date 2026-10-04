@@ -244,3 +244,5 @@ CONSUMABLE_COUNT,Consumables dropped: {0},已掉落消耗品：{0}
 FENGLIU_HIT_SHIELD_DROP_CONSUMABLE,%Consumable on Shield Hit,%护盾受击掉消耗品
 ITEM_PLASTIC_CANDY_JAR,Plastic Candy Jar,塑料糖果罐
 EFFECT_RANDOM_PRIMARY_STATS_ON_SHIELD_BROKEN,Gain {0} random Primary stat when your Shield is broken,穿透护盾时随机获得{0}点主要属性
+ITEM_ENERGY_SHIELD,Energy Shield,能量护盾
+EFFECT_ENERGY_SHIELD,Creates a semi-transparent shield area,形成一个半透明护盾区域

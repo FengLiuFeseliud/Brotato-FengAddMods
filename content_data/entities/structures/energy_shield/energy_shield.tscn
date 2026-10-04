@@ -1,0 +1,55 @@
+[gd_scene load_steps=8 format=2]
+
+[ext_resource path="res://entities/structures/structure.tscn" type="PackedScene" id=1]
+[ext_resource path="res://particles/sprites/aura_effect.png" type="Texture" id=2]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/entities/structures/energy_shield/energy_shield.gd" type="Script" id=3]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/energy_shield/energy_shield_icon.png" type="Texture" id=4]
+[ext_resource path="res://overlap/hitbox.gd" type="Script" id=5]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/entities/structures/energy_shield/energy_shield_attack_animation.tres" type="Animation" id=6]
+
+[sub_resource type="CircleShape2D" id=1]
+resource_local_to_scene = true
+radius = 200.0
+
+[sub_resource type="CircleShape2D" id=2]
+radius = 40.0
+
+[node name="EnergyShield" instance=ExtResource( 1 )]
+collision_layer = 0
+collision_mask = 0
+script = ExtResource( 3 )
+
+[node name="Sprite" parent="Animation" index="0"]
+visible = false
+
+[node name="Muzzle" parent="Animation" index="1"]
+position = Vector2( 0, 0 )
+
+[node name="ShieldArea" type="Area2D" parent="." index="3"]
+collision_layer = 0
+collision_mask = 6
+monitorable = false
+
+[node name="Aura" type="Sprite" parent="ShieldArea" index="0"]
+texture = ExtResource( 2 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ShieldArea" index="1"]
+shape = SubResource( 1 )
+
+[node name="CenterIcon" type="Sprite" parent="ShieldArea" index="2"]
+texture = ExtResource( 4 )
+
+[node name="IconAnimationPlayer" type="AnimationPlayer" parent="ShieldArea" index="3"]
+anims/attack = ExtResource( 6 )
+
+[node name="Hitbox" type="Area2D" parent="." index="4"]
+collision_layer = 0
+collision_mask = 0
+script = ExtResource( 5 )
+
+[node name="Collision" type="CollisionShape2D" parent="Hitbox" index="0"]
+disabled = true
+shape = SubResource( 2 )
+
+[connection signal="body_entered" from="ShieldArea" to="." method="_on_ShieldArea_body_entered"]
+[connection signal="body_exited" from="ShieldArea" to="." method="_on_ShieldArea_body_exited"]
