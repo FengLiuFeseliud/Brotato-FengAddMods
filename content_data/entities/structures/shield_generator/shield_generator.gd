@@ -2,7 +2,7 @@ class_name ShieldGenerator
 extends Structure
 
 
-# 区域光环配色：与盾条同色（extensions/main.gd 的 FENGLIU_STATUS_COLOR_SHIELD）
+# 区域光环配色
 const AREA_COLOR: = Color(0.25, 0.6, 1.0)
 # 区域半透明度
 const AREA_ALPHA: = 0.25
@@ -16,7 +16,7 @@ const CLOSE_AFTER_ATTACKS_BASE: = 5
 const ENGINEERING_ATTACK_RATE: = 0.1
 # 关闭区域后的冷却时长（秒，默认值）
 const CLOSE_DURATION: = 3.0
-# 伤害追踪键：固定指向「护盾发生器」道具，伤害累计显示在该道具提示里
+# 伤害追踪键
 const DAMAGE_TRACKING_KEY: = "item_shield_generator"
 
 onready var _shield_shape: CollisionShape2D = $ShieldArea / CollisionShape2D
@@ -82,9 +82,7 @@ func set_data(data: Resource) -> void:
 	_hitbox.from = self
 
 
-# 把盾条配色写到光环上，并按射程确定区域半径
 func apply_area_visual() -> void:
-	# 半透明区域：颜色与盾条完全一致
 	_aura.modulate = Color(AREA_COLOR.r, AREA_COLOR.g, AREA_COLOR.b, AREA_ALPHA)
 
 	# 射程为 0 时不改形状，保留场景里的默认半径
@@ -92,24 +90,21 @@ func apply_area_visual() -> void:
 	if radius <= 0.0:
 		return
 
-	# 形状与光环一起按半径缩放（形状 resource_local_to_scene，不会污染其它实例）
+	# 形状与光环一起按半径缩放
 	_shield_shape.shape.radius = radius
 	var scale_factor: float = radius / AURA_TEXTURE_RADIUS
 	_aura.scale = Vector2(scale_factor, scale_factor)
 
 
-# 用构筑物属性配置命中判定（伤害 / 暴击 / 击退 / 缩放），与炮塔同口径
 func _apply_hitbox_stats() -> void:
 	if stats == null:
 		return
 
-	# 命中判定只是伤害参数载体：不参与任何碰撞，也不会被敌人的 Hurtbox 检测到
 	_hitbox_args.set_from_weapon_stats(stats)
 	_hitbox.effect_scale = stats.effect_scale
 	_hitbox.from = self
 	_hitbox.set_damage(stats.damage, _hitbox_args)
 	_hitbox.speed_percent_modifier = stats.speed_percent_modifier
-	# 方向留空：由被击中方按「远离攻击者」自行推导击退方向
 	_hitbox.set_knockback(Vector2.ZERO, stats.knockback, stats.knockback_piercing)
 
 
@@ -160,8 +155,6 @@ func _physics_process(delta: float) -> void:
 		return
 
 	_cooldown = WeaponService.apply_structure_attack_speed_effects(stats.cooldown, player_index)
-	# 同一次攻击：对区域内敌人结算伤害，并给区域内玩家回盾
-	# 必须分开调用：用 or 连写会短路，后者不会被执行
 	var has_enemies: bool = _damage_enemies_in_area()
 	var has_players: bool = _regen_players_in_area()
 
@@ -178,7 +171,7 @@ func _physics_process(delta: float) -> void:
 		_set_area_closed(true)
 
 
-# 对区域内所有敌人结算一次伤害（返回区域内是否有有效敌人）
+# 对区域内所有敌人结算一次伤害
 func _damage_enemies_in_area() -> bool:
 	var targets: = []
 	for enemy in _enemies_in_area:
@@ -197,15 +190,13 @@ func _damage_enemies_in_area() -> bool:
 		var args: = TakeDamageArgs.new(player_index, _hitbox)
 		args.from = self
 		var dmg_taken: Array = enemy.take_damage(_hitbox.damage, args)
-		# 直接结算不经过命中判定重叠链路，这里补上命中回报，伤害才会计入道具追踪
 		_hitbox.hit_something(enemy, dmg_taken[1])
 
 	return true
 
 
-# 对区域内所有存活玩家回盾（满盾 / 禁回盾由玩家侧回盾接口自行处理，返回区域内是否有玩家）
+# 对区域内所有存活玩家回盾
 func _regen_players_in_area() -> bool:
-	# 先剔除已死亡 / 已释放的玩家
 	var alive: = []
 	for player in _players_in_area:
 		if not is_instance_valid(player) or player.dead:
@@ -220,9 +211,8 @@ func _regen_players_in_area() -> bool:
 	return alive.size() > 0
 
 
-# 区域开 / 关：关闭时只隐藏区域光环，中心图标恒显（效果结算由关闭分支拦住）
+# 区域开关
 func _set_area_closed(closed: bool) -> void:
-	# 区域光环随状态开关；中心图标始终显示，冷却中也能看清构筑物本体
 	_aura.visible = not closed
 	_center_icon.visible = true
 
@@ -240,7 +230,6 @@ func _update_attack_bar() -> void:
 
 # 给中心图标套上诅咒紫色描边
 func _apply_curse_outline() -> void:
-	# 自建描边材质
 	var mat: = ShaderMaterial.new()
 	mat.shader = outline_material.shader
 	mat.set_shader_param("texture_size", _center_icon.texture.get_size())

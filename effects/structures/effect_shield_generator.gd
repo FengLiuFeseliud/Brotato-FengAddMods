@@ -8,8 +8,8 @@ extends StructureEffect
 #   区域内玩家按同一节奏回复 shield_regen 点护盾；打满
 #   「close_after_attacks_base + 每 1 点工程学 × engineering_attack_rate」次后，
 #   关闭区域并冷却 close_duration 秒（区域无人时不计次）。
-#   被诅咒时由 RunData.fengliu_normalize_cursed_effect 按诅咒强度
-#   放大区域范围（stats.max_range）与回盾量（shield_regen）。
+#   被诅咒时由本类 fengliu_apply_curse 按诅咒强度放大区域范围（stats.max_range）
+#   与回盾量（shield_regen）；伤害表要挂的道具行由 fengliu_get_damage_tracking_key 给出。
 #   运行时 effect id：fengliu_shield_generator（不使用 custom_key）
 # ------------------------------------------------------------
 # 效果值：
@@ -21,6 +21,9 @@ extends StructureEffect
 #   close_duration            关闭区域后的冷却时长（秒）
 # ============================================================
 
+# 伤害追踪键的单一真相在构筑物脚本里，这里按路径取，避免两处字面量
+const SHIELD_GENERATOR_SCRIPT = preload("res://mods-unpacked/FengLiu-FengAddMods/content_data/entities/structures/shield_generator/shield_generator.gd")
+
 export (int) var shield_regen: int = 1
 export (int) var close_after_attacks_base: int = 5
 export (float) var engineering_attack_rate: float = 0.1
@@ -31,6 +34,28 @@ var _init_stats_args_shield: = WeaponServiceInitStatsArgs.new()
 
 static func get_id() -> String:
 	return "fengliu_shield_generator"
+
+
+# 本效果生成的构筑物把伤害记在哪个道具的追踪键上（空 = 不在第三方伤害表里挂道具行）
+func fengliu_get_damage_tracking_key() -> String:
+	return SHIELD_GENERATOR_SCRIPT.DAMAGE_TRACKING_KEY
+
+
+# 诅咒放大（钩子，由 RunData.fengliu_normalize_cursed_effects 调用）：
+# 区域半径与回盾量按 (1 + 诅咒强度) 放大；以未诅咒原型为基准绝对赋值，重复调用不叠加
+func fengliu_apply_curse(base_effect: Resource, curse_factor: float) -> void:
+	# 只处理与未诅咒原型同一脚本的效果，避免误改别的效果
+	if base_effect == null or base_effect.get_script() != get_script():
+		return
+
+	# 诅咒强度倍率
+	var factor: float = 1.0 + curse_factor
+	shield_regen = int(ceil(base_effect.shield_regen * factor))
+
+	# 原版只放大伤害，这里补上区域半径
+	var new_stats = stats.duplicate()
+	new_stats.max_range = int(ceil(base_effect.stats.max_range * factor))
+	stats = new_stats
 
 
 func get_args(player_index: int) -> Array:

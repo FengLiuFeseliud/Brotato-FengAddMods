@@ -51,7 +51,6 @@ func _ready() -> void :
 
 
 # 在上排生命容器内部最前面插入空占位节点，为血条上方的同尺寸盾条腾出空间。
-# 不改 UI/HUD 的边距 ⇒ 波次文本（UI/HUD/WaveContainer）等其它 HUD 元素位置不变
 func fengliu_reserve_shield_space() -> void :
 	for idx in [1, 2]:
 		var container = get_node_or_null("UI/HUD/LifeContainerP%d" % idx)
@@ -71,7 +70,7 @@ func fengliu_reserve_shield_space() -> void :
 
 
 func _process(delta: float) -> void :
-	# 伤害表源同步：单独按较慢的节流计时（中途买到羊角锤也能补挂道具行）
+	# 伤害表源同步：单独按较慢的节流计时（中途装上会生成构筑物的武器/道具也能补挂道具行）
 	_fengliu_damage_meter_sync_timer += delta
 	if _fengliu_damage_meter_sync_timer >= FENGLIU_DAMAGE_METER_SYNC_INTERVAL:
 		_fengliu_damage_meter_sync_timer = 0.0
@@ -700,32 +699,42 @@ func _on_player_health_updated(player: Player, current_val: int, max_val: int) -
 		player_life_bar.update_value(current_val, max_val)
 
 
-# 玩家是否持有羊角锤（按武器家族判定，1~4 阶通用）
-func fengliu_player_has_claw_hammer(player_index: int) -> bool:
-	# 只认武器家族 id，1~4 阶（含商店里的任意阶）都算持有
-	for weapon_data in RunData.get_player_weapons_ref(player_index):
-		if weapon_data != null and weapon_data.weapon_id == "weapon_claw_hammer":
-			return true
-	return false
-
-
-# 让第三方伤害表在羊角锤 build 里也显示「护盾发生器」道具行
-# （发生器造成的伤害本就记在该道具的追踪键上，锤子生成的发生器同样计入；
-# 未装该 mod、或对方改版后取不到节点/方法/属性时，一律静默跳过）
+# 让万能工具箱伤害表显示出本局构筑物效果所归属的道具行
 func fengliu_sync_damage_meter_source() -> void:
 	for player_index in RunData.get_player_count():
-		if not fengliu_player_has_claw_hammer(player_index):
+		var tracking_keys: Array = fengliu_get_structure_tracking_keys(player_index)
+		if tracking_keys.size() == 0:
 			continue
 
 		var container = get_node_or_null("UI/HUD/LifeContainerP" + str(player_index + 1) + "/CaveGlobalDamageMeterContainer")
 		if container == null or not container.has_method("add_element"):
 			continue
 
-		# 属性用 get() 取，避免对方改版后字段缺失直接报错
 		var meter_items = container.get("items")
-		if (meter_items is Array) and meter_items.has("item_shield_generator"):
+		if not (meter_items is Array):
 			continue
 
-		var item = ItemService.get_item_from_id(Keys.generate_hash("item_shield_generator"))
-		if item != null:
-			container.add_element(item)
+		# 已经在表里的行不重复挂
+		for tracking_key in tracking_keys:
+			if meter_items.has(tracking_key):
+				continue
+
+			var item = ItemService.get_item_from_id(Keys.generate_hash(tracking_key))
+			if item != null:
+				container.add_element(item)
+
+
+func fengliu_get_structure_tracking_keys(player_index: int) -> Array:
+	var tracking_keys: = []
+
+	for effect in RunData.get_player_effect(Keys.structures_hash, player_index):
+		if effect == null or not effect.has_method("fengliu_get_damage_tracking_key"):
+			continue
+
+		var tracking_key: String = effect.fengliu_get_damage_tracking_key()
+		if tracking_key == "" or tracking_keys.has(tracking_key):
+			continue
+
+		tracking_keys.append(tracking_key)
+
+	return tracking_keys

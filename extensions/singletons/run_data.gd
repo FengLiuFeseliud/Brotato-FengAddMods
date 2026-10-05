@@ -53,6 +53,12 @@ const ALL_ITEM_DEBUFF = [
 ]
 
 
+# 自定义属性
+const FENGLIU_EXTRA_PRIMARY_STAT_KEYS = [
+	"stat_fengliu_shield"
+]
+
+
 # 自定义次要属性
 const FENGLIU_EXTRA_SECONDARY_STAT_KEYS = [
 	"fengliu_bullet_scale",
@@ -78,8 +84,6 @@ const FENGLIU_SECONDARY_LEDGER_KEY := "fengliu_secondary_ledger"
 const FENGLIU_TEMP_LEDGER_KEY := "fengliu_secondary_ledger_temp"
 const FENGLIU_LINKED_LEDGER_KEY := "fengliu_secondary_ledger_linked"
 
-const FENGLIU_SHIELD_GENERATOR_EFFECT_SCRIPT = preload("res://mods-unpacked/FengLiu-FengAddMods/effects/structures/effect_shield_generator.gd")
-
 
 # 每个玩家是否需要「旧档 rebase」（读档时判定，取用后即清；仅 linked 层使用）
 var fengliu_legacy_rebase_pending := [false, false, false, false]
@@ -102,7 +106,8 @@ var fengliu_stat_upgrade_ratios = {
 	Keys.generate_hash("stat_range"): 15,           # 射程
 	Keys.generate_hash("stat_ranged_damage"): 1,    # 远程伤害
 	Keys.generate_hash("stat_speed"): 3,            # 移动速度
-	Keys.generate_hash("stat_harvesting"): 5        # 收获
+	Keys.generate_hash("stat_harvesting"): 5,       # 收获
+	Keys.generate_hash("stat_fengliu_shield"): 2        
 }
 
 
@@ -124,7 +129,6 @@ var all_item_tags = [
 	"stat_attack_speed",     # 12（9 / 3 / 0）
 	"stat_armor",            # 11（11 / 0 / 0）
 	"stat_harvesting",       # 11（10 / 1 / 0）
-	"stat_fengliu_shield",   # 11（0 / 0 / 11）本 mod 专属
 	"stat_curse",            # 5（0 / 5 / 0）DLC1 专属
 
 	# ---------------- 玩法机制类（15）----------------
@@ -220,6 +224,10 @@ func _enter_tree() -> void:
 
 
 func _ready() -> void :
+	for stat_id in FENGLIU_EXTRA_PRIMARY_STAT_KEYS:
+		all_item_tags.append(stat_id) 
+		primary_stats_list.append(Keys.generate_hash(stat_id))
+
 	# 生成次要属性哈希
 	for secondary_stat in ALL_SECONDARY_STATS:
 		all_secondary_stats_hashs.append(Keys.generate_hash(secondary_stat))
@@ -1141,8 +1149,8 @@ func fengliu_normalize_cursed_effect(item_data: ItemParentData) -> void:
 	# 转换类效果：value 是「每多少点算一组」的除数量级，原版诅咒放大它反而更弱，
 	fengliu_normalize_cursed_convert_effect(item_data, base_data)
 
-	# 护盾发生器
-	fengliu_normalize_cursed_shield_generator(item_data, base_data)
+	# 效果自身声明的诅咒放大（效果类实现 fengliu_apply_curse 即生效）
+	fengliu_normalize_cursed_effects(item_data, base_data)
 
 	# 找出原版对应树效果的文案键
 	var base_text_key: String = ""
@@ -1186,28 +1194,22 @@ func fengliu_normalize_cursed_convert_effect(item_data: ItemParentData, base_dat
 		effect.to_value = int(ceil(base_effect.to_value * (1.0 + item_data.curse_factor)))
 
 
-# 诅咒按强度放大区域范围与回盾量
-func fengliu_normalize_cursed_shield_generator(item_data: ItemParentData, base_data: ItemParentData) -> void:
+# 通用诅咒放大自己实现
+func fengliu_normalize_cursed_effects(item_data: ItemParentData, base_data: ItemParentData) -> void:
 	for i in item_data.effects.size():
 		var effect = item_data.effects[i]
-		if effect.get_script() != FENGLIU_SHIELD_GENERATOR_EFFECT_SCRIPT:
+		if not effect.has_method("fengliu_apply_curse"):
 			continue
 
-		# 与未诅咒原型按序号对齐；类型对不上就不动
 		if i >= base_data.effects.size():
 			continue
+
 		var base_effect = base_data.effects[i]
-		if base_effect.get_script() != FENGLIU_SHIELD_GENERATOR_EFFECT_SCRIPT:
+		if not base_effect.has_method("fengliu_apply_curse"):
 			continue
 
-		# 诅咒强度倍率
-		var factor: float = 1.0 + item_data.curse_factor
-		effect.shield_regen = int(ceil(base_effect.shield_regen * factor))
-
-		# 原版只放大伤害，这里补上区域半径
-		var new_stats = effect.stats.duplicate()
-		new_stats.max_range = int(ceil(base_effect.stats.max_range * factor))
-		effect.stats = new_stats
+		# 放大规则由效果决定
+		effect.fengliu_apply_curse(base_effect, item_data.curse_factor)
 
 
 # 扩展添加道具：诅咒水壶入库前先还原树效果
