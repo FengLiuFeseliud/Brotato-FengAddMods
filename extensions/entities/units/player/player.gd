@@ -320,11 +320,10 @@ func _fengliu_take_shield(amount: int) -> int:
 
 func fengliu_hit_lost_item() -> void:
     for player_item in RunData.get_player_items(player_index):
-        if not player_item is ModItemData:
+        if player_item.get("is_hit_lost_item") != true:
             continue
 
-        if player_item.is_hit_lost_item:
-            RunData.remove_item(player_item, player_index)
+        RunData.remove_item(player_item, player_index)
 
 
 func fengliu_on_hit_dmg() -> void:
