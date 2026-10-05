@@ -255,13 +255,18 @@ func take_damage(value: int, args: TakeDamageArgs) -> Array:
                 fengliu_on_shield_broken(args.from != self)
 
         fengliu_sync_full_shield_stat_link()
+
+        # 掉血
+        if damage_taken.size() > 1 and damage_taken[1] > 0:
+            fengliu_on_hit_dmg()
+
         return damage_taken
 
     var damage_taken_without_shield = .take_damage(value, args)
     fengliu_restart_shield_regen_delay(0, damage_taken_without_shield)
-    # 无盾可破时，被普通攻击掉血同样算受伤（闪避不会走到这里）
+    # 掉血
     if damage_taken_without_shield.size() > 1 and damage_taken_without_shield[1] > 0:
-        fengliu_no_hit_material()
+        fengliu_on_hit_dmg()
     return damage_taken_without_shield
 
 
@@ -313,10 +318,22 @@ func _fengliu_take_shield(amount: int) -> int:
     return lost
 
 
-# 破盾触发：材料计时失效 + 破盾爆炸（爆炸仅在非自伤时触发）
-func fengliu_on_shield_broken(can_explode: bool = true) -> void:
+func fengliu_hit_lost_item() -> void:
+    for player_item in RunData.get_player_items(player_index):
+        if not player_item is ModItemData:
+            continue
+
+        if player_item.is_hit_lost_item:
+            RunData.remove_item(player_item, player_index)
+
+
+func fengliu_on_hit_dmg() -> void:
+    fengliu_hit_lost_item()
     fengliu_no_hit_material()
-    
+
+
+# 破盾触发
+func fengliu_on_shield_broken(can_explode: bool = true) -> void:
     for effect in RunData.get_player_effect(effect_fengliu_random_primary_stats_on_shield_broken, player_index):
         for _i in effect[0]:
             RunData.add_stat(RunData.get_random_primary_stats(), 1, player_index)
@@ -349,20 +366,11 @@ func fengliu_can_shield_take_damage(value: int, args: TakeDamageArgs) -> bool:
     return true
 
 
-func fengliu_hit_lost_item() -> void:
-    for player_item in RunData.get_player_items(player_index):
-        if not player_item is ModItemData:
-            continue
-
-        if player_item.is_hit_lost_item:
-            RunData.remove_item(player_item, player_index)
-
-
 # 受击后重新开始回盾静默计时
 func fengliu_restart_shield_regen_delay(shield_absorbed: int, damage_taken: Array) -> void:
     if not (shield_absorbed > 0 or (damage_taken.size() > 1 and damage_taken[1] > 0)):
         return
-
+    
     _fengliu_shield_regen_pool = 0.0
     _fengliu_shield_regen_timer.wait_time = fengliu_shield_regen_delay
     _fengliu_shield_regen_timer.start()

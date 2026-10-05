@@ -26,3 +26,4 @@ max_nb = -1
 item_appearances = [  ]
 tags = [ "stat_percent_damage", "stat_attack_speed" ]
 replaced_by = ExtResource( 3 )
+is_hit_lost_item = true

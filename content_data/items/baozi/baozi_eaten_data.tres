@@ -22,4 +22,3 @@ curse_factor = 0.0
 max_nb = -1
 item_appearances = [  ]
 tags = [  ]
-is_hit_lost_item = true
