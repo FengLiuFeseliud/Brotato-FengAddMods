@@ -3,6 +3,7 @@ extends ItemData
 
 
 export (bool) var one_elements = false
+export (bool) var is_hit_lost_item = false
 var is_box_get = false
 
 

@@ -349,6 +349,15 @@ func fengliu_can_shield_take_damage(value: int, args: TakeDamageArgs) -> bool:
     return true
 
 
+func fengliu_hit_lost_item() -> void:
+    for player_item in RunData.get_player_items(player_index):
+        if not player_item is ModItemData:
+            continue
+
+        if player_item.is_hit_lost_item:
+            RunData.remove_item(player_item, player_index)
+
+
 # 受击后重新开始回盾静默计时
 func fengliu_restart_shield_regen_delay(shield_absorbed: int, damage_taken: Array) -> void:
     if not (shield_absorbed > 0 or (damage_taken.size() > 1 and damage_taken[1] > 0)):
