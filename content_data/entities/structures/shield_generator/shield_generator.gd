@@ -64,7 +64,7 @@ func set_data(data: Resource) -> void:
 	_close_duration = float(duration) if duration != null else CLOSE_DURATION
 	# 关闭阈值
 	var engineering: float = Utils.get_stat(Keys.stat_engineering_hash, player_index)
-	_attacks_before_close = max(1, _close_after_attacks_base + int(engineering * _engineering_attack_rate))
+	_attacks_before_close = int(max(1, _close_after_attacks_base + int(engineering * _engineering_attack_rate)))
 	# 新生成即处于开启态
 	_attacks_done = 0
 	_close_time_left = 0.0
@@ -154,7 +154,8 @@ func _physics_process(delta: float) -> void:
 	if _cooldown > 0.0:
 		return
 
-	_cooldown = WeaponService.apply_structure_attack_speed_effects(stats.cooldown, player_index)
+	# 中继器加成：只加速节奏，不改「关闭前攻击次数」
+	_cooldown = fengliu_apply_relay_attack_speed_to_cooldown(WeaponService.apply_structure_attack_speed_effects(stats.cooldown, player_index))
 	var has_enemies: bool = _damage_enemies_in_area()
 	var has_players: bool = _regen_players_in_area()
 

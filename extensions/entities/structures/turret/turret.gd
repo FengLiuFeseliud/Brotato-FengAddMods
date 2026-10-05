@@ -128,3 +128,8 @@ func on_target_died(target: Node, _args: Entity.DieArgs) -> void :
             continue
 
         fengliu_copy_turret(target)
+
+# 覆盖：攻击间隔在原版口径（炮台攻速属性）之上再叠加中继器加成
+func _get_max_cooldown() -> int:
+    # 先取原版口径（炮台攻速属性已生效），再叠加中继器加成
+    return .fengliu_apply_relay_attack_speed_to_cooldown(._get_max_cooldown())

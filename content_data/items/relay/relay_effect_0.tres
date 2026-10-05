@@ -1,0 +1,30 @@
+[gd_resource type="Resource" load_steps=4 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/effects/structures/effect_relay.gd" type="Script" id=1]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/entities/structures/relay/relay.tscn" type="PackedScene" id=2]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/entities/structures/relay/relay_stats.tres" type="Resource" id=3]
+
+[resource]
+script = ExtResource( 1 )
+key = ""
+text_key = "EFFECT_RELAY"
+value = 1
+custom_key = ""
+storage_method = 0
+effect_sign = 3
+custom_args = [  ]
+spawn_cooldown = -1
+scene = ExtResource( 2 )
+stats = ExtResource( 3 )
+effects = [  ]
+spawn_in_center = -1
+spawn_around_player = -1
+can_be_grouped = true
+is_pet = false
+attack_speed_percent = 0
+engineering_scale = 0.5
+attack_speed_scale = 0.5
+area_percent = 250
+area_engineering_scale = 1.0
+area_range_scale = 0.3
+stat_scale_multiplier = 1.0

@@ -253,3 +253,5 @@ ITEM_BAOZI,Baozi,包子
 ITEM_BAOZI_EATEN,Eaten Baozi,吃过的包子
 EFFECT_BAOZI_LOST_TEXT,Lost on taking a hit,受伤后失效
 EFFECT_BAOZI_EATEN_TEXT,This Baozi has already been eaten,这个包子已经吃过了
+ITEM_RELAY,Relay,中继器
+EFFECT_RELAY,"Summons a Relay that grants nearby Turrets +{0}% ({1}{2}) attack speed; its area size is {3} ({4}{5})",生成一个中继器，对区域内所有炮台攻击速度 +{0}（{1}{2}），区域范围大小为{3}（{4}{5}）
