@@ -255,3 +255,5 @@ EFFECT_BAOZI_LOST_TEXT,Lost on taking a hit,受到伤害后永久失效
 EFFECT_BAOZI_EATEN_TEXT,This Baozi has already been eaten,这个包子已经吃过了
 ITEM_RELAY,Relay,中继器
 EFFECT_RELAY,"Summons a Relay that grants nearby Turrets +{0}% ({1}{2}) attack speed; its area size is {3} ({4}{5})",生成一个中继器，对区域内所有炮台攻击速度 +{0}（{1}{2}），区域范围大小为{3}（{4}{5}）
+ITEM_SENTRY_TOWER,Sentry Tower,哨戒塔
+EFFECT_SENTRY_TOWER,"Summons a Sentry Tower that locks a target and fires an infinite-piercing laser dealing {0} damage ({1}); it shuts down for {4} seconds after every {2} ({3}) attacks",生成一座哨戒塔，锁定目标后持续发射无限贯通的激光造成{0}点伤害（{1}），每攻击{2}（{3}）次后关闭{4}秒

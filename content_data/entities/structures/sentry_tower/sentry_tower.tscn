@@ -1,0 +1,22 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://entities/structures/turret/turret.tscn" type="PackedScene" id=1]
+[ext_resource path="res://entities/structures/turret/laser/laser_turret.png" type="Texture" id=2]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/entities/structures/sentry_tower/sentry_tower.gd" type="Script" id=3]
+[ext_resource path="res://ui/hud/ui_progress_bar.tscn" type="PackedScene" id=4]
+
+[node name="SentryTower" instance=ExtResource( 1 )]
+script = ExtResource( 3 )
+
+[node name="Sprite" parent="Animation" index="0"]
+texture = ExtResource( 2 )
+
+[node name="AttackBar" parent="." index="5" instance=ExtResource( 4 )]
+margin_left = -32.0
+margin_top = -76.0
+margin_right = 32.0
+margin_bottom = -60.0
+nine_patch_stretch = true
+value = 100.0
+progress_color = Color( 0.35, 0.9, 1, 1 )
+tint_progress = Color( 0.35, 0.9, 1, 1 )
