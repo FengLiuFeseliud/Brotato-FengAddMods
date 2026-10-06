@@ -161,6 +161,9 @@
 
 - **小型居民楼（apartment）**：线条空间的专属**建筑型敌人**，**无法移动**（`MovementBehavior` 用原版基类，只做原地输出）；每次**射击 3 发连成一串子弹**（内嵌 `shoot` 动画一帧三响，`attack_anim_speed 2.0` + `cooldown 90` ⇒ 整周期 2.0 秒），并**每 3 秒召唤 2 只「红」**（Timer + `apartment_spawner.gd` 走原版生成链路）；外观自持（复制原版 `evil_mob_0.png`/`evil_mob_icon.png`，替换 `content_data/entities/units/enemies/apartment/apartment.png`、`.../apartment_icon.png` 即可换外观）；出现在线条空间的**第 4~20 波**（第 8 秒起、每 8 秒 1~2 座；节奏在各波目录 `zones/zone_line_space/004…020/apartment/apartment_group.tres`，数值与行为在 `.../apartment/apartment.tscn`）
 
+- **地铁站（metro）**：线条空间的专属**建筑型敌人**，**无法移动**（`MovementBehavior` 用原版基类，只做原地输出），并且**每 5 秒从「动态召唤池」随机召唤一只敌人**；池子在**运行时构建**——扫描所有已注册区域（含其它 mod 注册进来的敌人）的波次数据，再按「**基础血量 20~50** 且**会移动**」过滤（不动建筑与再生/孵化类不入池，避免递归召唤；区间与数量由节点导出的 `min_health`/`max_health`/`nb_to_spawn`/`spawn_radius` 控制，逻辑在 `content_data/entities/units/enemies/metro/metro_spawner.gd`）；外观自持（复制原版 `spawner.png`/`spawner_icon.png`，替换 `content_data/entities/units/enemies/metro/metro.png`、`.../metro_icon.png` 即可换外观）；出现在线条空间的**第 6~20 波**（第 20 秒起、每 120 秒 1 座 ⇒ 每波最多 1 座；节奏在各波目录 `zones/zone_line_space/006…020/metro/metro_group.tres`，数值与行为在 `.../metro/metro.tscn`）
+
+
 - **吞吞怪（evil_mob）**：清洁工每波敌袭额外生成的箱子型敌人，数量与血量随收获属性提升
 
 ## 素材与许可

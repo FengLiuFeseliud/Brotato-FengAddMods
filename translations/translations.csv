@@ -271,3 +271,5 @@ HONG_NAME,Red,红
 HONG_BEHAVIOUR_DESCRIPTION,Chases the character and damages on touch; never charges.,从其它敌人中出现，追逐角色并造成接触伤害。
 APARTMENT_NAME,Small Apartment,小型居民楼
 APARTMENT_BEHAVIOUR_DESCRIPTION,"Fires a burst of 3 bullets every 2 seconds and summons 2 Reds every 3 seconds; it cannot move.","对玩家每次射击3发连串子弹（间隔2秒），每3秒召唤2只"红"，自身无法移动。"
+METRO_NAME,Subway Station,地铁站
+METRO_BEHAVIOUR_DESCRIPTION,Cannot move; summons a random enemy with 20-50 base health from the other zones every 5 seconds.,无法移动；每5秒从其它区域随机召唤一只基础血量20~50的敌人。
