@@ -263,3 +263,5 @@ HEI_NAME,Black,黑
 HEI_BEHAVIOUR_DESCRIPTION,Periodically charges at you at high speed,会周期性地高速冲撞玩家
 HEICHE_NAME,Black Car,黑车
 HEICHE_BEHAVIOUR_DESCRIPTION,Chases the player and takes reduced damage from all sources.,追逐玩家，从所有来源受到的伤害降低。
+LAN_NAME,Blue,蓝
+LAN_BEHAVIOUR_DESCRIPTION,Shoots 3 times then waits 2 seconds; retreats when you get close.,对玩家射击 5 次后间隔 3 秒再攻击；玩家靠近时会后退。

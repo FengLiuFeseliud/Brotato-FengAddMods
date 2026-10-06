@@ -153,6 +153,8 @@
 
 - **黑车（heiche）**：线条空间的专属基础敌人，复制自原版龙虾（追逐并按接触判定造成伤害，护甲随波次提升 ⇒ 全来源减伤）；贴图与图标已自持在 mod 内（替换 `content_data/entities/units/enemies/heiche/heiche.png` 即可换外观），会出现在线条空间的**所有波次**（第 2 秒起、每 8 秒 3~5 只；刷新节奏在各波目录 `zones/zone_line_space/001…020/heiche/heiche_group.tres`，数值在 `.../heiche/heiche_stats.tres`）
 
+- **蓝（lan）**：线条空间的专属远程敌人，复制自原版远程敌人 `spitter`（数值与「保持距离」移动行为一致 ⇒ 玩家靠近时它会后退）；攻击节奏为**对玩家射击 3 次后停 2 秒再继续**（`shooting_attack_behavior` 的 `long_cooldown_every_x_shoots 3` + `long_cooldown 120` ＝2 秒，单发间隔由开火动画速度决定）；贴图、图标与弹药已自持在 mod 内（替换 `content_data/entities/units/enemies/lan/lan.png`、`.../lan_icon.png` 与 `projectiles/lan_bullets/lan_bullet.png` 即可换外观），出现在线条空间的**第 2~20 波**（第 8 秒起、每 8 秒 1~2 只；刷新节奏在各波目录 `zones/zone_line_space/002…020/lan/lan_group.tres`，数值与行为参数在 `.../lan/lan.tscn`）
+
 - **吞吞怪（evil_mob）**：清洁工每波敌袭额外生成的箱子型敌人，数量与血量随收获属性提升
 
 ## 素材与许可

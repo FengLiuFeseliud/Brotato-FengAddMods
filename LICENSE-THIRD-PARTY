@@ -41,6 +41,9 @@ Applies to:
   - content_data\entities\units\enemies\hei\hei_icon.png
   - content_data\entities\units\enemies\heiche\heiche.png
   - content_data\entities\units\enemies\heiche\heiche_icon.png
+  - content_data\entities\units\enemies\lan\lan.png
+  - content_data\entities\units\enemies\lan\lan_icon.png
+  - projectiles\lan_bullets\lan_bullet.png
 
 
 The game Brotato and its original assets are the property of Blobfish

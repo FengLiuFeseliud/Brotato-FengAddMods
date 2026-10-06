@@ -1,4 +1,4 @@
-[gd_resource type="Resource" load_steps=16 format=2]
+[gd_resource type="Resource" load_steps=17 format=2]
 
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/zones/zone_line_space/line_space_dlc_data.gd" type="Script" id=1]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/zones/zone_line_space/zone_line_space_data.tres" type="Resource" id=2]
@@ -15,6 +15,7 @@
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/zones/zone_line_space/entities/elite_rhino.tres" type="Resource" id=13]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/entities/units/enemies/hei/hei_item.tres" type="Resource" id=14]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/entities/units/enemies/heiche/heiche_item.tres" type="Resource" id=15]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/entities/units/enemies/lan/lan_item.tres" type="Resource" id=16]
 
 [resource]
 script = ExtResource( 1 )
@@ -23,4 +24,4 @@ zones = [ ExtResource( 2 ) ]
 backgrounds = [ ExtResource( 3 ) ]
 bosses = [ ExtResource( 4 ), ExtResource( 5 ) ]
 elites = [ ExtResource( 6 ), ExtResource( 7 ), ExtResource( 8 ), ExtResource( 9 ), ExtResource( 10 ), ExtResource( 11 ), ExtResource( 12 ), ExtResource( 13 ) ]
-entities_items = [ ExtResource( 14 ), ExtResource( 15 ) ]
+entities_items = [ ExtResource( 14 ), ExtResource( 15 ), ExtResource( 16 ) ]
