@@ -261,3 +261,5 @@ ZONE_LINE_SPACE,Line Space,线条空间
 BG_LINE_SPACE,Line Space,线条空间
 HEI_NAME,Black,黑
 HEI_BEHAVIOUR_DESCRIPTION,Periodically charges at you at high speed,会周期性地高速冲撞玩家
+HEICHE_NAME,Black Car,黑车
+HEICHE_BEHAVIOUR_DESCRIPTION,Chases the player and takes reduced damage from all sources.,追逐玩家，从所有来源受到的伤害降低。

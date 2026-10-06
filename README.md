@@ -149,7 +149,9 @@
 
 - **线条空间区域（zone_line_space）**：新增可选区域「线条空间」，结构照原版区域搭建（32×24 场地、20 波骨架且波次时长按原版曲线、专属场地与商店背景、原版 boss 与精英），波次内容待填充；场地贴图用「整张场地图」铺法（一整张图等比铺满场地、超出裁切居中，不再按 12 格随机拼贴，建议 2048×1536，其它尺寸也能用），场地与商店贴图目前为占位图，替换 resources 目录下同名文件即可；角色预览（选人界面与战斗内左下角面板）不显示场地图、边框色为白
 
-- **黑（hei）**：线条空间的专属基础敌人，复制自原版浮游生物（冲刺攻击、数值与行为参数一致）；贴图与图标已自持在 mod 内（替换 `content_data/entities/units/enemies/hei/hei.png` 即可换外观），会出现在线条空间的**所有波次**（第 10 秒起、每 8 秒 1~2 只；刷新节奏在 `zones/zone_line_space/enemies/hei_group.tres`，数值在 `.../hei/hei_stats.tres`）
+- **黑（hei）**：线条空间的专属基础敌人，复制自原版浮游生物（冲刺攻击、数值与行为参数一致）；贴图与图标已自持在 mod 内（替换 `content_data/entities/units/enemies/hei/hei.png` 即可换外观），会出现在线条空间的**所有波次**（第 1 秒起、每 8 秒 5~8 只；刷新节奏在各波目录 `zones/zone_line_space/001…020/hei/hei_group.tres`，数值在 `.../hei/hei_stats.tres`）
+
+- **黑车（heiche）**：线条空间的专属基础敌人，复制自原版龙虾（追逐并按接触判定造成伤害，护甲随波次提升 ⇒ 全来源减伤）；贴图与图标已自持在 mod 内（替换 `content_data/entities/units/enemies/heiche/heiche.png` 即可换外观），会出现在线条空间的**所有波次**（第 2 秒起、每 8 秒 3~5 只；刷新节奏在各波目录 `zones/zone_line_space/001…020/heiche/heiche_group.tres`，数值在 `.../heiche/heiche_stats.tres`）
 
 - **吞吞怪（evil_mob）**：清洁工每波敌袭额外生成的箱子型敌人，数量与血量随收获属性提升
 
