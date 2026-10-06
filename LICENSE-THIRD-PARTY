@@ -5,7 +5,6 @@ A. MINECRAFT FANWORK
 --------------------------------------------------------------------------
 
 Applies to:
-
   - content_data/characters/creeper/**
   - content_data/characters/steve/**
   - zones/zone_minecreft/**
@@ -37,15 +36,6 @@ Applies to:
   - content_data\items\ap_round\ap_round_icon.png
   - content_data\items\auto_open_box\auto_open_box_icon.png
   - content_data\items\forestry\forestry_icon.png
-  - content_data\entities\units\enemies\hei\hei.png
-  - content_data\entities\units\enemies\hei\hei_icon.png
-  - content_data\entities\units\enemies\heiche\heiche.png
-  - content_data\entities\units\enemies\heiche\heiche_icon.png
-  - content_data\entities\units\enemies\lan\lan.png
-  - content_data\entities\units\enemies\lan\lan_icon.png
-  - projectiles\lan_bullets\lan_bullet.png
-
-
 The game Brotato and its original assets are the property of Blobfish
 (Thomas Gervraud) and its publishers.
 

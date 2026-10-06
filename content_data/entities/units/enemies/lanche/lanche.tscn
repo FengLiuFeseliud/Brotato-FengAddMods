@@ -1,0 +1,97 @@
+[gd_scene load_steps=11 format=2]
+
+[ext_resource path="res://entities/units/enemies/enemy.tscn" type="PackedScene" id=1]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/entities/units/enemies/lanche/lanche.png" type="Texture" id=2]
+[ext_resource path="res://entities/units/enemies/pursuer/pursuer.gd" type="Script" id=3]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/entities/units/enemies/lanche/lanche_stats.tres" type="Resource" id=4]
+[ext_resource path="res://entities/units/enemies/pursuer/sci-fi_code_fail_13.wav" type="AudioStream" id=5]
+[ext_resource path="res://entities/units/enemies/attack_behaviors/shooting_attack_behavior.gd" type="Script" id=6]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/projectiles/lan_bullets/lan_projectile.tscn" type="PackedScene" id=7]
+
+[sub_resource type="CircleShape2D" id=5]
+radius = 14.0357
+
+[sub_resource type="CircleShape2D" id=4]
+radius = 64.3817
+
+[sub_resource type="CircleShape2D" id=6]
+radius = 26.0
+
+[node name="Enemy" instance=ExtResource( 1 )]
+script = ExtResource( 3 )
+stats = ExtResource( 4 )
+enemy_id = "lanche"
+boost_sound = ExtResource( 5 )
+boost_cooldown = 1.0
+max_boosts = 10
+speed_on_boost = 45
+damage_on_boost = 0
+size_on_boost = 0.0
+change_movement_behavior_after_x_boosts = -1
+bonus_speed_on_change_movement_behavior = 0
+reset_nb_times_boosted_on_hit = true
+
+[node name="Animation" parent="." index="0"]
+modulate = Color( 0.45, 0.65, 1, 1 )
+
+[node name="Sprite" parent="Animation" index="0"]
+texture = ExtResource( 2 )
+
+[node name="Collision" parent="." index="1"]
+position = Vector2( -1, 2 )
+shape = SubResource( 5 )
+
+[node name="Collision" parent="Hurtbox" index="0"]
+shape = SubResource( 4 )
+
+[node name="Hitbox" parent="." index="3"]
+position = Vector2( 0, -2 )
+
+[node name="Collision" parent="Hitbox" index="0"]
+position = Vector2( -1, -6 )
+shape = SubResource( 6 )
+
+[node name="AttackBehavior" parent="." index="7"]
+script = ExtResource( 6 )
+projectile_scene = ExtResource( 7 )
+projectile_speed = 600
+projectile_speed_randomization = 0
+speed_change_after_each_projectile = 0
+cooldown = 1.0
+initial_cooldown = 0
+max_cd_randomization = 0
+long_cooldown_every_x_shoots = 6
+long_cooldown = 120
+damage = 1
+damage_increase_each_wave = 1.0
+min_range = 0
+max_range = 700
+attack_anim_speed = 2.0
+base_direction_randomization = 0.0
+base_direction_constant_spread = false
+alternate_between_base_direction_spread = false
+random_direction = false
+number_projectiles = 1
+projectile_spread = 0.0
+spawn_projectiles_on_target = false
+projectile_spawn_spread = 0
+projectile_spawn_only_on_borders = false
+specific_degrees_spawns = [  ]
+constant_spread = false
+constant_spread_rand_base_pos = 0.0
+atleast_one_projectile_on_target = false
+shoot_towards_unit = false
+shoot_in_unit_direction = false
+shoot_away_from_unit = false
+shoot_from_proj_pos_towards_player = false
+random_rotation = 0.0
+rotate_projectile = true
+delete_projectile_on_death = false
+
+[node name="BoostTimer" type="Timer" parent="." index="10"]
+autostart = true
+
+[connection signal="timeout" from="BoostTimer" to="." method="_on_BoostTimer_timeout"]
+
+[editable path="Hurtbox"]
+[editable path="Hitbox"]

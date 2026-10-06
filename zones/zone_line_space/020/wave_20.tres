@@ -1,13 +1,14 @@
-[gd_resource type="Resource" load_steps=5 format=2]
+[gd_resource type="Resource" load_steps=6 format=2]
 
 [ext_resource path="res://zones/wave_data.gd" type="Script" id=1]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/zones/zone_line_space/020/hei/hei_group.tres" type="Resource" id=2]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/zones/zone_line_space/020/heiche/heiche_group.tres" type="Resource" id=3]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/zones/zone_line_space/020/lan/lan_group.tres" type="Resource" id=4]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/zones/zone_line_space/020/lanche/lanche_group.tres" type="Resource" id=5]
 
 [resource]
 script = ExtResource( 1 )
 wave_duration = 90
 max_enemies = 100
-groups_data = [ ExtResource( 2 ), ExtResource( 3 ), ExtResource( 4 ) ]
+groups_data = [ ExtResource( 2 ), ExtResource( 3 ), ExtResource( 4 ), ExtResource( 5 ) ]
 conditional_groups_data = [  ]
