@@ -15,6 +15,7 @@ APPLIES TO
   - content_data/items/**/*.png
   - content_data/entities/**/*.png       （实体贴图）
   - projectiles/**/*.png                 （投掷物贴图）
+  - zones/zone_line_space/resources/*.png（线条空间区域占位贴图，可直接替换）
   - icon.png                             （Mod 图标）
   - effects/**                           （除脚本外的素材）
 

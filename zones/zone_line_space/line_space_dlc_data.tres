@@ -1,0 +1,25 @@
+[gd_resource type="Resource" load_steps=15 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/zones/zone_line_space/line_space_dlc_data.gd" type="Script" id=1]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/zones/zone_line_space/zone_line_space_data.tres" type="Resource" id=2]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/zones/zone_line_space/backgrounds/line_space_background_data.tres" type="Resource" id=3]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/zones/zone_line_space/entities/boss_wizard.tres" type="Resource" id=4]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/zones/zone_line_space/entities/boss_crab.tres" type="Resource" id=5]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/zones/zone_line_space/entities/elite_butcher.tres" type="Resource" id=6]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/zones/zone_line_space/entities/elite_colossus.tres" type="Resource" id=7]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/zones/zone_line_space/entities/elite_croco.tres" type="Resource" id=8]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/zones/zone_line_space/entities/elite_demon.tres" type="Resource" id=9]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/zones/zone_line_space/entities/elite_insect.tres" type="Resource" id=10]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/zones/zone_line_space/entities/elite_mom.tres" type="Resource" id=11]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/zones/zone_line_space/entities/elite_monk.tres" type="Resource" id=12]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/zones/zone_line_space/entities/elite_rhino.tres" type="Resource" id=13]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/entities/units/enemies/hei/hei_item.tres" type="Resource" id=14]
+
+[resource]
+script = ExtResource( 1 )
+my_id = "line_space"
+zones = [ ExtResource( 2 ) ]
+backgrounds = [ ExtResource( 3 ) ]
+bosses = [ ExtResource( 4 ), ExtResource( 5 ) ]
+elites = [ ExtResource( 6 ), ExtResource( 7 ), ExtResource( 8 ), ExtResource( 9 ), ExtResource( 10 ), ExtResource( 11 ), ExtResource( 12 ), ExtResource( 13 ) ]
+entities_items = [ ExtResource( 14 ) ]

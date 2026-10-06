@@ -1,0 +1,14 @@
+[gd_resource type="Resource" load_steps=4 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/zones/zone_line_space/backgrounds/line_space_background_data.gd" type="Script" id=1]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/zones/zone_line_space/resources/tiles_line_space.png" type="Texture" id=2]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/zones/zone_line_space/resources/bg_line_space_icon.png" type="Texture" id=3]
+
+[resource]
+script = ExtResource( 1 )
+name = "BG_LINE_SPACE"
+icon = ExtResource( 3 )
+outline_color = Color( 1, 1, 1, 1 )
+tiles_sprite = ExtResource( 2 )
+fengliu_whole_image = true
+
