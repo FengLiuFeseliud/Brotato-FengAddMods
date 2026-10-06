@@ -14,6 +14,7 @@ APPLIES TO
   - content_data/weapons/**/*.png
   - content_data/items/**/*.png
   - content_data/entities/**/*.png       （实体贴图）
+        注：content_data/entities/units/enemies/ 下派生自 Brotato 原版素材的贴图与图标不在本许可范围内，详见 LICENSE-THIRD-PARTY。
   - projectiles/**/*.png                 （投掷物贴图）
   - zones/zone_line_space/resources/*.png（线条空间区域占位贴图，可直接替换）
   - icon.png                             （Mod 图标）

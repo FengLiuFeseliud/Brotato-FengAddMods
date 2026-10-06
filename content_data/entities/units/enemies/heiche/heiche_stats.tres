@@ -22,5 +22,5 @@ base_drop_chance = 0.01
 item_drop_chance = 0.01
 min_consumable_tier = 0
 max_consumable_tier = 0
-armor = 1
-armor_increase_each_wave = 0.5
+armor = 0
+armor_increase_each_wave = 0.0
