@@ -147,25 +147,7 @@
 
 - **Minecraft 世界区域（zone_minecreft）**：使用「史蒂夫」角色时会生成专属世界，包含石头、铁矿、青金石矿、绿宝石矿、钻石矿、黑曜石，以及可交易的村民等中立单位。
 
-- **线条空间区域（zone_line_space）**：新增可选区域「线条空间」，结构照原版区域搭建（32×24 场地、20 波骨架且波次时长按原版曲线、专属场地与商店背景、原版 boss 与精英），波次内容待填充；场地贴图用「整张场地图」铺法（一整张图等比铺满场地、超出裁切居中，不再按 12 格随机拼贴，建议 2048×1536，其它尺寸也能用），场地与商店贴图目前为占位图，替换 resources 目录下同名文件即可；角色预览（选人界面与战斗内左下角面板）不显示场地图、边框色为白
-
-- **黑（hei）**：线条空间的专属基础敌人，复制自原版浮游生物（冲刺攻击、数值与行为参数一致）；贴图与图标已自持在 mod 内（替换 `content_data/entities/units/enemies/hei/hei.png` 即可换外观），会出现在线条空间的**所有波次**（第 1 秒起、每 8 秒 5~8 只；刷新节奏在各波目录 `zones/zone_line_space/001…020/hei/hei_group.tres`，数值在 `.../hei/hei_stats.tres`）
-
-- **黑车（heiche）**：线条空间的专属基础敌人，复制自原版龙虾（追逐并按接触判定造成伤害，护甲随波次提升 ⇒ 全来源减伤）；贴图与图标已自持在 mod 内（替换 `content_data/entities/units/enemies/heiche/heiche.png` 即可换外观），会出现在线条空间的**所有波次**（第 2 秒起、每 8 秒 3~5 只；刷新节奏在各波目录 `zones/zone_line_space/001…020/heiche/heiche_group.tres`，数值在 `.../heiche/heiche_stats.tres`）
-
-- **蓝（lan）**：线条空间的专属远程敌人，复制自原版远程敌人 `spitter`（数值与「保持距离」移动行为一致 ⇒ 玩家靠近时它会后退）；攻击节奏为**对玩家射击 3 次后停 2 秒再继续**（`shooting_attack_behavior` 的 `long_cooldown_every_x_shoots 3` + `long_cooldown 120` ＝2 秒，单发间隔由开火动画速度决定）；贴图、图标与弹药已自持在 mod 内（替换 `content_data/entities/units/enemies/lan/lan.png`、`.../lan_icon.png` 与 `projectiles/lan_bullets/lan_bullet.png` 即可换外观），出现在线条空间的**第 2~20 波**（第 8 秒起、每 8 秒 1~2 只；刷新节奏在各波目录 `zones/zone_line_space/002…020/lan/lan_group.tres`，数值与行为参数在 `.../lan/lan.tscn`）
-
-- **蓝车（lanche）**：线条空间的专属精英级近战敌人，**完整继承原版追猎怪（pursuer）效果**（追逐角色、接触即造成伤害、每 1 秒提速 45 且最多 10 次、被击中后加速清零、boost 音效沿用原版），并在此基础上**会向玩家发射子弹**（**与「蓝」同一份弹体** `projectiles/lan_bullets/lan_projectile.tscn`（贴图 `lan_bullet.png`），6 发一轮后停 2 秒）；贴图与图标已自持在 mod 内（替换 `content_data/entities/units/enemies/lanche/lanche.png`、`.../lanche_icon.png` 与 `projectiles/lan_bullets/lan_bullet.png` 即可换外观），出现在线条空间的**第 3~20 波**（第 8 秒起、每 8 秒 1 只；刷新节奏在各波目录 `zones/zone_line_space/003…020/lanche/lanche_group.tres`，数值与行为参数在 `.../lanche/lanche.tscn`）
-
-- **红（hong）**：复制自「黑」的敌人（追逐型，**不冲刺**——不含 `charging_attack_behavior` 覆写，只有追逐与接触伤害），**不掉材料**（`hong_stats.tres` 的 `value = 0`，消耗品掉落仍与「黑」一致）；贴图与图标自持在 mod 内（替换 `content_data/entities/units/enemies/hong/hong.png`、`.../hong_icon.png` 即可换外观）。目前**只做到实体 + 图鉴**，尚未加入线条空间任何波次（要加入时把 `hong_unit.tres`/`hong_group.tres` 放进 `zones/zone_line_space/00N/hong/`，再在对应 `wave_N.tres` 的 `groups_data` 里加一组即可）
-
-- **小型居民楼（apartment）**：线条空间的专属**建筑型敌人**，**无法移动**（`MovementBehavior` 用原版基类，只做原地输出）；每次**射击 3 发连成一串子弹**（内嵌 `shoot` 动画一帧三响，`attack_anim_speed 2.0` + `cooldown 90` ⇒ 整周期 2.0 秒），并**每 3 秒召唤 2 只「红」**（Timer + `apartment_spawner.gd` 走原版生成链路）；外观自持（复制原版 `evil_mob_0.png`/`evil_mob_icon.png`，替换 `content_data/entities/units/enemies/apartment/apartment.png`、`.../apartment_icon.png` 即可换外观）；出现在线条空间的**第 4~20 波**（第 8 秒起、每 8 秒 1~2 座；节奏在各波目录 `zones/zone_line_space/004…020/apartment/apartment_group.tres`，数值与行为在 `.../apartment/apartment.tscn`）
-
-- **地铁站（metro）**：线条空间的专属**建筑型敌人**，**无法移动**（`MovementBehavior` 用原版基类，只做原地输出），并且**每 5 秒从「动态召唤池」随机召唤一只敌人**；池子在**运行时构建**——扫描所有已注册区域（含其它 mod 注册进来的敌人）的波次数据，再按「**基础血量 20~50** 且**会移动**」过滤（不动建筑与再生/孵化类不入池，避免递归召唤；区间与数量由节点导出的 `min_health`/`max_health`/`nb_to_spawn`/`spawn_radius` 控制，逻辑在 `content_data/entities/units/enemies/metro/metro_spawner.gd`）；外观自持（复制原版 `spawner.png`/`spawner_icon.png`，替换 `content_data/entities/units/enemies/metro/metro.png`、`.../metro_icon.png` 即可换外观）；出现在线条空间的**第 6~20 波**（第 20 秒起、每 120 秒 1 座 ⇒ 每波最多 1 座；节奏在各波目录 `zones/zone_line_space/006…020/metro/metro_group.tres`，数值与行为在 `.../metro/metro.tscn`）
-
-
-- **鬼火少年（guihuo）**（**已进波次 w8/9/10/12/13/14/16/19/20**，参数照 zone_1 的壮怪；同时把当波黑/黑车折算扣回、各波材料锁定不变；地铁站动态池已屏蔽它）：像壮怪（bruiser）一样**冲刺**（`charging_attack_behavior`，`charge_duration 0.75`／`charge_speed 700`／`cooldown 60`／`max_range 500`），冲刺途中每 0.5 秒在身后留下一片**紫区**（`projectiles/purple_zones/purple_zone.tscn`）：半径 45、**持续 3 秒**、每 0.5 秒对圈内玩家结算一次伤害（伤害取本体当前伤害，随波次成长）。紫区只检测玩家层（`collision_mask = 2`），不影响敌人与中立。要调节拍改 `guihuo.tscn` 里 `TrailTimer.wait_time`（默认 0.03 秒巡检一次位移），范围/时长/跳伤间隔改 `guihuo_trail.gd` 的 `ZONE_RADIUS`/`ZONE_DURATION`/`ZONE_TICK_INTERVAL`。**紫圈密度**：按**位移距离**铺片（`ZONE_SPACING = 60` ⇒ 每 60 px 一片，60 < 2×半径 90 ⇒ 路径**无空隙**（圆交接处腰宽约 67 px），一次冲刺约 12~13 片；调小更密（45 时约 17 片），但必须 < 2×`ZONE_RADIUS`），每个本体存活上限 `MAX_LIVE_ZONES = 30`；**伤害闸门** `purple_zone.gd::DAMAGE_GATE = 0.5`（每名玩家 0.5 秒只结算一次 ⇒ 叠片不会叠加 DPS），盘底透明度 `purple_zone.gd::LAYER_COLOR`（0.20，叠起来是均匀紫带）。
-
+- **线条空间区域（zone_line_space）**：新增可选区域「线条空间
 
 - **吞吞怪（evil_mob）**：清洁工每波敌袭额外生成的箱子型敌人，数量与血量随收获属性提升
 
