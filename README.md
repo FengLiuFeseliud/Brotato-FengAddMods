@@ -164,6 +164,9 @@
 - **地铁站（metro）**：线条空间的专属**建筑型敌人**，**无法移动**（`MovementBehavior` 用原版基类，只做原地输出），并且**每 5 秒从「动态召唤池」随机召唤一只敌人**；池子在**运行时构建**——扫描所有已注册区域（含其它 mod 注册进来的敌人）的波次数据，再按「**基础血量 20~50** 且**会移动**」过滤（不动建筑与再生/孵化类不入池，避免递归召唤；区间与数量由节点导出的 `min_health`/`max_health`/`nb_to_spawn`/`spawn_radius` 控制，逻辑在 `content_data/entities/units/enemies/metro/metro_spawner.gd`）；外观自持（复制原版 `spawner.png`/`spawner_icon.png`，替换 `content_data/entities/units/enemies/metro/metro.png`、`.../metro_icon.png` 即可换外观）；出现在线条空间的**第 6~20 波**（第 20 秒起、每 120 秒 1 座 ⇒ 每波最多 1 座；节奏在各波目录 `zones/zone_line_space/006…020/metro/metro_group.tres`，数值与行为在 `.../metro/metro.tscn`）
 
 
+- **鬼火少年（guihuo）**（**已进波次 w8/9/10/12/13/14/16/19/20**，参数照 zone_1 的壮怪；同时把当波黑/黑车折算扣回、各波材料锁定不变；地铁站动态池已屏蔽它）：像壮怪（bruiser）一样**冲刺**（`charging_attack_behavior`，`charge_duration 0.75`／`charge_speed 700`／`cooldown 60`／`max_range 500`），冲刺途中每 0.5 秒在身后留下一片**紫区**（`projectiles/purple_zones/purple_zone.tscn`）：半径 45、**持续 3 秒**、每 0.5 秒对圈内玩家结算一次伤害（伤害取本体当前伤害，随波次成长）。紫区只检测玩家层（`collision_mask = 2`），不影响敌人与中立。要调节拍改 `guihuo.tscn` 里 `TrailTimer.wait_time`（默认 0.03 秒巡检一次位移），范围/时长/跳伤间隔改 `guihuo_trail.gd` 的 `ZONE_RADIUS`/`ZONE_DURATION`/`ZONE_TICK_INTERVAL`。**紫圈密度**：按**位移距离**铺片（`ZONE_SPACING = 60` ⇒ 每 60 px 一片，60 < 2×半径 90 ⇒ 路径**无空隙**（圆交接处腰宽约 67 px），一次冲刺约 12~13 片；调小更密（45 时约 17 片），但必须 < 2×`ZONE_RADIUS`），每个本体存活上限 `MAX_LIVE_ZONES = 30`；**伤害闸门** `purple_zone.gd::DAMAGE_GATE = 0.5`（每名玩家 0.5 秒只结算一次 ⇒ 叠片不会叠加 DPS），盘底透明度 `purple_zone.gd::LAYER_COLOR`（0.20，叠起来是均匀紫带）。
+
+
 - **吞吞怪（evil_mob）**：清洁工每波敌袭额外生成的箱子型敌人，数量与血量随收获属性提升
 
 ## 素材与许可

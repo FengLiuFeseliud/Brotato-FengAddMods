@@ -7,7 +7,7 @@ export (int) var nb_to_spawn = 1
 export (int) var spawn_radius = 60
 
 var _pool: Array = []
-var _blacklist: Array = ["spawner.tscn", "bloated_spawner.tscn", "slasher_egg.tscn", "infected_slasher_egg.tscn", "evil_mob.tscn", "metro.tscn"]
+var _blacklist: Array = ["spawner.tscn", "bloated_spawner.tscn", "slasher_egg.tscn", "infected_slasher_egg.tscn", "evil_mob.tscn", "metro.tscn", "guihuo.tscn"]
 
 
 func _ready() -> void :
