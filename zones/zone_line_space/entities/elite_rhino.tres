@@ -5,6 +5,6 @@
 
 [resource]
 script = ExtResource( 1 )
-my_id = "elite_rhino"
+my_id = "line_space_elite_rhino"
 zone_id = 2
 scene = ExtResource( 2 )

@@ -372,6 +372,38 @@ func reset(restart: bool = false) -> void :
 	# 先清标记再走原版重置，避免旧档标记影响新局
 	fengliu_clear_legacy_rebase()
 	.reset(restart)
+	
+	if ProgressData.has_method("fengliu_ensure_line_space_zone_last"):
+		ProgressData.call("fengliu_ensure_line_space_zone_last", "run reset")
+
+
+func reset_background() -> void :
+	if ProgressData.has_method("fengliu_restore_zone_own_backgrounds"):
+		ProgressData.call("fengliu_restore_zone_own_backgrounds", "reset background")
+
+	.reset_background()
+
+	var resolved_zone = null
+	if ProgressData.has_method("fengliu_resolve_zone"):
+		resolved_zone = ProgressData.call("fengliu_resolve_zone", current_zone)
+
+	var zone_name: String = "<none>"
+	var pool_size: int = 0
+	if resolved_zone != null:
+		zone_name = str(resolved_zone.name)
+		if resolved_zone.default_backgrounds != null:
+			pool_size = resolved_zone.default_backgrounds.size()
+
+	var own_zone = null
+	if ProgressData.has_method("fengliu_get_line_space_zone"):
+		own_zone = ProgressData.call("fengliu_get_line_space_zone")
+
+	if own_zone != null and resolved_zone == own_zone and ProgressData.has_method("fengliu_get_line_space_own_background"):
+		var own_background = ProgressData.call("fengliu_get_line_space_own_background")
+		if own_background != null:
+			current_background = own_background
+
+	ModLoaderLog.info("Background reset: zone=%s current_zone=%d pool=%d picked=%s" % [zone_name, current_zone, pool_size, str(current_background.name) if current_background != null else "<null>"], "FengAddMods")
 
 
 # 通用台账读取（is_linked_layer 区分层）
@@ -1131,6 +1163,11 @@ func reset_to_start_wave_state() -> void :
 	# 标记本次为波次重开，再走原版重置
 	_restart_wave = true
 	.reset_to_start_wave_state()
+
+	# 存档里的 current_zone 是固定 id：本 mod 的区域可能被自愈挪过下标，读档后要对齐一次
+	# （详见 extensions/singletons/progress_data.gd::fengliu_ensure_line_space_zone_last）
+	if ProgressData.has_method("fengliu_ensure_line_space_zone_last"):
+		ProgressData.call("fengliu_ensure_line_space_zone_last", "run state loaded")
 
 
 # 还原树效果（只还原 mod 自己带收获/数值描述的复合树效果，

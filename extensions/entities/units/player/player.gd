@@ -238,6 +238,9 @@ func take_damage(value: int, args: TakeDamageArgs) -> Array:
         var damage_taken = .take_damage(value, args)
         if shield_full_absorb:
             _hit_protection = hit_protection_before
+            if fengliu_get_player_ui() != null:
+                fengliu_get_player_ui().update_hit_protection_count(self, _hit_protection)
+
 
         args.armor_applied = previous_armor_applied
         # 被闪避的伤害不吃盾：退还（静默，不飘 -x）

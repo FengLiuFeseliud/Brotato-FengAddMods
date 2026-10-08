@@ -2,12 +2,7 @@ class_name SentryTower
 extends Turret
 
 
-# 哨戒塔：锁定目标后按 stats.cooldown 的节拍持续用激光结算伤害
-#   节拍长度 = WeaponService.apply_structure_attack_speed_effects(stats.cooldown, player_index) 帧 ÷ 60 秒（含建筑攻速）
-#   每个节拍造成一次 stats.damage 并记 1 次攻击，累计 close_after_attacks_base + 20% 工程学 次后关闭 close_duration 秒
-#   节拍用本类私有计时器（不用基类的 _cooldown：原版炮塔的动画驱动链路会反复重置它）
-#   光束本体（continuous_laser）只负责驻留、跟随目标、只打锁定目标
-#
+# 哨戒塔
 # 关闭前基础攻击次数（默认值；实际由效果资源给出）
 const CLOSE_AFTER_ATTACKS_BASE: = 5
 # 每 1 点工程学增加的攻击次数比例（默认值）
@@ -29,7 +24,7 @@ var _attacks_done: int = 0
 var _attacks_before_close: int = CLOSE_AFTER_ATTACKS_BASE
 # 关闭剩余时间（秒），大于 0 表示正在冷却
 var _close_time_left: float = 0.0
-# 打满次数后光束的滞留剩余秒数（= 一个攻击速度节拍；归零即收束并进入关闭）
+# 打满次数后光束的滞留剩余秒数
 var _close_pending_time: float = 0.0
 # 距离下一次伤害结算的剩余秒数（本塔自己的节拍，不用基类 _cooldown）
 var _tick_time_left: float = 0.0
@@ -208,9 +203,6 @@ func _update_locked_target() -> void:
 		if dist >= float(stats.min_range) and dist <= float(stats.max_range):
 			return
 
-	# 重新选最远的可打目标（跳过已死亡 / 无效 / 被魅惑的）
-	# 换目标沿用当前节拍（节拍已按建筑攻速 + 中继器换算），不另起延迟
-	# 光束由每帧的 _sync_beam_target 即时换瞄准，不打断、不产生空档
 	_locked_target = _get_farthest_alive_target()
 
 

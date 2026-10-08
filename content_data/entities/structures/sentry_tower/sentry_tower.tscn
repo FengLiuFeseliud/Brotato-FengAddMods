@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://entities/structures/turret/turret.tscn" type="PackedScene" id=1]
-[ext_resource path="res://entities/structures/turret/laser/laser_turret.png" type="Texture" id=2]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/entities/structures/sentry_tower/sentry_tower.png" type="Texture" id=2]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/entities/structures/sentry_tower/sentry_tower.gd" type="Script" id=3]
 [ext_resource path="res://ui/hud/ui_progress_bar.tscn" type="PackedScene" id=4]
 

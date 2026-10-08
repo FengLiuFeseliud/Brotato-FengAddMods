@@ -5,6 +5,6 @@
 
 [resource]
 script = ExtResource( 1 )
-my_id = "boss_wizard"
+my_id = "line_space_boss_wizard"
 zone_id = 2
 scene = ExtResource( 2 )
