@@ -452,7 +452,7 @@ func fengliu_ensure_extra_stat_slots(player_index: int = - 1) -> void :
 				player_data.effects[stat_hsh] = 0
 
 
-# 懒生成次要属性哈希列表
+# 懒生成需补齐的效果键哈希列表
 func _fengliu_init_extra_stat_hashs() -> void :
 	# 已生成则直接复用
 	if not _fengliu_extra_stat_hashs.empty():
@@ -460,6 +460,10 @@ func _fengliu_init_extra_stat_hashs() -> void :
 
 	for stat_key in FENGLIU_EXTRA_SECONDARY_STAT_KEYS:
 		_fengliu_extra_stat_hashs.append(Keys.generate_hash(stat_key))
+
+	# 自定义主要属性的修改键
+	for stat_key in FENGLIU_EXTRA_PRIMARY_STAT_KEYS:
+		_fengliu_extra_stat_hashs.append(Keys.generate_hash("gain_" + stat_key))
 
 
 # 扩展追踪效果初始化

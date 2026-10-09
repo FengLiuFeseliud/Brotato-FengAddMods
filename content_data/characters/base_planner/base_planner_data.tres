@@ -1,0 +1,40 @@
+[gd_resource type="Resource" load_steps=11 format=2]
+
+[ext_resource path="res://items/characters/character_data.gd" type="Script" id=1]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/base_planner/base_planner_icon.png" type="Texture" id=2]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/base_planner/appearance/base_planner_eyes_appearance.tres" type="Resource" id=3]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/base_planner/effects/base_planner_effect_0.tres" type="Resource" id=4]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/base_planner/effects/base_planner_effect_1.tres" type="Resource" id=5]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/base_planner/effects/base_planner_effect_2.tres" type="Resource" id=6]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/base_planner/effects/base_planner_effect_3.tres" type="Resource" id=7]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/base_planner/effects/base_planner_effect_4.tres" type="Resource" id=8]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/base_planner/effects/base_planner_effect_5.tres" type="Resource" id=9]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/base_planner/effects/base_planner_effect_6.tres" type="Resource" id=10]
+[ext_resource path="res://weapons/melee/wrench/1/wrench_data.tres" type="Resource" id=11]
+[ext_resource path="res://weapons/melee/screwdriver/1/screwdriver_data.tres" type="Resource" id=12]
+
+
+[resource]
+script = ExtResource( 1 )
+my_id = "base_planner"
+unlocked_by_default = true
+can_be_looted = false
+icon = ExtResource( 2 )
+name = "BASE_PLANNER"
+tier = 0
+value = 1
+effects = [ ExtResource( 4 ), ExtResource( 5 ), ExtResource( 6 ), ExtResource( 7 ), ExtResource( 8 ), ExtResource( 9 ), ExtResource( 10 ) ]
+tracking_text = ""
+is_lockable = false
+unlock_codex_descr_after_get_it = 1
+is_cursed = false
+curse_factor = 0.0
+max_nb = -1
+item_appearances = [  ExtResource( 3 ) ]
+tags = [  ]
+wanted_tags = [ "stat_engineering", "stat_fengliu_shield", "structure" ]
+banned_item_groups = [  ]
+banned_items = [ ]
+banned_upgrades = [ "stat_percent_damage", "stat_ranged_damage", "stat_melee_damage", "stat_elemental_damage" ]
+starting_weapons = [ ExtResource( 11 ), ExtResource( 12 ) ]
+starting_items = [  ]
