@@ -33,5 +33,5 @@ func get_args(player_index: int) -> Array:
     return [
         args[0],
         args[1],
-        "[color=lime]+%s[/color]"  % int(Utils.get_stat(key_hash, player_index) / value)
+        str(int(Utils.get_stat(key_hash, player_index) / value))
     ]

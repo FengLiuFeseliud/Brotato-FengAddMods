@@ -36,7 +36,7 @@ func get_args(player_index: int) -> Array:
     var args = .get_args(player_index)
 
     return [
-        "[color=lime]%s%%[/color]" % args[0],
-        "[color=lime]+%s[/color]" % stat_nb if stat_nb > 0 else "[color=lime]%s[/color]" % stat_nb,
+        str(args[0]),
+        str(stat_nb),
         args[1]
     ]

@@ -44,7 +44,7 @@ func get_args(player_index: int) -> Array:
 	#   [1] = 恢复间隔时间 (wait_time)
 	#   [2] = 倍率属性图标文本
 	return [
-        "[color=lime]%s%%[/color]" % get_dynamic_chance(value, gain_value, int(Utils.get_stat(key_hash, player_index))),
+        str(get_dynamic_chance(value, gain_value, int(Utils.get_stat(key_hash, player_index)))),
         str(wait_time),
 		Utils.get_scaling_stat_icon_text(key_hash, gain_value / 100.0)
 	]

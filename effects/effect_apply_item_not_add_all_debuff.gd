@@ -32,5 +32,5 @@ func get_args(player_index: int) -> Array:
 	#   [0] = 触发概率百分比（绿色）
 	var args = .get_args(player_index)
 	return [
-		"[color=lime]%s%%[/color]" % args[0]
+		str(args[0])
 	]

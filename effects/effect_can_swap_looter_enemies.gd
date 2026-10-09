@@ -26,4 +26,4 @@ func unapply(player_index: int) -> void:
 func get_args(_player_index: int) -> Array:
     # 返回数组按顺序填充描述文本 {0} 占位符：
     #   [0] = 替换为战利品外星人的概率百分比（绿色）
-    return [ "[color=lime]%s%%[/color]" % str(value) ]
+    return [ str(value) ]

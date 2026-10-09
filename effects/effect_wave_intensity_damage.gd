@@ -29,4 +29,4 @@ func unapply(player_index: int) -> void:
 func get_args(player_index: int) -> Array:
     # 返回数组按顺序填充描述文本 {0} 占位符：
     #   [0] = 附加伤害百分比（绿色）
-    return ["[color=lime]%s%%[/color]" % .get_args(player_index)[0]]
+    return [str(.get_args(player_index)[0])]

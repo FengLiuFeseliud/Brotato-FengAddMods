@@ -76,7 +76,7 @@ func get_args(player_index: int) -> Array:
 			args[1], 
 			args[0], 
 			str(wave_max_value), 
-			"[color=lime]+%s[/color]" % add_stat
+			str(add_stat)
 		]
 	
 	if gain_stat or not "stat" in key:
@@ -88,7 +88,7 @@ func get_args(player_index: int) -> Array:
 			tr(stat_display.to_upper()), 
 			args[0], 
 			str(wave_max_value), 
-			"[color=lime]+%s%%[/color]" % add_stat
+			str(add_stat)
 		]
 	
 	var remove_stat = 0
@@ -103,5 +103,5 @@ func get_args(player_index: int) -> Array:
 		args[1], 
 		args[0], 
 		str(wave_max_value), 
-		"[color=lime]+%s[/color]" % add_stat
+		str(add_stat)
 	]

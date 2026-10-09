@@ -49,6 +49,6 @@ func get_args(player_index: int) -> Array:
         chance = value + get_item_count(player_index) * (bought_add_chance / 100.0)
     return [
 		args[1],
-		"[color=lime]%s%%[/color]" % chance,
-        "[color=lime]%s%%[/color]" % bought_add_chance
+		str(chance),
+        str(bought_add_chance)
 	]

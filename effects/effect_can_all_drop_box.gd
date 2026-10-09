@@ -45,7 +45,7 @@ func get_args(player_index: int) -> Array:
 	#   [1] = 倍率属性图标文本
 	var stat = Utils.get_stat(key_hash, player_index)
 	return [
-		"[color=lime]%s%%[/color]" % get_dynamic_chance(stat, chance, value), 
+		str(get_dynamic_chance(stat, chance, value)), 
 		Utils.get_scaling_stat_icon_text(key_hash, value / 100.0), 
 	]
 

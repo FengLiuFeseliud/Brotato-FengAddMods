@@ -40,5 +40,5 @@ func get_args(player_index: int) -> Array:
     # 返回 [每个空位的基础伤害, 当前空位累计的加成]
     return [
         str(value),
-        "[color=lime]%s[/color]" % add_damage
+        str(add_damage)
     ]

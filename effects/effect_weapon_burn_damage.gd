@@ -28,4 +28,4 @@ func unapply(player_index: int) -> void:
 
 func get_args(_player_index: int) -> Array:
 	# 描述只需并入比例
-	return ["[color=lime]%s%%[/color]" % value]
+	return [str(value)]

@@ -44,6 +44,6 @@ func get_args(player_index: int) -> Array:
     var add_hp = value + int(Utils.get_stat(key_hash, player_index) * (gain_value / 100.0))
     return [
         tr(("%s_NAME" % enemy_id).to_upper()),
-		"[color=lime]%s%%[/color]" % add_hp,
+		str(add_hp),
 		Utils.get_scaling_stat_icon_text(key_hash, gain_value / 100.0)
 	]

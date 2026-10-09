@@ -60,6 +60,6 @@ func get_args(player_index: int) -> Array:
 
 	return [
 		item_name,
-		"[color=lime]%s[/color]" % value,
+		str(value),
 		str(get_all_chance(player_index)),
 	]

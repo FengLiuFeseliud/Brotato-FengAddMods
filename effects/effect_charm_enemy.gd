@@ -38,7 +38,7 @@ func get_args(player_index: int) -> Array:
 	#   [2] = Boss/精英魅惑生命值阈值百分比（绿色）
 	var args = .get_args(player_index)
 	return [
-        "[color=lime]%s%%[/color]" % args[0],
+        str(args[0]),
 		"[color=lime]%s[/color]" % args[1],
-		"[color=lime]%s%%[/color]" % boss_charm_value
+		str(boss_charm_value)
 	]

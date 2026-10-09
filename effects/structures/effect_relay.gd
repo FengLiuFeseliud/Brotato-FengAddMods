@@ -52,7 +52,7 @@ func get_args(player_index: int) -> Array:
 	var area_radius: int = int(round(area_percent * (1.0 + (engineering * area_engineering_scale + stat_range * area_range_scale) * stat_scale_multiplier / 100.0)))
 
 	return [
-		"[color=lime]%s%%[/color]" % str(attack_bonus_percent),
+		str(attack_bonus_percent),
 		Utils.get_scaling_stat_icon_text(Keys.stat_engineering_hash, engineering_scale),
 		Utils.get_scaling_stat_icon_text(Keys.stat_attack_speed_hash, attack_speed_scale),
 		str(area_radius),

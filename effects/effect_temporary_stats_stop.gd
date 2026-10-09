@@ -36,5 +36,5 @@ func get_args(player_index: int) -> Array:
 
     return [
         "[color=lime]%s[/color]" % value,
-        "[color=lime]+%s[/color]" % count
+        str(count)
     ]

@@ -45,4 +45,4 @@ func get_args(_player_index: int) -> Array:
     #   [2] = 随机减少商品数上限（绿色）
     #   [3] = 每减少 1 个商品的优惠百分比（绿色）
     #   [4] = 保留锁定数上限（绿色）
-    return [str(value), "[color=lime]%s[/color]" % stat_min_value, "[color=lime]%s[/color]" % stat_max_value, "[color=lime]%s%%[/color]" % shop_count_price, "[color=lime]%s[/color]" % can_shop_locked]
+    return [str(value), "[color=lime]%s[/color]" % stat_min_value, "[color=lime]%s[/color]" % stat_max_value, str(shop_count_price), "[color=lime]%s[/color]" % can_shop_locked]

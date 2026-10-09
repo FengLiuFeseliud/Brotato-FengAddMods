@@ -31,6 +31,6 @@ func get_args(player_index: int) -> Array:
 	# 取当前「多重燃烧」作为掉落概率，与效果值一起代入文案
 	var rekindling: float = RunData.get_player_effect(fengliu_rekindling_hash, player_index)
 	return [
-		"[color=lime]%s%%[/color]" % rekindling,
+		str(rekindling),
 		"[color=lime]%s[/color]" % value
 	]

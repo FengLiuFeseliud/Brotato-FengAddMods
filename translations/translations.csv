@@ -142,11 +142,11 @@ EFFECT_CAN_ONE_NOT_MOVING_EXPLOSION,"Die instantly if the explosion fails to kil
 EFFECT_NO_PET,"You cannot summon pets",你无法召唤宠物
 EFFECT_ALL_WAVE_ELITES_SPAWN,"+1 extra Boss spawns in all waves",波次开始额外生成一个随机 Boss
 EFFECT_BOSS_DIED_RESPAWN,"When a Boss dies, it respawns with {1} increased all stats",Boss 死亡后将重生并且各向属性强化 {1}
-EFFECT_ITEM_BOUGHT_SPAWN_BOSS,"Buying {0} adds a {1} (+{2} per {0}) chance to spawn +1 extra Boss in the next wave",购买{0}后下场敌袭{1}（+{2} {0}数量）概率额外生成一个 Boss
+EFFECT_ITEM_BOUGHT_SPAWN_BOSS,"Buying {0} adds a {1} ({2} per {0}) chance to spawn +1 extra Boss in the next wave",购买{0}后下场敌袭{1}（{2} {0}数量）概率额外生成一个 Boss
 EFFECT_APPLY_NOT_EXTRA_ENEMIES,"When acquiring an item, ignore effects that spawn special enemies in the next wave",获取道具时无视下场敌袭出现特殊怪效果
 EFFECT_KILLED_ALL_BOSS_WAVE_END,"Killing all Bosses in the wave instantly clears the current wave",杀死波次所有 Boss 时将直接通过当前波次
 EFFECT_ADD_XP_GOLD_FROM_WAVE_TIME,"Clearing a wave grants Materials and XP based on remaining seconds: {0} ({1}) per second",通过波次时按剩余秒数获取材料与经验，每秒获取{0}（{1}）
-EFFECT_WEAPON_KILLED_LOOT,"Grants a Crate every {0} kills (+{1} kills required per wave, up to {2} kills)",每击杀{0}敌人获取一个箱子，每波增加{1}所需击杀数（上限{2}击杀数）
+EFFECT_WEAPON_KILLED_LOOT,"Grants a Crate every {0} kills ({1} kills required per wave, up to {2} kills)",每击杀{0}敌人获取一个箱子，每波增加{1}所需击杀数（上限{2}击杀数）
 LOOT_BOX,"Crates Acquired: {0}",获取到的箱子：{0}
 EFFECT_AUTO_OPEN_BOX,"You automatically collect items from Crates",你将自动获取箱子中的道具
 AUTO_OPEN_BOX,Crates Acquired: {0},自动获取到的箱子：{0}
@@ -188,7 +188,7 @@ EFFECT_STRONGER_ALIENS_ON_ALIENS,{0} in waves gain {1} ({2}) HP,敌袭内的{0}�
 EFFECT_RANDOM_DAMAGE_TEXT,Damage is randomized by the fired bullet type,伤害随发射的子弹类型随机
 EFFECT_RANDOM_CAN_RAND_SET_WEAPON,The shop will only offer {0} weapons,商店将只能出现{0}武器
 EFFECT_PET_ROBOT_VACUUM,"A Robot Vacuum pet that collects Materials and Consumables for you, grants [color=lime]3[/color] extra Materials when picking up a Consumable, and deals {0} ({1}) damage to enemies it touches",生成一个扫地机器人宠物，会自动捡取材料与消耗品，捡取消耗品时额外获取[color=lime]3[/color]材料，碰到它的敌人会受到{0}（{1}）伤害
-EFFECT_WEAPON_SHOP_EMPTY_SLOT_ADD_DAMEGE,"Before the wave starts, each empty shop slot adds {0} base damage [+{1}]",开始敌袭前商店每有一个空位加{0}基础伤害 [+{1}]
+EFFECT_WEAPON_SHOP_EMPTY_SLOT_ADD_DAMEGE,"Before the wave starts, each empty shop slot adds {0} base damage [{1}]",开始敌袭前商店每有一个空位加{0}基础伤害 [{1}]
 FENGLIU_TREE_DROP_DOUBLE,% Double Tree Drops,%树木掉落消耗品翻倍
 EFFECT_TREE_DROP_DOUBLE_VALUE,{0} % Double Tree Drops,{0} %树木掉落消耗品翻倍
 EFFECT_TREE_VALUE,Gain {0} Trees,增加{0}点树木
@@ -255,7 +255,7 @@ ITEM_BAOZI_EATEN,Eaten Baozi,吃过的包子
 EFFECT_BAOZI_LOST_TEXT,Lost on taking a hit,受到伤害后永久失效
 EFFECT_BAOZI_EATEN_TEXT,This Baozi has already been eaten,这个包子已经吃过了
 ITEM_RELAY,Relay,中继器
-EFFECT_RELAY,"Summons a Relay that grants nearby Turrets +{0}% ({1}{2}) attack speed; its area size is {3} ({4}{5})",生成一个中继器，对区域内所有炮台攻击速度 +{0}（{1}{2}），区域范围大小为{3}（{4}{5}）
+EFFECT_RELAY,"Summons a Relay that grants nearby Turrets {0} ({1}{2}) attack speed; its area size is {3} ({4}{5})",生成一个中继器，对区域内所有炮台攻击速度 {0}（{1}{2}），区域范围大小为{3}（{4}{5}）
 ITEM_SENTRY_TOWER,Sentry Tower,哨戒塔
 EFFECT_SENTRY_TOWER,"Summons a Sentry Tower that locks a target and fires an infinite-piercing laser dealing {0} damage ({1}); it shuts down for {4} seconds after every {2} ({3}) attacks",生成一座哨戒塔，锁定目标后持续发射无限贯通的激光造成{0}点伤害（{1}），每攻击{2}（{3}）次后关闭{4}秒
 ZONE_LINE_SPACE,Line Space,线条空间
@@ -276,4 +276,4 @@ METRO_NAME,Subway Station,地铁站
 METRO_BEHAVIOUR_DESCRIPTION,Cannot move; summons a random enemy with 20-50 base health from the other zones every 5 seconds.,无法移动；每5秒从其它区域随机召唤一只基础血量20~50的敌人。
 GUIHUO_NAME,Ghost Fire Boy,鬼火少年
 GUIHUO_BEHAVIOUR_DESCRIPTION,Charges at you like the Bruiser and leaves purple zones behind that keep damaging you for 3 seconds.,像壮怪一样冲刺；冲刺时在身后留下持续3秒、对玩家造成持续伤害的紫色区域。
-EFFECT_EXTRA_SHOP_ITEM_CHANCE,"For every 1 {0} you own, {1}% chance for an extra {0} to appear in the shop [{2}]",每持有1{0}，商店中出现{0}的概率{1} [{2}]
+EFFECT_EXTRA_SHOP_ITEM_CHANCE,"For every 1 {0} you own, {1} chance for an extra {0} to appear in the shop [{2}]",每持有1{0}，商店中出现{0}的概率{1} [{2}]

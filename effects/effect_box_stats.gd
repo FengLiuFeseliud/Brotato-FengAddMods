@@ -29,4 +29,4 @@ func get_args(player_index: int) -> Array:
     #   [0] = 获得的数值 +N（绿色）
     #   [1] = 获得的属性名（大写翻译）
     var args = .get_args(player_index)    
-    return ["[color=lime]+%s[/color]" % args[0], args[1]]
+    return [str(args[0]), args[1]]
