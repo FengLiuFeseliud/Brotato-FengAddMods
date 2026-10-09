@@ -6,7 +6,7 @@
 script = ExtResource( 1 )
 key = "item_spices"
 text_key = "EFFECT_EXTRA_SHOP_ITEM_CHANCE"
-value = 10
+value = 3
 custom_key = "fengliu_extra_shop_item_chance"
 storage_method = 0
 effect_sign = 3

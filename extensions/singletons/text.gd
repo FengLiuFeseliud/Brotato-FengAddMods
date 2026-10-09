@@ -10,13 +10,12 @@ var fengliu_keys_needing_operator = {
 	"effect_tree_drop_double_value": [0],
 	"effect_rekindling_value": [0],
 	"effect_reduce_shield_damage_value": [0],
-	"effect_gain_stat_for_every_stat_full_shield": [0],
-	"effect_gain_stat_for_every_living_tree": [0],
+	"effect_gain_stat_for_every_stat_full_shield": [0, 4],
+	"effect_gain_stat_for_every_living_tree": [0, 4],
 	"fengliu_wanted_item_tag_chance": [0],
 	"effect_hit_shield_drop_consumable_value": [0],
 	"fengliu_hit_shield_drop_consumable": [0],
 	"accuracy": [0],
-	# --- effects/ 下 get_args 迁移：带「+」的增益 / 百分比 ---
 	"effect_add_gain_stat_after_remove_change": [5],
 	"effect_add_gain_stat_after_remove_change_wave_max_gain": [5],
 	"effect_add_stat_cap": [5],
@@ -54,7 +53,7 @@ var fengliu_keys_needing_operator = {
 
 var fengliu_keys_needing_percent = {
 	"accuracy": [0],
-	# --- effects/ 下 get_args 迁移：百分比 / 概率 ---
+	"effect_gain_stat_for_every_stat_full_shield": [0, 4],
 	"effect_add_gain_stat_after_remove_change": [5],
 	"effect_chance_apply_item_not_add_all_debuff_from_box": [0],
 	"effect_boss_died_respawn": [1],
