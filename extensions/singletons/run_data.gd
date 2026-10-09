@@ -19,6 +19,7 @@ const ALL_SECONDARY_STATS = [
 	"free_rerolls",
 	"trees",
 	"number_of_enemies",
+	"accuracy",
 
 	"hp_start_wave",
 	"hp_start_next_wave",

@@ -86,6 +86,7 @@ func _fengliu_is_lock_limit_reached() -> bool:
 func _fengliu_is_item_locked() -> bool:
     if item_data == null:
         return false
+
     # 与已锁定列表逐个比对 my_id
     for entry in RunData.locked_shop_items[player_index]:
         if entry[0].my_id == item_data.my_id:
@@ -99,6 +100,7 @@ func _fengliu_refresh_lock_buttons() -> void:
     var parent = get_parent()
     if parent == null:
         return
+        
     for child in parent.get_children():
         if child is ShopItem:
             child.manage_lock_button_visibility()
@@ -107,11 +109,13 @@ func _fengliu_refresh_lock_buttons() -> void:
 # 达到锁定上限时，禁用未锁定道具的锁定按钮
 func manage_lock_button_visibility() -> void:
     .manage_lock_button_visibility()
+
     # 物品本身不可锁定时，强制禁用并隐藏，防止刷新时被重新激活
     if item_data == null or not item_data.is_lockable:
         _lock_button.disable()
         _lock_button.hide()
         return
+
     if _fengliu_is_lock_limit_reached() and not _fengliu_is_item_locked():
         _lock_button.disable()
 
@@ -121,6 +125,7 @@ func change_lock_status(button_pressed: bool) -> void:
     # 不可锁定道具与已达锁定上限时不允许新增锁定
     if button_pressed and item_data != null and not item_data.is_lockable:
         return
+
     if button_pressed and _fengliu_is_lock_limit_reached():
         return
     .change_lock_status(button_pressed)

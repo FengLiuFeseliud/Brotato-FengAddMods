@@ -64,11 +64,12 @@ ITEM_BALLOON,Balloon,气球
 ITEM_PLASTIC_BAG,Plastic Bag,塑料袋
 ITEM_INFUSION_BAG,Infusion Bag,输液袋
 ITEM_GACHA,Gacha Machine,抽卡
+ITEM_SPICES,Spices,香料
 ITEM_THICK_PRESERVATION_FILM,Thickened Preservation Film,加厚保鲜膜
 FENGLIU_REDUCE_SHIELD_DAMAGE,% Shield Damage Reduction,%护盾减伤
 FENGLIU_CONSUMABLE_SHIELD_REGEN,Consumable Shield Regen,消耗性回盾
 FENGLIU_WANTED_ITEM_TAG_CHANCE,% Wanted Item Tag Chance,%标签道具概率
-ITEM_TAG,,吊牌
+ITEM_TAG,Tag,吊牌
 STOCKER,Stocker,理货员
 EFFECT_TWO_HAND_WEAPON_SLOT_LIMIT,Only has two hands (so can only hold two weapons),只有两只手所以只拿两个武器
 ITEM_RAT_KING_RATZILLA,Rat Subject,鼠族臣民
@@ -215,11 +216,11 @@ ITEM_ACRYLIC_SHEET,Acrylic Sheet,亚克力板
 EFFECT_REDUCE_SHIELD_DAMAGE_VALUE,{0} % Shield Damage Reduction,{0} %护盾减伤
 EFFECT_CONVERT_STAT_ON_APPLY,Convert {0}% of your {1} into {2} (every {3} {1} converts {4} {2}),将{0}%的{1}转换为{2}（每{3}点{1}转换{4}点{2}）
 ITEM_PLASTIC_FRUIT_FORK,Plastic Fruit Fork,塑料果叉
-EFFECT_CONSUMABLE_SHIELD_REGEN_VALUE,,使用消耗品恢复{0}护盾
+EFFECT_CONSUMABLE_SHIELD_REGEN_VALUE,Restores {0} shield when you use a consumable,使用消耗品恢复{0}护盾
 ITEM_TITRATION_SOLUTION,Titration Solution,滴定液
 ITEM_BARK,Bark,树皮
 EFFECT_GAIN_STAT_FOR_EVERY_LIVING_TREE,{0} {1} for every living tree [{4}],每存活一棵树会{0}{1} [{4}]
-EFFECT_EXTRA_WANTAD_ITEM_TAG,,商店有概率额外出现{0}标签道具 [{1}]
+EFFECT_EXTRA_WANTAD_ITEM_TAG,The shop has a chance to feature extra items with the {0} tag [{1}],商店有概率额外出现{0}标签道具 [{1}]
 CONSUMABLE,Consumable,消耗品
 PICKUP,Pickup,拾取
 ECONOMY,Economy,经济
@@ -275,3 +276,4 @@ METRO_NAME,Subway Station,地铁站
 METRO_BEHAVIOUR_DESCRIPTION,Cannot move; summons a random enemy with 20-50 base health from the other zones every 5 seconds.,无法移动；每5秒从其它区域随机召唤一只基础血量20~50的敌人。
 GUIHUO_NAME,Ghost Fire Boy,鬼火少年
 GUIHUO_BEHAVIOUR_DESCRIPTION,Charges at you like the Bruiser and leaves purple zones behind that keep damaging you for 3 seconds.,像壮怪一样冲刺；冲刺时在身后留下持续3秒、对玩家造成持续伤害的紫色区域。
+EFFECT_EXTRA_SHOP_ITEM_CHANCE,"For every 1 {0} you own, {1}% chance for an extra {0} to appear in the shop [{2}]",每持有1{0}，商店中出现{0}的概率{1} [{2}]

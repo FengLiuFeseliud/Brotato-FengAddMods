@@ -13,6 +13,7 @@ var effect_fengliu_up_upgrade_data_tier = Keys.generate_hash("fengliu_up_upgrade
 var effect_fengliu_swap_enemie = Keys.generate_hash("fengliu_swap_enemie")
 var effect_fengliu_can_rand_set_weapon = Keys.generate_hash("fengliu_can_rand_set_weapon")
 var effect_fengliu_extra_wanted_item_tag = Keys.generate_hash("fengliu_extra_wanted_item_tag")
+var effect_fengliu_extra_shop_item_chance = Keys.generate_hash("fengliu_extra_shop_item_chance")
 
 
 var fengliu_wanted_item_tag_chance_hash = Keys.generate_hash("fengliu_wanted_item_tag_chance")
@@ -181,38 +182,61 @@ func get_consumable_to_drop(unit: Unit, item_chance: float) -> ConsumableData:
     return get_consumable_for_tier(tier)
 
 
-# 扩展保证商店道具
-func get_player_shop_items(wave: int, player_index: int, args: ItemServiceGetShopItemsArgs) -> Array:
-    var custom_guaranteed = RunData.get_player_effect(effect_fengliu_guaranteed_shop_items, player_index)
-
-    # 无自定义保证道具则走原逻辑
-    if custom_guaranteed.size() == 0:
-        return .get_player_shop_items(wave, player_index, args)
-
-    # 复用原版上限机制：统计已拥有（含锁定）且带 max_nb 限制的道具
+# 自定义保证商店道具
+func fengliu_guaranteed_shop_items(effect: Array, wave: int, player_index: int, args: ItemServiceGetShopItemsArgs) -> Array:
+     # 上限
     var limited_items = get_limited_items(args.owned_and_shop_items)
 
     # 临时把自定义保证道具合并进基础 guaranteed_shop_items
-    # 每个 entry 为 [key_hash, value]
     var base_guaranteed = RunData.get_player_effect(Keys.guaranteed_shop_items_hash, player_index)
     var appended = 0
-    for entry in custom_guaranteed:
+    for entry in effect:
         var item_hash = entry[0]
 
-        # 已拥有达到 max_nb 上限（原版逻辑），不再固定出售
+        # 已拥有达到 max_nb，不再固定出售
         if limited_items.has(item_hash) and limited_items[item_hash][1] >= limited_items[item_hash][0].max_nb:
             continue
 
         base_guaranteed.append([item_hash, 1])
         appended += 1
 
-    # 基础逻辑会自动替换随机道具并安全截断到商店上限
     var result = .get_player_shop_items(wave, player_index, args)
 
-    # 还原，避免污染基础效果数据
     for i in appended:
         base_guaranteed.pop_back()
 
+    return result
+
+
+# 扩展商店道具
+func get_player_shop_items(wave: int, player_index: int, args: ItemServiceGetShopItemsArgs) -> Array:
+    var custom_guaranteed = RunData.get_player_effect(effect_fengliu_guaranteed_shop_items, player_index)
+
+    var result
+    if custom_guaranteed.size() > 0:
+        result = fengliu_guaranteed_shop_items(custom_guaranteed, wave, player_index, args)
+    else:
+        result = .get_player_shop_items(wave, player_index, args)
+    
+    var extra_shop_item_chance_effects = RunData.get_player_effect(effect_fengliu_extra_shop_item_chance, player_index)
+    var guaranteed_count = custom_guaranteed.size() + RunData.get_player_effect(Keys.guaranteed_shop_items_hash, player_index).size()
+    var extra_shop_item_index = 0
+    if guaranteed_count >= result.size():
+        extra_shop_item_index = 3
+    else:
+        extra_shop_item_index = guaranteed_count
+
+    for effect in extra_shop_item_chance_effects:
+        if not Utils.get_chance_success(effect[1] / 100.0):
+            continue
+
+        if extra_shop_item_index >= result.size():
+            break
+
+        var item_data = ItemService.get_item_from_id(effect[0]).duplicate()
+        result[extra_shop_item_index] = [item_data, wave]
+        extra_shop_item_index += 1
+        
     return result
 
 
