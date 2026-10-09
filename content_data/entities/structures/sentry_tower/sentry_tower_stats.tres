@@ -1,11 +1,13 @@
-[gd_resource type="Resource" load_steps=3 format=2]
+[gd_resource type="Resource" load_steps=5 format=2]
 
 [ext_resource path="res://weapons/weapon_stats/ranged_weapon_stats.gd" type="Script" id=1]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/projectiles/continuous_laser/continuous_laser.tscn" type="PackedScene" id=2]
+[ext_resource path="res://weapons/ranged/laser_gun/gun_silenced_sniper1_shot_04.wav" type="AudioStream" id=3]
+[ext_resource path="res://weapons/ranged/laser_gun/gun_silenced_sniper1_shot_04v2.wav" type="AudioStream" id=4]
 
 [resource]
 script = ExtResource( 1 )
-cooldown = 20
+cooldown = 30
 damage = 6
 accuracy = 1.0
 crit_chance = 0.0
@@ -19,7 +21,7 @@ can_have_negative_knockback = false
 effect_scale = 1.0
 scaling_stats = [ [ "stat_engineering", 0.5 ], [ "stat_fengliu_shield", 0.5 ]  ]
 lifesteal = 0.0
-shooting_sounds = [  ]
+shooting_sounds = [ ExtResource( 3 ), ExtResource( 4 ) ]
 sound_db_mod = -12
 is_healing = false
 recoil = 25

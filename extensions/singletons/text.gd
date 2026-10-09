@@ -53,7 +53,6 @@ var fengliu_keys_needing_operator = {
 
 var fengliu_keys_needing_percent = {
 	"accuracy": [0],
-	"effect_gain_stat_for_every_stat_full_shield": [0, 4],
 	"effect_add_gain_stat_after_remove_change": [5],
 	"effect_chance_apply_item_not_add_all_debuff_from_box": [0],
 	"effect_boss_died_respawn": [1],

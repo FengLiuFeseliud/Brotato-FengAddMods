@@ -3,6 +3,7 @@
 [ext_resource path="res://items/characters/character_data.gd" type="Script" id=1]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/base_planner/base_planner_icon.png" type="Texture" id=2]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/base_planner/appearance/base_planner_eyes_appearance.tres" type="Resource" id=3]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/base_planner/appearance/base_planner_body_appearance.tres" type="Resource" id=13]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/base_planner/effects/base_planner_effect_0.tres" type="Resource" id=4]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/base_planner/effects/base_planner_effect_1.tres" type="Resource" id=5]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/base_planner/effects/base_planner_effect_2.tres" type="Resource" id=6]
@@ -30,11 +31,11 @@ unlock_codex_descr_after_get_it = 1
 is_cursed = false
 curse_factor = 0.0
 max_nb = -1
-item_appearances = [  ExtResource( 3 ) ]
+item_appearances = [  ExtResource( 3 ), ExtResource( 13 ) ]
 tags = [  ]
 wanted_tags = [ "stat_engineering", "stat_fengliu_shield", "structure" ]
 banned_item_groups = [  ]
 banned_items = [ ]
-banned_upgrades = [ "stat_percent_damage", "stat_ranged_damage", "stat_melee_damage", "stat_elemental_damage" ]
+banned_upgrades = [ "upgrade_elemental_damage", "upgrade_percent_damage", "upgrade_melee_damage", "upgrade_ranged_damage" ]
 starting_weapons = [ ExtResource( 11 ), ExtResource( 12 ) ]
 starting_items = [  ]

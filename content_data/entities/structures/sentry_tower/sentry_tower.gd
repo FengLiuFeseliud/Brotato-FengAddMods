@@ -123,6 +123,9 @@ func _physics_process(delta: float) -> void:
 		_animation_player.playback_speed = _shooting_speed
 		_animation_player.play("shoot")
 
+	# 开火音效：原版只在 Turret.shoot() 里播放，本塔绕开了它，故在此按攻击节拍自行播放
+	SoundManager2D.play(Utils.get_rand_element(stats.shooting_sounds), global_position, stats.sound_db_mod, 0.2)
+
 	_attacks_done += 1
 	_tick_time_left = _get_damage_interval()
 	if _attacks_done >= _attacks_before_close:
