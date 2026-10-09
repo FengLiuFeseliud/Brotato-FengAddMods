@@ -46,6 +46,22 @@ func load_game_file(try_fallback: = true) -> void :
 	call_deferred("fengliu_ensure_line_space_zone_last", "deferred after load game file")
 
 
+# 扩展存档：把波次强度统计附加到 run_state。
+func get_run_state(
+	shop_items: = [],
+	reroll_count: = [],
+	paid_reroll_count: = [],
+	initial_free_rerolls: = [],
+	free_rerolls: = [],
+	item_steals: = []
+) -> Dictionary:
+	var run_state = .get_run_state(shop_items, reroll_count, paid_reroll_count, initial_free_rerolls, free_rerolls, item_steals)
+	# 仅在进行中的对局附加，普通存档保持干净
+	if run_state.get("has_run_state", false):
+		RunData.fengliu_write_wave_intensity_state(run_state)
+	return run_state
+
+
 # 加载失败时递归列出断链（区域数据 → 波次 → 组 → 单位 → 场景 这类多层引用也能定位到具体文件）
 func _fengliu_log_missing_resources(path: String, depth: int = 0) -> void :
 	if depth > 4:

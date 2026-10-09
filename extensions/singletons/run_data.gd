@@ -86,6 +86,10 @@ const FENGLIU_TEMP_LEDGER_KEY := "fengliu_secondary_ledger_temp"
 const FENGLIU_LINKED_LEDGER_KEY := "fengliu_secondary_ledger_linked"
 
 
+# 波次强度统计的存档键：单键打包快照 [滑动窗口, 强度基准, 本波强度, 高质量波次数]
+const FENGLIU_WAVE_INTENSITY_STATE_KEY := "fengliu_wave_intensity_state"
+
+
 # 每个玩家是否需要「旧档 rebase」（读档时判定，取用后即清；仅 linked 层使用）
 var fengliu_legacy_rebase_pending := [false, false, false, false]
 
@@ -193,7 +197,6 @@ var all_secondary_abs_debuff_stats_hashs = []
 var all_item_debuff_hashs = []
 var _fengliu_extra_stat_hashs: Array = []
 var _wave_total_hp_to_durations = [1.0, 1.0, 1.0]
-var _wave_total_hp = 0
 
 
 var _wave_intensity = 0
@@ -317,6 +320,11 @@ func resume_from_state(state: Dictionary) -> void :
 	# 两步都必须在原版读档前完成（原版末段会立刻重算 LinkedStats）
 	fengliu_mark_legacy_rebase(state)
 	fengliu_normalize_state_effects(state)
+	# 仅真实存档带该键（由 progress_data.gd::get_run_state 写入）；
+	# 重试波次传入的 start_wave_state 直接来自 RunData.get_state()、不带该键 ⇒ 不动，
+	# 从而保留 _restart_wave「重试波跳过强度更新、不重复计入窗口」的原语义。
+	if state.has(FENGLIU_WAVE_INTENSITY_STATE_KEY):
+		fengliu_restore_wave_intensity_state(state)
 	.resume_from_state(state)
 
 
@@ -372,6 +380,8 @@ func fengliu_normalize_effect_values(value):
 func reset(restart: bool = false) -> void :
 	# 先清标记再走原版重置，避免旧档标记影响新局
 	fengliu_clear_legacy_rebase()
+	# 清空上一局的波次强度统计，避免新局误判高质量波次 / _high_wave_count 跨局累加
+	fengliu_reset_wave_intensity_tracking()
 	.reset(restart)
 	
 	if ProgressData.has_method("fengliu_ensure_line_space_zone_last"):
@@ -487,17 +497,55 @@ func fengliu_get_high_wave_count() -> int:
 
 # 判断是否为高质量波次（当前强度 ≥ 前三波平均强度的 2 倍）
 func fengliu_is_high_wave_intensity() -> bool:
+	if _wave_intensity <= 0:
+		return false
 	return (_current_wave_intensity / _wave_intensity) >= 2
-
-
-# 获取当前波次总血量
-func fengliu_get_wave_total_hp() -> float:
-	return _wave_total_hp
 
 
 # 获取当前波次每秒平均血量
 func fengliu_get_wave_total_hp_to_duration() -> float:
 	return _current_wave_intensity
+
+
+# 清空波次强度统计
+func fengliu_reset_wave_intensity_tracking() -> void :
+	_wave_total_hp_to_durations = [1.0, 1.0, 1.0]
+	_wave_intensity = 0
+	_current_wave_intensity = 0
+	_high_wave_count = 0
+	_restart_wave = false
+
+
+func fengliu_write_wave_intensity_state(state: Dictionary) -> void :
+	state[FENGLIU_WAVE_INTENSITY_STATE_KEY] = [
+		_wave_total_hp_to_durations.duplicate(),
+		_wave_intensity,
+		_current_wave_intensity,
+		_high_wave_count,
+	]
+
+
+# 从存档恢复波次强度统计
+func fengliu_restore_wave_intensity_state(state: Dictionary) -> void :
+	var snapshot = state.get(FENGLIU_WAVE_INTENSITY_STATE_KEY, null)
+	if not snapshot is Array or snapshot.size() < 4:
+		return
+	_wave_total_hp_to_durations = fengliu_normalize_wave_durations(snapshot[0])
+	_wave_intensity = float(snapshot[1])
+	_current_wave_intensity = float(snapshot[2])
+	_high_wave_count = int(snapshot[3])
+
+
+func fengliu_normalize_wave_durations(value) -> Array:
+	var parsed := []
+	if value is Array:
+		for entry in value:
+			parsed.push_back(float(entry))
+	while parsed.size() > 3:
+		parsed.remove(0)
+	while parsed.size() < 3:
+		parsed.push_front(1.0)
+	return parsed
 
 
 # 生成波次精英
@@ -684,7 +732,6 @@ func fengliu_calc_wave_total_hp_to_duration() -> float:
 			# 立即释放临时实例
 			scene_inst.free()
 
-	_wave_total_hp = total
 	# 返回每秒平均生命值 = 总生命值 / 波次时长
 	return total / float(max(1, wave_data.wave_duration))
 
