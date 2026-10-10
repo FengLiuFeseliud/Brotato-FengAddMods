@@ -1564,14 +1564,14 @@ func fengliu_normalize_cursed_effect(item_data: ItemParentData) -> void:
 func fengliu_normalize_cursed_convert_effect(item_data: ItemParentData, base_data: ItemParentData) -> void:
 	for i in item_data.effects.size():
 		var effect = item_data.effects[i]
-		if not (effect is ConvertStatEffect):
+		if not (effect is ConvertStatEffect or effect is ConvertStatOnApply):
 			continue
 
 		# 与未诅咒原型按序号对齐；来源/目标属性对不上就不动
 		if i >= base_data.effects.size():
 			continue
 		var base_effect = base_data.effects[i]
-		if not (base_effect is ConvertStatEffect):
+		if not (base_effect is ConvertStatEffect or base_effect is ConvertStatOnApply):
 			continue
 		if base_effect.key_hash != effect.key_hash or base_effect.to_stat_hash != effect.to_stat_hash:
 			continue
