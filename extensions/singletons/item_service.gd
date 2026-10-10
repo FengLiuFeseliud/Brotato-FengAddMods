@@ -208,6 +208,23 @@ func fengliu_guaranteed_shop_items(effect: Array, wave: int, player_index: int, 
     return result
 
 
+# 目标道具是否已达 max_nb 上限
+func fengliu_shop_slot_reached_limit(item_hash: int, limited_items: Dictionary, result: Array) -> bool:
+    var item = ItemService.get_item_from_id(item_hash)
+    if item == null or item.max_nb == -1:
+        return false
+
+    var count = 0
+    if limited_items.has(item_hash):
+        count = limited_items[item_hash][1]
+
+    for entry in result:
+        if entry[0] != null and entry[0].my_id_hash == item_hash:
+            count += 1
+
+    return count >= item.max_nb
+
+
 # 扩展商店道具
 func get_player_shop_items(wave: int, player_index: int, args: ItemServiceGetShopItemsArgs) -> Array:
     var custom_guaranteed = RunData.get_player_effect(effect_fengliu_guaranteed_shop_items, player_index)
@@ -226,12 +243,16 @@ func get_player_shop_items(wave: int, player_index: int, args: ItemServiceGetSho
     else:
         extra_shop_item_index = guaranteed_count
 
+    var limited_items = get_limited_items(args.owned_and_shop_items)
     for effect in extra_shop_item_chance_effects:
         if not Utils.get_chance_success(effect[1] / 100.0):
             continue
 
         if extra_shop_item_index >= result.size():
             break
+
+        if fengliu_shop_slot_reached_limit(effect[0], limited_items, result):
+            continue
 
         var item_data = ItemService.get_item_from_id(effect[0]).duplicate()
         result[extra_shop_item_index] = [item_data, wave]

@@ -320,9 +320,7 @@ func resume_from_state(state: Dictionary) -> void :
 	# 两步都必须在原版读档前完成（原版末段会立刻重算 LinkedStats）
 	fengliu_mark_legacy_rebase(state)
 	fengliu_normalize_state_effects(state)
-	# 仅真实存档带该键（由 progress_data.gd::get_run_state 写入）；
-	# 重试波次传入的 start_wave_state 直接来自 RunData.get_state()、不带该键 ⇒ 不动，
-	# 从而保留 _restart_wave「重试波跳过强度更新、不重复计入窗口」的原语义。
+
 	if state.has(FENGLIU_WAVE_INTENSITY_STATE_KEY):
 		fengliu_restore_wave_intensity_state(state)
 	.resume_from_state(state)
