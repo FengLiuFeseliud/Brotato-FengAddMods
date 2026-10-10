@@ -1,0 +1,14 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/effects/effect_add_random_character_to_shop.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+key = ""
+text_key = "EFFECT_ADD_RANDOM_CHARACTER_TO_SHOP"
+value = 20
+custom_key = "fengliu_add_random_character_to_shop"
+storage_method = 1
+effect_sign = 3
+custom_args = [ ]
+shop_price = 30

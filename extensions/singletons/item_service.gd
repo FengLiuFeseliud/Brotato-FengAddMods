@@ -14,6 +14,7 @@ var effect_fengliu_swap_enemie = Keys.generate_hash("fengliu_swap_enemie")
 var effect_fengliu_can_rand_set_weapon = Keys.generate_hash("fengliu_can_rand_set_weapon")
 var effect_fengliu_extra_wanted_item_tag = Keys.generate_hash("fengliu_extra_wanted_item_tag")
 var effect_fengliu_extra_shop_item_chance = Keys.generate_hash("fengliu_extra_shop_item_chance")
+var effect_fengliu_add_random_character_to_shop = Keys.generate_hash("fengliu_add_random_character_to_shop")
 
 
 var fengliu_wanted_item_tag_chance_hash = Keys.generate_hash("fengliu_wanted_item_tag_chance")
@@ -210,7 +211,7 @@ func fengliu_guaranteed_shop_items(effect: Array, wave: int, player_index: int, 
 
 # 目标道具是否已达 max_nb 上限
 func fengliu_shop_slot_reached_limit(item_hash: int, limited_items: Dictionary, result: Array) -> bool:
-    var item = ItemService.get_item_from_id(item_hash)
+    var item = fengliu_get_shop_extra_item(item_hash)
     if item == null or item.max_nb == -1:
         return false
 
@@ -225,6 +226,61 @@ func fengliu_shop_slot_reached_limit(item_hash: int, limited_items: Dictionary, 
     return count >= item.max_nb
 
 
+# 取商店额外商品数据
+func fengliu_get_shop_extra_item(item_hash: int) -> ItemParentData:
+    var item = ItemService.get_element(items, item_hash)
+    if item != null:
+        return item as ItemParentData
+
+    var character = ItemService.get_element(characters, item_hash)
+    return character as ItemParentData
+
+
+# 商店结果里是否已包含指定 id
+func fengliu_shop_result_has_hash(result: Array, item_hash: int) -> bool:
+    for entry in result:
+        if entry.size() > 0 and entry[0] != null and entry[0].my_id_hash == item_hash:
+            return true
+
+    return false
+
+
+# 随机取一角色
+func fengliu_get_rand_shop_character(player_index: int, result: Array) -> ItemParentData:
+    var current_character = RunData.get_player_character(player_index)
+    var candidates = []
+    for character in characters:
+    
+        if current_character != null and character.my_id_hash == current_character.my_id_hash:
+            continue
+
+        if fengliu_shop_result_has_hash(result, character.my_id_hash):
+            continue
+
+        candidates.push_back(character)
+
+    return Utils.get_rand_element(candidates)
+
+
+# 角色入店：把 [角色哈希, 概率, 初始价] 插到额外商品列表最前（概率由外层循环统一判定）
+func fengliu_prepend_random_character(extra_effects: Array, player_index: int, result: Array) -> Array:
+    var prepend_effects = RunData.get_player_effect(effect_fengliu_add_random_character_to_shop, player_index)
+    if prepend_effects.size() == 0:
+        return extra_effects
+
+    var new_effects = extra_effects.duplicate()
+    for effect in prepend_effects:
+        var character = fengliu_get_rand_shop_character(player_index, result)
+        if character == null:
+            continue
+
+        # 概率交给外层统一判定；第 3 项 = 商店初始价（0/缺省用角色自身 value）
+        var shop_price = int(effect[2]) if effect.size() > 2 else 0
+        new_effects.push_front([character.my_id_hash, effect[1], shop_price])
+
+    return new_effects
+
+
 # 扩展商店道具
 func get_player_shop_items(wave: int, player_index: int, args: ItemServiceGetShopItemsArgs) -> Array:
     var custom_guaranteed = RunData.get_player_effect(effect_fengliu_guaranteed_shop_items, player_index)
@@ -236,6 +292,8 @@ func get_player_shop_items(wave: int, player_index: int, args: ItemServiceGetSho
         result = .get_player_shop_items(wave, player_index, args)
     
     var extra_shop_item_chance_effects = RunData.get_player_effect(effect_fengliu_extra_shop_item_chance, player_index)
+    extra_shop_item_chance_effects = fengliu_prepend_random_character(extra_shop_item_chance_effects, player_index, result)
+
     var guaranteed_count = custom_guaranteed.size() + RunData.get_player_effect(Keys.guaranteed_shop_items_hash, player_index).size()
     var extra_shop_item_index = 0
     if guaranteed_count >= result.size():
@@ -254,7 +312,10 @@ func get_player_shop_items(wave: int, player_index: int, args: ItemServiceGetSho
         if fengliu_shop_slot_reached_limit(effect[0], limited_items, result):
             continue
 
-        var item_data = ItemService.get_item_from_id(effect[0]).duplicate()
+        var item_data = fengliu_get_shop_extra_item(effect[0]).duplicate()
+        # 额外商品可带初始价（覆盖角色/道具自身 value）
+        if effect.size() > 2 and int(effect[2]) > 0:
+            item_data.value = int(effect[2])
         result[extra_shop_item_index] = [item_data, wave]
         extra_shop_item_index += 1
         

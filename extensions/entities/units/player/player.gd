@@ -261,7 +261,7 @@ func take_damage(value: int, args: TakeDamageArgs) -> Array:
 
         # 掉血
         if damage_taken.size() > 1 and damage_taken[1] > 0:
-            fengliu_on_hit_dmg()
+            fengliu_on_hit_dmg(args)
 
         return damage_taken
 
@@ -269,7 +269,7 @@ func take_damage(value: int, args: TakeDamageArgs) -> Array:
     fengliu_restart_shield_regen_delay(0, damage_taken_without_shield)
     # 掉血
     if damage_taken_without_shield.size() > 1 and damage_taken_without_shield[1] > 0:
-        fengliu_on_hit_dmg()
+        fengliu_on_hit_dmg(args)
     return damage_taken_without_shield
 
 
@@ -329,7 +329,8 @@ func fengliu_hit_lost_item() -> void:
         RunData.remove_item(player_item, player_index)
 
 
-func fengliu_on_hit_dmg() -> void:
+func fengliu_on_hit_dmg(args: TakeDamageArgs = null) -> void:
+    RunData.fengliu_rotate_shop_character(player_index)
     fengliu_hit_lost_item()
     fengliu_no_hit_material()
 

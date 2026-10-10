@@ -278,3 +278,8 @@ GUIHUO_NAME,Ghost Fire Boy,鬼火少年
 GUIHUO_BEHAVIOUR_DESCRIPTION,Charges at you like the Bruiser and leaves purple zones behind that keep damaging you for 3 seconds.,像壮怪一样冲刺；冲刺时在身后留下持续3秒、对玩家造成持续伤害的紫色区域。
 EFFECT_EXTRA_SHOP_ITEM_CHANCE,"For every 1 {0} you own, {1} chance for an extra {0} to appear in the shop [{2}]",商店中的物品有{1}几率被替换成{0} [{2}]
 BASE_PLANNER,Base Planner,基地规划师
+EFFECT_SHOP_CHARACTER,Characters bought in the shop are applied at the start of the next wave and are lost when you take damage,在下一波开始时最早购买的角色将生效，受到伤害后失去生效的角色并下一个购买的角色将生效
+PAWN,Cannon Fodder,炮灰
+EFFECT_ADD_RANDOM_CHARACTER_TO_SHOP,{0}% chance to add a random Character to the shop (base price {1}),商店有{0}概率出现随机角色（基础价格{1}）
+EFFECT_PENDING_NOT_ACTIVE,Not yet active,还没有生效
+EFFECT_STAT_FOR_EVERY_CHARACTER,{0} {1} for every Character you hold [{2}],每持有一个角色{0}{1} [{2}]

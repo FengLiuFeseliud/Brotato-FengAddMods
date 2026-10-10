@@ -169,6 +169,8 @@ var effect_fengliu_get_fixed_upgrade = Keys.generate_hash("fengliu_get_fixed_upg
 var effect_fengliu_can_rand_set_weapon = Keys.generate_hash("fengliu_can_rand_set_weapon")
 var effect_fengliu_extra_wanted_item_tag = Keys.generate_hash("fengliu_extra_wanted_item_tag")
 var effect_fengliu_random_extra_wanted_item_tag = Keys.generate_hash("fengliu_random_extra_wanted_item_tag")
+var fengliu_shop_character_key_hash = Keys.generate_hash("fengliu_shop_character")
+var fengliu_stat_per_character_key_hash = Keys.generate_hash("fengliu_stat_per_character")
 
 
 var fengliu_need_reroll_effect = [
@@ -762,8 +764,306 @@ func fengliu_get_player_random_weapon_set(player_index: int) -> SetData:
 	return Utils.get_rand_element(sets.keys())
 
 
+# 是否持有该效果
+func fengliu_shop_character_is_enabled(player_index: int) -> bool:
+	for element in RunData.get_player_effects(player_index).get(fengliu_shop_character_key_hash, []):
+		if element is Array and element.size() == 2 and not (element[0] is Array):
+			return true
+	return false
+
+
+func fengliu_shop_character_state(player_index: int, create: bool = true) -> Array:
+	var effects_dict = RunData.get_player_effects(player_index)
+	if not effects_dict.has(fengliu_shop_character_key_hash):
+		if not create:
+			return []
+		effects_dict[fengliu_shop_character_key_hash] = []
+
+	var effect_list = effects_dict[fengliu_shop_character_key_hash]
+	for element in effect_list:
+		if element is Array and element.size() == 3 and element[0] is Array:
+			element[1] = int(element[1])
+			element[2] = int(element[2])
+			return element
+
+	if not create:
+		return []
+
+	var state = [[], Keys.empty_hash, Keys.empty_hash]
+	effect_list.push_back(state)
+	return state
+
+
+# 商店买到的角色：入背包并显示，但不应用效果（复制一份，避免污染 ItemService.characters 共享资源）
+func fengliu_add_pending_shop_character(character: ItemParentData, player_index: int) -> void :
+	if character == null:
+		return
+
+	var state = fengliu_shop_character_state(player_index)
+	# 购买时就把原角色记下来（此刻 current_character 还不是商店角色，最可靠）
+	if state[1] == Keys.empty_hash and state[2] == Keys.empty_hash:
+		var current_character = RunData.get_player_character(player_index)
+		if current_character != null:
+			state[2] = current_character.my_id_hash
+
+	var copy = character.duplicate()
+	copy.effects = copy.effects.duplicate()
+	copy.effects.append(fengliu_make_pending_notice())
+
+	# 复刻原版 add_item 的入库，跳过 apply_item_effects 与 add_item_displayed（外观只在生效时才挂）
+	players_data[player_index].items.push_back(copy)
+	_update_item_caches(copy, player_index)
+	update_item_related_effects(player_index)
+	LinkedStats.reset_player(player_index)
+	add_item_to_item_count(copy)
+
+	state[0].push_back([copy.my_id_hash])
+	fengliu_stat_per_character_sync(player_index)
+
+
+# 「还没有生效」提示效果（只用于道具描述，从未被 apply）
+func fengliu_make_pending_notice():
+	var notice = load("res://mods-unpacked/FengLiu-FengAddMods/effects/effect_pending_notice.gd").new()
+	notice.text_key = "EFFECT_PENDING_NOT_ACTIVE"
+	notice.custom_key = "fengliu_pending_notice"
+	return notice
+
+
+# 该道具是否带「还没有生效」提示
+func fengliu_item_has_pending_notice(item: ItemParentData) -> bool:
+	if not (item is ItemData):
+		return false
+
+	for effect in item.effects:
+		if effect is Effect and effect.custom_key == "fengliu_pending_notice":
+			return true
+	return false
+
+
+# 摘掉「还没有生效」提示
+func fengliu_remove_pending_notice(item: ItemParentData) -> void :
+	if not (item is ItemData):
+		return
+
+	var kept = []
+	for effect in item.effects:
+		if effect is Effect and effect.custom_key == "fengliu_pending_notice":
+			continue
+		kept.push_back(effect)
+	item.effects = kept
+
+
+# 按 id 哈希取角色资源
+func fengliu_get_shop_character(character_hash: int) -> CharacterData:
+	if character_hash == Keys.empty_hash:
+		return null
+
+	return ItemService.get_element(ItemService.characters, character_hash) as CharacterData
+
+
+# 在背包里找待生效的商店角色（优先带提示；提示丢失时退回同 id 的第一条，原角色除外）
+func fengliu_find_pending_character_item(player_index: int, character_hash: int) -> ItemData:
+	var state = fengliu_shop_character_state(player_index, false)
+	var base_hash = int(state[2]) if state.size() > 2 else Keys.empty_hash
+	var fallback = null
+
+	for item in RunData.get_player_items(player_index):
+		if not (item is CharacterData) or item.my_id_hash != character_hash:
+			continue
+		# 原角色本身不参与待生效识别
+		if item.my_id_hash == base_hash:
+			continue
+
+		if fengliu_item_has_pending_notice(item):
+			return item
+		if fallback == null:
+			fallback = item
+
+	return fallback
+
+
+# 在背包里找已生效的商店角色
+func fengliu_find_applied_character_item(player_index: int, character_hash: int) -> ItemData:
+	for item in RunData.get_player_items(player_index):
+		if item is CharacterData and item.my_id_hash == character_hash and not fengliu_item_has_pending_notice(item):
+			return item
+	return null
+
+
+# 只把 current_character 还原成原角色（不动背包与效果）
+func fengliu_restore_shop_character_base(player_index: int) -> void :
+	var state = fengliu_shop_character_state(player_index, false)
+	if state.size() == 0 or state[2] == Keys.empty_hash:
+		return
+
+	var base_character = fengliu_get_shop_character(state[2])
+	if base_character != null:
+		players_data[player_index].current_character = base_character
+
+
+# 状态自愈：修掉「current_character 卡在商店角色、但生效标记为空」等不一致
+func fengliu_shop_character_repair(player_index: int) -> void :
+	var state = fengliu_shop_character_state(player_index, false)
+	if state.size() == 0:
+		return
+
+	# 生效标记指向的商店角色若已不在背包，视为已失去
+	if state[1] != Keys.empty_hash and fengliu_find_applied_character_item(player_index, int(state[1])) == null:
+		state[1] = Keys.empty_hash
+
+	if state[1] != Keys.empty_hash:
+		return
+
+	var current_character = RunData.get_player_character(player_index)
+	if current_character == null:
+		fengliu_restore_shop_character_base(player_index)
+		return
+
+	if current_character.my_id_hash == int(state[2]):
+		return
+
+	# 当前角色是背包里的商店角色（而非原角色本人）时，还原原角色
+	if fengliu_find_applied_character_item(player_index, current_character.my_id_hash) != null:
+		fengliu_restore_shop_character_base(player_index)
+
+
+# 移除待生效角色：只摘背包条目，不撤销效果（其效果从未应用）
+func fengliu_remove_pending_character_item(player_index: int, item: ItemData) -> void :
+	if item == null:
+		return
+
+	players_data[player_index].items.erase(item)
+	_update_item_caches(item, player_index)
+	update_item_related_effects(player_index)
+	LinkedStats.reset_player(player_index)
+	fengliu_stat_per_character_sync(player_index)
+
+
+# 激活队首的待生效角色：摘提示 + 设为当前角色 + 应用效果
+func fengliu_activate_pending_shop_character(player_index: int) -> bool:
+	var state = fengliu_shop_character_state(player_index, false)
+	if state.size() == 0:
+		return false
+
+	var pending = state[0]
+	if state[1] != Keys.empty_hash or pending.size() == 0:
+		return false
+
+	var character_hash = int(pending[0][0])
+	var item = fengliu_find_pending_character_item(player_index, character_hash)
+	pending.pop_front()
+	if item == null:
+		return false
+
+	# 首次应用前记录原角色
+	if state[2] == Keys.empty_hash:
+		var current_character = RunData.get_player_character(player_index)
+		if current_character != null:
+			state[2] = current_character.my_id_hash
+
+	# 原角色效果保持不动，商店角色作为第二份效果叠加
+	fengliu_remove_pending_notice(item)
+	state[1] = character_hash
+	players_data[player_index].current_character = item
+	RunData.apply_item_effects(item, player_index)
+	add_item_displayed(item, player_index)
+	update_item_related_effects(player_index)
+	return true
+
+
+# 仅当没有生效商店角色时，激活队首
+func fengliu_apply_shop_character_at_wave_start(player_index: int) -> void :
+	fengliu_activate_pending_shop_character(player_index)
+
+
+# 受击结算：移除生效的商店角色；有替补则顶替，否则 current_character 指回原角色
+func fengliu_rotate_shop_character(player_index: int) -> void :
+	# 先自愈（修掉 current_character 与生效标记不一致）
+	fengliu_shop_character_repair(player_index)
+
+	var state = fengliu_shop_character_state(player_index, false)
+	if state.size() == 0 or state[1] == Keys.empty_hash:
+		return
+
+	# 只摘掉商店角色这件道具：原角色的道具与效果保持不动
+	var applied_item = fengliu_find_applied_character_item(player_index, state[1])
+	state[1] = Keys.empty_hash
+	if applied_item != null:
+		RunData.remove_item(applied_item, player_index)
+
+	# 有替补则顶替
+	if fengliu_activate_pending_shop_character(player_index):
+		return
+
+	# 无替补：current_character 指回原角色
+	fengliu_restore_shop_character_base(player_index)
+
+
+# 失去该效果时清场：移除全部待生效角色 + 撤销生效角色 + 还原 current_character
+func fengliu_shop_character_clear(player_index: int) -> void :
+	var state = fengliu_shop_character_state(player_index, false)
+	if state.size() == 0:
+		return
+
+	for pending in state[0]:
+		fengliu_remove_pending_character_item(player_index, fengliu_find_pending_character_item(player_index, int(pending[0])))
+	state[0].clear()
+
+	fengliu_rotate_shop_character(player_index)
+	state[1] = Keys.empty_hash
+	# state[2]（原角色）保留：便于后续还原与自愈
+
+
+# 扩展通关结算：先把 current_character 还原成原角色，避免进度/挑战记到商店角色
+func apply_run_won() -> void :
+	for player_index in get_player_count():
+		fengliu_restore_shop_character_base(player_index)
+	.apply_run_won()
+
+
+# 扩展结束结算：同样先还原
+func apply_end_run() -> void :
+	for player_index in get_player_count():
+		fengliu_restore_shop_character_base(player_index)
+	.apply_end_run()
+
+
+# 统计背包里持有的角色数量（含原角色与未生效的商店角色）
+func fengliu_count_owned_characters(player_index: int) -> int:
+	var count = 0
+	for item in RunData.get_player_items(player_index):
+		if item is CharacterData:
+			count += 1
+	return count
+
+
+# 同步「每持有一个角色 +N 属性」：按持有数差给目标属性加减
+func fengliu_stat_per_character_sync(player_index: int) -> void :
+	var effect_list = RunData.get_player_effects(player_index).get(fengliu_stat_per_character_key_hash, [])
+	if effect_list.size() == 0:
+		return
+
+	var character_count = fengliu_count_owned_characters(player_index)
+	for effect in effect_list:
+		if effect.size() < 2:
+			continue
+
+		var applied_count = int(effect[2]) if effect.size() > 2 else 0
+		if applied_count == character_count:
+			continue
+
+		RunData.add_stat(int(effect[0]), int(effect[1]) * (character_count - applied_count), player_index)
+		effect[2] = character_count
+
+
 # 扩展波次开始
 func on_wave_start(timer: WaveTimer) -> void :
+	for player_index in get_player_count():
+		if fengliu_shop_character_is_enabled(player_index):
+			fengliu_shop_character_repair(player_index)
+			fengliu_apply_shop_character_at_wave_start(player_index)
+
+		fengliu_stat_per_character_sync(player_index)
 	
 	# 清除波次上限
 	for value_keys in stat_after_change_wave_value_count.keys():
@@ -1307,6 +1607,8 @@ func add_item(item: ItemData, player_index: int, is_selection: bool = false) -> 
 	.add_item(item, player_index, is_selection)
 	# 满盾联动：道具变化后重新判定
 	fengliu_notify_full_shield_link(player_index)
+	# 持有角色数可能变化：「每持有一个角色加属性」重新结算
+	fengliu_stat_per_character_sync(player_index)
 
 
 # 扩展添加武器：诅咒水壶入库前先还原树效果
@@ -1320,6 +1622,8 @@ func add_weapon(weapon: WeaponData, player_index: int, is_selection: bool = fals
 func remove_item(item: ItemData, player_index: int, by_id: bool = false) -> void :
 	.remove_item(item, player_index, by_id)
 	fengliu_notify_full_shield_link(player_index)
+	# 持有角色数可能变化：「每持有一个角色加属性」重新结算
+	fengliu_stat_per_character_sync(player_index)
 
 
 # 通知玩家重新判定满盾联动（按 player_index 取 Main._players）

@@ -188,6 +188,15 @@ func fengliu_add_item_bought_elite(effect: Array, shop_item: ShopItem, player_in
 
 # 扩展属性代付购买
 func on_shop_item_bought(shop_item: ShopItem, player_index: int) -> void :
+	# 商店买下的角色：持有该效果时入背包但先不生效，否则直接应用
+	if shop_item.item_data.get_category() == Category.CHARACTER:
+		if RunData.fengliu_shop_character_is_enabled(player_index):
+			RunData.fengliu_add_pending_shop_character(shop_item.item_data, player_index)
+			# 立即刷新背包，让待生效角色当场可见（原版 buy_item 也是这么刷的）
+			_get_gear_container(player_index).set_items_data(RunData.get_player_items(player_index))
+		else:
+			RunData.add_character(shop_item.item_data as CharacterData, player_index)
+		
 	# 购买指定道具生成精英
 	for effect in RunData.get_player_effect(effect_fengliu_item_bought_spawn_boss, player_index):
 		if shop_item.item_data.my_id_hash == effect[0]:

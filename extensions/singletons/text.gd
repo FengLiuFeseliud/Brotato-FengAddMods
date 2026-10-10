@@ -48,6 +48,7 @@ var fengliu_keys_needing_operator = {
 	"effect_weapon_killed_health": [0],
 	"effect_weapon_killed_loot": [1],
 	"effect_weapon_killed_add_temp_stat": [0, 2],
+	"effect_stat_for_every_character": [0, 2]
 }
 
 
@@ -76,6 +77,7 @@ var fengliu_keys_needing_percent = {
 	"effect_relay": [0],
 	"effect_weapon_killed_health": [0],
 	"effect_weapon_killed_add_temp_stat": [0],
+	"effect_add_random_character_to_shop": [0]
 }
 
 
