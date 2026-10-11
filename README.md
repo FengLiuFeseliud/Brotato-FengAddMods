@@ -152,6 +152,8 @@
 
 - **线条空间区域（zone_line_space）**：新增可选区域「线条空间
 
+- **橡皮擦（eraser，线条空间专属敌人）**：**不攻击玩家**的骚扰型敌人——自身与黑区一律不造成伤害（接触与冲刺撞击均为 0：`eraser.tscn` 里 `Hitbox.deals_damage = false`，`stats.damage = 0`；黑区 `zone_damage = 0` 且不检测玩家），并**主动躲避玩家**：默认**在玩家附近保持距离游走**（每只自带约 200~440 的环半径——太近就拉开、太远只靠回环上、不远不近绕着你侧向游走；贴墙时沿墙滑、死角会绕开，另带 ±20° 抖动；把 `eraser_avoid_movement_behavior.gd` 的 `keep_distance` 设为 0 就退化成"一路逃跑"），每约 1.7 秒来一次**逃跑冲刺**（方向同样是躲：若借到朝向你的方向会自动换成切向，沿途铺下**黑色区域**）：半径 45、**只拦截玩家子弹**（进圈弹体直接回收，穿透弹也一并擦掉；不影响敌方子弹、也不伤人），且**只在橡皮擦死亡或离场时才清空**；**已编入 w10–w20 全部波次，统一 2 只/批、每 15 秒一批（第 15/30/45 秒）⇒ 每波共 6 只**。调参：`eraser_avoid_movement_behavior.gd`（`keep_distance` / `keep_distance_randomization` / `ring_tolerance` / 抖动 / 贴墙边距）、`eraser.tscn` 的 `TrailTimer`（`zone_color` / `zone_blocks_bullets` / `zone_persist_until_death` / `zone_damage`）、`eraser_charge_attack_behavior.gd`（冲刺方向守护）、`guihuo_trail.gd`（铺片间距 / 上限）。
+
 - **吞吞怪（evil_mob）**：清洁工每波敌袭额外生成的箱子型敌人，数量与血量随收获属性提升
 
 ## 素材与许可
