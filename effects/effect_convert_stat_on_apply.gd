@@ -43,16 +43,11 @@ func _generate_hashes() -> void:
 
 
 func apply(player_index: int) -> void:
-	# 哈希可能尚未生成（.tres 走 call_deferred），结算前补齐
-	if key_hash == Keys.empty_hash or to_stat_hash == Keys.empty_hash:
-		_generate_hashes()
-
-	# 按原版口径立刻结算：扣源属性、加目标属性，永久写入 effects
 	Utils.convert_stats([self], player_index)
 
 
 func unapply(_player_index: int) -> void:
-	# 一次性转换，不随道具移除回退
+	# 一次性转换
 	pass
 
 
