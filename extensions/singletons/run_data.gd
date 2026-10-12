@@ -1,6 +1,10 @@
 extends "res://singletons/run_data.gd"
 
 
+# 回盾信号：任何来源要给玩家回盾时广播（value=回盾量，player_index=目标玩家）
+signal fengliu_shield_regen(value, player_index)
+
+
 const ALL_SECONDARY_STATS = [
 	"consumable_heal",
 	"xp_gain",

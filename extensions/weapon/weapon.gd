@@ -7,6 +7,7 @@ var effect_fengliu_weapon_killed_health = Keys.generate_hash("fengliu_weapon_kil
 var effect_fengliu_wpapon_killed_add_temp_stat = Keys.generate_hash("fengliu_wpapon_killed_add_temp_stat")
 var effect_fengliu_weapon_hit_slow = Keys.generate_hash("fengliu_weapon_hit_slow")
 var effect_fengliu_waepon_shop_empty_slot_add_damage = Keys.generate_hash("fengliu_waepon_shop_empty_slot_add_damage")
+var effect_fengliu_use_shield_shoot = Keys.generate_hash("fengliu_use_shield_shoot")
 
 
 var wave_gain = Keys.generate_hash("wave_gain")
@@ -20,6 +21,12 @@ static func fengliu_get_dynamic_value(stat_min_value: int, stat_max_value: int, 
 	if dynamic_value == 0 and stat_no_zero:
 		return fengliu_get_dynamic_value(stat_min_value, stat_max_value, stat_no_zero)
 	return dynamic_value
+
+
+func fengliu_get_player() -> Node:
+	if _parent != null and _parent.has_method("fengliu_deduct_shield"):
+		return _parent
+	return null
 
 
 # 杀敌获取随机属性
@@ -173,4 +180,38 @@ func on_killed_something(_thing_killed: Node, hitbox: Hitbox) -> void :
 			fengliu_wpapon_killed_add_temp_stat(effect)
 			continue
 
-		
+
+func should_shoot() -> bool:
+	var can_should_shoot = .should_shoot()
+	var use_shield_shoot = RunData.get_player_effect(effect_fengliu_use_shield_shoot, player_index).size() > 0
+
+	if not use_shield_shoot:
+		return can_should_shoot
+
+	if not can_should_shoot:
+		return false
+
+	var player = fengliu_get_player()
+	if player == null:
+		return true
+
+	return player.fengliu_shield > 0
+
+
+func shoot() -> void :
+	if not RunData.get_player_effect(effect_fengliu_use_shield_shoot, player_index).size() > 0:
+		.shoot()
+		return
+
+	var player = fengliu_get_player()
+	if player == null:
+		.shoot()
+		return
+	
+	if stats is RangedWeaponStats:
+		player.fengliu_deduct_shield(stats.nb_projectiles)
+	else:
+		player.fengliu_deduct_shield(1)
+
+	player.fengliu_restart_shield_regen_delay()
+	.shoot()

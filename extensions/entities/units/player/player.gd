@@ -103,6 +103,10 @@ func _ready() -> void :
     # 配置满盾联动（初始盾值即按满/不满判定）
     fengliu_sync_full_shield_stat_link()
 
+    # 订阅回盾信号（击杀回盾等来源）
+    if not RunData.is_connected("fengliu_shield_regen", self, "fengliu_on_shield_regen_signal"):
+        var _error_regen = RunData.connect("fengliu_shield_regen", self, "fengliu_on_shield_regen_signal")
+
 
 # 生成一个消耗品模拟树
 func _fengliu_drop_consumable() -> void:
@@ -252,7 +256,7 @@ func take_damage(value: int, args: TakeDamageArgs) -> Array:
                 emit_signal("fengliu_shield_lost", shield_lost, player_index)
                 
             # 受击后重新开始回盾静默计时
-            fengliu_restart_shield_regen_delay(shield_lost, damage_taken)
+            fengliu_restart_shield_regen_delay()
             # 破盾触发：材料计时失效（+ 破盾爆炸，不含自伤）
             if shield_broken:
                 fengliu_on_shield_broken(args.from != self)
@@ -266,7 +270,7 @@ func take_damage(value: int, args: TakeDamageArgs) -> Array:
         return damage_taken
 
     var damage_taken_without_shield = .take_damage(value, args)
-    fengliu_restart_shield_regen_delay(0, damage_taken_without_shield)
+    fengliu_restart_shield_regen_delay()
     # 掉血
     if damage_taken_without_shield.size() > 1 and damage_taken_without_shield[1] > 0:
         fengliu_on_hit_dmg(args)
@@ -370,10 +374,7 @@ func fengliu_can_shield_take_damage(value: int, args: TakeDamageArgs) -> bool:
 
 
 # 受击后重新开始回盾静默计时
-func fengliu_restart_shield_regen_delay(shield_absorbed: int, damage_taken: Array) -> void:
-    if not (shield_absorbed > 0 or (damage_taken.size() > 1 and damage_taken[1] > 0)):
-        return
-    
+func fengliu_restart_shield_regen_delay() -> void:
     _fengliu_shield_regen_pool = 0.0
     _fengliu_shield_regen_timer.wait_time = fengliu_shield_regen_delay
     _fengliu_shield_regen_timer.start()
@@ -484,6 +485,15 @@ func fengliu_find_stat_link_tuple(slot_effects: Array, sig: String) -> Array:
         if effect.value > 0 and fengliu_stat_link_signature(effect) == sig:
             return [effect.key_hash, effect.value, effect.stat_scaled_hash, effect.nb_stat_scaled, effect.perm_stats_only]
     return []
+
+
+# 回盾信号
+func fengliu_on_shield_regen_signal(value: int, target_player_index: int) -> void:
+    # 目标玩家不是本实例则跳过
+    if target_player_index != player_index:
+        return
+
+    fengliu_shield_regen(value)
 
 
 # 盾恢复

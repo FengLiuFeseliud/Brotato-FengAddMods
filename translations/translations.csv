@@ -285,3 +285,6 @@ EFFECT_PENDING_NOT_ACTIVE,Not yet active,还没有生效
 EFFECT_STAT_FOR_EVERY_CHARACTER,{0} {1} for every Character you hold [{2}],每持有一个角色{0}{1} [{2}]
 ERASER_NAME,Eraser,橡皮擦
 ERASER_BEHAVIOUR_DESCRIPTION,Charges sideways along your movement and leaves black zones that block your bullets and only vanish when it dies.,沿着你的左右方向横向冲刺，身后留下黑色区域，会拦截你的子弹，且只有它死亡时才会消失。
+EFFECT_USE_SHIELD_SHOOT,,你的每次攻击都需要消耗护盾
+EFFECT_KILLED_REGEN_SHIELD,Gain {0} Shield when killing an enemy,击杀敌人时恢复{0}点护盾
+TIN_CAN,Tin Can,罐头

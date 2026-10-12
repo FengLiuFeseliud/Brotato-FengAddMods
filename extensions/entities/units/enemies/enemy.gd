@@ -5,6 +5,7 @@ var effect_fengliu_wave_intensity_damage = Keys.generate_hash("fengliu_wave_inte
 var effect_fengliu_no_kill_enemy = Keys.generate_hash("fengliu_no_kill_enemy")
 var effect_fengliu_charm_enemy = Keys.generate_hash("fengliu_charm_enemy")
 var effect_fengliu_stronger_aliens_on_stats = Keys.generate_hash("fengliu_stronger_aliens_on_stats")
+var effect_fengliu_killed_regen_shield = Keys.generate_hash("fengliu_killed_regen_shield")
 
 
 # 判断攻击来源是否匹配指定类型
@@ -100,6 +101,15 @@ func init(zone_min_pos: Vector2, zone_max_pos: Vector2, p_players_ref: Array = [
         reset_health_stat(enemy_factor)
 
 
+# 击杀回盾量：汇总槽内全部实例的效果数值
+func fengliu_get_killed_regen_shield_value(effects: Array) -> int:
+    # 多份效果叠加；读档回来可能是浮点，统一取整
+    var total: int = 0
+    for effect in effects:
+        total += int(effect[1])
+    return total
+
+
 # 扩展受伤结算
 func take_damage(value: int, args: TakeDamageArgs) -> Array:
     var damage_taken = .take_damage(value, args)
@@ -108,6 +118,12 @@ func take_damage(value: int, args: TakeDamageArgs) -> Array:
     var effects = RunData.get_player_effect(effect_fengliu_charm_enemy, args.from_player_index)
     if effects.size() > 0:
         fengliu_charm_enemy(effects[0], args)
+
+    if args.from_player_index >= 0 and current_stats.health <= 0:
+        # 击杀回盾量 = 槽内全部实例的效果数值之和；0 或负值不广播
+        var regen = fengliu_get_killed_regen_shield_value(RunData.get_player_effect(effect_fengliu_killed_regen_shield, args.from_player_index))
+        if regen > 0:
+            RunData.emit_signal("fengliu_shield_regen", regen, args.from_player_index)
 
     return damage_taken
 
