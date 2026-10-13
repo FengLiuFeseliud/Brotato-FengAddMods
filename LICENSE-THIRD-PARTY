@@ -32,6 +32,9 @@ Applies to:
   - content_data\characters\crate_gobbler\crate_gobbler_icon.png
   - content_data\characters\crate_gobbler\appearance\crate_gobbler_eyes.png
   - content_data\characters\crate_gobbler\appearance\crate_gobbler_hat.png
+  - content_data\characters\blood_bull\blood_bull_icon.png
+  - content_data\characters\blood_bull\appearance\blood_bull_eyes.png
+  - content_data\characters\blood_bull\appearance\blood_bull_hat.png
   - content_data\characters\curse_fiend\curse_fiend_icon.png
   - content_data\items\ap_round\ap_round_icon.png
   - content_data\items\auto_open_box\auto_open_box_icon.png

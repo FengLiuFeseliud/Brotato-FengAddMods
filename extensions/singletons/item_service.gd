@@ -15,6 +15,7 @@ var effect_fengliu_can_rand_set_weapon = Keys.generate_hash("fengliu_can_rand_se
 var effect_fengliu_extra_wanted_item_tag = Keys.generate_hash("fengliu_extra_wanted_item_tag")
 var effect_fengliu_extra_shop_item_chance = Keys.generate_hash("fengliu_extra_shop_item_chance")
 var effect_fengliu_add_random_character_to_shop = Keys.generate_hash("fengliu_add_random_character_to_shop")
+var effect_fengliu_reset_item_stat = Keys.generate_hash("fengliu_reset_item_stat")
 
 
 var fengliu_wanted_item_tag_chance_hash = Keys.generate_hash("fengliu_wanted_item_tag_chance")
@@ -281,6 +282,20 @@ func fengliu_prepend_random_character(extra_effects: Array, player_index: int, r
     return new_effects
 
 
+func fengliu_reset_item_stat(item, effect) -> ItemParentData:
+    var new_item = item.duplicate()
+    for item_effect_index in new_item.effects.size():
+        var item_effect = new_item.effects[item_effect_index]
+        if item_effect.key_hash != effect[0]:
+            continue
+
+        var new_item_effect = item_effect.duplicate()
+        new_item_effect.key_hash = effect[1]
+        new_item.effects[item_effect_index] = new_item_effect
+
+    return new_item
+
+
 # 扩展商店道具
 func get_player_shop_items(wave: int, player_index: int, args: ItemServiceGetShopItemsArgs) -> Array:
     var custom_guaranteed = RunData.get_player_effect(effect_fengliu_guaranteed_shop_items, player_index)
@@ -318,7 +333,7 @@ func get_player_shop_items(wave: int, player_index: int, args: ItemServiceGetSho
             item_data.value = int(effect[2])
         result[extra_shop_item_index] = [item_data, wave]
         extra_shop_item_index += 1
-        
+
     return result
 
 
@@ -498,19 +513,23 @@ func _get_rand_item_for_wave(wave: int, player_index: int, type: int, args: GetR
             has_reroll_effect = true
             break
 
-    if not has_reroll_effect:
-        return item
-
     # 复制 item，并逐个复制需要重随的效果，避免污染商店池里的模板资源
     var new_item = item.duplicate()
-    var new_effects = []
-    for effect in new_item.effects:
-        if _fengliu_effect_needs_reroll(effect):
-            effect = effect.duplicate()
-            effect.fengliu_roll_effect(player_index)
-        new_effects.append(effect)
+    if has_reroll_effect:
+        var new_effects = []
+        for effect in new_item.effects:
+            if _fengliu_effect_needs_reroll(effect):
+                effect = effect.duplicate()
+                effect.fengliu_roll_effect(player_index)
+            new_effects.append(effect)
 
-    new_item.effects = new_effects
+        new_item.effects = new_effects
+
+    effects = RunData.get_player_effect(effect_fengliu_reset_item_stat, player_index)
+    if effects.size() > 0:
+        for effect in effects:
+            new_item = ItemService.fengliu_reset_item_stat(new_item, effect)
+
     return new_item
 
 
@@ -645,6 +664,12 @@ func get_upgrades(level: int, number: int, old_upgrades: Array, player_index: in
     # 应用升级项品阶提升效果
     for effect in RunData.get_player_effect(effect_fengliu_up_upgrade_data_tier, player_index):
         upgrades = fengliu_up_upgrade_data_tier(effect, upgrades, player_index)
+    
+    effects = RunData.get_player_effect(effect_fengliu_reset_item_stat, player_index)
+    if effects.size() > 0:
+        for effect in effects:
+            for index in upgrades.size():
+                upgrades[index] = ItemService.fengliu_reset_item_stat(upgrades[index], effect)
 
     return upgrades
 

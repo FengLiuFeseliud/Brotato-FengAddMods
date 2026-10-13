@@ -288,3 +288,6 @@ ERASER_BEHAVIOUR_DESCRIPTION,Charges sideways along your movement and leaves bla
 EFFECT_USE_SHIELD_SHOOT,,你的每次攻击都需要消耗护盾
 EFFECT_KILLED_REGEN_SHIELD,Gain {0} Shield when killing an enemy,击杀敌人时恢复{0}点护盾
 TIN_CAN,Tin Can,罐头
+EFFECT_RESET_ITEM_STAT,,所有{0}道具效果与升级转为{1}
+ITEM_BLUE_CELLS,Blue Cells,蓝细胞
+BLOOD_BULL,Blood Bull,血牛

@@ -6,6 +6,7 @@ var effect_fengliu_stats_stop = Keys.generate_hash("fengliu_stats_stop")
 var effect_fengliu_stats_buy_item = Keys.generate_hash("fengliu_stats_buy_item")
 var effect_fengliu_item_bought_spawn_boss = Keys.generate_hash("fengliu_item_bought_spawn_boss")
 var effect_fengliu_temporary_stats_stop = Keys.generate_hash("fengliu_temporary_stats_stop")
+var effect_fengliu_reset_item_stat = Keys.generate_hash("fengliu_reset_item_stat")
 
 
 var fengliu_shop_items_count_price = Keys.generate_hash("fengliu_shop_items_count_price")

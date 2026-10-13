@@ -173,6 +173,7 @@ var effect_fengliu_get_fixed_upgrade = Keys.generate_hash("fengliu_get_fixed_upg
 var effect_fengliu_can_rand_set_weapon = Keys.generate_hash("fengliu_can_rand_set_weapon")
 var effect_fengliu_extra_wanted_item_tag = Keys.generate_hash("fengliu_extra_wanted_item_tag")
 var effect_fengliu_random_extra_wanted_item_tag = Keys.generate_hash("fengliu_random_extra_wanted_item_tag")
+var effect_fengliu_reset_item_stat = Keys.generate_hash("fengliu_reset_item_stat")
 
 
 var fengliu_shop_character_key_hash = Keys.generate_hash("fengliu_shop_character")
@@ -1465,6 +1466,11 @@ func fengliu_remove_all_item_debuff_effects(effects: Array):
 
 # 扩展应用道具效果
 func apply_item_effects(item_data: ItemParentData, player_index: int) -> void :
+	var effects = RunData.get_player_effect(effect_fengliu_reset_item_stat, player_index)
+	if effects.size() > 0:
+		for effect in effects:
+			item_data = ItemService.fengliu_reset_item_stat(item_data, effect)
+
 	# 备份原效果
 	var old_effects = item_data.effects.duplicate()
 	var new_effects = item_data.effects.duplicate()
@@ -1503,7 +1509,7 @@ func apply_item_effects(item_data: ItemParentData, player_index: int) -> void :
 			continue
 
 	# 概率删除全部负面效果
-	var effects = RunData.get_player_effect(effect_fengliu_apply_item_not_add_all_debuff, player_index)
+	effects = RunData.get_player_effect(effect_fengliu_apply_item_not_add_all_debuff, player_index)
 	if effects.size() > 0 and not effects[0][1] and Utils.get_chance_success(effects[0][0] / 100.0):
 		fengliu_remove_all_item_debuff_effects(new_effects)
 	
