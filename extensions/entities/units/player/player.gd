@@ -17,6 +17,7 @@ var effect_fengliu_shield_set_hit_protection = Keys.generate_hash("fengliu_shiel
 var effect_fengliu_shield_not_regen = Keys.generate_hash("fengliu_shield_not_regen")
 var effect_fengliu_shield_hp_together = Keys.generate_hash("fengliu_shield_hp_together")
 var effect_fengliu_random_primary_stats_on_shield_broken = Keys.generate_hash("fengliu_random_primary_stats_on_shield_broken")
+var effect_fengliu_hold_attract_nearby_consumables_hash = Keys.generate_hash("fengliu_hold_attract_nearby_consumables")
 
 
 var fengliu_shield_hash: int = Keys.generate_hash("stat_fengliu_shield")
@@ -52,6 +53,9 @@ var _fengliu_no_hit_material_timers: Array = []
 var _fengliu_no_hit_material_disabled: Array = []
 var _fengliu_full_shield_link_active: bool = false
 var _fengliu_full_shield_link_effects: Array = []
+
+
+var _fengliu_hold_attract_nearby_consumables = false
 
 
 # 盾恢复信号
@@ -93,6 +97,10 @@ func _ready() -> void :
         _clean_up_room_timer = FixedTimer.new(1)
         _can_not_moving_explosio = false
         _exploding_on_clean_up_room = effects[0].exploding_on_clean_up_room
+
+    effects = RunData.get_player_effect(effect_fengliu_hold_attract_nearby_consumables_hash, player_index)
+    if effects.size() > 0:
+        _fengliu_hold_attract_nearby_consumables = true
     
     # 配置盾值
     fengliu_shield = Utils.get_stat(fengliu_shield_hash, player_index)
@@ -164,6 +172,8 @@ func _physics_process(delta: float) -> void :
         if no_hit_material_loop > 0:
             fengliu_on_no_hit_material(_fengliu_no_hit_material_effects[i], no_hit_material_loop)
 
+    if _fengliu_hold_attract_nearby_consumables:
+        _attract_nearby_consumables()
 
 # 扩展受伤防护
 func take_damage(value: int, args: TakeDamageArgs) -> Array:
@@ -265,7 +275,7 @@ func take_damage(value: int, args: TakeDamageArgs) -> Array:
 
         # 掉血
         if damage_taken.size() > 1 and damage_taken[1] > 0:
-            fengliu_on_hit_dmg(args)
+            fengliu_on_hit_dmg()
 
         return damage_taken
 
@@ -273,7 +283,7 @@ func take_damage(value: int, args: TakeDamageArgs) -> Array:
     fengliu_restart_shield_regen_delay()
     # 掉血
     if damage_taken_without_shield.size() > 1 and damage_taken_without_shield[1] > 0:
-        fengliu_on_hit_dmg(args)
+        fengliu_on_hit_dmg()
     return damage_taken_without_shield
 
 
@@ -333,7 +343,7 @@ func fengliu_hit_lost_item() -> void:
         RunData.remove_item(player_item, player_index)
 
 
-func fengliu_on_hit_dmg(args: TakeDamageArgs = null) -> void:
+func fengliu_on_hit_dmg() -> void:
     RunData.fengliu_rotate_shop_character(player_index)
     fengliu_hit_lost_item()
     fengliu_no_hit_material()

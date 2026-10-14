@@ -293,3 +293,5 @@ ITEM_BLUE_CELLS,Blue Cells,蓝细胞
 BLOOD_BULL,Blood Bull,血牛
 ITEM_SPLIT_TRAINING,Split Training,二分化训练
 EFFECT_SPLIT_UPGRADE,,你的升级项将一分为二，可以一次定向攻击升级项，一次定向生存升级项
+ITEM_PLASTIC_STRAW,Plastic Straw,塑料吸管
+EFFECT_HOLD_ATTRACT_NEARBY_CONSUMABLES,,不管什么时候你都会吸取消耗品
