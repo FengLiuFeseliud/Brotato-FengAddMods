@@ -1,0 +1,26 @@
+[gd_resource type="Resource" load_steps=4 format=2]
+
+[ext_resource path="res://items/global/item_data.gd" type="Script" id=1]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/split_training/split_training_icon.png" type="Texture" id=2]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/split_training/split_training_effect_0.tres" type="Resource" id=3]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/split_training/split_training_effect_1.tres" type="Resource" id=4]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/split_training/split_training_effect_2.tres" type="Resource" id=5]
+
+[resource]
+script = ExtResource( 1 )
+my_id = "item_split_training"
+unlocked_by_default = true
+can_be_looted = true
+icon = ExtResource( 2 )
+name = "ITEM_SPLIT_TRAINING"
+tier = 2
+value = 75
+effects = [ ExtResource( 3 ), ExtResource( 4 ), ExtResource( 5 ) ]
+tracking_text = ""
+is_lockable = true
+unlock_codex_descr_after_get_it = 1
+is_cursed = false
+curse_factor = 0.0
+max_nb = 1
+item_appearances = [  ]
+tags = [ "xp_gain", "stat_melee_damage", "stat_ranged_damage", "stat_percent_damage", "stat_engineering", "stat_range", "stat_attack_speed", "stat_crit_chance", "stat_elemental_damage", "stat_max_hp", "stat_hp_regeneration", "stat_lifesteal", "stat_armor", "stat_dodge", "stat_harvesting", "stat_speed", "stat_fengliu_shield", "stat_luck" ]

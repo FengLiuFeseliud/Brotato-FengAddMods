@@ -29,6 +29,7 @@ var effect_fengliu_gold_stats = Keys.generate_hash("fengliu_gold_stats")
 var effect_fengliu_effect_box_stats = Keys.generate_hash("fengliu_box_stats")
 var effect_fengliu_burning_kill_extra_material = Keys.generate_hash("fengliu_burning_kill_extra_material")
 var effect_fengliu_add_stat_fron_alive_trees = Keys.generate_hash("fengliu_add_stat_fron_alive_trees")
+var effect_fengliu_split_upgrade = Keys.generate_hash("fengliu_split_upgrade")
 
 
 var fengliu_item_auto_open_box_hash = Keys.generate_hash("item_auto_open_box")
@@ -41,6 +42,13 @@ var fengliu_shield_hash = Keys.generate_hash("stat_fengliu_shield")
 
 var fengliu_tree_drop_double = Keys.generate_hash("fengliu_tree_drop_double")
 var fengliu_rekindling_hash = Keys.generate_hash("fengliu_rekindling")
+
+
+var fengliu_damage_upgrade_icon_data = load("res://mods-unpacked/FengLiu-FengAddMods/content_data/upgrades/damage_upgrade_icon_data.tres")
+var fengliu_damage_upgrade_hash = Keys.generate_hash(fengliu_damage_upgrade_icon_data.my_id)
+
+var fengliu_hp_upgrade_icon_data = load("res://mods-unpacked/FengLiu-FengAddMods/content_data/upgrades/hp_upgrade_icon_data.tres")
+var fengliu_hp_upgrade_hash = Keys.generate_hash(fengliu_hp_upgrade_icon_data.my_id)
 
 
 var _is_speedrun_ending: bool = false
@@ -416,6 +424,26 @@ func fengliu_burning_kill_extra_material(enemy: Enemy, args: Entity.DieArgs) -> 
 	RunData.add_tracked_value(player_index, fengliu_item_kebab_hash, extra_count)
 
 
+func fengliu_add_damage_upgrade(player_index: int) -> void:
+	_things_to_process_player_containers[player_index].upgrades.add_element(
+		fengliu_damage_upgrade_icon_data.icon, fengliu_damage_upgrade_hash)
+
+	var upgrade_to_process = UpgradesUI.UpgradeToProcess.new()
+	upgrade_to_process.level = fengliu_damage_upgrade_hash
+	upgrade_to_process.player_index = player_index
+	_upgrades_to_process[player_index].push_back(upgrade_to_process)
+
+
+func fengliu_add_hp_upgrade(player_index: int) -> void:
+	_things_to_process_player_containers[player_index].upgrades.add_element(
+		fengliu_hp_upgrade_icon_data.icon, fengliu_hp_upgrade_hash)
+
+	var upgrade_to_process = UpgradesUI.UpgradeToProcess.new()
+	upgrade_to_process.level = fengliu_hp_upgrade_hash
+	upgrade_to_process.player_index = player_index
+	_upgrades_to_process[player_index].push_back(upgrade_to_process)
+
+
 # 扩展升级提升
 func on_levelled_up(player_index: int) -> void :
 	.on_levelled_up(player_index)
@@ -424,6 +452,17 @@ func on_levelled_up(player_index: int) -> void :
 	for effect in effects:
 		# 随机升级获取属性
 		fengliu_random_stats_on_level_up(effect, player_index)
+
+	effects = RunData.get_player_effect(effect_fengliu_split_upgrade, player_index)
+	if effects.size() > 0:
+		var level = RunData.get_player_level(player_index)
+		_things_to_process_player_containers[player_index].upgrades.remove_element(level)
+		_upgrades_to_process[player_index].remove(_upgrades_to_process[player_index].size() - 1)
+
+		_players_ui[player_index].update_level_label()
+
+		fengliu_add_damage_upgrade(player_index)
+		fengliu_add_hp_upgrade(player_index)
 
 
 # 自动开箱

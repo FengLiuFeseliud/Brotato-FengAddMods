@@ -6,6 +6,16 @@ const FENGLIU_EFFECTS_DIR = "res://mods-unpacked/FengLiu-FengAddMods/effects/"
 const FENGLIU_STATS_DIR = "res://mods-unpacked/FengLiu-FengAddMods/content_data/stats/"
 
 
+const FENGLIU_UPGRADE_POOL_STATS := {
+	"fengliu_icon_damage_upgrade": [
+		"stat_melee_damage", "stat_ranged_damage", "stat_percent_damage", "stat_engineering", "stat_range", "stat_attack_speed", "stat_crit_chance", "stat_elemental_damage",
+	],
+	"fengliu_icon_hp_upgrade": [
+		"stat_max_hp", "stat_hp_regeneration", "stat_lifesteal", "stat_armor", "stat_dodge", "stat_harvesting", "stat_speed", "stat_fengliu_shield", "stat_luck"
+	]
+}
+
+
 var effect_fengliu_can_all_drop_box = Keys.generate_hash("fengliu_can_all_drop_box")
 var effect_fengliu_guaranteed_shop_items = Keys.generate_hash("fengliu_guaranteed_shop_items")
 var effect_fengliu_get_fixed_upgrade = Keys.generate_hash("fengliu_get_fixed_upgrade")
@@ -20,6 +30,12 @@ var effect_fengliu_reset_item_stat = Keys.generate_hash("fengliu_reset_item_stat
 
 var fengliu_wanted_item_tag_chance_hash = Keys.generate_hash("fengliu_wanted_item_tag_chance")
 
+var fengliu_damage_upgrade_hash = Keys.generate_hash("fengliu_icon_damage_upgrade")
+var fengliu_hp_upgrade_hash = Keys.generate_hash("fengliu_icon_hp_upgrade")
+
+
+var fengliu_upgrades_pools = {}
+
 
 # 需要重新随机的效果列表
 var need_reroll_effect = [
@@ -32,6 +48,15 @@ var need_reroll_effect = [
 
 # 全部升级项 id 哈希缓存
 var _all_upgrade_ids = {}
+
+
+func _ready():
+    for key in FENGLIU_UPGRADE_POOL_STATS.keys():
+        var pool = []
+        for stat_id in FENGLIU_UPGRADE_POOL_STATS[key]:
+            pool.append(Keys.generate_hash(stat_id))
+
+        fengliu_upgrades_pools[Keys.generate_hash(key)] = pool
 
 
 func _enter_tree() -> void:
@@ -653,13 +678,54 @@ func fengliu_up_upgrade_data_tier(effect: Array, upgrades: Array, player_index: 
     return new_upgrades
 
 
+func _fengliu_get_upgrades_pool(pool_id_hash: int, player_index: int) -> Array:
+    var upgrades_ids = []
+    var build_pool = []
+    var banned_upgrades = RunData.get_player_character(player_index).banned_upgrades
+
+    for stat_id_hash in fengliu_upgrades_pools[pool_id_hash]:
+        var upgrade_id = fengliu_get_upgrade_data_id_hash_by_stat(stat_id_hash)
+        if not Keys.hash_to_string[upgrade_id] in banned_upgrades:
+            build_pool.append(upgrade_id)
+
+    while true:
+        if upgrades_ids.size() >= 4:
+            break
+        
+        var upgrade_id = Utils.get_rand_element(build_pool)
+        if upgrade_id in upgrades_ids and build_pool.size() > 4:
+            continue
+        
+        upgrades_ids.append(upgrade_id)
+
+    var upgrades = []
+    var level = RunData.get_player_level(player_index)
+    for id_hash in upgrades_ids:
+        upgrades.append(fengliu_get_fixed_upgrade_data(level, player_index, id_hash))
+
+    return upgrades
+
+
 # 扩展生成升级项
 func get_upgrades(level: int, number: int, old_upgrades: Array, player_index: int) -> Array:
-    var upgrades = .get_upgrades(level, number, old_upgrades, player_index)
+    var is_fengliu_upgrades_pool = false
+    if level in fengliu_upgrades_pools:
+        is_fengliu_upgrades_pool = true
+    
+    var upgrades = []
+    if not is_fengliu_upgrades_pool:
+        upgrades = .get_upgrades(level, number, old_upgrades, player_index)
+        
     # 有固定升级项效果则替换升级项
     var effects = RunData.get_player_effect(effect_fengliu_get_fixed_upgrade, player_index)
     if effects.size() > 0 and effects[0].all_fixed_upgrade_id_hashs.size() >= 4:
+        if is_fengliu_upgrades_pool:
+            level = RunData.get_player_level(player_index)
+
         upgrades = fengliu_get_fixed_upgrade(level, effects[0], player_index)
+
+    if is_fengliu_upgrades_pool and effects.size() <= 0:
+        upgrades = _fengliu_get_upgrades_pool(level, player_index)
 
     # 应用升级项品阶提升效果
     for effect in RunData.get_player_effect(effect_fengliu_up_upgrade_data_tier, player_index):
