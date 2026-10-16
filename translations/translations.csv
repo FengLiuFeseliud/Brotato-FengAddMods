@@ -295,3 +295,5 @@ ITEM_SPLIT_TRAINING,Split Training,二分化训练
 EFFECT_SPLIT_UPGRADE,Your upgrades are split in two: one damage upgrade and one survival upgrade,你的升级项将一分为二，可以一次定向攻击升级项，一次定向生存升级项
 ITEM_PLASTIC_STRAW,Plastic Straw,塑料吸管
 EFFECT_HOLD_ATTRACT_NEARBY_CONSUMABLES,You always attract nearby Consumables,不管什么时候你都会吸取消耗品
+BIG_APARTMENT_NAME,Large Apartment,大型居民楼
+BIG_APARTMENT_BEHAVIOUR_DESCRIPTION,"Fires a continuous fan barrage of 15 bullets per second, summons 5-10 Line Space mobs at its own center every 2 seconds, mutates twice, the first mutation summons 14 Small Apartments and the second summons 20 Subway Stations at random positions on the map, heavily armored and it cannot move",连续发射扇形弹幕（每秒 15 发），每 2 秒在自身中心召唤 5~10 只线条空间的小怪，可异变两次，第一次异变一次性在整图随机位置召唤 14 只小型居民楼，第二次异变一次性在整图随机位置召唤 20 座地铁站，护甲极高，自身无法移动

@@ -165,6 +165,10 @@
 
 - **吞吞怪（evil_mob）**：清洁工每波敌袭额外生成的箱子型敌人，数量与血量随收获属性提升
 
+- **大型居民楼（big_apartment，线条空间专属精英）**：线条空间**唯一的精英**（原 8 只原版精英已移除）——**无法移动**、**固定在场地正中生成**、高血高甲（数值见 `big_apartment_stats.tres`），对玩家**连续发射扇形弹幕**（每轮 5 颗、每秒 3 轮 ⇒ 约 15 发/秒），并**每 2 秒在自身中心召唤 5~10 只线条空间的小怪**（黑 / 黑车 / 蓝 / 蓝车 / 鬼火少年）；**可异变两次**（异变1：生命 ≤65% 或开战 20 秒；异变2：生命 ≤45% 或开战 35 秒；每次切入原版异变状态并弹出 MUTATION 提示）：**异变1 一次性在整图随机位置召唤 14 只小型居民楼**、**异变2 一次性在整图随机位置召唤 20 座地铁站**；专属美术 `big_apartment.png`（黑色剪影 + 镂空窗格，底座与小型居民楼同一基线）；调参：`big_apartment.tscn` 的 `AttackBehavior`（`cooldown` / `number_projectiles` / `projectile_spread`）、`SummonTimer`（`wait_time` = 2 秒 / `min_nb_to_spawn` = 5 / `max_nb_to_spawn` = 10 / `spawn_radius` = 0（精英中心、不散布） / `enemies_to_spawn`）、`States/State1`（异变阈值 `hp_start` / `timer_start` 与异变后弹幕）、`big_apartment.gd`（`mutation_summon_scene` / `mutation_summon_number` / `mutation2_summon_scene` / `mutation2_summon_number`；两段异变均为整图随机召唤，半径参数已移除）、`big_apartment_stats.tres`（生命 / 护甲）。
+
+- **线条空间敌袭（敌众）**：与 zone1 对齐 —— 新增 `zones/zone_line_space/000_hordes/`（`group_1`~`group_5` + `unit_1`~`unit_5`）：节奏与每批数量逐项照抄 zone1（`spawn_timing` 1/8/15/25/30、`repeating_interval` 5/4/3/2/2、`reduce_repeating_interval` 1、`min_repeating_interval` 2/2/1/1/1、`area` -1/200/200/400/400、`min_wave` 0/0/0/14/15），敌人换成线条空间的黑 / 黑车 / 蓝 / 蓝车 / 鬼火。
+
 ## 素材与许可
 
 - 本项目原创素材（角色外观、图标、武器与投掷物贴图）适用 `LICENSE-ASSETS`

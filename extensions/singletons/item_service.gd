@@ -933,3 +933,18 @@ func fengliu_get_rand_item_for_wave(wave: int, player_index: int, type: int, arg
 		elt.effects[0].stats_swapped = []
 
 	return apply_item_effect_modifications(elt, player_index)
+
+
+# 覆盖: 原版 init_elites_spawn 在难度 ≥ 4 时一次连抽 3 只精英，且每抽一只就从该池里移除一条；
+func get_elites_from_zone(zone_id: int) -> Array:
+	var zone_elites: Array = .get_elites_from_zone(zone_id)
+
+	# 空池保持原样（调用方本就按「本区域没有精英」处理），只补齐 1~2 条的情况
+	if zone_elites.size() == 0 or zone_elites.size() >= 3:
+		return zone_elites
+
+	var padded: Array = zone_elites.duplicate()
+	while padded.size() < 3:
+		padded.push_back(zone_elites[padded.size() % zone_elites.size()])
+
+	return padded

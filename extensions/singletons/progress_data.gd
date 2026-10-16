@@ -412,9 +412,20 @@ func _fengliu_log_zone_state(p_zone_id: int) -> void :
 	var zones_info = []
 	for zone in ZoneService.zones:
 		zones_info.append("%s/my_id%d" % [zone.name, zone.my_id])
-	ModLoaderLog.info("Line space zone ready: zone_id=%d zones=%d[%s] backgrounds=%d bosses=%d elites=%d (zone bosses=%d, zone elites=%d)" % [p_zone_id, ZoneService.zones.size(), ", ".join(zones_info), ItemService.backgrounds.size(), ItemService.bosses.size(), ItemService.elites.size(), ItemService.get_bosses_from_zone(p_zone_id).size(), ItemService.get_elites_from_zone(p_zone_id).size()], FENGLIU_MOD_ID)
+	ModLoaderLog.info("Line space zone ready: zone_id=%d zones=%d[%s] backgrounds=%d bosses=%d elites=%d (zone bosses=%d, zone elites=%d)" % [p_zone_id, ZoneService.zones.size(), ", ".join(zones_info), ItemService.backgrounds.size(), ItemService.bosses.size(), ItemService.elites.size(), ItemService.get_bosses_from_zone(p_zone_id).size(), _fengliu_count_zone_elites(p_zone_id)], FENGLIU_MOD_ID)
 
 	var mismatch: int = _fengliu_zone_mismatch_count()
 	if mismatch != 0:
 		ModLoaderLog.warning("Zone id mismatch remains: %d zone(s) have my_id != index (a third-party mod may hardcode its my_id)" % mismatch, FENGLIU_MOD_ID)
 
+
+# 本区域真正登记在册的精英条数
+func _fengliu_count_zone_elites(p_zone_id: int) -> int:
+	# 不走 ItemService.get_elites_from_zone —— 那条 API 已被本 mod 覆盖成「不足 3 条时补齐」，
+	# 这里要报的是登记状态，不是补齐后的数量
+	var count: int = 0
+	for elite in ItemService.elites:
+		if elite.zone_id == p_zone_id:
+			count += 1
+
+	return count

@@ -9,8 +9,8 @@ extends "res://mods-unpacked/FengLiu-FengAddMods/effects/global/mod_effect.gd"
 #   运行时 custom_key：fengliu_reset_item_stat
 # ------------------------------------------------------------
 # 效果值：
-#   key       被改写的属性 id（如 stat_max_hp）
-#   to_stat   改写后的属性 id（如 stat_fengliu_shield）
+#   key       被改写的属性 id
+#   to_stat   改写后的属性 id
 # ============================================================
 
 
