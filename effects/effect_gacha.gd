@@ -2,6 +2,21 @@ class_name Gacha
 extends "res://mods-unpacked/FengLiu-FengAddMods/effects/global/mod_null_effect.gd"
 
 
+# ============================================================
+# 效果：抽卡（商店道具）
+#   消耗材料连抽，按概率抽出普通道具、红箱道具，或给下一波排一只
+#   随机精英；幸运越高越容易出红箱。
+#   运行时 custom_key：fengliu_gacha
+# ------------------------------------------------------------
+# 效果值：
+#   value                抽取次数
+#   boss_chance          每抽出 Boss 的概率（百分比）
+#   legendary_chance     每抽出红箱的概率（百分比）
+#   cost_gold            单抽基础材料消耗（随波次按 wave_inflation_rate 膨胀）
+#   wave_inflation_rate  每波材料涨价比例
+# ============================================================
+
+
 export(int) var boss_chance = 0
 export(int) var legendary_chance = 0
 export(int) var cost_gold = 0

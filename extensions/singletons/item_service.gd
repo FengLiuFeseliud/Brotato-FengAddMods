@@ -307,6 +307,7 @@ func fengliu_prepend_random_character(extra_effects: Array, player_index: int, r
     return new_effects
 
 
+# 道具属性改写
 func fengliu_reset_item_stat(item, effect) -> ItemParentData:
     var new_item = item.duplicate()
     for item_effect_index in new_item.effects.size():
@@ -316,6 +317,7 @@ func fengliu_reset_item_stat(item, effect) -> ItemParentData:
 
         var new_item_effect = item_effect.duplicate()
         new_item_effect.key_hash = effect[1]
+        new_item_effect.key = Keys.hash_to_string.get(effect[1], new_item_effect.key)
         new_item.effects[item_effect_index] = new_item_effect
 
     return new_item
