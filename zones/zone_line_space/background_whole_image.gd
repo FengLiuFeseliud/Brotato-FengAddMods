@@ -5,6 +5,10 @@ extends Reference
 # ⇒ 本 mod 不会影响任何别的区域（原版 my_tile_map 对所有区域都会走到这里，必须严格限定）。
 
 const SPRITE_NAME = "FengliuWholeBackground"
+const EDGES_NAME = "FengliuEdgeDecor"
+const BACKDROP_NAME = "FengliuWhiteBackdrop"
+const EDGES_SCRIPT = "res://mods-unpacked/FengLiu-FengAddMods/zones/zone_line_space/backgrounds/background_edges.gd"
+
 const LOG_ID = "FengAddMods"
 
 
@@ -65,6 +69,8 @@ static func apply(tilemap: TileMap, zone, area_cells: Rect2, cell_size: int) -> 
 		# 常驻诊断（每次进区域 1 行）：说明这次为什么没铺整图，便于排查「场地图没了」
 		ModLoaderLog.info("Whole background skipped: zone=%s background=%s" % [zone_name, str(background.name) if background != null else "<null>"], LOG_ID)
 		clear(tilemap)
+		clear_edges(tilemap)
+		clear_backdrop(tilemap)
 		return
 
 	var texture: Texture = background.get_tiles_sprite()
@@ -92,8 +98,68 @@ static func apply(tilemap: TileMap, zone, area_cells: Rect2, cell_size: int) -> 
 	sprite.scale = Vector2(scale_factor, scale_factor)
 	sprite.position = area_cells.position * cell_size + (area_size - texture_size * scale_factor) * 0.5
 
+	# 背景铺好后，在四边撒上点缀（节点挂 TileMap 下 ⇒ 在背景之上、单位之下）
+	apply_edges(tilemap, area_cells, cell_size)
+	apply_backdrop(tilemap, area_cells, cell_size)
+
 	# 常驻诊断（每次进区域 1 行）：实际铺了什么图、什么尺寸、保留了多少拼贴格
 	ModLoaderLog.info("Whole background applied: zone=%s background=%s texture=%s size=%s sprite_scale=%s cells=%d" % [zone_name, str(background.name), str(texture.resource_path), str(texture_size), str(sprite.scale), tilemap.get_used_cells().size()], LOG_ID)
+
+
+static func apply_edges(tilemap: TileMap, area_cells: Rect2, cell_size: int) -> void :
+	# 在整图背景之上撒四边点缀：节点挂 TileMap 下，保证在所有单位之下
+	if tilemap == null:
+		return
+	var edges = tilemap.get_node_or_null(EDGES_NAME)
+	if edges == null:
+		var edges_script = load(EDGES_SCRIPT)
+		if edges_script == null:
+			return
+		edges = edges_script.new()
+		edges.name = EDGES_NAME
+		tilemap.add_child(edges)
+	# 条带贴图由 background_edges.gd 自己加载 6 张静态段贴图并随机拼接，这里不再注入
+	if not edges.has_method("_fengliu_rebuild"):
+		return
+	edges._fengliu_rebuild(Rect2( area_cells.position * cell_size, area_cells.size * cell_size ), cell_size)
+	ModLoaderLog.info("Edge strips applied: count=%d" % [edges.get_child_count()], LOG_ID)
+
+
+static func apply_backdrop(tilemap: TileMap, area_cells: Rect2, cell_size: int) -> void :
+	# 场地外显示浅灰（DCDCDC）：在 TileMap 之前插一块超大矩形，盖住镜头可见范围
+	if tilemap == null or tilemap.get_parent() == null:
+		return
+	var parent_node = tilemap.get_parent()
+	var backdrop = parent_node.get_node_or_null(BACKDROP_NAME)
+	if backdrop == null:
+		backdrop = ColorRect.new()
+		backdrop.name = BACKDROP_NAME
+		backdrop.color = Color( 0.862745, 0.862745, 0.862745, 1 )
+		backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		parent_node.add_child(backdrop)
+		parent_node.move_child(backdrop, tilemap.get_index())
+	var arena_size: Vector2 = area_cells.size * cell_size
+	backdrop.rect_position = Vector2( - 3000, - 3000 )
+	backdrop.rect_size = arena_size + Vector2( 6000, 6000 )
+	ModLoaderLog.info("White backdrop applied: size=%s" % [str(backdrop.rect_size)], LOG_ID)
+
+
+static func clear_backdrop(tilemap: TileMap) -> void :
+	# 关闭整图背景时移除白色底板（其它区域恢复原版配色）
+	if tilemap == null or tilemap.get_parent() == null:
+		return
+	var backdrop = tilemap.get_parent().get_node_or_null(BACKDROP_NAME)
+	if backdrop != null:
+		backdrop.queue_free()
+
+
+static func clear_edges(tilemap: TileMap) -> void :
+	# 关闭整图背景时把四边点缀一起清掉
+	if tilemap == null:
+		return
+	var edges = tilemap.get_node_or_null(EDGES_NAME)
+	if edges != null:
+		edges.queue_free()
 
 
 # 捕获「场景烘焙」的预览格（pos → autotile 坐标）

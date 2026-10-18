@@ -300,4 +300,8 @@ BIG_APARTMENT_BEHAVIOUR_DESCRIPTION,"Fires a continuous fan barrage of 15 bullet
 UMBRELLA_NAME,Umbrella,伞
 UMBRELLA_BEHAVIOUR_DESCRIPTION,Stays at a distance from you and boosts nearby enemies; its aura still reaches enemies right next to you,与玩家保持距离并强化它产生的区域内的小怪
 TRASH_CAN_NAME,Trash Can,垃圾桶
-TRASH_CAN_BEHAVIOUR_DESCRIPTION,Like a Tree but drops 1-4 consumables and releases 4 Reds when destroyed,像树一样的可摧毁中立物，被摧毁时掉落1~3个消耗品并放出4只黑
+TRASH_CAN_BEHAVIOUR_DESCRIPTION,Like a Tree but drops 1-4 consumables and releases 4 Reds when destroyed,被摧毁时掉落1~3个消耗品并放出4只黑
+TRAIN_STATION_NAME,Train Station,火车站
+TRAIN_STATION_BEHAVIOUR_DESCRIPTION,"Rails cross at the station and a 5-car train runs one way along the horizontal and vertical rails without ever turning back, leaving the screen on one side and re-entering from the opposite side; every car has a third of a standard elite's health and killing one removes that car; cars fire homing narwhal spikes, deal triple contact damage with knockback, always drop an item box and summon 15 line-space enemies on death; the station barrage matches the big apartment; if the station dies first the train coasts to a stop and the rails stay until every car is destroyed",铁轨在车站交叉，一列 5 节车厢的列车沿横向与纵向铁轨单向穿行，站台先被击杀时列车会滑行停住
+RAIL_TRAIN_CAR_NAME,Train Car,列车车厢
+RAIL_TRAIN_CAR_BEHAVIOUR_DESCRIPTION,"Cars travel along the rails and fire a homing narwhal spike every 2 seconds; contact deals triple damage with knockback; each car always drops an item box and summons 15 line-space enemies when destroyed",车厢沿铁轨行驶，每 2 秒发射一枚追踪玩家的尖刺，撞击玩家造成三倍伤害并将其击飞，每节车厢被摧毁时必掉普通箱子，并在周围召唤 15 只线条空间小怪

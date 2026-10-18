@@ -22,19 +22,18 @@ func die(args: = Utils.default_die_args) -> void :
 	_fengliu_spawn_extra_enemies()
 
 
-# 掉 1~4 个消耗品：逐个调用原版掉落链路，每个都会独立掷「果子 / 箱子」
+# 掉 1~n 个消耗品
 func _fengliu_drop_consumables() -> void :
 	var main = Utils.get_scene_node()
 	if main == null or not main.has_method("spawn_consumables"):
 		return
 
-	# 1~4 个：每次独立走原版掉落链路（各自掷果子 / 箱子）
 	var nb: int = Utils.randi_range(min_drops, max_drops)
 	for i in nb:
 		main.spawn_consumables(self)
 
 
-# 额外放出 N 只小怪：塞进原版生成队列（EntityType.ENEMY），位置在自身周围抖动
+# 额外放出 N 只小怪
 func _fengliu_spawn_extra_enemies() -> void :
 	if extra_enemy_scene == null or extra_enemy_number <= 0:
 		return

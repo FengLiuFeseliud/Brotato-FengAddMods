@@ -8,7 +8,7 @@
 script = ExtResource( 1 )
 name = "BG_LINE_SPACE"
 icon = ExtResource( 3 )
-outline_color = Color( 1, 1, 1, 1 )
+outline_color = Color( 0.862745, 0.862745, 0.862745, 1 )
 tiles_sprite = ExtResource( 2 )
 fengliu_whole_image = true
 
