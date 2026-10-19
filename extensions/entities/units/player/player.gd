@@ -1,6 +1,16 @@
 extends Player
 
 
+# 湿滑地面滑行
+const FENGLIU_SLIDE_ACCELERATION: float = 900.0
+const FENGLIU_SLIDE_FRICTION: float = 300.0
+const FENGLIU_SLIDE_STOP_SPEED: float = 8.0
+
+var _fengliu_slippery_sources: Array = []
+var _fengliu_slide_velocity: Vector2 = Vector2.ZERO
+var _fengliu_was_on_slippery: bool = false
+
+
 var effect_fengliu_consumable_stats = Keys.generate_hash("fengliu_consumable_stats")
 var effect_fengliu_effect_box_stats = Keys.generate_hash("fengliu_box_stats")
 var effect_fengliu_effect_stat_hit_protection = Keys.generate_hash("fengliu_stat_hit_protection")
@@ -739,3 +749,70 @@ func check_moving_stats(movement: Vector2) -> void :
     _can_not_moving_explosio = true
     if not _not_moving_explosion_timer.is_stopped():
         _not_moving_explosion_timer.stop()
+
+
+func fengliu_add_slippery_source(source_id: int) -> void:
+	if not _fengliu_slippery_sources.has(source_id):
+		_fengliu_slippery_sources.push_back(source_id)
+
+
+func fengliu_remove_slippery_source(source_id: int) -> void:
+	_fengliu_slippery_sources.erase(source_id)
+
+
+func fengliu_is_on_slippery_ground() -> bool:
+	return _fengliu_slippery_sources.size() > 0
+
+
+func get_next_velocity() -> Vector2:
+	var knockback = get_next_knockback_value()
+
+	# 移动被锁定时不保留滑行惯性（受击硬直、落地等）
+	if not _can_move:
+		_fengliu_slide_velocity = Vector2.ZERO
+		_fengliu_was_on_slippery = false
+		return get_move_input() + knockback
+
+	var on_slippery = fengliu_is_on_slippery_ground()
+
+	if not on_slippery:
+		_fengliu_slide_velocity = Vector2.ZERO
+		_fengliu_was_on_slippery = false
+		return get_move_input() + knockback
+
+	var input_velocity = get_move_input()
+
+	# 进入水面第一帧保留当前速度，避免瞬间急停
+	if not _fengliu_was_on_slippery:
+		_fengliu_slide_velocity = input_velocity
+
+	var delta = get_physics_process_delta_time()
+
+	if input_velocity.length_squared() > 0:
+		_fengliu_slide_velocity = _fengliu_slide_velocity.move_toward(
+			input_velocity,
+			FENGLIU_SLIDE_ACCELERATION * delta
+		)
+	else:
+		_fengliu_slide_velocity = _fengliu_slide_velocity.move_toward(
+			Vector2.ZERO,
+			FENGLIU_SLIDE_FRICTION * delta
+		)
+
+	if _fengliu_slide_velocity.length() < FENGLIU_SLIDE_STOP_SPEED:
+		_fengliu_slide_velocity = Vector2.ZERO
+
+	_fengliu_was_on_slippery = true
+	return _fengliu_slide_velocity + knockback
+
+
+func update_animation(movement: Vector2) -> void:
+	if not _can_move:
+		.update_animation(movement)
+		return
+
+	if fengliu_is_on_slippery_ground() and _fengliu_slide_velocity.length_squared() > 0.01:
+		.update_animation(_fengliu_slide_velocity)
+	else:
+		.update_animation(movement)
+

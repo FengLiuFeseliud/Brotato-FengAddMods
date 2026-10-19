@@ -54,7 +54,8 @@ const ALL_ITEM_DEBUFF = [
 	"extra_enemies_next_wave",
 	"minimum_weapon_cooldowns",
 	"hp_cap",
-	"lock_current_weapons"
+	"lock_current_weapons",
+	"fengliu_shield_not_regen"
 ]
 
 
@@ -1462,6 +1463,47 @@ func fengliu_remove_all_item_debuff_effects(effects: Array):
 	fengliu_remove_all_secondary_stats(effects)
 	# 移除主要属性负面
 	fengliu_remove_all_stats(effects)
+
+
+# ============================================================
+# 通用区域事件：动态注册 / 区块预排期
+# ============================================================
+
+func fengliu_get_zone_event_service():
+	var mod_main = get_node_or_null("/root/ModLoader/FengLiu-FengAddMods")
+	if mod_main == null:
+		return null
+	return mod_main.get("zone_event_service")
+
+
+func init_events_nightmare(base_wave: int = 10) -> void:
+	.init_events_nightmare(base_wave)
+	_fengliu_schedule_zone_events(base_wave)
+
+
+func _fengliu_schedule_zone_events(base_wave: int) -> void:
+	var service = fengliu_get_zone_event_service()
+	if service == null:
+		return
+
+	# 与旧雨事件判断保持一致：优先解析动态重排后的当前区域
+	var zone = null
+	if ProgressData.has_method("fengliu_resolve_zone"):
+		zone = ProgressData.call("fengliu_resolve_zone", RunData.current_zone)
+	if zone == null:
+		zone = ZoneService.get_zone_data(RunData.current_zone)
+	if zone == null:
+		return
+
+	service.schedule_events_for_base_wave(zone, base_wave, RunData.current_difficulty)
+
+
+func reset_events_nightmare() -> void:
+	.reset_events_nightmare()
+
+	var service = fengliu_get_zone_event_service()
+	if service != null:
+		service.reset_run_counts()
 
 
 # 扩展应用道具效果
