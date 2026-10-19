@@ -1,14 +1,12 @@
 extends Main
 
 
-const FENGLIU_STATUS_REFRESH_INTERVAL: = 0.1
 const FENGLIU_STATUS_COLOR_SHIELD: = Color(0.25, 0.6, 1.0, 1.0)   # 蓝色
 # 盾条预留的高度（血条高 48 + 间隔 4 = 52）
 const FENGLIU_HUD_TOP_SPACER_HEIGHT: = 52
 # 伤害表源同步的检查间隔（秒）
 const FENGLIU_DAMAGE_METER_SYNC_INTERVAL: = 1.0
 
-var _fengliu_status_refresh_timer: float = 0.0
 var _fengliu_damage_meter_sync_timer: float = 0.0
 var _fengliu_shield_wave_max: = [0.0, 0.0, 0.0, 0.0]
 var _fengliu_shield_hud = null
@@ -101,6 +99,11 @@ func _fengliu_init_shield_hud() -> void:
 	hud.add_child(_fengliu_shield_hud)
 	_fengliu_shield_hud.set_anchors_and_margins_preset(Control.PRESET_WIDE)
 	_fengliu_shield_hud.raise()
+
+	var world_ui = get_node_or_null("WorldUI")
+	if world_ui != null:
+		_fengliu_shield_hud.set_overhead_parent(world_ui)
+
 	ModLoaderLog.info("FengliuShieldHUD created under UI/HUD", "FengAddMods")
 
 
@@ -110,13 +113,6 @@ func _process(delta: float) -> void :
 	if _fengliu_damage_meter_sync_timer >= FENGLIU_DAMAGE_METER_SYNC_INTERVAL:
 		_fengliu_damage_meter_sync_timer = 0.0
 		fengliu_sync_damage_meter_source()
-
-	_fengliu_status_refresh_timer += delta
-	if _fengliu_status_refresh_timer < FENGLIU_STATUS_REFRESH_INTERVAL:
-		return
-	_fengliu_status_refresh_timer = 0.0
-
-	fengliu_update_player_status_bars()
 
 
 # 覆盖: 玩家生成时把盾的 +x / -x 信号接到飘字管理器（同原版 healed 的接法）
@@ -141,7 +137,7 @@ func _on_EntitySpawner_players_spawned(players: Array) -> void :
 		if player.has_signal("fengliu_shield_lost") and not player.is_connected("fengliu_shield_lost", self, "fengliu_on_player_shield_changed"):
 			var _error_lost = player.connect("fengliu_shield_lost", self, "fengliu_on_player_shield_changed")
 
-		# 生成时立即推一次，避免等待 0.1 秒轮询
+		# 生成时立即推一次
 		if player.player_index >= 0 and player.player_index < _players_ui.size():
 			fengliu_set_player_status_bars(
 				player.player_index,
@@ -847,7 +843,11 @@ func _on_player_health_updated(player: Player, current_val: int, max_val: int) -
 	if player_life_bar == null:
 		return
 
-	fengliu_refresh_player_life_bar_visibility(player_index, current_val, max_val)
+	# 血量变化时只更新显隐/头顶 HUD
+	fengliu_set_player_status_bars(
+		player_index,
+		fengliu_get_player_status_items(player, player_index)
+	)
 
 	# 被这里重新点亮时原版跳过了数值刷新，补一次，避免血满时填充还是旧的
 	if player_life_bar.visible:

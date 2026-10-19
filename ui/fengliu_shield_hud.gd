@@ -3,12 +3,21 @@ extends Control
 
 # 独立护盾 HUD
 
-const REFRESH_INTERVAL: = 0.1
 const STATUS_SPACING: = 4.0
 
 
 var _entries: Dictionary = {}
-var _refresh_timer: float = 0.0
+var _overhead_parent = null
+
+
+func set_overhead_parent(parent: Node) -> void:
+	if _overhead_parent == parent:
+		return
+
+	for player_index in _entries.keys():
+		_free_entry(player_index)
+
+	_overhead_parent = parent
 
 
 func _ready() -> void:
@@ -53,12 +62,7 @@ func set_player_status(player_index: int, items: Array, life_bar, overhead_life_
 	_update_entry(entry)
 
 
-func _process(delta: float) -> void:
-	_refresh_timer += delta
-	if _refresh_timer < REFRESH_INTERVAL:
-		return
-	_refresh_timer = 0.0
-
+func _process(_delta: float) -> void:
 	var player_count: int = RunData.get_player_count()
 	for player_index in _entries:
 		var entry = _entries[player_index]
@@ -72,18 +76,20 @@ func _ensure_bars(entry) -> void:
 	var bars: Array = entry["bars"]
 	var items: Array = entry["items"]
 	while bars.size() < items.size():
-		bars.push_back(_create_bar(entry["life_bar"], true))
+		bars.push_back(_create_bar(entry["life_bar"], true, self))
 	entry["bars"] = bars
 
 	var overhead_bars: Array = entry["overhead_bars"]
 	var overhead_life_bar = entry["overhead_life_bar"]
 	if overhead_life_bar != null and is_instance_valid(overhead_life_bar):
 		while overhead_bars.size() < items.size():
-			overhead_bars.push_back(_create_bar(overhead_life_bar, false))
+			overhead_bars.push_back(
+				_create_bar(overhead_life_bar, false, _overhead_parent)
+			)
 	entry["overhead_bars"] = overhead_bars
 
 
-func _create_bar(life_bar, with_label: bool = true) -> Dictionary:
+func _create_bar(life_bar, with_label: bool = true, bar_parent = null) -> Dictionary:
 	var bar: = TextureProgress.new()
 	bar.name = "FengliuShieldBar"
 	bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -100,8 +106,14 @@ func _create_bar(life_bar, with_label: bool = true) -> Dictionary:
 	bar.theme = life_bar.theme
 	bar.tint_progress = Color.white
 	bar.visible = false
-	add_child(bar)
-	bar.raise()
+
+	if bar_parent == null:
+		bar_parent = self
+	bar_parent.add_child(bar)
+	if bar_parent is CanvasItem:
+		bar.raise()
+	else:
+		bar_parent.move_child(bar, bar_parent.get_child_count() - 1)
 
 	var container = null
 	var label = null
@@ -209,8 +221,7 @@ func _update_bar_set(bars: Array, reference_bar, items: Array, should_show: bool
 				hidden_bar.hide()
 		return
 
-	# 用 canvas 坐标，避免 WorldUI 与 UI/HUD 的 CanvasLayer 变换差异
-	var reference_position: Vector2 = reference_bar.get_global_transform_with_canvas().origin
+	var reference_position: Vector2 = reference_bar.rect_global_position
 
 	for i in bars.size():
 		var bar_data = bars[i]
@@ -285,3 +296,8 @@ func _find_label(node: Node) -> Label:
 		if nested != null:
 			return nested
 	return null
+
+
+func _exit_tree() -> void:
+	for player_index in _entries.keys():
+		_free_entry(player_index)
