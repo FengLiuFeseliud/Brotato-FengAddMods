@@ -5,10 +5,10 @@ extends Boss
 #   异变2（States/State2，索引 1）：一次性在整图随机位置召唤一批「地铁站」
 # boss.gd 传入的 new_state 是 States 子节点索引（从 0 开始）；以下导出是两段异变的调参口
 export (PackedScene) var mutation_summon_scene
-export (int) var mutation_summon_number = 14
+export (int) var mutation_summon_number = 7
 
 export (PackedScene) var mutation2_summon_scene
-export (int) var mutation2_summon_number = 20
+export (int) var mutation2_summon_number = 10
 
 var _fengliu_mutation_summoned: bool = false
 var _fengliu_mutation2_summoned: bool = false
