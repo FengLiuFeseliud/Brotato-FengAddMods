@@ -16,7 +16,7 @@ func _ready() -> void:
 	set_process(true)
 
 
-func set_player_status(player_index: int, items: Array, life_bar) -> void:
+func set_player_status(player_index: int, items: Array, life_bar, overhead_life_bar = null, overhead_visible: bool = true) -> void:
 	if player_index < 0:
 		return
 
@@ -25,7 +25,10 @@ func set_player_status(player_index: int, items: Array, life_bar) -> void:
 		return
 
 	var entry = _entries.get(player_index)
-	if entry != null and entry["life_bar"] != life_bar:
+	if entry != null and (
+		entry["life_bar"] != life_bar
+		or entry["overhead_life_bar"] != overhead_life_bar
+	):
 		_free_entry(player_index)
 		entry = null
 
@@ -33,12 +36,18 @@ func set_player_status(player_index: int, items: Array, life_bar) -> void:
 		entry = {
 			"player_index": player_index,
 			"life_bar": life_bar,
+			"overhead_life_bar": overhead_life_bar,
 			"items": [],
 			"bars": [],
+			"overhead_bars": [],
+			"overhead_visible": overhead_visible,
 		}
 		_entries[player_index] = entry
 
+	entry["overhead_life_bar"] = overhead_life_bar
+	entry["overhead_visible"] = overhead_visible
 	entry["items"] = items.duplicate(true)
+
 	_ensure_bars(entry)
 	_apply_items(entry)
 	_update_entry(entry)
@@ -63,11 +72,18 @@ func _ensure_bars(entry) -> void:
 	var bars: Array = entry["bars"]
 	var items: Array = entry["items"]
 	while bars.size() < items.size():
-		bars.push_back(_create_bar(entry["life_bar"]))
+		bars.push_back(_create_bar(entry["life_bar"], true))
 	entry["bars"] = bars
 
+	var overhead_bars: Array = entry["overhead_bars"]
+	var overhead_life_bar = entry["overhead_life_bar"]
+	if overhead_life_bar != null and is_instance_valid(overhead_life_bar):
+		while overhead_bars.size() < items.size():
+			overhead_bars.push_back(_create_bar(overhead_life_bar, false))
+	entry["overhead_bars"] = overhead_bars
 
-func _create_bar(life_bar) -> Dictionary:
+
+func _create_bar(life_bar, with_label: bool = true) -> Dictionary:
 	var bar: = TextureProgress.new()
 	bar.name = "FengliuShieldBar"
 	bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -89,29 +105,30 @@ func _create_bar(life_bar) -> Dictionary:
 
 	var container = null
 	var label = null
-	var template = _find_container_child(life_bar)
-	if template != null:
-		container = template.duplicate(true)
-		container.name = "ValueContainer"
-		container.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		container.show()
-		bar.add_child(container)
-		label = _find_label(container)
+	if with_label:
+		var template = _find_container_child(life_bar)
+		if template != null:
+			container = template.duplicate(true)
+			container.name = "ValueContainer"
+			container.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			container.show()
+			bar.add_child(container)
+			label = _find_label(container)
 
-	if label == null:
-		label = Label.new()
-		label.name = "ShieldValueLabel"
-		label.anchor_right = 1.0
-		label.anchor_bottom = 1.0
-		label.align = Label.ALIGN_CENTER
-		label.valign = Label.VALIGN_CENTER
+		if label == null:
+			label = Label.new()
+			label.name = "ShieldValueLabel"
+			label.anchor_right = 1.0
+			label.anchor_bottom = 1.0
+			label.align = Label.ALIGN_CENTER
+			label.valign = Label.VALIGN_CENTER
+			label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			label.theme = life_bar.theme
+			bar.add_child(label)
+
+		label.set_message_translation(false)
 		label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		label.theme = life_bar.theme
-		bar.add_child(label)
-
-	label.set_message_translation(false)
-	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	label.show()
+		label.show()
 
 	return {
 		"bar": bar,
@@ -121,9 +138,11 @@ func _create_bar(life_bar) -> Dictionary:
 
 
 func _apply_items(entry) -> void:
-	var bars: Array = entry["bars"]
-	var items: Array = entry["items"]
+	_apply_items_to_bars(entry["bars"], entry["items"])
+	_apply_items_to_bars(entry["overhead_bars"], entry["items"])
 
+
+func _apply_items_to_bars(bars: Array, items: Array) -> void:
 	for i in bars.size():
 		var bar_data = bars[i]
 		var bar: TextureProgress = bar_data["bar"]
@@ -152,23 +171,47 @@ func _apply_items(entry) -> void:
 
 func _update_entry(entry) -> void:
 	var life_bar = entry["life_bar"]
+	var overhead_life_bar = entry["overhead_life_bar"]
 	var items: Array = entry["items"]
 
-	if life_bar == null or not is_instance_valid(life_bar):
-		_hide_entry(entry)
-		return
-	if not life_bar.visible or items.size() == 0:
-		_hide_entry(entry)
+	var screen_visible: bool = (
+		life_bar != null
+		and is_instance_valid(life_bar)
+		and life_bar.visible
+		and items.size() > 0
+	)
+	_update_bar_set(entry["bars"], life_bar, items, screen_visible)
+
+	var overhead_visible: bool = (
+		entry["overhead_visible"]
+		and overhead_life_bar != null
+		and is_instance_valid(overhead_life_bar)
+		and items.size() > 0
+	)
+	_update_bar_set(entry["overhead_bars"], overhead_life_bar, items, overhead_visible)
+
+
+func _update_bar_set(bars: Array, reference_bar, items: Array, should_show: bool) -> void:
+	if not should_show:
+		for bar_data in bars:
+			var hidden_bar = bar_data["bar"]
+			if is_instance_valid(hidden_bar):
+				hidden_bar.hide()
 		return
 
-	var bar_size: Vector2 = life_bar.rect_size
+	var bar_size: Vector2 = reference_bar.rect_size
 	if bar_size.x <= 0.0 or bar_size.y <= 0.0:
-		bar_size = life_bar.rect_min_size
+		bar_size = reference_bar.rect_min_size
 	if bar_size.x <= 0.0 or bar_size.y <= 0.0:
-		_hide_entry(entry)
+		for bar_data in bars:
+			var hidden_bar = bar_data["bar"]
+			if is_instance_valid(hidden_bar):
+				hidden_bar.hide()
 		return
 
-	var bars: Array = entry["bars"]
+	# 用 canvas 坐标，避免 WorldUI 与 UI/HUD 的 CanvasLayer 变换差异
+	var reference_position: Vector2 = reference_bar.get_global_transform_with_canvas().origin
+
 	for i in bars.size():
 		var bar_data = bars[i]
 		var bar: TextureProgress = bar_data["bar"]
@@ -180,7 +223,7 @@ func _update_entry(entry) -> void:
 			continue
 
 		bar.rect_size = bar_size
-		bar.rect_global_position = life_bar.rect_global_position + Vector2(
+		bar.rect_global_position = reference_position + Vector2(
 			0.0,
 			-(bar_size.y + STATUS_SPACING) * float(i + 1)
 		)
@@ -192,6 +235,11 @@ func _hide_entry(entry) -> void:
 		var bar = bar_data["bar"]
 		if is_instance_valid(bar):
 			bar.hide()
+
+	for bar_data in entry["overhead_bars"]:
+		var overhead_bar = bar_data["bar"]
+		if is_instance_valid(overhead_bar):
+			overhead_bar.hide()
 
 
 func _hide_player(player_index: int) -> void:
@@ -209,6 +257,11 @@ func _free_entry(player_index: int) -> void:
 		var bar = bar_data["bar"]
 		if is_instance_valid(bar):
 			bar.queue_free()
+
+	for bar_data in entry["overhead_bars"]:
+		var overhead_bar = bar_data["bar"]
+		if is_instance_valid(overhead_bar):
+			overhead_bar.queue_free()
 
 	_entries.erase(player_index)
 

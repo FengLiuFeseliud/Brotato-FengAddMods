@@ -130,15 +130,35 @@ func _on_EntitySpawner_players_spawned(players: Array) -> void :
 		_fengliu_init_shield_hud()
 
 	var text_manager = _floating_text_manager
-	if text_manager == null or not text_manager.has_method("fengliu_on_player_shield_gained"):
-		return
-
 	for player in _players:
-		if player != null and player.has_signal("fengliu_shield_gained") and not player.is_connected("fengliu_shield_gained", text_manager, "fengliu_on_player_shield_gained"):
-			var _error = player.connect("fengliu_shield_gained", text_manager, "fengliu_on_player_shield_gained")
+		if player == null:
+			continue
 
-		if player != null and player.has_signal("fengliu_shield_lost") and not player.is_connected("fengliu_shield_lost", text_manager, "fengliu_on_player_shield_lost"):
-			var _error = player.connect("fengliu_shield_lost", text_manager, "fengliu_on_player_shield_lost")
+		# 盾条由信号即时刷新，不依赖飘字管理器
+		if player.has_signal("fengliu_shield_gained") and not player.is_connected("fengliu_shield_gained", self, "fengliu_on_player_shield_changed"):
+			var _error_gained = player.connect("fengliu_shield_gained", self, "fengliu_on_player_shield_changed")
+
+		if player.has_signal("fengliu_shield_lost") and not player.is_connected("fengliu_shield_lost", self, "fengliu_on_player_shield_changed"):
+			var _error_lost = player.connect("fengliu_shield_lost", self, "fengliu_on_player_shield_changed")
+
+		# 生成时立即推一次，避免等待 0.1 秒轮询
+		if player.player_index >= 0 and player.player_index < _players_ui.size():
+			fengliu_set_player_status_bars(
+				player.player_index,
+				fengliu_get_player_status_items(player, player.player_index)
+			)
+
+		if text_manager == null:
+			continue
+
+		if text_manager.has_method("fengliu_on_player_shield_gained") and not player.is_connected("fengliu_shield_gained", text_manager, "fengliu_on_player_shield_gained"):
+			var _error_text_gained = player.connect("fengliu_shield_gained", text_manager, "fengliu_on_player_shield_gained")
+
+		if text_manager.has_method("fengliu_on_player_shield_lost") and not player.is_connected("fengliu_shield_lost", text_manager, "fengliu_on_player_shield_lost"):
+			var _error_text_lost = player.connect("fengliu_shield_lost", text_manager, "fengliu_on_player_shield_lost")
+
+	# 等 UI 节点完全就绪后再补一次，避免生成信号时 _players_ui 尚未填充
+	call_deferred("fengliu_update_player_status_bars")
 
 
 # 扩展切换场景（进入商店后清理波次结束失效的道具）
@@ -741,6 +761,19 @@ func fengliu_get_shield_text(shield: float, basis: float) -> String:
 	return str(int(round(shield))) + " / " + str(int(round(basis)))
 
 
+# 扣盾/回盾信号：立即刷新头顶盾条与独立 HUD 盾条
+func fengliu_on_player_shield_changed(_value, player_index: int) -> void :
+	if player_index < 0 or player_index >= _players.size() or player_index >= _players_ui.size():
+		return
+
+	var player = _players[player_index]
+	if not is_instance_valid(player) or player.dead:
+		fengliu_set_player_status_bars(player_index, [])
+		return
+
+	fengliu_set_player_status_bars(player_index, fengliu_get_player_status_items(player, player_index))
+
+
 func fengliu_set_player_status_bars(player_index: int, items: Array) -> void :
 	if player_index >= _players_ui.size():
 		return
@@ -758,13 +791,44 @@ func fengliu_set_player_status_bars(player_index: int, items: Array) -> void :
 				shield_space.visible = show_shield_space
 				hud_container.queue_sort()
 
+	var player_life_bar = player_ui.player_life_bar
+	fengliu_refresh_player_life_bar_visibility(player_index)
+	var overhead_visible: bool = player_life_bar != null and player_life_bar.visible
+
 	var life_bar = player_ui.life_bar
 	if _fengliu_shield_hud != null and is_instance_valid(_fengliu_shield_hud):
-		_fengliu_shield_hud.set_player_status(player_index, items, life_bar)
+		_fengliu_shield_hud.set_player_status(
+			player_index,
+			items,
+			life_bar,
+			player_life_bar,
+			overhead_visible
+		)
+
+
+# 头顶血条显隐
+func fengliu_refresh_player_life_bar_visibility(player_index: int, current_health: int = -1, max_health: int = -1) -> void :
+	if player_index < 0 or player_index >= _players.size() or player_index >= _players_ui.size():
+		return
+
+	var player = _players[player_index]
+	var player_ui = _players_ui[player_index]
+	if player == null or player_ui == null:
+		return
 
 	var player_life_bar = player_ui.player_life_bar
-	if player_life_bar != null and player_life_bar.has_method("set_status_items"):
-		player_life_bar.set_status_items(items)
+	if player_life_bar == null:
+		return
+
+	var hp_not_full: bool
+	if current_health >= 0 and max_health >= 0:
+		hp_not_full = current_health != max_health
+	else:
+		hp_not_full = player.current_stats.health != player.max_stats.health
+
+	var shield_not_full: bool = player.fengliu_shield < Utils.get_stat(fengliu_shield_hash, player_index)
+	var status_visible: bool = ProgressData.settings.hp_bar_on_character and (hp_not_full or shield_not_full) and not player.dead
+	player_life_bar.visible = status_visible
 
 
 # 覆盖: 头顶血条 → 盾不满时也照常显示（原版只在血量不满时显示）
@@ -783,9 +847,7 @@ func _on_player_health_updated(player: Player, current_val: int, max_val: int) -
 	if player_life_bar == null:
 		return
 
-	# 原版只看血量：血满但盾不满时，头顶血条会连带上方的盾条一起被收起
-	var shield_not_full: bool = player.fengliu_shield < Utils.get_stat(fengliu_shield_hash, player_index)
-	player_life_bar.visible = ProgressData.settings.hp_bar_on_character and (current_val != max_val or shield_not_full) and not player.dead
+	fengliu_refresh_player_life_bar_visibility(player_index, current_val, max_val)
 
 	# 被这里重新点亮时原版跳过了数值刷新，补一次，避免血满时填充还是旧的
 	if player_life_bar.visible:
