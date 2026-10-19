@@ -65,6 +65,3 @@ func _fengliu_add_zone_event_icons() -> void:
 		slot._label.modulate.a = 1.0
 
 		added.push_back("%d:%s" % [slot.value, str(added_this_slot)])
-
-	if added.size() > 0:
-		ModLoaderLog.info("Zone event timeline icons: %s" % str(added), "FengAddMods")

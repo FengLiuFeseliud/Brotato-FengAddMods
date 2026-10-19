@@ -233,11 +233,6 @@ func _schedule_block(zone, from_wave: int, to_wave: int, difficulty: int) -> voi
 			scheduled[event_id] = []
 		scheduled[event_id].push_back(wave_number)
 
-	ModLoaderLog.info(
-		"Zone event block %d-%d: %s" % [from_wave, to_wave, str(scheduled)],
-		"FengAddMods"
-	)
-
 
 func _schedule_wave(zone, wave_number: int, difficulty: int) -> void:
 	if _has_registered_event_in_spawn(wave_number):
@@ -273,10 +268,6 @@ func _try_schedule_event(data, wave_number: int) -> void:
 		RunData.events_spawn.push_back([wave_number, event_id])
 
 	_run_counts[event_id] = count + 1
-	ModLoaderLog.info(
-		"Zone event scheduled: wave %d -> %s" % [wave_number, event_id],
-		"FengAddMods"
-	)
 
 
 func _ensure_min_per_block(
