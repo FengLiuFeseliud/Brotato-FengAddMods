@@ -11,6 +11,7 @@ const FENGLIU_DAMAGE_METER_SYNC_INTERVAL: = 1.0
 var _fengliu_status_refresh_timer: float = 0.0
 var _fengliu_damage_meter_sync_timer: float = 0.0
 var _fengliu_shield_wave_max: = [0.0, 0.0, 0.0, 0.0]
+var _fengliu_shield_hud = null
 
 
 var effect_fengliu_can_add_chance_stat_damage_when_pickup_gold = Keys.generate_hash("fengliu_can_add_chance_stat_damage_when_pickup_gold")
@@ -56,6 +57,7 @@ var _is_speedrun_ending: bool = false
 
 func _ready() -> void :
 	fengliu_reserve_shield_space()
+	_fengliu_init_shield_hud()
 
 
 # 在上排生命容器内部最前面插入空占位节点，为血条上方的同尺寸盾条腾出空间。
@@ -71,10 +73,35 @@ func fengliu_reserve_shield_space() -> void :
 
 		var spacer: = Control.new()
 		spacer.name = "FengliuShieldSpace"
+		spacer.visible = false
 		spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		spacer.rect_min_size = Vector2(0.0, FENGLIU_HUD_TOP_SPACER_HEIGHT)
 		container.add_child(spacer)
 		container.move_child(spacer, 0)
+
+
+func _fengliu_init_shield_hud() -> void:
+	if _fengliu_shield_hud != null and is_instance_valid(_fengliu_shield_hud):
+		return
+
+	var hud = get_node_or_null("UI/HUD")
+	if hud == null:
+		ModLoaderLog.error("FengliuShieldHUD: UI/HUD not found", "FengAddMods")
+		return
+
+	var shield_hud_script = load(
+		"res://mods-unpacked/FengLiu-FengAddMods/ui/fengliu_shield_hud.gd"
+	)
+	if shield_hud_script == null:
+		ModLoaderLog.error("FengliuShieldHUD: script not found", "FengAddMods")
+		return
+
+	_fengliu_shield_hud = shield_hud_script.new()
+	_fengliu_shield_hud.name = "FengliuShieldHUD"
+	hud.add_child(_fengliu_shield_hud)
+	_fengliu_shield_hud.set_anchors_and_margins_preset(Control.PRESET_WIDE)
+	_fengliu_shield_hud.raise()
+	ModLoaderLog.info("FengliuShieldHUD created under UI/HUD", "FengAddMods")
 
 
 func _process(delta: float) -> void :
@@ -98,6 +125,9 @@ func _on_EntitySpawner_players_spawned(players: Array) -> void :
 
 	# 按 events_spawn 生成当前波的区域事件
 	call_deferred("_fengliu_try_spawn_wave_events")
+
+	if _fengliu_shield_hud == null or not is_instance_valid(_fengliu_shield_hud):
+		_fengliu_init_shield_hud()
 
 	var text_manager = _floating_text_manager
 	if text_manager == null or not text_manager.has_method("fengliu_on_player_shield_gained"):
@@ -687,14 +717,18 @@ func fengliu_update_player_status_bars() -> void :
 
 
 # 组装状态项[[ratio, Color, 文本], ...]
-# 没盾（shield <= 0）时也推一条空条（ratio = 0），让血条上方始终画着盾条
+# 护盾上限 <= 0 时返回空，不显示盾条；
+# 上限 > 0 时当前盾为 0 也显示空条。
 func fengliu_get_player_status_items(player: Player, player_index: int) -> Array:
 	var items: = []
 
-	var shield: float = player.fengliu_shield
 	var basis: float = Utils.get_stat(fengliu_shield_hash, player_index)
+	if basis <= 0.0:
+		return []
+
+	var shield: float = player.fengliu_shield
 	var ratio: float = 0.0
-	if shield > 0.0 and basis > 0.0:
+	if shield > 0.0:
 		ratio = clamp(shield / basis, 0.0, 1.0)
 
 	items.push_back([ratio, FENGLIU_STATUS_COLOR_SHIELD, fengliu_get_shield_text(shield, basis)])
@@ -714,9 +748,19 @@ func fengliu_set_player_status_bars(player_index: int, items: Array) -> void :
 	if player_ui == null:
 		return
 
+	# 有盾时保留血条上方占位；没盾时收起占位，让 HUD 血条上移
+	var hud_container = player_ui.hud_container
+	if hud_container != null:
+		var shield_space = hud_container.get_node_or_null("FengliuShieldSpace")
+		if shield_space != null:
+			var show_shield_space: bool = items.size() > 0
+			if shield_space.visible != show_shield_space:
+				shield_space.visible = show_shield_space
+				hud_container.queue_sort()
+
 	var life_bar = player_ui.life_bar
-	if life_bar != null and life_bar.has_method("set_status_items"):
-		life_bar.set_status_items(items)
+	if _fengliu_shield_hud != null and is_instance_valid(_fengliu_shield_hud):
+		_fengliu_shield_hud.set_player_status(player_index, items, life_bar)
 
 	var player_life_bar = player_ui.player_life_bar
 	if player_life_bar != null and player_life_bar.has_method("set_status_items"):

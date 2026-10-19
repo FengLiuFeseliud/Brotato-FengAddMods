@@ -8,12 +8,12 @@
 script = ExtResource( 1 )
 id = "rain"
 scene = ExtResource( 2 )
-chance_per_wave = 0.25
+chance_per_wave = 0.4
 min_per_block = 1
 zone_names = [ "ZONE_LINE_SPACE" ]
 min_wave = 1
 max_wave = 9999
-min_difficulty = 0
+min_difficulty = 5
 max_difficulty = 9999
 show_in_timeline = true
 icon = ExtResource( 3 )

@@ -1,7 +1,8 @@
 extends UIProgressBar
 
 
-# 血条上的「盾条」：外观与血条完全一致、尺寸与血条完全相同，外扩在血条正上方。
+# 头顶血条/其他 UIProgressBar 的「盾条」：外观与血条完全一致、尺寸与血条完全相同，外扩在血条正上方。
+# 屏幕 HUD 的护盾条由 ui/fengliu_shield_hud.gd 独立绘制。
 # 血条本体（ui/hud/ui_progress_bar.gd）只在 health_updated 时刷新，且受击闪白会改写 tint_progress，
 # 所以盾条用独立子节点承载，由外部推送数据（玩家侧见 extensions/main.gd 的 fengliu_update_player_status_bars）。
 # 用法：bar.set_status_items([[ratio, Color], ...])，ratio 取 0.0~1.0；无数据时全部隐藏。
