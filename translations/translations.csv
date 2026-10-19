@@ -307,3 +307,4 @@ RAIL_TRAIN_CAR_NAME,Train Car,列车车厢
 RAIL_TRAIN_CAR_BEHAVIOUR_DESCRIPTION,"Cars travel along the rails and fire a homing narwhal spike every 2 seconds; contact deals triple damage with knockback; each car always drops an item box and summons 15 line-space enemies when destroyed",车厢沿铁轨行驶，每 2 秒发射一枚追踪玩家的尖刺，撞击玩家造成三倍伤害并将其击飞，每节车厢被摧毁时必掉普通箱子，并在周围召唤 15 只线条空间小怪
 TRUCK_NAME,Truck,卡车
 TRUCK_BEHAVIOUR_DESCRIPTION,"Runs around, drops a crate on death.",四处奔跑，死亡时掉落一个箱子。
+ZONE_EVENT_RAIN_DESCRIPTION,Rain and puddles appear,出现下雨与水洼

@@ -1,6 +1,8 @@
 extends Resource
 
 export (String) var id = ""
+# 难度选择面板中显示的事件说明翻译键
+export (String) var text_key = ""
 export (PackedScene) var scene = null
 
 export (float) var chance_per_wave = 0.2

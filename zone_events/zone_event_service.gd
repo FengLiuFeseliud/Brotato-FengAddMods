@@ -122,6 +122,60 @@ func get_events_for_wave(zone, wave_number: int, difficulty: int) -> Array:
 	return result
 
 
+# 难度选择面板用：取该区域/难度下所有自定义事件的说明与图标
+func get_descriptions_for_difficulty(zone, difficulty: int) -> Array:
+	var entries = []
+	if zone == null:
+		return entries
+
+	var zone_name = String(zone.name)
+	var seen = {}
+
+	for event_id in events:
+		var data = events[event_id]
+		if data == null:
+			continue
+
+		var enabled_value = data.get("enabled")
+		if enabled_value != null and not bool(enabled_value):
+			continue
+
+		var event_zone_names = data.get("zone_names")
+		if event_zone_names != null and event_zone_names.size() > 0:
+			if not event_zone_names.has(zone_name):
+				continue
+
+		if difficulty < int(data.get("min_difficulty")) or difficulty > int(data.get("max_difficulty")):
+			continue
+
+		var text_key_value = data.get("text_key")
+		var text_key = "" if text_key_value == null else String(text_key_value)
+		if text_key == "" or seen.has(text_key):
+			continue
+
+		var text = Text.text(text_key)
+		if text == text_key:
+			ModLoaderLog.warning("Zone event translation missing: %s" % text_key, "FengAddMods")
+			continue
+
+		seen[text_key] = true
+		entries.push_back({
+			"text": text,
+			"icon": get_event_icon(data),
+			"priority": int(data.get("priority")),
+		})
+
+	entries.sort_custom(self, "_sort_icon_entries")
+	return entries
+
+
+func get_texts_for_difficulty(zone, difficulty: int) -> Array:
+	var texts = []
+	for entry in get_descriptions_for_difficulty(zone, difficulty):
+		texts.push_back(String(entry.get("text")))
+	return texts
+
+
 func schedule_events_for_base_wave(zone, base_wave: int, difficulty: int) -> void:
 	if zone == null:
 		return
