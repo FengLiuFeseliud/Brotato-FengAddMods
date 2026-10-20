@@ -1,6 +1,9 @@
 extends BaseShop
 
 
+const EyeCareOverlay = preload("res://mods-unpacked/FengLiu-FengAddMods/zones/zone_line_space/eye_care_overlay.gd")
+
+
 var effect_fengliu_shop_item_count = Keys.generate_hash("fengliu_shop_item_count")
 var effect_fengliu_stats_stop = Keys.generate_hash("fengliu_stats_stop")
 var effect_fengliu_stats_buy_item = Keys.generate_hash("fengliu_stats_buy_item")
@@ -258,3 +261,15 @@ func _on_tree_exited() -> void:
 		for locked_item in locked_items:
 			if locked_item.size() > 0:
 				RunData.fengliu_normalize_cursed_effect(locked_item[0])
+
+
+# 覆盖: 商店就绪后给线条空间叠护眼层（Shop / CoopShop 都不调用 BaseShop._ready，故用通知接）
+func _notification(what: int) -> void :
+	if what == NOTIFICATION_READY:
+		call_deferred("_fengliu_apply_eye_care_overlay")
+
+
+func _fengliu_apply_eye_care_overlay() -> void :
+	# 与战斗场景同一判据：该区域是否自持「整张图」背景
+	var zone = ZoneService.get_zone_data(RunData.current_zone)
+	EyeCareOverlay.apply_shop(self, zone != null and zone.name == "ZONE_LINE_SPACE")

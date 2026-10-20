@@ -16,6 +16,7 @@ radius = 48.5077
 radius = 34.0
 
 [node name="Enemy" instance=ExtResource( 2 )]
+mode = 3
 stats = ExtResource( 3 )
 enemy_id = "metro"
 to_be_removed_in_priority = false

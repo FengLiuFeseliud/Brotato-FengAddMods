@@ -2,6 +2,7 @@ extends "res://global/my_tile_map.gd"
 
 
 const WholeImageBackground = preload("res://mods-unpacked/FengLiu-FengAddMods/zones/zone_line_space/background_whole_image.gd")
+const EyeCareOverlay = preload("res://mods-unpacked/FengLiu-FengAddMods/zones/zone_line_space/eye_care_overlay.gd")
 
 
 # 覆盖: 原版逐格铺满之后，若这个区域自持「整张图」背景（线条空间），就清掉拼贴格、改用整张场地图铺满场地。
@@ -16,3 +17,5 @@ func init(zone: ZoneData) -> void :
 
 	# 整张图模式：apply 内部会先清掉拼贴格，再把整张场地图按 cover 铺到场地范围
 	WholeImageBackground.apply(self, zone, Rect2(0, 0, zone.width, zone.height), Utils.TILE_SIZE)
+
+	EyeCareOverlay.apply(get_parent(), zone.name == "ZONE_LINE_SPACE")
