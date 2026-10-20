@@ -6,9 +6,9 @@ extends Enemy
 export (Resource) var boost_sound
 export (int) var nb_entities_boosted_at_once = 0
 export (float) var boost_cooldown = 1.0
-export (int) var hp_boost = 200
+export (int) var hp_boost = 100
 export (int) var damage_boost = 50
-export (int) var speed_boost = 50
+export (int) var speed_boost = 30
 
 # aura_effect.png 为 250x250，贴图自身半径 125
 const AURA_TEXTURE_RADIUS: = 125.0

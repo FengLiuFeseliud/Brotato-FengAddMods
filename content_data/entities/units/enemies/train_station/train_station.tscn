@@ -19,7 +19,7 @@ radius = 132.0
 radius = 88.0
 
 [node name="Boss" instance=ExtResource( 2 )]
-mode = 3
+mode = 1
 script = ExtResource( 6 )
 can_be_boosted = false
 stats = ExtResource( 3 )
@@ -72,7 +72,7 @@ base_direction_randomization = 0.0
 base_direction_constant_spread = false
 alternate_between_base_direction_spread = false
 random_direction = false
-number_projectiles = 5
+number_projectiles = 3
 projectile_spread = 0.5
 spawn_projectiles_on_target = false
 projectile_spawn_spread = 0

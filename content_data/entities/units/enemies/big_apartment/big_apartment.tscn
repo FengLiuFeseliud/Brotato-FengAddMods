@@ -61,7 +61,7 @@ tracks/1/keys = {
 }
 
 [node name="Boss" instance=ExtResource( 2 )]
-mode = 3
+mode = 1
 scale = Vector2( 1.25, 1.25 )
 script = ExtResource( 13 )
 can_be_boosted = false
@@ -73,6 +73,9 @@ mutation_summon_number = 7
 mutation2_summon_scene = ExtResource( 16 )
 mutation2_summon_number = 10
 to_be_removed_in_priority = false
+
+[node name="Hitbox" parent="." index="3"]
+deals_damage = false
 
 [node name="Sprite" parent="Animation" index="0"]
 offset = Vector2( 2.63, -12.266 )
@@ -109,7 +112,7 @@ max_cd_randomization = 0
 long_cooldown_every_x_shoots = 0
 long_cooldown = 0
 damage = 1
-damage_increase_each_wave = 1.0
+damage_increase_each_wave = 1.5
 min_range = 0
 max_range = 1200
 attack_anim_speed = 2.0
@@ -117,7 +120,7 @@ base_direction_randomization = 0.0
 base_direction_constant_spread = false
 alternate_between_base_direction_spread = false
 random_direction = false
-number_projectiles = 5
+number_projectiles = 3
 projectile_spread = 0.5
 spawn_projectiles_on_target = false
 projectile_spawn_spread = 0
@@ -176,7 +179,7 @@ base_direction_randomization = 0.0
 base_direction_constant_spread = false
 alternate_between_base_direction_spread = false
 random_direction = false
-number_projectiles = 5
+number_projectiles = 3
 projectile_spread = 0.5
 spawn_projectiles_on_target = false
 projectile_spawn_spread = 0
@@ -220,7 +223,7 @@ base_direction_randomization = 0.0
 base_direction_constant_spread = false
 alternate_between_base_direction_spread = false
 random_direction = false
-number_projectiles = 5
+number_projectiles = 3
 projectile_spread = 0.5
 spawn_projectiles_on_target = false
 projectile_spawn_spread = 0

@@ -1,6 +1,6 @@
 extends "res://entities/units/enemies/attack_behaviors/shooting_attack_behavior.gd"
 
-# 武装车辆：一次发射三条互相平行、等间隔的一角鲸子弹，随后沿开火方向冲刺
+# 武装车辆：一次发射两条互相平行、等间隔的一角鲸子弹，随后沿开火方向冲刺
 
 export (float) var projectile_spacing = 200.0
 export (float) var muzzle_offset = 22.0
@@ -64,7 +64,7 @@ func get_parallel_spawn_data(direction: Vector2) -> Array:
 
 	var perpendicular: Vector2 = Vector2( - dir.y, dir.x)
 	var result: Array = []
-	for offset in [ - projectile_spacing, 0.0, projectile_spacing]:
+	for offset in [ - projectile_spacing, projectile_spacing]:
 		result.append({
 			"position": _parent.global_position + dir * muzzle_offset + perpendicular * offset,
 			"rotation": dir.angle(),

@@ -7,13 +7,13 @@
 script = ExtResource( 1 )
 icon = ExtResource( 2 )
 health = 50
-health_increase_each_wave = 30.0
-speed = 230
+health_increase_each_wave = 20.0
+speed = 150
 speed_randomization = 0
 damage = 2
 damage_increase_each_wave = 1.2
 attack_cd = 20.0
-value = 5
+value = 8
 knockback_resistance = 0.5
 gold_spread = 0
 can_drop_consumables = true
