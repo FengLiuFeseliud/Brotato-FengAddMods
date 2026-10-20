@@ -51,7 +51,7 @@ tracks/1/keys = {
 }
 
 [node name="Enemy" instance=ExtResource( 2 )]
-mode = 1
+mode = 3
 stats = ExtResource( 3 )
 enemy_id = "apartment"
 to_be_removed_in_priority = false

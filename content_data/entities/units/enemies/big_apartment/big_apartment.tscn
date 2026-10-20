@@ -61,7 +61,7 @@ tracks/1/keys = {
 }
 
 [node name="Boss" instance=ExtResource( 2 )]
-mode = 1
+mode = 3
 scale = Vector2( 1.25, 1.25 )
 script = ExtResource( 13 )
 can_be_boosted = false

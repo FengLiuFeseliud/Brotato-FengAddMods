@@ -118,6 +118,9 @@ func _fengliu_spawn_train() -> void :
 		var args = EntitySpawner.SpawnEntityArgs.new(global_position, EntityType.ENEMY)
 		var car = _entity_spawner_ref.spawn_entity(train_car_scene, args, null, self)
 		if car != null:
+			# 站台与自己的车厢互不碰撞：车厢位置由脚本每帧写入，避免在交叉点被站台刚体顶回
+			add_collision_exception_with(car)
+			car.add_collision_exception_with(self)
 			# 记下出生槽位：后续只按槽位摆放，打掉一节不会把后面的车拽过来
 			_fengliu_slots[car.get_instance_id()] = _index
 			_fengliu_cars.push_back(car)
