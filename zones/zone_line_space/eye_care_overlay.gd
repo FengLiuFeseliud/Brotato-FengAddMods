@@ -7,7 +7,7 @@ const RECT_NAME = "Rect"
 const SHOP_RECT_NAME = "FengliuEyeCareRect"
 const SHOP_BACKGROUND_NAME = "Background"
 const OVERLAY_LAYER = 0
-const OVERLAY_COLOR = Color( 1.0, 0.86, 0.62, 0.32 )
+const OVERLAY_COLOR = Color(0.5, 0.5, 0.5, 0.15)
 const ENABLED = true
 const LOG_ID = "FengAddMods"
 

@@ -1,7 +1,8 @@
-[gd_resource type="Resource" load_steps=3 format=2]
+[gd_resource type="Resource" load_steps=4 format=2]
 
 [ext_resource path="res://zones/wave_group_data.gd" type="Script" id=1]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/zones/zone_line_space/008/hei/hei_unit.tres" type="Resource" id=2]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/zones/zone_line_space/008/armed_vehicle/armed_vehicle_unit.tres" type="Resource" id=3]
 
 [resource]
 script = ExtResource( 1 )
@@ -14,7 +15,7 @@ min_repeating_interval = 1
 area = -1
 spawn_dist_away_from_edges = 200
 spawn_edge_of_map = false
-wave_units_data = [ ExtResource( 2 ) ]
+wave_units_data = [ ExtResource( 2 ), ExtResource( 3 ) ]
 is_neutral = false
 is_boss = false
 is_horde = false

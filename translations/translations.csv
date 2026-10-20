@@ -308,3 +308,5 @@ RAIL_TRAIN_CAR_BEHAVIOUR_DESCRIPTION,"Cars travel along the rails and fire a hom
 TRUCK_NAME,Truck,卡车
 TRUCK_BEHAVIOUR_DESCRIPTION,"Runs around, drops a crate on death.",四处奔跑，死亡时掉落一个箱子。
 ZONE_EVENT_RAIN_DESCRIPTION,Rain and puddles appear,出现下雨与水洼
+ARMED_VEHICLE_NAME,Armed Vehicle,武装车辆
+ARMED_VEHICLE_BEHAVIOUR_DESCRIPTION,"Fires three parallel narwhal spikes, then immediately charges at the player; all three projectiles travel in parallel lines with equal spacing",向玩家发射三条与自身平行，等间隔的一角鲸子弹，随后立刻向玩家冲刺
