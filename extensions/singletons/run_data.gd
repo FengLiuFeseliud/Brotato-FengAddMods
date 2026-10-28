@@ -391,38 +391,6 @@ func reset(restart: bool = false) -> void :
 	# 清空上一局的波次强度统计，避免新局误判高质量波次 / _high_wave_count 跨局累加
 	fengliu_reset_wave_intensity_tracking()
 	.reset(restart)
-	
-	if ProgressData.has_method("fengliu_ensure_line_space_zone_last"):
-		ProgressData.call("fengliu_ensure_line_space_zone_last", "run reset")
-
-
-func reset_background() -> void :
-	if ProgressData.has_method("fengliu_restore_zone_own_backgrounds"):
-		ProgressData.call("fengliu_restore_zone_own_backgrounds", "reset background")
-
-	.reset_background()
-
-	var resolved_zone = null
-	if ProgressData.has_method("fengliu_resolve_zone"):
-		resolved_zone = ProgressData.call("fengliu_resolve_zone", current_zone)
-
-	var zone_name: String = "<none>"
-	var pool_size: int = 0
-	if resolved_zone != null:
-		zone_name = str(resolved_zone.name)
-		if resolved_zone.default_backgrounds != null:
-			pool_size = resolved_zone.default_backgrounds.size()
-
-	var own_zone = null
-	if ProgressData.has_method("fengliu_get_line_space_zone"):
-		own_zone = ProgressData.call("fengliu_get_line_space_zone")
-
-	if own_zone != null and resolved_zone == own_zone and ProgressData.has_method("fengliu_get_line_space_own_background"):
-		var own_background = ProgressData.call("fengliu_get_line_space_own_background")
-		if own_background != null:
-			current_background = own_background
-
-	ModLoaderLog.info("Background reset: zone=%s current_zone=%d pool=%d picked=%s" % [zone_name, current_zone, pool_size, str(current_background.name) if current_background != null else "<null>"], "FengAddMods")
 
 
 # 通用台账读取（is_linked_layer 区分层）
@@ -1465,47 +1433,6 @@ func fengliu_remove_all_item_debuff_effects(effects: Array):
 	fengliu_remove_all_stats(effects)
 
 
-# ============================================================
-# 通用区域事件：动态注册 / 区块预排期
-# ============================================================
-
-func fengliu_get_zone_event_service():
-	var mod_main = get_node_or_null("/root/ModLoader/FengLiu-FengAddMods")
-	if mod_main == null:
-		return null
-	return mod_main.get("zone_event_service")
-
-
-func init_events_nightmare(base_wave: int = 10) -> void:
-	.init_events_nightmare(base_wave)
-	_fengliu_schedule_zone_events(base_wave)
-
-
-func _fengliu_schedule_zone_events(base_wave: int) -> void:
-	var service = fengliu_get_zone_event_service()
-	if service == null:
-		return
-
-	# 与旧雨事件判断保持一致：优先解析动态重排后的当前区域
-	var zone = null
-	if ProgressData.has_method("fengliu_resolve_zone"):
-		zone = ProgressData.call("fengliu_resolve_zone", RunData.current_zone)
-	if zone == null:
-		zone = ZoneService.get_zone_data(RunData.current_zone)
-	if zone == null:
-		return
-
-	service.schedule_events_for_base_wave(zone, base_wave, RunData.current_difficulty)
-
-
-func reset_events_nightmare() -> void:
-	.reset_events_nightmare()
-
-	var service = fengliu_get_zone_event_service()
-	if service != null:
-		service.reset_run_counts()
-
-
 # 扩展应用道具效果
 func apply_item_effects(item_data: ItemParentData, player_index: int) -> void :
 	var effects = RunData.get_player_effect(effect_fengliu_reset_item_stat, player_index)
@@ -1567,12 +1494,6 @@ func reset_to_start_wave_state() -> void :
 	# 标记本次为波次重开，再走原版重置
 	_restart_wave = true
 	.reset_to_start_wave_state()
-
-	# 存档里的 current_zone 是固定 id：本 mod 的区域可能被自愈挪过下标，读档后要对齐一次
-	# （详见 extensions/singletons/progress_data.gd::fengliu_ensure_line_space_zone_last）
-	if ProgressData.has_method("fengliu_ensure_line_space_zone_last"):
-		ProgressData.call("fengliu_ensure_line_space_zone_last", "run state loaded")
-
 
 # 还原树效果（只还原 mod 自己带收获/数值描述的复合树效果，
 # 原版「树」系道具保留原版诅咒文案，见 FENGLIU_VANILLA_TREES_TEXT_KEYS）

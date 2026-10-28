@@ -25,7 +25,6 @@ const FENGLIU_T0_INJECT_EXCLUDE_WEAPONS := [
 
 
 var _fengliu_content_loader = null
-var zone_event_service = null
 
 
 func _init():
@@ -167,24 +166,8 @@ func _ready()->void:
 	# 动态注册
 	_fengliu_load_content_data_dynamic(ContentLoader)
 
-	# 动态区域事件服务
-	_init_zone_event_service()
-
 	# 把本 mod 的 t0 武器注入到各可用角色的初始武器池（含本 mod 角色，见排除名单）。
 	call_deferred("fengliu_inject_t0_starting_weapons")
-
-
-func _init_zone_event_service() -> void:
-	var service_script = load("res://mods-unpacked/FengLiu-FengAddMods/zone_events/zone_event_service.gd")
-	if service_script == null:
-		ModLoaderLog.error("Failed to load ZoneEventService script", MOD_ID)
-		return
-
-	zone_event_service = service_script.new()
-	zone_event_service.name = "ZoneEventService"
-	add_child(zone_event_service)
-	zone_event_service.load_events_from_dir("res://mods-unpacked/FengLiu-FengAddMods/zone_events/events/")
-	ModLoaderLog.info("ZoneEventService initialized", MOD_ID)
 
 
 # 注：宠物伤害说明效果的原型注册已移入 extensions/singletons/item_service.gd 的 _enter_tree()，
