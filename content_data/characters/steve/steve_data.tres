@@ -37,3 +37,4 @@ banned_items = [ "item_lumberjack_shirt" ]
 banned_upgrades = [  ]
 starting_weapons = [ ExtResource( 5 ) ]
 starting_items = [  ]
+required_item_set = "fengliu"

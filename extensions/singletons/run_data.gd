@@ -1569,8 +1569,9 @@ func add_weapon(weapon: WeaponData, player_index: int, is_selection: bool = fals
 
 
 # 满盾联动事件钩子：道具移除时通知玩家重新判定（不再每帧轮询）
-func remove_item(item: ItemData, player_index: int, by_id: bool = false) -> void :
-	.remove_item(item, player_index, by_id)
+# 1.2.0 起原版 remove_item 新增第 4 个参数 apply_replacement，签名必须一致
+func remove_item(item: ItemData, player_index: int, by_id: bool = false, apply_replacement: bool = true) -> void :
+	.remove_item(item, player_index, by_id, apply_replacement)
 	fengliu_notify_full_shield_link(player_index)
 	# 持有角色数可能变化：「每持有一个角色加属性」重新结算
 	fengliu_stat_per_character_sync(player_index)

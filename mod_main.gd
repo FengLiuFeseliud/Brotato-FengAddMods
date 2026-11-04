@@ -24,7 +24,6 @@ const FENGLIU_T0_INJECT_EXCLUDE_WEAPONS := [
 ]
 
 
-var _fengliu_content_loader = null
 
 
 func _init():
@@ -71,77 +70,6 @@ func _install_extensions_from_dir(dir_path: String) -> void:
 	dir.list_dir_end()
 
 
-# 动态注册本 mod 内容
-func _fengliu_load_content_data_dynamic(content_loader) -> void:
-	# 与 content_data.tres 的五个列表一一对应
-	var content := {
-		"characters": [],
-		"items": [],
-		"weapons": [],
-		"sets": [],
-		"upgrades": [],
-	}
-
-	# 逐个子目录收集，目录结构本身就是分类依据
-	for sub_dir_name in FENGLIU_DYNAMIC_CONTENT_SUBDIRS:
-		_fengliu_collect_content_dir(CONTENT_DIR + sub_dir_name, content)
-
-	content_loader.load_data_by_dictionary(content, MOD_ID)
-	ModLoaderLog.info("Dynamic content loaded, characters=%d items=%d weapons=%d sets=%d upgrades=%d."
-		% [content["characters"].size(), content["items"].size(), content["weapons"].size(),
-			content["sets"].size(), content["upgrades"].size()], MOD_ID)
-
-
-# 递归收集目录里的 .tres，目录打不开只记错误、不中断其它目录
-func _fengliu_collect_content_dir(dir_path: String, content: Dictionary) -> void:
-	var dir := Directory.new()
-	if dir.open(dir_path) != OK:
-		ModLoaderLog.error("Failed to open content directory: %s" % dir_path, MOD_ID)
-		return
-
-	# 先收齐条目名再排序，避免注册顺序随文件系统枚举顺序变化
-	var entry_names := []
-	var is_dir_by_name := {}
-	dir.list_dir_begin(true, true)
-	var file_name := dir.get_next()
-	while file_name != "":
-		entry_names.push_back(file_name)
-		is_dir_by_name[file_name] = dir.current_is_dir()
-		file_name = dir.get_next()
-	dir.list_dir_end()
-	entry_names.sort()
-
-	# 子目录继续递归，.tres 交给分类函数，其余文件忽略
-	for entry_name in entry_names:
-		var full_path := dir_path.plus_file(entry_name)
-		if is_dir_by_name[entry_name]:
-			_fengliu_collect_content_dir(full_path, content)
-		elif entry_name.get_extension() == "tres":
-			_fengliu_collect_content_file(full_path, content)
-
-
-func _fengliu_collect_content_file(file_path: String, content: Dictionary) -> void:
-	var data = load(file_path)
-	if data == null:
-		ModLoaderLog.warning("Failed to load content resource: %s" % file_path, MOD_ID)
-		return
-
-	if data is CharacterData:
-		content["characters"].push_back(data)
-	elif data is WeaponData:
-		content["weapons"].push_back(data)
-	elif data is SetData:
-		content["sets"].push_back(data)
-	elif data is UpgradeData:
-		content["upgrades"].push_back(data)
-	elif data is ConsumableData:
-		# 本 mod 暂无消耗品，显式跳过，避免被下面的 ItemData 分支收进物品池
-		return
-	elif data is ItemData:
-		content["items"].push_back(data)
-	# 其余为效果 / 外观 / 属性等子资源，不参与注册
-
-
 func add_translations() -> void:
 	ModLoaderLog.info("add translations...", MOD_ID)
 	# 注册简体中文与英文两份翻译
@@ -155,41 +83,29 @@ func _ready()->void:
 		if is_instance_valid(ProgressData):
 			ProgressData.load_dlc_pcks()
 
-	var ContentLoader = get_node("/root/ModLoader/Darkly77-ContentLoader/ContentLoader")
-	if ContentLoader == null:
-		ModLoaderLog.error("ContentLoader not load...", MOD_ID)
-
 	# 玩家效果槽里存的是效果实例的 custom_key 必须登记进原版全量序列化名单，
-	# 且必须在 ContentLoader 触发读档之前完成（否则槽位会被原样序列化写成字典）
+	# 且必须在读档之前完成（否则槽位会被原样序列化写成字典）
 	_fengliu_register_effect_slot_keys()
-
-	# 动态注册
-	_fengliu_load_content_data_dynamic(ContentLoader)
 
 	# 把本 mod 的 t0 武器注入到各可用角色的初始武器池（含本 mod 角色，见排除名单）。
 	call_deferred("fengliu_inject_t0_starting_weapons")
 
 
 # 注：宠物伤害说明效果的原型注册已移入 extensions/singletons/item_service.gd 的 _enter_tree()，
-# 因为它必须早于 ContentLoader 触发的那次读档（详见该文件注释）。
+# 因为它必须早于原生注册触发的那次读档（详见该文件注释）。
 func fengliu_inject_t0_starting_weapons() -> void:
 	if not is_instance_valid(ItemService) or ItemService.characters.size() == 0 or ItemService.weapons.size() == 0:
 		ModLoaderLog.warning("ItemService.characters/weapons is empty, skip t0 starting weapon injection.", MOD_ID)
 		return
 
-	_fengliu_content_loader = get_node_or_null("/root/ModLoader/Darkly77-ContentLoader/ContentLoader")
-	if _fengliu_content_loader == null:
-		ModLoaderLog.error("ContentLoader not found, skip t0 starting weapon injection.", MOD_ID)
-		return
-
-	# 动态收集 mod 的武器
+	# 动态收集 mod 的武器（1.2.0：按资源路径前缀识别，不再依赖 ContentLoader）
 	var t0_weapons := []
 	for weapon in ItemService.weapons:
 		if weapon == null or not (weapon is WeaponData):
 			continue
 		if weapon.tier != 0:
 			continue
-		if _fengliu_content_loader.lookup_modid_by_itemdata(weapon) != MOD_ID:
+		if not weapon.resource_path.begins_with(MOD_DIR):
 			continue
 		# 武器排除名单：my_id 或 weapon_id 命中即跳过
 		if FENGLIU_T0_INJECT_EXCLUDE_WEAPONS.has(weapon.my_id) or FENGLIU_T0_INJECT_EXCLUDE_WEAPONS.has(weapon.weapon_id):

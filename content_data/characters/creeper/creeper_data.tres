@@ -39,3 +39,4 @@ banned_items = [ "item_jelly", "item_nail", "item_crystal", "item_coffee", "item
 banned_upgrades = [  ]
 starting_weapons = [  ]
 starting_items = [  ]
+required_item_set = "fengliu"
