@@ -1082,6 +1082,7 @@ func _fengliu_register_all_content() -> void:
 # 补齐「激活套组 → 重建缓存 → 默认解锁 → 商店/升级池」，可重复调用
 func _fengliu_finalize_content_pools() -> void:
 	ProgressData.refresh_active_update_data()
+	_fengliu_register_meca_stats()
 	invalidate_items_cache()
 	invalidate_weapons_cache()
 	invalidate_characters_cache()
@@ -1304,3 +1305,34 @@ static func fengliu_get_dynamic_value(stat_min_value: int, stat_max_value: int, 
 	if dynamic_value == 0 and stat_no_zero:
 		return fengliu_get_dynamic_value(stat_min_value, stat_max_value, stat_no_zero)
 	return dynamic_value
+
+
+# 机械升级池
+func _fengliu_register_meca_stats() -> void :
+	if not ProgressData.has_item_set("fengliu"):
+		return
+
+	var dlc2 = get_dlc_data_by_id("primal_dread")
+	if dlc2 == null:
+		return
+
+	var categories = dlc2.get("meca_stat_categories")
+	if not (categories is Dictionary):
+		return
+
+	var shield_hash: int = Keys.generate_hash("stat_fengliu_shield")
+
+	dlc2.set("_upgrade_value_cache", {})
+	if dlc2.get_meca_stat_value(shield_hash, 1) <= 0:
+		return
+
+	var defense_key = DLC2Data.MecaStatCategory.DEFENSE
+	var defense: Array = categories.get(defense_key, []).duplicate()
+
+	if defense.has(shield_hash):
+		return
+
+	defense.append(shield_hash)
+	categories[defense_key] = defense
+	dlc2.set("meca_stat_categories", categories)
+	dlc2.set("_upgrade_value_cache", {})

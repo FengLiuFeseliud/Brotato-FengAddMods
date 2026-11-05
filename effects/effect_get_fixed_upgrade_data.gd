@@ -63,6 +63,8 @@ func fengliu_roll_effect(player_index: int) -> void:
 	if ItemService.fengliu_get_all_upgrade_id_hashs().size() == 0:
 		return
 
+	all_fixed_upgrade_id_hashs.clear() 
+	
 	# 有「必含最高属性」效果时先加入最高属性升级项
 	var effects = RunData.get_player_effect(effect_fengliu_get_highest_stat_fixed_upgrade_data, player_index)
 	if effects.size() > 0:
