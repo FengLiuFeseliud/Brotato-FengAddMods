@@ -1176,3 +1176,142 @@ func _fengliu_collect_mod_resources(pool: Array) -> Array:
 		if element.resource_path.begins_with(FENGLIU_MOD_DIR):
 			result.push_back(element)
 	return result
+
+
+var fengliu_shop_item_count_hash = Keys.generate_hash("fengliu_shop_item_count")
+var fengliu_shop_items_count_price_hash = Keys.generate_hash("fengliu_shop_items_count_price")
+
+
+# 按「商店道具数量」效果裁剪商店数据（只处理纯数据，UI 同步由调用方负责）
+func fengliu_trim_shop_item_count(items_data: Array, player_index: int) -> Array:
+	var effects = RunData.get_player_effect(fengliu_shop_item_count_hash, player_index)
+	
+	# 无效果则不处理
+	if effects.size() == 0:
+		return items_data
+
+	var effect = effects[0]
+	var item_count: int = effect[1]
+
+	# effect[3] 非 0 表示动态数量（effect[2]~effect[3] 区间，effect[4] 是否避开 0）
+	if effect[3] != 0:
+		item_count = NB_SHOP_ITEMS - fengliu_get_dynamic_value(effect[2], effect[3], effect[4])
+
+	var locked_size := 0
+	if player_index < RunData.locked_shop_items.size():
+		locked_size = RunData.locked_shop_items[player_index].size()
+
+	var final_count: int = item_count
+	# 锁定格多于效果数量：优先保留锁定格，最多铺满
+	if locked_size > final_count:
+		if locked_size >= NB_SHOP_ITEMS:
+			final_count = NB_SHOP_ITEMS
+		else:
+			final_count = min(NB_SHOP_ITEMS, locked_size + final_count)
+
+	if final_count <= 0 or final_count >= items_data.size():
+		return items_data
+
+	var trimmed := []
+
+	for index in range(final_count):
+		trimmed.push_back(items_data[index])
+
+	return trimmed
+
+
+
+# 按缺少的格子加价（幂等：格子数量没变就不重复加）
+func fengliu_apply_shop_item_count_price(items_data: Array, player_index: int) -> void :
+	var effects = RunData.get_player_effects(player_index)
+	var count_effects = RunData.get_player_effect(fengliu_shop_item_count_hash, player_index)
+
+	# 无效果则不处理
+	if count_effects.size() == 0:
+		return
+
+	var base_price: int = count_effects[0][5]
+
+	# 未开启加价则不处理
+	if base_price == 0:
+		return
+
+	if not effects.has(fengliu_shop_items_count_price_hash):
+		effects[fengliu_shop_items_count_price_hash] = 0
+
+	var prev_price: int = effects[fengliu_shop_items_count_price_hash]
+	var new_price: int = base_price * (NB_SHOP_ITEMS - items_data.size())
+	# 数量没变化则保持原样，避免重复刷新时叠加
+	if new_price == prev_price:
+		return
+
+	effects[Keys.items_price_hash] = effects[Keys.items_price_hash] + abs(prev_price) + new_price
+	effects[fengliu_shop_items_count_price_hash] = new_price
+
+
+# 商店刷新重随：预报类效果 + 套装武器替换
+func fengliu_roll_shop_rerolls(items_data: Array, player_index: int) -> void :
+	for entry in items_data:
+		if entry == null or entry[0] == null:
+			continue
+		var item = entry[0]
+		if item.effects == null:
+			continue
+		for effect in item.effects:
+			if effect == null:
+				continue
+			# 未生成哈希时按 custom_key 补算
+			if effect.custom_key_hash == Keys.empty_hash and effect.custom_key != "":
+				effect.custom_key_hash = Keys.generate_hash(effect.custom_key)
+			if not _fengliu_effect_needs_reroll(effect):
+				continue
+			if effect.has_method("fengliu_roll_effect"):
+				effect.fengliu_roll_effect(player_index)
+
+	fengliu_roll_set_weapon_in_shop_data(items_data, player_index)
+
+
+# 商店刷新重随：把非目标套装的武器替换为目标套装武器（纯数据版）
+func fengliu_roll_set_weapon_in_shop_data(items_data: Array, player_index: int) -> void :
+	var effects = RunData.get_player_effect(effect_fengliu_can_rand_set_weapon, player_index)
+	# 无该效果则不处理
+	if effects.size() == 0:
+		return
+
+	var locked_size := 0
+	if player_index < RunData.locked_shop_items.size():
+		locked_size = RunData.locked_shop_items[player_index].size()
+
+	# 商店刷新带来的品阶提升
+	var increase_tier := 0
+	for increase_tier_effect in RunData.get_player_effect(Keys.increase_tier_on_reroll_hash, player_index):
+		increase_tier = increase_tier_effect[1]
+		break
+
+	# 商店内道具 + 玩家已拥有道具，用于原版数量上限判定
+	var owned_and_shop_items: Array = RunData.get_player_items(player_index).duplicate()
+	for entry in items_data:
+		if entry != null and entry[0] != null:
+			owned_and_shop_items.push_back(entry[0])
+
+	fengliu_roll_set_weapon_in_shop(items_data, locked_size, RunData.current_wave, player_index, owned_and_shop_items, increase_tier)
+
+
+# 随机生成动态值（数量效果用）
+static func fengliu_get_dynamic_value(stat_min_value: int, stat_max_value: int, stat_no_zero: bool) -> int:
+	var dynamic_value = int(floor(rand_range(stat_min_value, stat_max_value + 1)))
+	# 为 0 时重新取值
+	if dynamic_value == 0 and stat_no_zero:
+		return fengliu_get_dynamic_value(stat_min_value, stat_max_value, stat_no_zero)
+	return dynamic_value
+
+
+
+# 物品套组显示兜底
+func get_update_data_from_item(item_data: ItemParentData) -> UpdateData:
+	var update_data = .get_update_data_from_item(item_data)
+	if update_data != null:
+		return update_data
+
+	return get_update_data_by_item_id(item_data)
+
