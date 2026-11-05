@@ -240,7 +240,10 @@ func fengliu_picke_consumable_drop_structure(effect: Array, consumable: Node, pl
 	for _index in range(structure_count):
 		var pos = _entity_spawner.get_spawn_pos_in_area(consumable.global_position, 200)
 		var queue = _entity_spawner.queues_to_spawn_structures[player_index]
-		queue.push_back([EntityType.STRUCTURE, effect[3].scene, pos, effect[3]])
+		
+		var request: = SpawnRequest.new(EntityType.STRUCTURE, effect[3].scene, pos)
+		request.data = effect[3]
+		queue.push_back(request)
 
 
 # 计算开箱花费

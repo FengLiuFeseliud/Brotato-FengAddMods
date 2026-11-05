@@ -36,3 +36,4 @@ banned_items = [  ]
 banned_upgrades = [  ]
 starting_weapons = [ ExtResource( 11 ), ExtResource( 12 ) ]
 starting_items = [  ]
+required_item_set = "fengliu"

@@ -13,11 +13,11 @@
 
 [resource]
 script = ExtResource( 3 )
-my_id = "weapon_molotov_1"
+my_id = "weapon_mod_molotov_1"
 unlocked_by_default = true
 can_be_looted = true
 icon = ExtResource( 5 )
-name = "WEAPON_MOLOTOV"
+name = "WEAPON_MOD_MOLOTOV"
 tier = 0
 value = 13
 effects = [ ExtResource( 6 ), ExtResource( 7 ) ]
@@ -26,7 +26,7 @@ is_lockable = true
 unlock_codex_descr_after_get_it = 1
 is_cursed = false
 curse_factor = 0.0
-weapon_id = "weapon_molotov"
+weapon_id = "weapon_mod_molotov"
 type = 1
 sets = [ ExtResource( 8 ), ExtResource( 9 ) ]
 scene = ExtResource( 4 )

@@ -20,6 +20,11 @@ func fengliu_persist_var_names() -> Array:
 	return ["roll_tags"]
 
 
+# 读档归一化：旧版存档把 roll_tags 存成标签哈希（数字 / 数字串），这里还原成标签名
+func fengliu_on_persist_vars_restored() -> void:
+	roll_tags = RunData.fengliu_resolve_item_tag_name(roll_tags)
+
+
 func fengliu_roll_effect(player_index: int):
 	var taken := {}
 	var player_character = RunData.get_player_character(player_index)
@@ -41,12 +46,14 @@ func fengliu_roll_effect(player_index: int):
 
 
 func apply(player_index: int) -> void:
-    if roll_tags == "":
-        fengliu_roll_effect(player_index)
-        if roll_tags == "":
-            return
-    
-    RunData.get_player_effect(custom_key_hash ,player_index).push_front(roll_tags)
+	# 旧档可能把 roll_tags 存成哈希：先还原，还原不了就重新 roll
+	roll_tags = RunData.fengliu_resolve_item_tag_name(roll_tags)
+	if roll_tags == "":
+		fengliu_roll_effect(player_index)
+		if roll_tags == "":
+			return
+
+	RunData.get_player_effect(custom_key_hash ,player_index).push_front(roll_tags)
 
 
 func unapply(player_index: int) -> void:
@@ -54,22 +61,31 @@ func unapply(player_index: int) -> void:
 
 
 func get_args(player_index: int) -> Array:
-    var wanted_tags: Array = RunData.get_player_effect(custom_key_hash, player_index).duplicate()
-    var player_character = RunData.get_player_character(player_index)
-    if player_character != null:
-        wanted_tags.append_array(player_character.wanted_tags)
+	var wanted_tags := []
+	for wanted_tag in RunData.get_player_effect(custom_key_hash, player_index):
+		# 槽位里可能是旧档的标签哈希，先还原成标签名
+		var wanted_tag_name: String = RunData.fengliu_resolve_item_tag_name(wanted_tag)
+		if wanted_tag_name != "":
+			wanted_tags.push_back(wanted_tag_name)
 
-    var wanted_tags_name := []
-    var seen := {}
-    for wanted_tag in wanted_tags:
-        var tag_text := tr(str(wanted_tag).to_upper())
-        if seen.has(tag_text):
-            continue
+	var player_character = RunData.get_player_character(player_index)
+	if player_character != null:
+		wanted_tags.append_array(player_character.wanted_tags)
 
-        seen[tag_text] = true
-        wanted_tags_name.append(tag_text)
+	var wanted_tags_name := []
+	var seen := {}
+	for wanted_tag in wanted_tags:
+		var tag_text := tr(str(wanted_tag).to_upper())
+		if seen.has(tag_text):
+			continue
 
-    if roll_tags == "":
-        return ["[color=lime]?[/color]", "[color=lime]%s[/color]" % "/".join(wanted_tags_name)]
+		seen[tag_text] = true
+		wanted_tags_name.append(tag_text)
 
-    return ["[color=lime]%s[/color]" % tr(str(roll_tags).to_upper()), "[color=lime]%s[/color]" % "/".join(wanted_tags_name)]
+	# 显示前再兜一次底：解析不出来就显示 ?（绝不显示哈希）
+	var display_roll: String = RunData.fengliu_resolve_item_tag_name(roll_tags)
+	if display_roll == "":
+		return ["[color=lime]?[/color]", "[color=lime]%s[/color]" % "/".join(wanted_tags_name)]
+
+	return ["[color=lime]%s[/color]" % tr(display_roll.to_upper()), "[color=lime]%s[/color]" % "/".join(wanted_tags_name)]
+

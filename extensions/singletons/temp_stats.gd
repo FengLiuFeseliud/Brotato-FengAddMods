@@ -76,6 +76,27 @@ func _fengliu_ensure_secondary_hashs_generated() -> void :
 		_fengliu_secondary_stats_hashs.append(Keys.generate_hash(secondary_stat))
 
 
+func init_stats() -> Dictionary:
+	var stats: Dictionary = .init_stats()
+
+	# 自定义主要属性
+	for stat_key in RunData.FENGLIU_EXTRA_PRIMARY_STAT_KEYS:
+		var stat_hsh: int = Keys.generate_hash(stat_key)
+		if not stats.has(stat_hsh):
+			stats[stat_hsh] = 0
+
+	# 物品套组注册的属性（套组未启用也补齐：旧档仍可能持有对应内容）
+	if ItemService.update_data_list != null:
+		for update_data in ItemService.update_data_list:
+			if update_data == null or update_data.item_set == null:
+				continue
+			for set_stat in update_data.item_set.stats:
+				if set_stat != null and not stats.has(set_stat.stat_hash):
+					stats[set_stat.stat_hash] = 0
+
+	return stats
+
+
 # 判断是否为次要属性哈希
 func _fengliu_is_secondary_stat(stat_hsh: int) -> bool:
 	# 先确保哈希列表已生成
@@ -219,6 +240,14 @@ func fengliu_clear_rebase_pending(player_index: int) -> void :
 		_fengliu_rebase_pending[player_index] = false
 
 
+func _fengliu_ensure_player_stat_key(stat_hsh: int, player_index: int) -> void:
+	if player_index < 0 or player_index >= player_stats.size():
+		return
+		
+	if not player_stats[player_index].has(stat_hsh):
+		player_stats[player_index][stat_hsh] = 0
+
+
 # 扩展设置属性（次要属性叠加到 effects 层，其余走原逻辑）
 func set_stat(stat_hsh: int, value: int, player_index: int) -> void :
 	# 非次要属性交回原版逻辑
@@ -239,6 +268,7 @@ func set_stat(stat_hsh: int, value: int, player_index: int) -> void :
 func add_stat(stat_hsh: int, value: int, player_index: int) -> void :
 	# 非次要属性交回原版逻辑
 	if not _fengliu_is_secondary_stat(stat_hsh):
+		_fengliu_ensure_player_stat_key(stat_hsh, player_index)
 		.add_stat(stat_hsh, value, player_index)
 		# 护盾上限变化：通知玩家重新判定满盾联动
 		if stat_hsh == Keys.generate_hash("stat_fengliu_shield"):
@@ -253,6 +283,7 @@ func add_stat(stat_hsh: int, value: int, player_index: int) -> void :
 func remove_stat(stat_hsh: int, value: int, player_index: int) -> void :
 	# 次要属性从叠加层扣除，其余交给原版
 	if not _fengliu_is_secondary_stat(stat_hsh):
+		_fengliu_ensure_player_stat_key(stat_hsh, player_index)
 		.remove_stat(stat_hsh, value, player_index)
 		# 护盾上限变化：通知玩家重新判定满盾联动
 		if stat_hsh == Keys.generate_hash("stat_fengliu_shield"):

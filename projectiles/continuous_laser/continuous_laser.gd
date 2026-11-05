@@ -59,7 +59,8 @@ func _set_time_until_max_range() -> void:
 
 # 收束 / 回池时先通知发射者：塔必须知道这束光已经没了，否则会一直沿用死引用（换目标后不再重建）
 # 注意基类 stop() 在菜单环境可能因池子拿不到场景节点而中断，所以通知必须放在它前面
-func stop() -> void:
+# 1.2.0 起基类 stop(from_screen_border) 带参数（基类自身不使用），签名必须一致，否则整份脚本解析失败
+func stop(from_screen_border: bool = false) -> void:
 	# 重复调用直接忽略（回池后可能还会被再调一次）
 	if _stopped:
 		return
@@ -68,7 +69,7 @@ func stop() -> void:
 	var source = _hitbox.from if _hitbox != null else null
 	if source != null and is_instance_valid(source) and source.has_method("on_beam_stopped"):
 		source.on_beam_stopped(self)
-	.stop()
+	.stop(from_screen_border)
 
 
 # 每帧：跟随目标 / 目标或塔没了就消失 / 维护「只打锁定目标」的忽略名单 / 落地塔请求的结算

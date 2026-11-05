@@ -138,8 +138,7 @@ func _on_ItemAttractArea_area_entered(item: Item) -> void :
 	if item.attracted_by != null and not _fengliu_attractor_is_dead(item):
 		return
 
-	# 会伤害玩家的消耗品不代吸，留给玩家自己决定踩不踩
-	if _fengliu_is_damaging_consumable(item):
+	if _fengliu_should_skip_consumable(item):
 		return
 
 	item.attracted_by = self
@@ -167,8 +166,7 @@ func _on_ItemPickUpArea_area_entered(area: Area2D) -> void :
 	if consumable.already_picked_up:
 		return
 
-	# 会伤害玩家的消耗品不代捡，交给玩家自己踩
-	if _fengliu_is_damaging_consumable(consumable):
+	if _fengliu_should_skip_consumable(consumable):
 		return
 
 	_fengliu_forget_attracted_item(consumable)
@@ -192,18 +190,17 @@ func _fengliu_attractor_is_dead(item: Item) -> bool:
 	return (item.attracted_by as Unit).dead
 
 
-# 判断消耗品是否会伤害玩家（毒果等），这类消耗品不代吸不代捡
-func _fengliu_is_damaging_consumable(item: Item) -> bool:
-	# 数据未就绪的消耗品按安全处理，避免读取空数据
+func _fengliu_should_skip_consumable(item: Item) -> bool:
+	# 非消耗品不在此判定范围
 	if not (item is Consumable):
 		return false
 
 	var consumable = item as Consumable
+	# 数据未就绪时按安全处理，避免读取空数据
 	if consumable.consumable_data == null:
 		return false
 
-	# 借用原版判定，同时尊重 mod 对「波次结束不拾取」的扩展
-	return consumable.has_damage_effect()
+	return not consumable.should_be_picked_up_at_end_of_wave()
 
 
 # 把物品从本宠物的吸附列表里移除

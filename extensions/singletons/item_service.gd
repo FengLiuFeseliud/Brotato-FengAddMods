@@ -4,6 +4,27 @@ extends "res://singletons/item_service.gd"
 const FENGLIU_MOD_ID = "FengAddMods"
 const FENGLIU_EFFECTS_DIR = "res://mods-unpacked/FengLiu-FengAddMods/effects/"
 const FENGLIU_STATS_DIR = "res://mods-unpacked/FengLiu-FengAddMods/content_data/stats/"
+const FENGLIU_MOD_DIR = "res://mods-unpacked/FengLiu-FengAddMods/"
+
+const FENGLIU_EXTRA_EFFECT_PROTOTYPES := [
+	"res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/creeper/creeper_exploding_effect.gd"
+]
+
+# 1.2.0 物品套组
+const FENGLIU_ITEM_SET_ID = "fengliu_set"
+const FENGLIU_UPDATE_TRES = "res://mods-unpacked/FengLiu-FengAddMods/content_data/item_set/fengliu_update.tres"
+const FENGLIU_CONTENT_DIR = "res://mods-unpacked/FengLiu-FengAddMods/content_data/"
+# 参与原生注册的子目录（其余目录只放子资源，不注册）
+const FENGLIU_DYNAMIC_CONTENT_SUBDIRS := ["characters", "items", "weapons", "sets", "upgrades"]
+
+
+# 图鉴 / 道具套组只显示 previous_upgrade == null 的武器；
+# 这里只补「展示用前阶指针」，不写 upgrades_into ⇒ 商店升级 / 合成玩法不变
+const FENGLIU_CODEX_HIDDEN_WEAPON_CHAIN := {
+	"wood_pickaxe": "stone_pickaxe",
+	"stone_pickaxe": "iron_pickaxe",
+	"iron_pickaxe": "diamond_pickaxe"
+}
 
 
 const FENGLIU_UPGRADE_POOL_STATS := {
@@ -49,6 +70,9 @@ var need_reroll_effect = [
 # 全部升级项 id 哈希缓存
 var _all_upgrade_ids = {}
 
+# 原生内容是否已注册
+var _fengliu_content_registered := false
+
 
 func _ready():
     for key in FENGLIU_UPGRADE_POOL_STATS.keys():
@@ -57,6 +81,9 @@ func _ready():
             pool.append(Keys.generate_hash(stat_id))
 
         fengliu_upgrades_pools[Keys.generate_hash(key)] = pool
+
+    # 1.2.0：原生注册全部内容（物品套组 + 武器套装 + 升级项）
+    _fengliu_register_all_content()
 
 
 func _enter_tree() -> void:
@@ -101,23 +128,36 @@ func _fengliu_register_effect_prototypes() -> void:
 
 	# 逐个加载效果脚本，只有自带唯一 id 的具体效果才能被读档匹配
 	for effect_path in _fengliu_collect_effect_script_paths(FENGLIU_EFFECTS_DIR):
-		var effect_script = load(effect_path)
-		if effect_script == null or not (effect_script is GDScript):
+		if _fengliu_try_register_effect_prototype(effect_path) > 0:
+			registered += 1
+		else:
 			skipped += 1
-			ModLoaderLog.warning("Failed to load effect script: %s" % effect_path, FENGLIU_MOD_ID)
-			continue
 
-		if not _fengliu_is_registerable_effect(effect_script):
+	# 目录外（content_data 下）的效果脚本显式登记
+	for effect_path in FENGLIU_EXTRA_EFFECT_PROTOTYPES:
+		if _fengliu_try_register_effect_prototype(effect_path) > 0:
+			registered += 1
+		else:
 			skipped += 1
-			continue
-
-		if effects.has(effect_script):
-			continue
-
-		effects.push_back(effect_script)
-		registered += 1
 
 	ModLoaderLog.info("Registered %d effect prototypes from %s (skipped %d)." % [registered, FENGLIU_EFFECTS_DIR, skipped], FENGLIU_MOD_ID)
+
+
+# 尝试登记单个效果脚本为读档原型：返回 1 表示本次登记成功
+func _fengliu_try_register_effect_prototype(effect_path: String) -> int:
+	var effect_script = load(effect_path)
+	if effect_script == null or not (effect_script is GDScript):
+		ModLoaderLog.warning("Failed to load effect script: %s" % effect_path, FENGLIU_MOD_ID)
+		return 0
+
+	if not _fengliu_is_registerable_effect(effect_script):
+		return 0
+
+	if effects.has(effect_script):
+		return 0
+
+	effects.push_back(effect_script)
+	return 1
 
 
 # 是否登记为原型：是效果类，且自带唯一 id（基类与仍继承 id 的脚本一律跳过）
@@ -211,17 +251,18 @@ func get_consumable_to_drop(unit: Unit, item_chance: float) -> ConsumableData:
 
 # 自定义保证商店道具
 func fengliu_guaranteed_shop_items(effect: Array, wave: int, player_index: int, args: ItemServiceGetShopItemsArgs) -> Array:
-     # 上限
-    var limited_items = get_limited_items(args.owned_and_shop_items)
-
     # 临时把自定义保证道具合并进基础 guaranteed_shop_items
     var base_guaranteed = RunData.get_player_effect(Keys.guaranteed_shop_items_hash, player_index)
     var appended = 0
     for entry in effect:
         var item_hash = entry[0]
+        var item_data = fengliu_get_shop_extra_item(item_hash)
+        if item_data == null:
+            continue
 
-        # 已拥有达到 max_nb，不再固定出售
-        if limited_items.has(item_hash) and limited_items[item_hash][1] >= limited_items[item_hash][0].max_nb:
+        # 只看同名道具：replaced_by 的失效版（max_nb 常为 -1）不占原道具上限，
+        # 否则「失效的定向训练」会让正版永远不再保底
+        if item_data.max_nb != -1 and fengliu_count_same_items(item_hash, args.owned_and_shop_items) >= item_data.max_nb:
             continue
 
         base_guaranteed.append([item_hash, 1])
@@ -235,16 +276,23 @@ func fengliu_guaranteed_shop_items(effect: Array, wave: int, player_index: int, 
     return result
 
 
-# 目标道具是否已达 max_nb 上限
-func fengliu_shop_slot_reached_limit(item_hash: int, limited_items: Dictionary, result: Array) -> bool:
+# 统计「同名」道具数量：不把 replaced_by 的失效版算进来
+#（失效版 max_nb 常为 -1，用 origin 聚合会把原道具的 max_nb 永久占满）
+func fengliu_count_same_items(item_hash: int, from_items: Array) -> int:
+    var count := 0
+    for item in from_items:
+        if item != null and item.my_id_hash == item_hash:
+            count += 1
+    return count
+
+
+# 目标道具是否已达 max_nb 上限（只看同名，失效版不占原道具上限）
+func fengliu_shop_slot_reached_limit(item_hash: int, owned_and_shop_items: Array, result: Array) -> bool:
     var item = fengliu_get_shop_extra_item(item_hash)
     if item == null or item.max_nb == -1:
         return false
 
-    var count = 0
-    if limited_items.has(item_hash):
-        count = limited_items[item_hash][1]
-
+    var count = fengliu_count_same_items(item_hash, owned_and_shop_items)
     for entry in result:
         if entry[0] != null and entry[0].my_id_hash == item_hash:
             count += 1
@@ -254,11 +302,11 @@ func fengliu_shop_slot_reached_limit(item_hash: int, limited_items: Dictionary, 
 
 # 取商店额外商品数据
 func fengliu_get_shop_extra_item(item_hash: int) -> ItemParentData:
-    var item = ItemService.get_element(items, item_hash)
+    var item = ItemService.get_element(get_items(), item_hash)
     if item != null:
         return item as ItemParentData
 
-    var character = ItemService.get_element(characters, item_hash)
+    var character = ItemService.get_element(get_characters(), item_hash)
     return character as ItemParentData
 
 
@@ -275,7 +323,7 @@ func fengliu_shop_result_has_hash(result: Array, item_hash: int) -> bool:
 func fengliu_get_rand_shop_character(player_index: int, result: Array) -> ItemParentData:
     var current_character = RunData.get_player_character(player_index)
     var candidates = []
-    for character in characters:
+    for character in get_characters():
     
         if current_character != null and character.my_id_hash == current_character.my_id_hash:
             continue
@@ -343,7 +391,6 @@ func get_player_shop_items(wave: int, player_index: int, args: ItemServiceGetSho
     else:
         extra_shop_item_index = guaranteed_count
 
-    var limited_items = get_limited_items(args.owned_and_shop_items)
     for effect in extra_shop_item_chance_effects:
         if not Utils.get_chance_success(effect[1] / 100.0):
             continue
@@ -351,7 +398,7 @@ func get_player_shop_items(wave: int, player_index: int, args: ItemServiceGetSho
         if extra_shop_item_index >= result.size():
             break
 
-        if fengliu_shop_slot_reached_limit(effect[0], limited_items, result):
+        if fengliu_shop_slot_reached_limit(effect[0], args.owned_and_shop_items, result):
             continue
 
         var item_data = fengliu_get_shop_extra_item(effect[0]).duplicate()
@@ -849,7 +896,11 @@ func fengliu_get_rand_item_for_wave(wave: int, player_index: int, type: int, arg
         # 修改道具 tags 
 		wanted_item_tag_chance += RunData.get_player_effect(fengliu_wanted_item_tag_chance_hash, player_index) / 100.0
 		var wanted_tags: Array = player_character.wanted_tags.duplicate()
-		wanted_tags.append_array(RunData.get_player_effect(effect_fengliu_extra_wanted_item_tag, player_index))
+		# 旧档槽位里可能是标签哈希，统一还原成标签名后再比对
+		for extra_wanted_tag in RunData.get_player_effect(effect_fengliu_extra_wanted_item_tag, player_index):
+			var extra_wanted_tag_name: String = RunData.fengliu_resolve_item_tag_name(extra_wanted_tag)
+			if extra_wanted_tag_name != "":
+				wanted_tags.push_back(extra_wanted_tag_name)
 
 		if Utils.get_chance_success(wanted_item_tag_chance) and wanted_tags.size() > 0:
 			for item in pool:
@@ -924,15 +975,31 @@ func fengliu_get_rand_item_for_wave(wave: int, player_index: int, type: int, arg
 			elt = Utils.get_rand_element(pool)
 
 	if DebugService.force_item_in_shop != "" and randf() < 0.5:
-		elt = get_element(items, Keys.generate_hash(DebugService.force_item_in_shop))
+		elt = get_element(get_items(), Keys.generate_hash(DebugService.force_item_in_shop))
 		if elt == null:
-			elt = get_element(weapons, Keys.generate_hash(DebugService.force_item_in_shop))
+			elt = get_element(get_weapons(), Keys.generate_hash(DebugService.force_item_in_shop))
 
 	
 	if elt.my_id_hash == Keys.item_axolotl_hash and elt.effects.size() > 0 and "stats_swapped" in elt.effects[0]:
 		elt.effects[0].stats_swapped = []
 
 	return apply_item_effect_modifications(elt, player_index)
+
+
+func get_stat(stat_hash: int) -> StatData:
+	var stat := .get_stat(stat_hash)
+	if stat != null:
+		return stat
+
+	# 按物品套组注册表补查
+	for update_data in update_data_list:
+		if update_data == null or update_data.item_set == null:
+			continue
+		for set_stat in update_data.item_set.stats:
+			if set_stat != null and set_stat.stat_hash == stat_hash:
+				return set_stat
+
+	return null
 
 
 # 覆盖: 原版 init_elites_spawn 在难度 ≥ 4 时一次连抽 3 只精英，且每抽一只就从该池里移除一条；
@@ -948,3 +1015,164 @@ func get_elites_from_zone(zone_id: int) -> Array:
 		padded.push_back(zone_elites[padded.size() % zone_elites.size()])
 
 	return padded
+
+
+func _fengliu_register_all_content() -> void:
+	# 只注册一次
+	if _fengliu_content_registered:
+		return
+        
+	_fengliu_content_registered = true
+
+	# 按目录分类收集，目录结构本身就是分类依据
+	var content := {
+		"characters": [],
+		"items": [],
+		"weapons": [],
+		"sets": [],
+		"upgrades": [],
+	}
+
+	for sub_dir_name in FENGLIU_DYNAMIC_CONTENT_SUBDIRS:
+		_fengliu_collect_content_dir(FENGLIU_CONTENT_DIR + sub_dir_name, content)
+
+	sets.append_array(content["sets"])
+	upgrades.append_array(content["upgrades"])
+
+	# 物品套组：角色 / 道具 / 武器 / 自定义属性
+	var item_set := ItemSetData.new()
+	item_set.my_id = FENGLIU_ITEM_SET_ID
+	item_set.items = content["items"]
+	item_set.weapons = content["weapons"]
+	item_set.characters = content["characters"]
+	item_set.stats = _fengliu_collect_mod_resources(stats)
+
+	var update_data = load(FENGLIU_UPDATE_TRES)
+	if update_data == null or not (update_data is UpdateData):
+		ModLoaderLog.error("UpdateData tres missing or invalid: %s" % FENGLIU_UPDATE_TRES, FENGLIU_MOD_ID)
+		return
+
+	update_data.item_set = item_set
+	update_data_list.push_back(update_data)
+
+	# 激活套组 → 重建聚合缓存 → 读档前登记效果槽位 → 读档 → 补解锁 → 重建池
+	ProgressData.refresh_active_update_data()
+	invalidate_items_cache()
+	invalidate_weapons_cache()
+
+	for weapon in get_weapons():
+		if weapon.upgrades_into != null:
+			weapon.upgrades_into.previous_upgrade = weapon
+
+	invalidate_characters_cache()
+	_fengliu_hide_weapons_from_codex()
+	# 套组注册后才进入 active_update_data，这里补一次 stat keys（vanilla 的 reset 在注册之前）
+	Utils.reset_stat_keys()
+	_fengliu_ensure_effect_slot_keys()
+	ProgressData.load_game_file()
+	_fengliu_finalize_content_pools()
+
+	ModLoaderLog.info("Registered native content: characters=%d items=%d weapons=%d sets=%d upgrades=%d stats=%d."
+		% [item_set.characters.size(), item_set.items.size(), item_set.weapons.size(),
+			content["sets"].size(), content["upgrades"].size(), item_set.stats.size()], FENGLIU_MOD_ID)
+
+	call_deferred("_fengliu_finalize_content_pools")
+
+
+# 补齐「激活套组 → 重建缓存 → 默认解锁 → 商店/升级池」，可重复调用
+func _fengliu_finalize_content_pools() -> void:
+	ProgressData.refresh_active_update_data()
+	invalidate_items_cache()
+	invalidate_weapons_cache()
+	invalidate_characters_cache()
+	_fengliu_hide_weapons_from_codex()
+	ProgressData.add_unlocked_by_default()
+	init_unlocked_pool()
+
+
+# 让指定武器家族在图鉴/道具套组里只保留最低阶（幂等；已有真实升级链的武器不动）
+func _fengliu_hide_weapons_from_codex() -> void:
+	var weapons_by_id := {}
+	for weapon in get_weapons():
+		if weapon != null:
+			weapons_by_id[weapon.my_id] = weapon
+
+	for base_id in FENGLIU_CODEX_HIDDEN_WEAPON_CHAIN:
+		var base_weapon = weapons_by_id.get(base_id)
+		var next_weapon = weapons_by_id.get(FENGLIU_CODEX_HIDDEN_WEAPON_CHAIN[base_id])
+		if base_weapon == null or next_weapon == null:
+			continue
+		# 已有真实升级链（或已挂前阶）则不动
+		if next_weapon.previous_upgrade != null or next_weapon.upgrades_into != null:
+			continue
+		next_weapon.previous_upgrade = base_weapon
+
+
+# 读档前登记效果实例槽位（mod_main 已登记一次，这里幂等兜底，与本函数的读档顺序无关）
+func _fengliu_ensure_effect_slot_keys() -> void:
+	var mod_node = get_node_or_null("/root/ModLoader/FengLiu-FengAddMods")
+	if mod_node != null and mod_node.has_method("_fengliu_register_effect_slot_keys"):
+		mod_node._fengliu_register_effect_slot_keys()
+
+
+# 递归收集目录里的 .tres，目录打不开只记错误、不中断其它目录
+func _fengliu_collect_content_dir(dir_path: String, content: Dictionary) -> void:
+	var dir := Directory.new()
+	if dir.open(dir_path) != OK:
+		ModLoaderLog.error("Failed to open content directory: %s" % dir_path, FENGLIU_MOD_ID)
+		return
+
+	# 先收齐条目名再排序，避免注册顺序随文件系统枚举顺序变化
+	var entry_names := []
+	var is_dir_by_name := {}
+	dir.list_dir_begin(true, true)
+	var file_name := dir.get_next()
+
+	while file_name != "":
+		entry_names.push_back(file_name)
+		is_dir_by_name[file_name] = dir.current_is_dir()
+		file_name = dir.get_next()
+
+	dir.list_dir_end()
+	entry_names.sort()
+
+	# 子目录继续递归，.tres 交给分类函数，其余文件忽略
+	for entry_name in entry_names:
+		var full_path := dir_path.plus_file(entry_name)
+
+		if is_dir_by_name[entry_name]:
+			_fengliu_collect_content_dir(full_path, content)
+
+		elif entry_name.get_extension() == "tres":
+			_fengliu_collect_content_file(full_path, content)
+
+
+func _fengliu_collect_content_file(file_path: String, content: Dictionary) -> void:
+	var data = load(file_path)
+	if data == null:
+		ModLoaderLog.warning("Failed to load content resource: %s" % file_path, FENGLIU_MOD_ID)
+		return
+
+	if data is CharacterData:
+		content["characters"].push_back(data)
+	elif data is WeaponData:
+		content["weapons"].push_back(data)
+	elif data is SetData:
+		content["sets"].push_back(data)
+	elif data is UpgradeData:
+		content["upgrades"].push_back(data)
+	elif data is ConsumableData:
+		return
+	elif data is ItemData:
+		content["items"].push_back(data)
+
+
+# 只收集本 mod 目录下的资源，避免把原版内容重复塞进套组
+func _fengliu_collect_mod_resources(pool: Array) -> Array:
+	var result := []
+	for element in pool:
+		if element == null:
+			continue
+		if element.resource_path.begins_with(FENGLIU_MOD_DIR):
+			result.push_back(element)
+	return result

@@ -44,6 +44,9 @@ func get_args(player_index: int) -> Array:
     if dynamic_chance > 100:
         dynamic_chance = 100
     
+    if health_gain_stat_hash == null:
+        health_gain_stat_hash = Keys.generate_hash(health_gain_stat)
+        
     var health = health_value + int(Utils.get_stat(health_gain_stat_hash, player_index) * (health_gain_value / 100.0))
     return [
         str(dynamic_chance), 

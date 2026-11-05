@@ -38,3 +38,4 @@ banned_items = [ "item_baby_gecko", "item_sifds_relic", "item_alien_tongue" ]
 banned_upgrades = [  ]
 starting_weapons = [ ExtResource(11), ExtResource(12), ExtResource(13), ExtResource(14) ]
 starting_items = [  ]
+required_item_set = "fengliu"
