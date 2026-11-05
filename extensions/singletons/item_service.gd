@@ -18,6 +18,15 @@ const FENGLIU_CONTENT_DIR = "res://mods-unpacked/FengLiu-FengAddMods/content_dat
 const FENGLIU_DYNAMIC_CONTENT_SUBDIRS := ["characters", "items", "weapons", "sets", "upgrades"]
 
 
+# 图鉴 / 道具套组只显示 previous_upgrade == null 的武器；
+# 这里只补「展示用前阶指针」，不写 upgrades_into ⇒ 商店升级 / 合成玩法不变
+const FENGLIU_CODEX_HIDDEN_WEAPON_CHAIN := {
+	"wood_pickaxe": "stone_pickaxe",
+	"stone_pickaxe": "iron_pickaxe",
+	"iron_pickaxe": "diamond_pickaxe"
+}
+
+
 const FENGLIU_UPGRADE_POOL_STATS := {
 	"fengliu_icon_damage_upgrade": [
 		"stat_melee_damage", "stat_ranged_damage", "stat_percent_damage", "stat_engineering", "stat_range", "stat_attack_speed", "stat_crit_chance", "stat_elemental_damage",
@@ -242,17 +251,18 @@ func get_consumable_to_drop(unit: Unit, item_chance: float) -> ConsumableData:
 
 # 自定义保证商店道具
 func fengliu_guaranteed_shop_items(effect: Array, wave: int, player_index: int, args: ItemServiceGetShopItemsArgs) -> Array:
-     # 上限
-    var limited_items = get_limited_items(args.owned_and_shop_items)
-
     # 临时把自定义保证道具合并进基础 guaranteed_shop_items
     var base_guaranteed = RunData.get_player_effect(Keys.guaranteed_shop_items_hash, player_index)
     var appended = 0
     for entry in effect:
         var item_hash = entry[0]
+        var item_data = fengliu_get_shop_extra_item(item_hash)
+        if item_data == null:
+            continue
 
-        # 已拥有达到 max_nb，不再固定出售
-        if limited_items.has(item_hash) and limited_items[item_hash][1] >= limited_items[item_hash][0].max_nb:
+        # 只看同名道具：replaced_by 的失效版（max_nb 常为 -1）不占原道具上限，
+        # 否则「失效的定向训练」会让正版永远不再保底
+        if item_data.max_nb != -1 and fengliu_count_same_items(item_hash, args.owned_and_shop_items) >= item_data.max_nb:
             continue
 
         base_guaranteed.append([item_hash, 1])
@@ -266,16 +276,23 @@ func fengliu_guaranteed_shop_items(effect: Array, wave: int, player_index: int, 
     return result
 
 
-# 目标道具是否已达 max_nb 上限
-func fengliu_shop_slot_reached_limit(item_hash: int, limited_items: Dictionary, result: Array) -> bool:
+# 统计「同名」道具数量：不把 replaced_by 的失效版算进来
+#（失效版 max_nb 常为 -1，用 origin 聚合会把原道具的 max_nb 永久占满）
+func fengliu_count_same_items(item_hash: int, from_items: Array) -> int:
+    var count := 0
+    for item in from_items:
+        if item != null and item.my_id_hash == item_hash:
+            count += 1
+    return count
+
+
+# 目标道具是否已达 max_nb 上限（只看同名，失效版不占原道具上限）
+func fengliu_shop_slot_reached_limit(item_hash: int, owned_and_shop_items: Array, result: Array) -> bool:
     var item = fengliu_get_shop_extra_item(item_hash)
     if item == null or item.max_nb == -1:
         return false
 
-    var count = 0
-    if limited_items.has(item_hash):
-        count = limited_items[item_hash][1]
-
+    var count = fengliu_count_same_items(item_hash, owned_and_shop_items)
     for entry in result:
         if entry[0] != null and entry[0].my_id_hash == item_hash:
             count += 1
@@ -374,7 +391,6 @@ func get_player_shop_items(wave: int, player_index: int, args: ItemServiceGetSho
     else:
         extra_shop_item_index = guaranteed_count
 
-    var limited_items = get_limited_items(args.owned_and_shop_items)
     for effect in extra_shop_item_chance_effects:
         if not Utils.get_chance_success(effect[1] / 100.0):
             continue
@@ -382,7 +398,7 @@ func get_player_shop_items(wave: int, player_index: int, args: ItemServiceGetSho
         if extra_shop_item_index >= result.size():
             break
 
-        if fengliu_shop_slot_reached_limit(effect[0], limited_items, result):
+        if fengliu_shop_slot_reached_limit(effect[0], args.owned_and_shop_items, result):
             continue
 
         var item_data = fengliu_get_shop_extra_item(effect[0]).duplicate()
@@ -880,7 +896,11 @@ func fengliu_get_rand_item_for_wave(wave: int, player_index: int, type: int, arg
         # 修改道具 tags 
 		wanted_item_tag_chance += RunData.get_player_effect(fengliu_wanted_item_tag_chance_hash, player_index) / 100.0
 		var wanted_tags: Array = player_character.wanted_tags.duplicate()
-		wanted_tags.append_array(RunData.get_player_effect(effect_fengliu_extra_wanted_item_tag, player_index))
+		# 旧档槽位里可能是标签哈希，统一还原成标签名后再比对
+		for extra_wanted_tag in RunData.get_player_effect(effect_fengliu_extra_wanted_item_tag, player_index):
+			var extra_wanted_tag_name: String = RunData.fengliu_resolve_item_tag_name(extra_wanted_tag)
+			if extra_wanted_tag_name != "":
+				wanted_tags.push_back(extra_wanted_tag_name)
 
 		if Utils.get_chance_success(wanted_item_tag_chance) and wanted_tags.size() > 0:
 			for item in pool:
@@ -1045,6 +1065,7 @@ func _fengliu_register_all_content() -> void:
 			weapon.upgrades_into.previous_upgrade = weapon
 
 	invalidate_characters_cache()
+	_fengliu_hide_weapons_from_codex()
 	# 套组注册后才进入 active_update_data，这里补一次 stat keys（vanilla 的 reset 在注册之前）
 	Utils.reset_stat_keys()
 	_fengliu_ensure_effect_slot_keys()
@@ -1064,8 +1085,27 @@ func _fengliu_finalize_content_pools() -> void:
 	invalidate_items_cache()
 	invalidate_weapons_cache()
 	invalidate_characters_cache()
+	_fengliu_hide_weapons_from_codex()
 	ProgressData.add_unlocked_by_default()
 	init_unlocked_pool()
+
+
+# 让指定武器家族在图鉴/道具套组里只保留最低阶（幂等；已有真实升级链的武器不动）
+func _fengliu_hide_weapons_from_codex() -> void:
+	var weapons_by_id := {}
+	for weapon in get_weapons():
+		if weapon != null:
+			weapons_by_id[weapon.my_id] = weapon
+
+	for base_id in FENGLIU_CODEX_HIDDEN_WEAPON_CHAIN:
+		var base_weapon = weapons_by_id.get(base_id)
+		var next_weapon = weapons_by_id.get(FENGLIU_CODEX_HIDDEN_WEAPON_CHAIN[base_id])
+		if base_weapon == null or next_weapon == null:
+			continue
+		# 已有真实升级链（或已挂前阶）则不动
+		if next_weapon.previous_upgrade != null or next_weapon.upgrades_into != null:
+			continue
+		next_weapon.previous_upgrade = base_weapon
 
 
 # 读档前登记效果实例槽位（mod_main 已登记一次，这里幂等兜底，与本函数的读档顺序无关）

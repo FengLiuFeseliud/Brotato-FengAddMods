@@ -343,6 +343,8 @@ func resume_from_state(state: Dictionary) -> void :
 	fengliu_normalize_state_effects(state)
 	# 旧档效果槽可能被写成实例 id，读档前先修复
 	fengliu_repair_effect_slots(state)
+	# 旧档「所需标签」槽可能存的是标签哈希，读档前统一还原成标签名
+	fengliu_normalize_wanted_tag_slot(state)
 
 	if state.has(FENGLIU_WAVE_INTENSITY_STATE_KEY):
 		fengliu_restore_wave_intensity_state(state)
@@ -453,6 +455,76 @@ func fengliu_repair_effect_slots(state: Dictionary) -> void :
 		for slot_hash in corrupted.keys():
 			if not effects.has(slot_hash):
 				effects[slot_hash] = []
+
+
+# 旧档「所需标签」槽里可能存的是标签哈希（int / 数字串），读档前统一还原成标签名
+# 说明：item_service 的标签命中用 wanted_tags.has(item_tag) 比字符串，
+#       槽里若残留数字则永远不命中（同时道具卡上的标签也会显示成数字）
+func fengliu_normalize_wanted_tag_slot(state: Dictionary) -> void :
+	# 空档直接跳过
+	if not state.has("players_data"):
+		return
+
+	var slot_hash: int = effect_fengliu_extra_wanted_item_tag
+	for player_data in state.players_data:
+		if player_data == null or not player_data is PlayerRunData:
+			continue
+
+		var effects: Dictionary = player_data.effects
+		if not effects.has(slot_hash):
+			continue
+
+		var raw = effects[slot_hash]
+		if not raw is Array:
+			effects[slot_hash] = []
+			continue
+
+		var normalized := []
+		var dirty := false
+		for element in raw:
+			var tag_name: String = fengliu_resolve_item_tag_name(element)
+			# 解析不出来的（已失效标签）直接丢弃
+			if tag_name == "":
+				dirty = true
+				continue
+			if tag_name != str(element):
+				dirty = true
+			normalized.push_back(tag_name)
+
+		if dirty:
+			effects[slot_hash] = normalized
+
+
+# 把「标签名 / 标签哈希 / 数字字符串」统一还原成标签名；无法识别返回 ""
+# 兼容旧版存档：标签曾经以 Keys.generate_hash(tag) 的形式落盘
+func fengliu_resolve_item_tag_name(value) -> String:
+	if value == null:
+		return ""
+
+	var text: String = str(value)
+	# 已经是合法标签名
+	if all_item_tags.has(text):
+		return text
+
+	# 取数字形态的哈希：int / float / "1234567890" / "1234567890.0"
+	var numeric_hash: int = 0
+	if value is int or value is float:
+		numeric_hash = int(value)
+	elif value is String and (value as String).is_valid_float():
+		numeric_hash = int(float(value))
+	else:
+		return ""
+
+	# 先查原版哈希表（运行时 generate_hash 会登记名字）
+	if Keys.hash_to_string.has(numeric_hash) and all_item_tags.has(Keys.hash_to_string[numeric_hash]):
+		return Keys.hash_to_string[numeric_hash]
+
+	# 再遍历标签表逐个比对（覆盖当前进程内还没登记进 hash_to_string 的情况）
+	for tag in all_item_tags:
+		if Keys.generate_hash(tag) == numeric_hash:
+			return tag
+
+	return ""
 
 
 # 扩展新局 / 重开：effects 全新重建，不存在需要 rebase 的烘焙值

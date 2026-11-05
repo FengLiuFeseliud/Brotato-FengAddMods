@@ -10,6 +10,6 @@ id = "fengliu"
 name = "ITEM_SET_FENGLIU"
 update_type = 1
 icon = ExtResource( 2 )
-color = Color( 0.72, 0.45, 0.85, 1 )
+color = Color( 0.4, 0.8, 1, 1 )
 baner_logo = ExtResource( 3 )
 baner_illu = ExtResource( 3 )

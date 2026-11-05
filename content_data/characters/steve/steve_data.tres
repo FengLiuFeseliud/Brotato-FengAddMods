@@ -1,4 +1,4 @@
-[gd_resource type="Resource" load_steps=7 format=2]
+[gd_resource type="Resource" load_steps=12 format=2]
 
 [ext_resource path="res://items/characters/character_data.gd" type="Script" id=1]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/steve/steve_icon.png" type="Texture" id=2]
@@ -7,8 +7,7 @@
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/melee/pickaxe/wood/wood_pickaxe_data.tres" type="Resource" id=5]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/steve/effects/steve_effect_0.tres" type="Resource" id=6]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/steve/effects/steve_effect_1.tres" type="Resource" id=7]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/steve/effects/steve_effect_2.tres" type="Resource" id=8]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/steve/effects/steve_effect_3.tres" type="Resource" id=9]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/steve/effects/steve_effect_no_weapon_in_shop.tres" type="Resource" id=13]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/steve/effects/steve_effect_4.tres" type="Resource" id=10]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/steve/effects/steve_effect_5.tres" type="Resource" id=11]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/steve/effects/steve_effect_6.tres" type="Resource" id=12]
@@ -22,7 +21,7 @@ icon = ExtResource( 2 )
 name = "STEVE"
 tier = 0
 value = 1
-effects = [ ExtResource( 6 ), ExtResource( 7 ), ExtResource( 8 ), ExtResource( 9 ), ExtResource( 10 ), ExtResource( 11 ), ExtResource( 12 ) ]
+effects = [ ExtResource( 6 ), ExtResource( 7 ), ExtResource( 13 ), ExtResource( 10 ), ExtResource( 11 ), ExtResource( 12 ) ]
 tracking_text = ""
 is_lockable = false
 unlock_codex_descr_after_get_it = 1
