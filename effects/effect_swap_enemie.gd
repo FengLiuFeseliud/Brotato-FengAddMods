@@ -89,12 +89,13 @@ func fengliu_roll_effect(player_index: int) -> void:
 
 	var effects = RunData.get_player_effect(effect_fengliu_can_swap_looter_enemies, player_index)
 	if effects.size() > 0 and Utils.get_chance_success(effects[0] / 100.0):
-		var dlc = ProgressData.get_dlc_data("abyssal_terrors")
-		if dlc != null and dlc.zones.has(ZoneService.get_zone_data(RunData.current_zone)):
-			wave_enemy_y = 'res://dlcs/dlc_1/enemies/looting_pig/looting_pig.tscn'
+
+		var zone_dlc_id: String = ZoneService.get_zone_data(RunData.current_zone).dlc_id
+		if zone_dlc_id == "abyssal_terrors" and ProgressData.is_dlc_available_and_active("abyssal_terrors"):
+			wave_enemy_y = 'res://entities/units/enemies/abyss/basic/looting_pig/looting_pig.tscn'
 			wave_enemy_y_id = 'looting_pig'
 		else:
-			wave_enemy_y = 'res://entities/units/enemies/looter/looter.tscn'
+			wave_enemy_y = 'res://entities/units/enemies/crash_zone/basic/looter/looter.tscn'
 			wave_enemy_y_id = 'looter'
 	else:
 		# 随机取替换成的敌人（保证两者不同）

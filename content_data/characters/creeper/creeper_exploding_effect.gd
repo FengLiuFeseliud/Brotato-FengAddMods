@@ -5,6 +5,10 @@ export (float) var wait_time = 0.0
 export (bool) var exploding_on_clean_up_room = false
 
 
+static func get_id() -> String:
+	return "fengliu_not_moving_explosion_effect"
+
+
 func apply(player_index: int) -> void:
 	RunData.get_player_effect(key_hash ,player_index).push_back(self)
 	

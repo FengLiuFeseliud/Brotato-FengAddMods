@@ -13,6 +13,13 @@ const ModEffectScript = preload("res://mods-unpacked/FengLiu-FengAddMods/effects
 #   子类必须自带 get_id()（返回 fengliu_ 前缀的唯一 id）。
 # ============================================================
 
+# 复制后重算哈希：Resource.duplicate() 不会执行 _init，
+# 子类在 _generate_hashes() 里追加的自定义哈希（如 health_gain_stat_hash）否则为 null
+func duplicate(subresources := false) -> Resource:
+	var duplication = .duplicate(subresources)
+	duplication._generate_hashes()
+	return duplication
+
 
 # 需要随存档持久化的非导出变量名
 func fengliu_persist_var_names() -> Array:

@@ -179,8 +179,7 @@ func _fengliu_is_consumable_available(consumable) -> bool:
 	if consumable.consumable_data == null:
 		return false
 
-	# 会伤害玩家的消耗品留给玩家自己踩（含 mod 的波次结束不拾取效果）
-	return not consumable.has_damage_effect()
+	return not consumable.should_be_picked_up_at_end_of_wave()
 
 
 # 取场上最近的、还没被捡走且可以代捡的消耗品

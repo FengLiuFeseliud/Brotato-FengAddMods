@@ -80,8 +80,8 @@ func _ready()->void:
 	var dlc_probe_path = "res://dlcs/dlc_1/characters/builder/effects/builder_effect_1c.tres" 
 	if not ResourceLoader.exists(dlc_probe_path):
 		ModLoaderLog.info("DLC not load, load DLC...", MOD_ID)
-		if is_instance_valid(ProgressData):
-			ProgressData.load_dlc_pcks()
+		if is_instance_valid(ProgressData) and is_instance_valid(ItemService):
+			ItemService.init_dlc_content()
 
 	# 玩家效果槽里存的是效果实例的 custom_key 必须登记进原版全量序列化名单，
 	# 且必须在读档之前完成（否则槽位会被原样序列化写成字典）
@@ -176,15 +176,10 @@ func _fengliu_register_effect_slot_keys() -> void:
 		ModLoaderLog.error("RunData not ready, effect slot keys not registered.", MOD_ID)
 		return
 
-	# 幂等登记：名单里已有同 key 就跳过
-	for slot_key in [
-		Keys.generate_hash("fengliu_swap_enemie"),
-		Keys.generate_hash("fengliu_get_fixed_upgrade"),
-		Keys.generate_hash("fengliu_get_highest_stat_fixed_upgrade_data"),
-		Keys.generate_hash("fengliu_no_hit_material"),
-		Keys.generate_hash("fengliu_full_shield_stat_link")
-	]:
-		if not RunData.effect_keys_full_serialization.has(slot_key):
-			RunData.effect_keys_full_serialization.push_back(slot_key)
+	# 幂等登记：名单在 RunData 扩展里（单一来源），已有同 key 就跳过
+	for slot_key in RunData.FENGLIU_EFFECT_SLOT_KEYS:
+		var slot_hash: int = Keys.generate_hash(slot_key)
+		if not RunData.effect_keys_full_serialization.has(slot_hash):
+			RunData.effect_keys_full_serialization.push_back(slot_hash)
 
 	ModLoaderLog.info("Registered effect slot keys, total=%d." % RunData.effect_keys_full_serialization.size(), MOD_ID)

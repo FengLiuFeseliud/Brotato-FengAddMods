@@ -102,11 +102,13 @@ func _ready() -> void :
 
     # 配置静止爆炸
     effects = RunData.get_player_effect(effect_fengliu_not_moving_explosion, player_index)
-    if effects.size() > 0:
-        _not_moving_explosion_timer = FixedTimer.new(effects[0].wait_time)
+    if effects.size() > 0 and effects[0] is Effect:
+        var not_moving_wait_time = effects[0].get("wait_time")
+        var not_moving_clean_up_explosion = effects[0].get("exploding_on_clean_up_room")
+        _not_moving_explosion_timer = FixedTimer.new(1.0 if not_moving_wait_time == null else not_moving_wait_time)
         _clean_up_room_timer = FixedTimer.new(1)
         _can_not_moving_explosio = false
-        _exploding_on_clean_up_room = effects[0].exploding_on_clean_up_room
+        _exploding_on_clean_up_room = false if not_moving_clean_up_explosion == null else not_moving_clean_up_explosion
 
     effects = RunData.get_player_effect(effect_fengliu_hold_attract_nearby_consumables_hash, player_index)
     if effects.size() > 0:

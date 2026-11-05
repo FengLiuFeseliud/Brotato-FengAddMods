@@ -110,8 +110,10 @@ func fengliu_can_copy_turret(target: Node, _turret_copy_effect: Array, player_in
 func fengliu_copy_turret(target: Node) -> void:
     var pos = fengliu_get_entity_spawner().get_spawn_pos_in_area(target.global_position, 100)
     var queue = fengliu_get_entity_spawner().queues_to_spawn_structures[player_index]
-    # 加入生成队列
-    queue.push_back([EntityType.STRUCTURE, _data.scene, pos, _data])
+    
+    var request: = SpawnRequest.new(EntityType.STRUCTURE, _data.scene, pos)
+    request.data = _data
+    queue.push_back(request)
 
 
 # 扩展目标死亡复制

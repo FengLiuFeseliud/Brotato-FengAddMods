@@ -95,6 +95,17 @@ const FENGLIU_LINKED_LEDGER_KEY := "fengliu_secondary_ledger_linked"
 const FENGLIU_WAVE_INTENSITY_STATE_KEY := "fengliu_wave_intensity_state"
 
 
+const FENGLIU_EFFECT_SLOT_KEYS := [
+	"fengliu_explode_on_shield_broken",
+	"fengliu_not_moving_explosion",
+	"fengliu_swap_enemie",
+	"fengliu_get_fixed_upgrade",
+	"fengliu_get_highest_stat_fixed_upgrade_data",
+	"fengliu_no_hit_material",
+	"fengliu_full_shield_stat_link"
+]
+
+
 # 每个玩家是否需要「旧档 rebase」（读档时判定，取用后即清；仅 linked 层使用）
 var fengliu_legacy_rebase_pending := [false, false, false, false]
 
@@ -327,9 +338,11 @@ func fengliu_mark_legacy_rebase(state: Dictionary) -> void :
 
 # 扩展读档：先标记旧档（无台账）玩家，再把 JSON 浮点归一化为 int，其余交给原逻辑
 func resume_from_state(state: Dictionary) -> void :
-	# 两步都必须在原版读档前完成（原版末段会立刻重算 LinkedStats）
+	# 三步都必须在原版读档前完成（原版末段会立刻重算 LinkedStats）
 	fengliu_mark_legacy_rebase(state)
 	fengliu_normalize_state_effects(state)
+	# 旧档效果槽可能被写成实例 id，读档前先修复
+	fengliu_repair_effect_slots(state)
 
 	if state.has(FENGLIU_WAVE_INTENSITY_STATE_KEY):
 		fengliu_restore_wave_intensity_state(state)
@@ -337,8 +350,6 @@ func resume_from_state(state: Dictionary) -> void :
 
 
 # 读档前把 effects 里的数字归一化为 int
-#   存档是 JSON，数字会读成 float：原版 LinkedStats 有 `assert(x is int)`、多处用哈希当字典键，
-#   本 mod 也有 `is int` 判断；不归一化会被误判为类型不符（清零）或让断言/查表失败
 func fengliu_normalize_state_effects(state: Dictionary) -> void :
 	# 没有玩家数据（空档）直接跳过
 	if not state.has("players_data"):
@@ -382,6 +393,66 @@ func fengliu_normalize_effect_values(value):
 			normalized_array.push_back(fengliu_normalize_effect_values(element))
 		return normalized_array
 	return value
+
+
+# 修复旧档里 int 的残留
+func fengliu_repair_effect_slots(state: Dictionary) -> void :
+	# 空档直接跳过
+	if not state.has("players_data"):
+		return
+
+	var slot_hashs := {}
+	for slot_key in FENGLIU_EFFECT_SLOT_KEYS:
+		slot_hashs[Keys.generate_hash(slot_key)] = true
+
+	for player_data in state.players_data:
+		if player_data == null or not player_data is PlayerRunData:
+			continue
+
+		var effects: Dictionary = player_data.effects
+		var corrupted := {}
+
+		# 第一步：剔除不是效果实例的残留（未登记全量序列化时会被写成实例 id）
+		for slot_hash in slot_hashs.keys():
+			if not effects.has(slot_hash):
+				continue
+			var raw = effects[slot_hash]
+			var dirty := false
+			if raw is Array:
+				var kept := []
+				for element in raw:
+					if element is Effect:
+						kept.push_back(element)
+					else:
+						dirty = true
+				if not dirty:
+					continue
+				effects[slot_hash] = kept
+			else:
+				effects[slot_hash] = []
+			corrupted[slot_hash] = true
+
+		# 未损坏则无需补回
+		if corrupted.empty():
+			continue
+
+		# 第二步：按槽位键从道具 / 角色自带效果里补回实例（等价于各效果 apply 的 push self）
+		for item in player_data.items:
+			if item == null:
+				continue
+			for effect in item.effects:
+				if effect == null or not effect is Effect:
+					continue
+				var effect_slot_hash: int = effect.custom_key_hash if effect.custom_key != "" else effect.key_hash
+				if not corrupted.has(effect_slot_hash):
+					continue
+				var slot_effects: Array = effects[effect_slot_hash]
+				if not slot_effects.has(effect):
+					slot_effects.push_back(effect)
+
+		for slot_hash in corrupted.keys():
+			if not effects.has(slot_hash):
+				effects[slot_hash] = []
 
 
 # 扩展新局 / 重开：effects 全新重建，不存在需要 rebase 的烘焙值
@@ -603,7 +674,11 @@ func fengliu_try_item_merge(item_merge_effect: Array, player_index: int) -> void
 
 # 诅咒一个道具
 func fengliu_curse_item(curse_item_effect: Array, player_index: int) -> bool:
-	var dlc = ProgressData.get_dlc_data("abyssal_terrors")
+	
+	var dlc = ItemService.get_dlc_data_by_id("abyssal_terrors")
+	if dlc == null:
+		return false
+
 	# 找一个可诅咒的道具
 	for item in get_player_items(player_index):
 		if item.is_cursed or item.my_id_hash in curse_item_effect[3] or item.get_category() == Category.CHARACTER:
@@ -620,7 +695,11 @@ func fengliu_curse_item(curse_item_effect: Array, player_index: int) -> bool:
 
 # 诅咒一把武器
 func fengliu_curse_weapon(curse_item_effect: Array, player_index: int) -> bool:
-	var dlc = ProgressData.get_dlc_data("abyssal_terrors")
+	
+	var dlc = ItemService.get_dlc_data_by_id("abyssal_terrors")
+	if dlc == null:
+		return false
+		
 	# 找一把可诅咒的武器
 	for weapon in get_player_weapons(player_index):
 		if weapon.is_cursed or weapon.my_id_hash in curse_item_effect[3]:
@@ -638,7 +717,7 @@ func fengliu_curse_weapon(curse_item_effect: Array, player_index: int) -> bool:
 # 自动诅咒道具或武器
 func fengliu_auto_curse(curse_item_effect: Array, player_index: int) -> void:
 	# 无 DLC 或材料不足则跳过
-	if ProgressData.get_dlc_data("abyssal_terrors") == null or fengliu_get_item_count(curse_item_effect[0], player_index) < curse_item_effect[1]:
+	if not ProgressData.is_dlc_available_and_active("abyssal_terrors") or fengliu_get_item_count(curse_item_effect[0], player_index) < curse_item_effect[1]:
 		return
 		
 	# 等级不足则跳过
@@ -1151,6 +1230,29 @@ func get_player_effect(key: int, player_index: int):
 	assert (player_index >= 0, Keys.hash_to_string[key])
 	return effects[key]
 	
+
+
+func handle_explode_effect(key: int, position: Vector2, player_index: int, use_second_args: = false) -> void :
+	var effects: Dictionary = get_player_effects(player_index)
+	# 槽位不存在时原版会越界，这里直接跳过
+	if not effects.has(key):
+		return
+
+	var effect = effects[key]
+	if not effect is Array:
+		return
+
+	# 倒序剔除垃圾值，只保留真正的爆炸效果实例
+	for index in range(effect.size() - 1, -1, -1):
+		if not effect[index] is Effect:
+			effect.remove(index)
+
+	# 清完没有可用的爆炸效果则无事可做
+	if effect.size() == 0:
+		return
+
+	.handle_explode_effect(key, position, player_index, use_second_args)
+
 
 # 添加倍率修改
 func fengliu_add_gain_stat(effect: Array, add_value: int, player_index: int):

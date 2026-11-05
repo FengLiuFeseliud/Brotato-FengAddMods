@@ -8,6 +8,10 @@ var effect_fengliu_stronger_aliens_on_stats = Keys.generate_hash("fengliu_strong
 var effect_fengliu_killed_regen_shield = Keys.generate_hash("fengliu_killed_regen_shield")
 
 
+var _fengliu_charm_behavior_scene: PackedScene = null
+var _fengliu_charm_behavior_scene_resolved := false
+
+
 # 判断攻击来源是否匹配指定类型
 func fengliu_key_in_class(key: String, hitbox: Hitbox = null) -> bool:
     # 无攻击来源则不匹配
@@ -44,6 +48,9 @@ func fengliu_charm_enemy(effect: Array, args: TakeDamageArgs) -> void:
     if not fengliu_key_in_class(effect[0], args.hitbox):
         return
 
+    if is_loot or not can_be_charmed:
+        return
+
     var chance
     var health = 1
     # 普通敌人按概率魅惑
@@ -72,16 +79,37 @@ func fengliu_charm_enemy(effect: Array, args: TakeDamageArgs) -> void:
             has_charm_behavior = true
             break
 
-    # 无魅惑行为则加载并添加
     if not has_charm_behavior:
-        var charm_scene = load("res://dlcs/dlc_1/effect_behaviors/enemy/charm_enemy_effect_behavior.tscn")
+        var charm_scene = fengliu_get_charm_behavior_scene()
         if charm_scene != null:
-            var charm_behavior = charm_scene.instance()
+            # 与原版 init_effect_behaviors() 一致：先 init(self) 再挂到 effect_behaviors
+            var charm_behavior = charm_scene.instance().init(self)
             effect_behaviors.add_child(charm_behavior)
-            charm_behavior.init(self)
 
     # 应用魅惑
     set_charmed(args.from_player_index)
+
+
+func fengliu_get_charm_behavior_scene() -> PackedScene:
+    if _fengliu_charm_behavior_scene_resolved:
+        return _fengliu_charm_behavior_scene
+    _fengliu_charm_behavior_scene_resolved = true
+
+    if is_instance_valid(EffectBehaviorService):
+        for behavior_data in EffectBehaviorService.enemy_effect_behaviors:
+            if behavior_data == null or behavior_data.scene == null:
+                continue
+            var behavior_instance = behavior_data.scene.instance()
+            if behavior_instance == null:
+                continue
+            var is_charm = "charmed" in behavior_instance
+            behavior_instance.free()
+            if is_charm:
+                _fengliu_charm_behavior_scene = behavior_data.scene
+                return _fengliu_charm_behavior_scene
+
+    _fengliu_charm_behavior_scene = load("res://effect_behaviors/enemies/charm_enemy_effect_behavior.tscn")
+    return _fengliu_charm_behavior_scene
 
 
 # 扩展初始化：按波次强敌效果提高本敌人属性
