@@ -276,3 +276,14 @@ EFFECT_SPLIT_UPGRADE,Your upgrades are split in two: one damage upgrade and one 
 ITEM_PLASTIC_STRAW,Plastic Straw,塑料吸管
 EFFECT_HOLD_ATTRACT_NEARBY_CONSUMABLES,You always attract nearby Consumables,不管什么时候你都会吸取消耗品
 ITEM_SET_FENGLIU,Brotato Musings,土豆随想
+MENU_POTATO_WORLD,Potato World,土豆的世界
+MENU_POTATO_WORLD_TITLE,Potato World,土豆的世界
+MENU_POTATO_WORLD_CODE_PLACEHOLDER,Server address (ip[:port]),服务器地址（ip[:端口]）
+MENU_POTATO_WORLD_CONNECT,Connect,连接
+MENU_POTATO_WORLD_CONNECTING,Connecting...,连接中...
+MENU_POTATO_WORLD_CONNECTED,Connected,已连接
+MENU_POTATO_WORLD_CONNECT_FAILED,Connection failed,连接失败
+MENU_POTATO_WORLD_DISCONNECTED,Disconnected,已断开
+MENU_POTATO_WORLD_INVALID_ADDRESS,Invalid server address,服务器地址无效
+MENU_POTATO_WORLD_CODE_EMPTY,Please enter the server address,请输入服务器地址
+MENU_POTATO_WORLD_ROOM_CODE,Room code,房间号

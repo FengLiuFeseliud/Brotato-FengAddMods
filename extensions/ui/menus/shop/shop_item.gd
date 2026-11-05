@@ -86,6 +86,29 @@ func set_shop_item(p_item_data: ItemParentData, p_wave_value: int = RunData.curr
         
     .set_shop_item(p_item_data, p_wave_value)
     _fengliu_refresh_pay_display()
+    fengliu_refresh_item_set_icon(p_item_data)
+
+
+# 商店道具的物品套组图标
+func fengliu_refresh_item_set_icon(p_item_data: ItemParentData) -> void :
+    if _item_description == null or not is_instance_valid(_item_description):
+        return
+
+    var icon_set = _item_description.get("_icon_item_set")
+    if icon_set == null:
+        return
+
+    # 原版路径优先
+    var update_data = ItemService.get_update_data_from_item(p_item_data)
+    if update_data == null:
+        update_data = ItemService.get_update_data_by_item_id(p_item_data)
+
+    if update_data == null:
+        icon_set.visible = false
+        return
+
+    icon_set.visible = true
+    icon_set.texture = update_data.icon
 
 
 # 是否达到锁定上限

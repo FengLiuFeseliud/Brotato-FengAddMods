@@ -1304,14 +1304,3 @@ static func fengliu_get_dynamic_value(stat_min_value: int, stat_max_value: int, 
 	if dynamic_value == 0 and stat_no_zero:
 		return fengliu_get_dynamic_value(stat_min_value, stat_max_value, stat_no_zero)
 	return dynamic_value
-
-
-
-# 物品套组显示兜底
-func get_update_data_from_item(item_data: ItemParentData) -> UpdateData:
-	var update_data = .get_update_data_from_item(item_data)
-	if update_data != null:
-		return update_data
-
-	return get_update_data_by_item_id(item_data)
-
