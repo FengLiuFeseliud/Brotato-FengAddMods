@@ -345,6 +345,8 @@ func resume_from_state(state: Dictionary) -> void :
 	fengliu_repair_effect_slots(state)
 	# 旧档「所需标签」槽可能存的是标签哈希，读档前统一还原成标签名
 	fengliu_normalize_wanted_tag_slot(state)
+	# 旧档兜底：修复「替代材料支付透支最大生命」造成的异常值
+	fengliu_repair_substitute_payment_stats(state)
 
 	if state.has(FENGLIU_WAVE_INTENSITY_STATE_KEY):
 		fengliu_restore_wave_intensity_state(state)
@@ -525,6 +527,41 @@ func fengliu_resolve_item_tag_name(value) -> String:
 			return tag
 
 	return ""
+
+
+# 兜底：给道具里「需要重随但还没有数据」的效果补一次 roll
+# 正式版（Steam）里 base_shop.gd 扩展装不上，预报类效果需要在这里自愈，
+# 否则天气预报 / 定向训练 会一直显示成 ?
+func fengliu_ensure_item_roll(item, player_index: int) -> void :
+	if item == null or player_index < 0:
+		return
+	if player_index >= players_data.size():
+		return
+
+	var item_effects = item.get("effects")
+	if item_effects == null or not item_effects is Array:
+		return
+
+	for effect in item_effects:
+		if effect == null or not (effect is Effect):
+			continue
+
+		# 未生成哈希时按 custom_key 补算
+		if effect.custom_key_hash == Keys.empty_hash and effect.custom_key != "":
+			effect.custom_key_hash = Keys.generate_hash(effect.custom_key)
+
+		# 只处理需要重随的效果
+		if not fengliu_need_reroll_effect.has(effect.custom_key_hash):
+			continue
+
+		if not effect.has_method("fengliu_roll_effect"):
+			continue
+
+		# 已经有数据的不重复 roll
+		if effect.has_method("fengliu_has_roll_data") and effect.fengliu_has_roll_data():
+			continue
+			
+		effect.fengliu_roll_effect(player_index)
 
 
 # 扩展新局 / 重开：effects 全新重建，不存在需要 rebase 的烘焙值
@@ -1197,6 +1234,9 @@ func on_wave_start(timer: WaveTimer) -> void :
 		stat_after_change_wave_value_count[value_keys] = 0
 	.on_wave_start(timer)
 
+	# 锁定格道具被诅咒后同步还原效果（原 base_shop._on_tree_exited 的职责）
+	fengliu_normalize_locked_shop_items()
+
 	for player_data in players_data:
 		# 注入精英
 		if player_data.effects.has(effect_fengliu_wave_elites_spawn) and player_data.effects[effect_fengliu_wave_elites_spawn].size() > 0:
@@ -1762,3 +1802,44 @@ func fengliu_notify_full_shield_link(player_index: int) -> void :
 	var player = players[player_index]
 	if player != null and player.has_method("fengliu_sync_full_shield_stat_link"):
 		player.fengliu_sync_full_shield_stat_link()
+
+
+# 波次开始：锁定格道具被「诅咒锁定道具」逻辑诅咒后，同步还原其效果
+# （原 base_shop.gd 扩展 _on_tree_exited 里的逻辑；正式版该扩展装不上，改到这里）
+func fengliu_normalize_locked_shop_items() -> void :
+	for player_index in get_player_count():
+		if player_index >= locked_shop_items.size():
+			continue
+
+		var locked_items: Array = locked_shop_items[player_index]
+		for locked_item in locked_items:
+			if locked_item is Array and locked_item.size() > 0 and locked_item[0] != null:
+				fengliu_normalize_cursed_effect(locked_item[0])
+
+
+# 旧档兜底：修复「替代材料支付曾可透支最大生命」造成的异常值
+#   stat_max_hp 为负 → 归 0（保底 0，允许扣到 0 但不允许负数）
+#   hp_start_wave 缺失或 <= 0 → 回填 100（否则进波只剩 max(1, 0) = 1 点血）
+func fengliu_repair_substitute_payment_stats(state: Dictionary) -> void :
+	if not state.has("players_data"):
+		return
+
+	var max_hp_hash: int = Keys.stat_max_hp_hash
+	var hp_start_wave_hash: int = Keys.hp_start_wave_hash
+	for player_data in state.players_data:
+		if player_data == null or not player_data is PlayerRunData:
+			continue
+
+		var effects: Dictionary = player_data.effects
+
+		# 最大生命不允许为负（透支兜底）
+		if effects.has(max_hp_hash) and int(effects[max_hp_hash]) < 0:
+			print("FengAddMods: repaired negative max hp %d -> 0" % int(effects[max_hp_hash]))
+			effects[max_hp_hash] = 0
+
+		# 进波血量百分比缺失或非正数 → 回填默认 100
+		if not effects.has(hp_start_wave_hash) or int(effects[hp_start_wave_hash]) <= 0:
+			print("FengAddMods: repaired hp_start_wave -> 100")
+			effects[hp_start_wave_hash] = 100
+
+

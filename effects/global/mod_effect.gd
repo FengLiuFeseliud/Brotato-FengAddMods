@@ -58,6 +58,11 @@ func fengliu_on_persist_vars_restored() -> void:
 	pass
 
 
+# 是否已经有 roll 出来的数据（子类按需覆写；默认视为已有，避免无谓重随）
+func fengliu_has_roll_data() -> bool:
+	return true
+
+
 # 取实例声明的持久化变量名（未覆写时为空）
 static func fengliu_get_persist_var_names(instance) -> Array:
 	if not instance.has_method("fengliu_persist_var_names"):

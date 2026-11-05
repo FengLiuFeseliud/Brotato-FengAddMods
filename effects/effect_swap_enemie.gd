@@ -31,6 +31,17 @@ func fengliu_persist_var_names() -> Array:
 	return ["wave_enemy_x", "wave_enemy_y", "wave_enemy_x_id", "wave_enemy_y_id"]
 
 
+# 读档归一化：id 字段统一成字符串（旧档可能是 null / 数字）
+func fengliu_on_persist_vars_restored() -> void:
+	wave_enemy_x_id = "" if wave_enemy_x_id == null else str(wave_enemy_x_id)
+	wave_enemy_y_id = "" if wave_enemy_y_id == null else str(wave_enemy_y_id)
+
+
+# 是否已经有预报数据
+func fengliu_has_roll_data() -> bool:
+	return wave_enemy_x_id != "" and wave_enemy_y_id != ""
+
+
 # 随机预报下一波敌人替换
 func fengliu_roll_effect(player_index: int) -> void:
 	# 获取下一波波次数据
@@ -107,6 +118,9 @@ func fengliu_roll_effect(player_index: int) -> void:
 
 
 func apply(player_index: int) -> void:
+	# 旧档 / 商店侧刷新没跑到时没有预报数据：这里先补一次，保证机制与文案都有内容
+	if not fengliu_has_roll_data():
+		fengliu_roll_effect(player_index)
 	# 把预报效果挂到玩家身上，下一波开始时由 WaveManager 统一收集并应用替换
 	RunData.get_player_effect(custom_key_hash ,player_index).push_back(self)
 	
@@ -115,7 +129,10 @@ func unapply(player_index: int) -> void:
 	RunData.get_player_effects(player_index)[custom_key_hash].erase(self)
 
 
-func get_args(_player_index: int) -> Array:
+func get_args(player_index: int) -> Array:
+	# 没有数据时补一次 roll（正式版 base_shop 扩展可能未安装，这里自愈）
+	if not fengliu_has_roll_data() and player_index >= 0 and player_index < RunData.players_data.size():
+		fengliu_roll_effect(player_index)
 	# 返回数组按顺序填充描述文本 {0} {1} 占位符：
 	#   [0] = 被替换的敌人名（绿色）
 	#   [1] = 替换成的敌人名（绿色）
@@ -123,3 +140,4 @@ func get_args(_player_index: int) -> Array:
 		"[color=lime]%s[/color]" % tr(wave_enemy_x_id.to_upper() + "_NAME" if wave_enemy_x_id != "" else "?"), 
 		"[color=lime]%s[/color]" % tr(wave_enemy_y_id.to_upper() + "_NAME" if wave_enemy_y_id != "" else "?")
 	]
+
