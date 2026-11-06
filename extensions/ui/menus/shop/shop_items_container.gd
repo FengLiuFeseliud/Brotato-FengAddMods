@@ -86,6 +86,14 @@ func on_shop_item_buy_button_pressed(shop_item) -> void :
 		fengliu_buy_character_pending(shop_item)
 		return
 
+
+	if shop_item.item_data.get_category() == Category.WEAPON and not _can_weapon_be_bought(shop_item):
+		return
+
+	if shop_item.item_data.is_meca and shop_item.effect_choice_selected < 0:
+		give_focus_to_mecha_choice(shop_item)
+		return
+		
 	var payment: int = fengliu_resolve_substitute_payment(shop_item)
 	var original_value: int = shop_item.value
 	if payment == FENGLIU_PAY_GOLD or payment == FENGLIU_PAY_STATS:

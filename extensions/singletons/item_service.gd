@@ -82,7 +82,6 @@ func _ready():
 
         fengliu_upgrades_pools[Keys.generate_hash(key)] = pool
 
-    # 1.2.0：原生注册全部内容（物品套组 + 武器套装 + 升级项）
     _fengliu_register_all_content()
 
 
@@ -1076,10 +1075,7 @@ func _fengliu_register_all_content() -> void:
 		% [item_set.characters.size(), item_set.items.size(), item_set.weapons.size(),
 			content["sets"].size(), content["upgrades"].size(), item_set.stats.size()], FENGLIU_MOD_ID)
 
-	call_deferred("_fengliu_finalize_content_pools")
 
-
-# 补齐「激活套组 → 重建缓存 → 默认解锁 → 商店/升级池」，可重复调用
 func _fengliu_finalize_content_pools() -> void:
 	ProgressData.refresh_active_update_data()
 	_fengliu_register_meca_stats()

@@ -81,10 +81,9 @@ func update_color() -> void :
 
 # 扩展设置商店道具
 func set_shop_item(p_item_data: ItemParentData, p_wave_value: int = RunData.current_wave) -> void :
-    # 材料原价
-    fengliu_item_gold_value = ItemService.get_value(p_wave_value, p_item_data.value, player_index, true, p_item_data is WeaponData, p_item_data.my_id_hash)
-        
     .set_shop_item(p_item_data, p_wave_value)
+    
+    fengliu_item_gold_value = value
     _fengliu_refresh_pay_display()
     fengliu_refresh_item_set_icon(p_item_data)
 
