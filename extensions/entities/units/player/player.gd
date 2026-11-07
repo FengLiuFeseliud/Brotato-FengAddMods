@@ -28,6 +28,8 @@ var effect_fengliu_shield_not_regen = Keys.generate_hash("fengliu_shield_not_reg
 var effect_fengliu_shield_hp_together = Keys.generate_hash("fengliu_shield_hp_together")
 var effect_fengliu_random_primary_stats_on_shield_broken = Keys.generate_hash("fengliu_random_primary_stats_on_shield_broken")
 var effect_fengliu_hold_attract_nearby_consumables_hash = Keys.generate_hash("fengliu_hold_attract_nearby_consumables")
+var effect_fengliu_mutation_fruit_extra_mutation = Keys.generate_hash("fengliu_mutation_fruit_extra_mutation")
+var effect_fengliu_acid_puddle_reverse: int = Keys.generate_hash("fengliu_acid_puddle_reverse")
 
 
 var fengliu_shield_hash: int = Keys.generate_hash("stat_fengliu_shield")
@@ -297,6 +299,19 @@ func take_damage(value: int, args: TakeDamageArgs) -> Array:
     if damage_taken_without_shield.size() > 1 and damage_taken_without_shield[1] > 0:
         fengliu_on_hit_dmg()
     return damage_taken_without_shield
+
+
+# 酸液 tick 拦截
+func on_damage_effect(value: int, armor_applied: bool, dodgeable: bool, from = null) -> void:
+    if from == null and armor_applied and not dodgeable and fengliu_has_acid_puddle_reverse():
+        if value > 0:
+            on_healing_effect(value)
+        return
+    .on_damage_effect(value, armor_applied, dodgeable, from)
+
+
+func fengliu_has_acid_puddle_reverse() -> bool:
+    return not RunData.get_player_effect(effect_fengliu_acid_puddle_reverse, player_index).empty()
 
 
 # 扣盾
@@ -683,6 +698,17 @@ func on_consumable_picked_up(consumable_data: ConsumableData) -> void :
     # 拾取加体型
     for effect in RunData.get_player_effect(effect_fengliu_picked_up_consumable_add_size, player_index):
         fengliu_set_scale_size(effect[0])
+
+    # 拾取变异果追加变异次数
+    if consumable_data.my_id_hash == Keys.consumable_mutant_fruit_hash and not RunData.is_meca_only(player_index):
+        for effect in RunData.get_player_effect(effect_fengliu_mutation_fruit_extra_mutation, player_index):
+            if not Utils.get_chance_success(effect[0] / 100.0):
+                continue
+            RunData.players_data[player_index].pending_mutations += 1
+            
+            var main = Utils.get_scene_node()
+            if main != null and main.has_method("fengliu_show_extra_mutation_fruit"):
+                main.fengliu_show_extra_mutation_fruit(player_index)
 
     .on_consumable_picked_up(consumable_data)
 

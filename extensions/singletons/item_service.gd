@@ -467,8 +467,10 @@ func fengliu_get_set_weapon_candidates(set_hash: int, player_index: int, item_ti
             continue
 
         # 数量上限
-        if limited_items.has(weapon.my_id_hash) and limited_items[weapon.my_id_hash][1] >= weapon.max_nb:
-            continue
+        if limited_items.has(weapon.my_id_hash):
+            var limit_entry: Array = limited_items[weapon.my_id_hash]
+            if limit_entry.size() > 1 and limit_entry[0] is ItemData and limit_entry[1] >= limit_entry[0].max_nb:
+                continue
 
         # 无近战 / 无远程 / 无构筑物
         if no_melee_weapons and weapon.type == WeaponType.MELEE:
@@ -1288,7 +1290,7 @@ func fengliu_roll_set_weapon_in_shop_data(items_data: Array, player_index: int) 
 	# 商店内道具 + 玩家已拥有道具，用于原版数量上限判定
 	var owned_and_shop_items: Array = RunData.get_player_items(player_index).duplicate()
 	for entry in items_data:
-		if entry != null and entry[0] != null:
+		if entry != null and entry[0] is ItemData:
 			owned_and_shop_items.push_back(entry[0])
 
 	fengliu_roll_set_weapon_in_shop(items_data, locked_size, RunData.current_wave, player_index, owned_and_shop_items, increase_tier)

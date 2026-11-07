@@ -287,3 +287,8 @@ MENU_POTATO_WORLD_DISCONNECTED,Disconnected,已断开
 MENU_POTATO_WORLD_INVALID_ADDRESS,Invalid server address,服务器地址无效
 MENU_POTATO_WORLD_CODE_EMPTY,Please enter the server address,请输入服务器地址
 MENU_POTATO_WORLD_ROOM_CODE,Room code,房间号
+EFFECT_MUTATION_FRUIT_EXTRA_MUTATION,"Picking up a Mutation Fruit has a {0} chance to gain an additional mutation",拾取异变果时有{0}概率额外获得一次变异
+FENGLIU_ACID_PUDDLE_SIZE,% Acid Puddle Size,%酸液池尺寸
+EFFECT_FENGLIU_ACID_PUDDLE_SIZE,Acid puddle size {0},酸液池尺寸{0}
+EFFECT_FENGLIU_ACID_PUDDLE_REVERSE,"Acid puddles no longer damage you: each tick heals you for the un-armored acid damage and deals {0} ({1}) damage to enemies inside","酸液池每跳按未受护甲的酸液伤害为你回复生命，并对池内敌人造成{0}（{1}）点伤害"
+SPITTER,Spitter,喷溅者

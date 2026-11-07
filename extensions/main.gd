@@ -58,6 +58,34 @@ func _ready() -> void :
 	_fengliu_init_shield_hud()
 
 
+# 待处理消耗品列表里多显示一个变异果图标
+func fengliu_show_extra_mutation_fruit(player_index: int) -> void :
+	if player_index < 0 or player_index >= _things_to_process_player_containers.size():
+		return
+	if player_index >= _displayed_consumables_picked_up.size():
+		return
+
+	var fruit = _fengliu_get_mutation_fruit_data()
+	if fruit == null:
+		return
+
+	_displayed_consumables_picked_up[player_index].push_back(fruit)
+	_things_to_process_player_containers[player_index].consumables.add_element(fruit)
+
+
+# 取变异果数据
+func _fengliu_get_mutation_fruit_data():
+	var fruit = ItemService.get_element(ItemService.consumables, Keys.consumable_mutant_fruit_hash)
+	if fruit != null:
+		return fruit
+
+	var dlc = ItemService.get_dlc_data_by_id("primal_dread")
+	if dlc != null:
+		return dlc.mutation_fruit
+
+	return null
+
+
 # 在上排生命容器内部最前面插入空占位节点，为血条上方的同尺寸盾条腾出空间。
 func fengliu_reserve_shield_space() -> void :
 	for idx in [1, 2]:

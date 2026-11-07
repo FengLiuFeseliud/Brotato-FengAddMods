@@ -7,6 +7,7 @@ var fengliu_keys_needing_operator = {
 	"info_neg_stat_fengliu_shield": [0],
 	"effect_consumable_shield_regen_value": [0],
 	"fengliu_bullet_scale": [0],
+	"effect_fengliu_acid_puddle_size": [0],
 	"effect_tree_drop_double_value": [0],
 	"effect_rekindling_value": [0],
 	"effect_reduce_shield_damage_value": [0],
@@ -67,6 +68,7 @@ var fengliu_keys_needing_percent = {
 	"effect_item_bought_spawn_boss": [1, 2],
 	"effect_kill_looter_spawn_boss": [0],
 	"effect_picked_up_consumable_add_size": [0],
+	"effect_mutation_fruit_extra_mutation": [0],
 	"effect_regen_hit_protection": [0],
 	"effect_random_shop_item_count_price": [3],
 	"effect_stronger_aliens_on_aliens": [1],
@@ -77,7 +79,8 @@ var fengliu_keys_needing_percent = {
 	"effect_relay": [0],
 	"effect_weapon_killed_health": [0],
 	"effect_weapon_killed_add_temp_stat": [0],
-	"effect_add_random_character_to_shop": [0]
+	"effect_add_random_character_to_shop": [0],
+	"effect_fengliu_acid_puddle_size": [0]
 }
 
 

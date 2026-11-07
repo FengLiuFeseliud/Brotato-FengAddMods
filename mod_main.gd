@@ -16,7 +16,8 @@ const FENGLIU_T0_INJECT_EXCLUDE_CHARACTERS := [
 	"cleaner",
 	"baked_potato",
 	"blood_bull",
-	"steve"   # 史蒂夫：只保留镐子（靠挖矿合成升级），不注入其它 t0 武器
+	"steve",
+	"spitter"
 ]
 
 # 排除不希望自动注入到初始武器池的 t0 mod 武器（weapon_id）

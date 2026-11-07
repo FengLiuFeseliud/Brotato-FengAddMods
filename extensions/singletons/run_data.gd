@@ -34,7 +34,8 @@ const ALL_SECONDARY_STATS = [
 	"fengliu_reduce_shield_damage",
 	"fengliu_consumable_shield_regen",
 	"fengliu_wanted_item_tag_chance",
-	"fengliu_hit_shield_drop_consumable"
+	"fengliu_hit_shield_drop_consumable",
+	"fengliu_acid_puddle_size",
 ]
 
 
@@ -73,7 +74,8 @@ const FENGLIU_EXTRA_SECONDARY_STAT_KEYS = [
 	"fengliu_reduce_shield_damage",
 	"fengliu_consumable_shield_regen",
 	"fengliu_wanted_item_tag_chance",
-	"fengliu_hit_shield_drop_consumable"
+	"fengliu_hit_shield_drop_consumable",
+	"fengliu_acid_puddle_size",
 ]
 
 
@@ -102,7 +104,8 @@ const FENGLIU_EFFECT_SLOT_KEYS := [
 	"fengliu_get_fixed_upgrade",
 	"fengliu_get_highest_stat_fixed_upgrade_data",
 	"fengliu_no_hit_material",
-	"fengliu_full_shield_stat_link"
+	"fengliu_full_shield_stat_link",
+	"fengliu_acid_puddle_reverse"
 ]
 
 
@@ -1841,5 +1844,4 @@ func fengliu_repair_substitute_payment_stats(state: Dictionary) -> void :
 		if not effects.has(hp_start_wave_hash) or int(effects[hp_start_wave_hash]) <= 0:
 			print("FengAddMods: repaired hp_start_wave -> 100")
 			effects[hp_start_wave_hash] = 100
-
 

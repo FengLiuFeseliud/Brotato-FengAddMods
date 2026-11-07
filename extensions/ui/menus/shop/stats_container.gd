@@ -18,7 +18,7 @@ func _ready() -> void:
 		var row = row_template.duplicate()
 		row.key = stat_key.to_upper()
 		row.custom_text_key = ""
-		row.reverse = false
+		row.reverse = stat_key == "fengliu_acid_puddle_size"
 		_secondary_stats.add_child(row)
 		row.disable_focus()
 		secondary_stats.append(row)

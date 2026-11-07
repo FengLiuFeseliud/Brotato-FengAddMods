@@ -1,0 +1,15 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/effects/effect_acid_puddle_reverse.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+key = ""
+text_key = "EFFECT_FENGLIU_ACID_PUDDLE_REVERSE"
+value = 5
+custom_key = "fengliu_acid_puddle_reverse"
+storage_method = 0
+effect_sign = 3
+custom_args = [  ]
+gain_value = 100
+scaling_stat = "stat_elemental_damage"
