@@ -22,6 +22,16 @@ func duplicate(subresources := false) -> Resource:
 	return duplication
 
 
+# 本效果是否允许被异变复制（默认禁止；数值累加/遍历型效果显式覆写为 true）
+func fengliu_can_be_copied_by_mutation() -> bool:
+	return false
+
+
+# 本效果在玩家效果槽里的初始值（子类按需覆写：数值型返回 0，数组型返回 []）
+func fengliu_get_effect_init_value():
+	return []
+
+
 # 取实例相对其基类脚本新增的导出字段名（排除基类已持久化的字段）
 static func fengliu_get_custom_property_names(instance) -> Array:
 	var base_names := {}

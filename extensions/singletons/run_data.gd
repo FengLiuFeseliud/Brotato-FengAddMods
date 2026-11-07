@@ -290,6 +290,7 @@ func reset_players_data_stats_and_effects() -> void :
 	for player_data in players_data:
 		if player_data is PlayerRunData:
 			player_data.fengliu_apply_base_shield()
+			player_data.fengliu_apply_effect_init_values()
 
 
 # 台账键哈希（is_linked_layer 区分层：true = StatLink 层，false = TempStats 层）
@@ -1245,8 +1246,10 @@ func on_wave_start(timer: WaveTimer) -> void :
 		if player_data.effects.has(effect_fengliu_wave_elites_spawn) and player_data.effects[effect_fengliu_wave_elites_spawn].size() > 0:
 			fengliu_wave_elites_spawn(player_data)
 		
-		if player_data.effects.has(effect_fengliu_random_extra_wanted_item_tag) and player_data.effects.has(effect_fengliu_extra_wanted_item_tag):
-			for _i in player_data.effects[effect_fengliu_random_extra_wanted_item_tag]:
+		if player_data.effects[effect_fengliu_random_extra_wanted_item_tag] > 0 and player_data.effects.has(effect_fengliu_extra_wanted_item_tag):
+			var extra_tag_count = player_data.effects[effect_fengliu_random_extra_wanted_item_tag]
+
+			for _i in extra_tag_count:
 				player_data.effects[effect_fengliu_extra_wanted_item_tag].remove(player_data.effects[effect_fengliu_extra_wanted_item_tag].size() - 1)
 
 	# 精英/敌众波次或重开波次时不更新强度统计
@@ -1279,19 +1282,21 @@ func on_wave_end() -> void :
 	for player_index in players_data.size():
 		var player_data = players_data[player_index]
 		# 处理道具合并
-		if player_data.effects.has(effect_fengliu_item_merge):
+		if player_data.effects[effect_fengliu_item_merge].size() > 0:
 			for item_merge_effect in player_data.effects[effect_fengliu_item_merge]:
 				fengliu_try_item_merge(item_merge_effect, player_index)
 
 		# 处理自动诅咒
-		if player_data.effects.has(effect_fengliu_random_curse):
+		if player_data.effects[effect_fengliu_random_curse].size() > 0:
 			fengliu_auto_curse(player_data.effects[effect_fengliu_random_curse][0], player_index)
 
-		if player_data.effects.has(effect_fengliu_random_extra_wanted_item_tag):
+		if player_data.effects[effect_fengliu_random_extra_wanted_item_tag] > 0:
 			if not player_data.effects.has(effect_fengliu_extra_wanted_item_tag):
 				player_data.effects[effect_fengliu_extra_wanted_item_tag] = []
-				
-			for _i in player_data.effects[effect_fengliu_random_extra_wanted_item_tag]:
+
+			var extra_tag_count = player_data.effects[effect_fengliu_random_extra_wanted_item_tag]
+
+			for _i in extra_tag_count:
 				player_data.effects[effect_fengliu_extra_wanted_item_tag].append(Utils.get_rand_element(all_item_tags))
 
 	_restart_wave = false
@@ -1338,13 +1343,13 @@ func _fengliu_get_wave_end_remove_item_to_remove(item_hash: int, player_index: i
 # 统一添加效果哈希
 func get_player_effect(key: int, player_index: int):
 	var effects = .get_player_effects(player_index)
-	# 缺失时先补空数组，避免调用方越界
+
+	# 缺失时取该效果自己声明的初始值
 	if not effects.has(key):
-		effects[key] = []
-	
+		effects[key] = ItemService.fengliu_get_effect_init_value(key)
+
 	assert (player_index >= 0, Keys.hash_to_string[key])
 	return effects[key]
-	
 
 
 func handle_explode_effect(key: int, position: Vector2, player_index: int, use_second_args: = false) -> void :
@@ -1354,7 +1359,11 @@ func handle_explode_effect(key: int, position: Vector2, player_index: int, use_s
 		return
 
 	var effect = effects[key]
+
 	if not effect is Array:
+		return
+
+	if effect.size() == 0:
 		return
 
 	# 倒序剔除垃圾值，只保留真正的爆炸效果实例
@@ -1528,7 +1537,7 @@ func fengliu_get_stat_ratios_from_price(stats_hash: int) -> int:
 # 扩展获取货币
 func get_player_currency(player_index: int) -> int:
 	var temporary_stats_stop_count = get_player_effect(effect_fengliu_temporary_stats_stop, player_index) 
-	if temporary_stats_stop_count is int and temporary_stats_stop_count > 0:
+	if temporary_stats_stop_count > 0:
 		var stat_hash = fengliu_get_highest_stat_hash(player_index)
 		return int(get_stat(stat_hash, player_index) * fengliu_get_stat_ratios_from_price(stat_hash))
 
@@ -1545,7 +1554,7 @@ func get_player_currency(player_index: int) -> int:
 # 扩展移除货币
 func remove_currency(value: int, player_index: int) -> void :
 	var temporary_stats_stop_count = get_player_effect(effect_fengliu_temporary_stats_stop, player_index) 
-	if temporary_stats_stop_count is int and temporary_stats_stop_count > 0:
+	if temporary_stats_stop_count > 0:
 		var stat_hash = fengliu_get_highest_stat_hash(player_index)
 		remove_stat(stat_hash, int(ceil(value / float(fengliu_get_stat_ratios_from_price(stat_hash)))), player_index)
 		return

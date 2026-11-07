@@ -19,14 +19,26 @@ static func get_id() -> String:
 	return "fengliu_random_extra_wanted_item_tag"
 
 
+# 数值累加 / 消费端遍历，异变复制有效
+func fengliu_can_be_copied_by_mutation() -> bool:
+	return true
+
+
 # 登记本效果：槽位里每个条目代表每波追加的 1 组随机标签
-func apply(player_index: int) -> void:
-	RunData.get_player_effect(custom_key_hash, player_index).push_back(value)
+func apply(player_index: int) -> void :
+	var effects = RunData.get_player_effects(player_index)
+	effects[custom_key_hash] = effects.get(custom_key_hash, 0) + value
 	
 
 # 移除登记：只抹掉一个同值条目
-func unapply(player_index: int) -> void:
-	RunData.get_player_effect(custom_key_hash, player_index).erase(value)
+func unapply(player_index: int) -> void :
+	var effects = RunData.get_player_effects(player_index)
+	effects[custom_key_hash] = max(0, effects.get(custom_key_hash, 0) - value)
+
+
+# 槽位存的是单个数值（不是列表）
+func fengliu_get_effect_init_value():
+	return 0
 
 
 func get_args(player_index: int) -> Array:

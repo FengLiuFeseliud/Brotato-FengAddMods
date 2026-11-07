@@ -25,8 +25,8 @@ func apply(player_index: int) -> void:
 
 func unapply(player_index: int) -> void:
 	var effects = RunData.get_player_effects(player_index)
-	# 键缺失时直接跳过，避免旧档越界
-	if not effects.has(custom_key_hash):
+	# 空槽位直接跳过，避免旧档越界
+	if effects[custom_key_hash].size() == 0:
 		return
 
 	effects[custom_key_hash].erase([key_hash, value])

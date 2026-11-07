@@ -16,14 +16,27 @@ extends "res://mods-unpacked/FengLiu-FengAddMods/effects/global/mod_effect.gd"
 static func get_id() -> String:
 	return "fengliu_wave_intensity_damage"
 
+
+# 数值累加 / 消费端遍历，异变复制有效
+func fengliu_can_be_copied_by_mutation() -> bool:
+	return true
+
+
 # 波次强度附加伤害
 
-func apply(player_index: int) -> void:
-	RunData.get_player_effect(custom_key_hash ,player_index).push_back([value])
+func apply(player_index: int) -> void :
+	var effects = RunData.get_player_effects(player_index)
+	effects[custom_key_hash] = effects.get(custom_key_hash, 0) + value
 	
 
-func unapply(player_index: int) -> void:
-	RunData.get_player_effects(player_index)[custom_key_hash].erase([value])
+func unapply(player_index: int) -> void :
+	var effects = RunData.get_player_effects(player_index)
+	effects[custom_key_hash] = max(0, effects.get(custom_key_hash, 0) - value)
+
+
+# 槽位存的是单个数值（不是列表）
+func fengliu_get_effect_init_value():
+	return 0
 
 
 func get_args(player_index: int) -> Array:

@@ -162,9 +162,11 @@ func get_damage_value(dmg_value: int, from_player_index: int, armor_applied: = t
     # 获取基础伤害
     var damage_value = .get_damage_value(dmg_value, from_player_index, armor_applied, dodgeable, is_crit, hitbox, is_burning)
 
-    # 附加波次强度伤害（波次每秒总血量 × 百分比）
-    for effect in RunData.get_player_effect(effect_fengliu_wave_intensity_damage, from_player_index):
-        damage_value.value += int(RunData.fengliu_get_wave_total_hp_to_duration() * (effect[0] / 100.0))
+    # 附加波次强度伤害（波次每秒总血量 × 百分比；槽位为总百分比）
+    var wave_intensity_damage = RunData.get_player_effect(effect_fengliu_wave_intensity_damage, from_player_index)
+
+    if wave_intensity_damage != 0:
+        damage_value.value += int(RunData.fengliu_get_wave_total_hp_to_duration() * (wave_intensity_damage / 100.0))
 
     # 不致死效果：将伤害压到生命值剩余 1
     var effects = RunData.get_player_effect(effect_fengliu_no_kill_enemy, from_player_index)

@@ -21,6 +21,11 @@ static func get_id() -> String:
 	return "fengliu_weapon_hit_slow"
 
 
+# 数值累加 / 消费端遍历，异变复制有效
+func fengliu_can_be_copied_by_mutation() -> bool:
+	return true
+
+
 func get_args(player_index: int) -> Array:
     # 计算当前减速值（基础值 + 属性倍率）
     var slow_value = value + int(Utils.get_stat(key_hash, player_index) * (gain_value / 100.0))

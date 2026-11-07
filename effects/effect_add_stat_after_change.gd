@@ -30,6 +30,11 @@ static func get_id() -> String:
 	return "fengliu_add_stat_after_change"
 
 
+# 数值累加 / 消费端遍历，异变复制有效
+func fengliu_can_be_copied_by_mutation() -> bool:
+	return true
+
+
 func _generate_hashes() -> void:
 	._generate_hashes()
 	# 目标属性：key 以 "gain_" 开头时去掉前缀；否则 key 本身就是目标属性

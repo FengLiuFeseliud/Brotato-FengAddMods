@@ -17,6 +17,11 @@ static func get_id() -> String:
 	return "fengliu_stat_per_character"
 
 
+# 数值累加 / 消费端遍历，异变复制有效
+func fengliu_can_be_copied_by_mutation() -> bool:
+	return true
+
+
 func apply(player_index: int) -> void:
 	# 登记本次持有结算（第 3 项＝已结算的持有个数），再按当前持有数补上属性
 	RunData.get_player_effect(custom_key_hash, player_index).push_back([fengliu_stat_hash(), value, 0])

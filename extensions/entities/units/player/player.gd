@@ -210,15 +210,8 @@ func take_damage(value: int, args: TakeDamageArgs) -> Array:
             reduce_shield_damage = 0
 
         # 抵消型护盾 每次受击固定消耗的护盾点数
-        var effect = RunData.get_player_effect(effect_fengliu_shield_set_hit_protection, player_index)
-        var shield_hit_protection_damage: int = 0
-        if effect is int:
-            shield_hit_protection_damage = effect
-
-        effect = RunData.get_player_effect(effect_fengliu_shield_hp_together, player_index)
-        var shield_hp_together = false
-        if effect is int and effect > 0:
-            shield_hp_together = true
+        var shield_hit_protection_damage: int = RunData.get_player_effect(effect_fengliu_shield_set_hit_protection, player_index)
+        var shield_hp_together: bool = RunData.get_player_effect(effect_fengliu_shield_hp_together, player_index) > 0
 
         if shield_hp_together:
             incoming_damage = incoming_damage / 2
@@ -378,10 +371,11 @@ func fengliu_on_hit_dmg() -> void:
 
 # 破盾触发
 func fengliu_on_shield_broken(can_explode: bool = true) -> void:
-    for effect in RunData.get_player_effect(effect_fengliu_random_primary_stats_on_shield_broken, player_index):
-        for _i in effect[0]:
-            RunData.add_stat(RunData.get_random_primary_stats(), 1, player_index)
-            RunData.add_tracked_value(player_index, fengliu_item_plastic_candy_jar_hash, 1)
+    var random_stat_count = RunData.get_player_effect(effect_fengliu_random_primary_stats_on_shield_broken, player_index)
+
+    for _i in random_stat_count:
+        RunData.add_stat(RunData.get_random_primary_stats(), 1, player_index)
+        RunData.add_tracked_value(player_index, fengliu_item_plastic_candy_jar_hash, 1)
             
     if not can_explode or RunData.get_player_effect(effect_fengliu_explode_on_shield_broken, player_index).size() == 0:
         return
@@ -395,11 +389,7 @@ func fengliu_can_shield_take_damage(value: int, args: TakeDamageArgs) -> bool:
         return false
 
     if _hit_protection != 0:
-        var effect = RunData.get_player_effect(effect_fengliu_shield_to_hit_protection_front, player_index)
-        if not effect is int:
-            return false
-            
-        return effect > 0
+        return RunData.get_player_effect(effect_fengliu_shield_to_hit_protection_front, player_index) > 0
 
     if args.hitbox != null and args.hitbox.is_healing:
         return false
@@ -535,8 +525,7 @@ func fengliu_on_shield_regen_signal(value: int, target_player_index: int) -> voi
 
 # 盾恢复
 func fengliu_shield_regen(regen: int) -> int:
-    var effect = RunData.get_player_effect(effect_fengliu_shield_not_regen, player_index)
-    if effect is int and effect > 0:
+    if RunData.get_player_effect(effect_fengliu_shield_not_regen, player_index) > 0:
         return 0
 
     if regen <= 0:
@@ -701,9 +690,9 @@ func on_consumable_picked_up(consumable_data: ConsumableData) -> void :
 
     # 拾取变异果追加变异次数
     if consumable_data.my_id_hash == Keys.consumable_mutant_fruit_hash and not RunData.is_meca_only(player_index):
-        for effect in RunData.get_player_effect(effect_fengliu_mutation_fruit_extra_mutation, player_index):
-            if not Utils.get_chance_success(effect[0] / 100.0):
-                continue
+        var extra_chance = RunData.get_player_effect(effect_fengliu_mutation_fruit_extra_mutation, player_index)
+
+        if Utils.get_chance_success(extra_chance / 100.0):
             RunData.players_data[player_index].pending_mutations += 1
             
             var main = Utils.get_scene_node()

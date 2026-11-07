@@ -19,6 +19,11 @@ static func get_id() -> String:
 	return "fengliu_apply_item_not_add_all_debuff"
 
 
+# 消费端只取 effects[0]，异变复制无效
+func fengliu_can_be_copied_by_mutation() -> bool:
+	return false
+
+
 func apply(player_index: int) -> void:
 	RunData.get_player_effect(custom_key_hash ,player_index).push_back([value, from_box])
 	

@@ -26,6 +26,16 @@ func fengliu_persist_var_names() -> Array:
 	return []
 
 
+# 本效果是否允许被异变复制（默认禁止；数值累加/遍历型效果显式覆写为 true）
+func fengliu_can_be_copied_by_mutation() -> bool:
+	return false
+
+
+# 本效果在玩家效果槽里的初始值（与 ModEffect 保持一致；数值型子类覆写为 0）
+func fengliu_get_effect_init_value():
+	return []
+
+
 # 先存基类字段，再存自定义导出字段与白名单非导出变量
 func serialize() -> Dictionary:
 	var serialized = .serialize()

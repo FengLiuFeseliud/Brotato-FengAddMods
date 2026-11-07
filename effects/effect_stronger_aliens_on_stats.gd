@@ -25,6 +25,11 @@ static func get_id() -> String:
 	return "fengliu_stronger_aliens_on_stats"
 
 
+# 数值累加 / 消费端遍历，异变复制有效
+func fengliu_can_be_copied_by_mutation() -> bool:
+	return true
+
+
 func _generate_hashes() -> void:
     # 预生成敌人 ID 哈希
     ._generate_hashes()

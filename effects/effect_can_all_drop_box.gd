@@ -22,6 +22,11 @@ static func get_id() -> String:
 	return "fengliu_can_all_drop_box"
 
 
+# 数值累加 / 消费端遍历，异变复制有效
+func fengliu_can_be_copied_by_mutation() -> bool:
+	return true
+
+
 func apply(player_index: int) -> void:
 	RunData.get_player_effect(custom_key_hash ,player_index).push_back([key_hash, value, chance])
 	
@@ -48,4 +53,3 @@ func get_args(player_index: int) -> Array:
 		str(get_dynamic_chance(stat, chance, value)), 
 		Utils.get_scaling_stat_icon_text(key_hash, value / 100.0), 
 	]
-

@@ -22,6 +22,11 @@ static func get_id() -> String:
 	return "fengliu_regen_hit_protection"
 
 
+# REPLACE 且消费端只取 effects[0]，异变复制无效
+func fengliu_can_be_copied_by_mutation() -> bool:
+	return false
+
+
 static func get_dynamic_chance(init_chance: int, add_chance: int = 100, stat_count: int = 0) -> int:
 	var dynamic_chance = init_chance + (stat_count * (add_chance / 100.0))
 	if dynamic_chance > 100:

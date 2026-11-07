@@ -26,6 +26,11 @@ static func get_id() -> String:
 	return "fengliu_wpapon_killed_add_temp_stat"
 
 
+# 数值累加 / 消费端遍历，异变复制有效
+func fengliu_can_be_copied_by_mutation() -> bool:
+	return true
+
+
 func _generate_hashes() -> void:
 	._generate_hashes()
 	# 预生成概率倍率属性哈希

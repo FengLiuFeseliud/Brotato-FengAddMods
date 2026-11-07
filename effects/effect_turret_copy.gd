@@ -20,6 +20,11 @@ static func get_id() -> String:
 	return "fengliu_turret_copy"
 
 
+# 数值累加 / 消费端遍历，异变复制有效
+func fengliu_can_be_copied_by_mutation() -> bool:
+	return true
+
+
 static func get_dynamic_chance(init_chance: int, add_chance: int = 100, stat_count: int = 0) -> int:
 	var dynamic_chance = init_chance + (stat_count * (add_chance / 100.0))
 	if dynamic_chance > 100:

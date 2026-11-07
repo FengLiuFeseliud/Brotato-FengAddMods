@@ -20,6 +20,11 @@ static func get_id() -> String:
 	return "fengliu_burning_slow"
 
 
+# 数值累加 / 消费端遍历，异变复制有效
+func fengliu_can_be_copied_by_mutation() -> bool:
+	return true
+
+
 func apply(player_index: int) -> void:
 	# 效果槽存 [倍率属性, 基础减速值, 减速倍率]
 	RunData.get_player_effect(custom_key_hash, player_index).push_back([key_hash, value, gain_value])

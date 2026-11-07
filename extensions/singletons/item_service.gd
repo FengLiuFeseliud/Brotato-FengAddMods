@@ -58,6 +58,11 @@ var fengliu_hp_upgrade_hash = Keys.generate_hash("fengliu_icon_hp_upgrade")
 var fengliu_upgrades_pools = {}
 
 
+# 效果元数据缓存
+var _fengliu_effect_init_values: Dictionary = {}
+var _fengliu_effect_metadata_ready: bool = false
+
+
 # 需要重新随机的效果列表
 var need_reroll_effect = [
 	effect_fengliu_swap_enemie,
@@ -157,6 +162,77 @@ func _fengliu_try_register_effect_prototype(effect_path: String) -> int:
 
 	effects.push_back(effect_script)
 	return 1
+
+
+# 一趟遍历内容上的效果实例：按 custom_key（无则 key）登记初始值与异变复制黑名单
+func fengliu_collect_effect_metadata() -> void :
+	if _fengliu_effect_metadata_ready:
+		return
+
+	var mutation_dlc = get_dlc_data_by_id("primal_dread")
+
+	if mutation_dlc == null:
+		return
+
+	_fengliu_effect_metadata_ready = false
+
+	var effect_sources: Array = get_items() + get_characters()
+	var mod_effect_count: int = 0
+
+	for source in effect_sources:
+		if source == null or source.effects == null:
+			continue
+
+		for effect in source.effects:
+			if effect == null or not (effect is Effect):
+				continue
+
+			var key: int = effect.key_hash
+
+			if effect.custom_key != "":
+				key = Keys.generate_hash(effect.custom_key)
+
+			if key == Keys.empty_hash:
+				continue
+
+			if effect.has_method("fengliu_get_effect_init_value"):
+				_fengliu_effect_init_values[key] = effect.fengliu_get_effect_init_value()
+				mod_effect_count += 1
+
+			if not effect.has_method("fengliu_can_be_copied_by_mutation"):
+				continue
+
+			if effect.fengliu_can_be_copied_by_mutation():
+				continue
+
+			if not mutation_dlc.mutation_copy_blacklist.has(key):
+				mutation_dlc.mutation_copy_blacklist.push_back(key)
+
+	if mod_effect_count > 0:
+		_fengliu_effect_metadata_ready = true
+
+
+# 把各效果声明的初始值直接补进 effects
+func fengliu_apply_effect_init_values(effects_dict: Dictionary) -> void :
+	fengliu_collect_effect_metadata()
+
+	for key in _fengliu_effect_init_values:
+		if effects_dict.has(key):
+			continue
+
+		var init_value = _fengliu_effect_init_values[key]
+		effects_dict[key] = init_value.duplicate() if init_value is Array or init_value is Dictionary else init_value
+
+
+# 单键查询初始值（仅供 get_player_effect 兜底；未登记返回 []）
+func fengliu_get_effect_init_value(key: int):
+	fengliu_collect_effect_metadata()
+
+	if not _fengliu_effect_init_values.has(key):
+		return []
+
+	var init_value = _fengliu_effect_init_values[key]
+	return init_value.duplicate() if init_value is Array or init_value is Dictionary else init_value
 
 
 # 是否登记为原型：是效果类，且自带唯一 id（基类与仍继承 id 的脚本一律跳过）

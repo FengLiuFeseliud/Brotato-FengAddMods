@@ -16,11 +16,17 @@ static func get_id() -> String:
 	return "fengliu_temporary_stats_stop"
 
 
+# 数值累加 / 消费端遍历，异变复制有效
+func fengliu_can_be_copied_by_mutation() -> bool:
+	return true
+
+
+func fengliu_get_effect_init_value():
+	return 0
+
+
 func apply(player_index: int) -> void:
     var count = RunData.get_player_effect(custom_key_hash, player_index)
-    if not count is int:
-        count = 0
-
     count += value
     # 写回累计后的次数，供商店代偿购买读取
     RunData.get_player_effects(player_index)[custom_key_hash] = count
@@ -31,8 +37,6 @@ func get_args(player_index: int) -> Array:
     #   [0] = 本次新增的代偿次数
     #   [1] = 当前累计代偿次数
     var count = RunData.get_player_effect(custom_key_hash, player_index)
-    if not count is int:
-        count = 0
 
     return [
         "[color=lime]%s[/color]" % value,

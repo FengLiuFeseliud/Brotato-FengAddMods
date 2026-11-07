@@ -24,6 +24,11 @@ static func get_id() -> String:
 	return "fengliu_weapon_killed_loot"
 
 
+# 数值累加 / 消费端遍历，异变复制有效
+func fengliu_can_be_copied_by_mutation() -> bool:
+	return true
+
+
 func get_args(_player_index: int) -> Array:
 
     # 返回数组按顺序填充描述文本 {0}~{2} 占位符：

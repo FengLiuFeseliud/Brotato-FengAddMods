@@ -45,9 +45,7 @@ func _fengliu_get_weapon_burn_damage(burning: BurningData, player_index: int) ->
 	if burning == null:
 		return
 
-	var burn_damage_percent: int = 0
-	for weapon_burn_damage_effect in RunData.get_player_effect(weapon_burn_damage_hash, player_index):
-		burn_damage_percent += weapon_burn_damage_effect[0]
+	var burn_damage_percent = RunData.get_player_effect(weapon_burn_damage_hash, player_index)
 
 	# 未持有该效果则不生效
 	if burn_damage_percent <= 0:

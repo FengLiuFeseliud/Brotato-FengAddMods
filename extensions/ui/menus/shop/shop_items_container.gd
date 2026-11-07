@@ -120,7 +120,7 @@ func fengliu_resolve_substitute_payment(shop_item) -> int:
 
 	# 临时停表：remove_currency 会扣最高主属性，这里不插手
 	var temp_stop_count = RunData.get_player_effect(effect_fengliu_temporary_stats_stop, player_index)
-	if temp_stop_count is int and temp_stop_count > 0:
+	if temp_stop_count > 0:
 		return FENGLIU_PAY_BY_CURRENCY
 
 	# alternative_coins == false：remove_currency 内部直接扣属性
@@ -240,7 +240,7 @@ func fengliu_add_icon_elite(shop_item) -> void :
 # 临时停表：商店购买后按效果加属性并递减计数
 func fengliu_handle_temporary_stats_stop() -> void :
 	var temp_stop_count = RunData.get_player_effect(effect_fengliu_temporary_stats_stop, player_index)
-	if not (temp_stop_count is int) or temp_stop_count <= 0:
+	if temp_stop_count <= 0:
 		return
 
 	for add_effect in RunData.get_player_effect(effect_fengliu_stats_buy_item, player_index):

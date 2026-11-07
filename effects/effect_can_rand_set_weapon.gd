@@ -19,6 +19,11 @@ static func get_id() -> String:
 	return "fengliu_can_rand_set_weapon"
 
 
+# 纯标记 + 消费端只取 effects[0]，异变复制无效
+func fengliu_can_be_copied_by_mutation() -> bool:
+	return false
+
+
 func fengliu_roll_effect(player_index: int) -> void:
 	roll_set = RunData.fengliu_get_player_random_weapon_set(player_index)
 

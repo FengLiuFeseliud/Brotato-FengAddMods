@@ -15,15 +15,17 @@ static func get_id() -> String:
 	return "fengliu_shield_hp_together"
 
 
+func fengliu_get_effect_init_value():
+	return 0
+
+
 func apply(player_index: int) -> void:
-	# 计数 +1；槽位异常（非整数）按 0 兜底，避免读到空数组
+	# 计数 +1
 	var effects = RunData.get_player_effects(player_index)
-	var count = effects.get(custom_key_hash, 0)
-	effects[custom_key_hash] = (count if count is int else 0) + 1
+	effects[custom_key_hash] = effects.get(custom_key_hash, 0) + 1
 
 
 func unapply(player_index: int) -> void:
-	# 计数 -1，下限 0（多份道具/读档后仍与原版 apply/unapply 配套）
+	# 计数 -1，下限 0
 	var effects = RunData.get_player_effects(player_index)
-	var count = effects.get(custom_key_hash, 0)
-	effects[custom_key_hash] = max(0, (count if count is int else 0) - 1)
+	effects[custom_key_hash] = max(0, effects.get(custom_key_hash, 0) - 1)
