@@ -1,4 +1,4 @@
-extends Unit
+extends "res://entities/units/unit/unit.gd"
 
 
 var fengliu_rekindling = Keys.generate_hash("fengliu_rekindling")

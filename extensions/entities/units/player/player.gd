@@ -1,4 +1,4 @@
-extends Player
+extends "res://entities/units/player/player.gd"
 
 
 # 湿滑地面滑行

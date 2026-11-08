@@ -1,4 +1,4 @@
-extends WaveManager
+extends "res://zones/wave_manager.gd"
 
 var effect_fengliu_minecraft = Keys.generate_hash("fengliu_minecraft")
 var effect_fengliu_swap_enemie = Keys.generate_hash("fengliu_swap_enemie")

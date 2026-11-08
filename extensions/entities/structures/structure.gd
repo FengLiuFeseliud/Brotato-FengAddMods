@@ -1,4 +1,4 @@
-extends Structure
+extends "res://entities/structures/structure.gd"
 
 
 # 中继器攻速加成来源（来源节点 → 百分比）；同一构筑物被多座中继器覆盖时相加

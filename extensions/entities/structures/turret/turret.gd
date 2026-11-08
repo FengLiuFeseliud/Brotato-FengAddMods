@@ -1,4 +1,4 @@
-extends Turret
+extends "res://entities/structures/turret/turret.gd"
 
 
 var effect_fengliu_turret_prioriy_attack_highest_hp = Keys.generate_hash("fengliu_turret_prioriy_attack_highest_hp")

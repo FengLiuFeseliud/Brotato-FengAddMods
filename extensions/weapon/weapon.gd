@@ -1,4 +1,4 @@
-extends Weapon
+extends "res://weapons/weapon.gd"
 
 
 var effect_fengliu_gain_random_killed_stat = Keys.generate_hash("fengliu_gain_random_killed_stat")

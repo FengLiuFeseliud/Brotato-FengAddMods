@@ -1,4 +1,4 @@
-extends Enemy
+extends "res://entities/units/enemies/enemy.gd"
 
 
 var effect_fengliu_wave_intensity_damage = Keys.generate_hash("fengliu_wave_intensity_damage")

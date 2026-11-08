@@ -1,4 +1,4 @@
-extends Main
+extends "res://main.gd"
 
 
 const FENGLIU_STATUS_COLOR_SHIELD: = Color(0.25, 0.6, 1.0, 1.0)   # 蓝色

@@ -1,4 +1,4 @@
-extends Neutral
+extends "res://entities/units/neutral/neutral.gd"
 
 
 const DROP_STICK_ITEM = preload("res://mods-unpacked/FengLiu-FengAddMods/content_data/items/stick/stick_data.tres")

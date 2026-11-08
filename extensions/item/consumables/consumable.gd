@@ -1,4 +1,4 @@
-extends Consumable
+extends "res://items/consumables/consumable.gd"
 
 
 var effect_fengliu_wave_end_not_pick_consumable: int = Keys.generate_hash("fengliu_wave_end_not_pick_consumable")

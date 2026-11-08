@@ -1,4 +1,4 @@
-extends ShopItem
+extends "res://ui/menus/shop/shop_item.gd"
 
 
 var material_ui_icon = load("res://items/materials/material_ui.png")

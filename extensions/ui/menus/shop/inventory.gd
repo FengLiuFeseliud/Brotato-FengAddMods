@@ -1,4 +1,4 @@
-extends Inventory
+extends "res://ui/menus/shop/inventory.gd"
 
 
 # 判断道具是否为不可叠加类型

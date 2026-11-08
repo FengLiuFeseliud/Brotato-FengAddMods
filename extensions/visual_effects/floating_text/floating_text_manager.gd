@@ -1,4 +1,4 @@
-extends FloatingTextManager
+extends "res://visual_effects/floating_text/floating_text_manager.gd"
 
 
 # 与 HUD 盾条同色

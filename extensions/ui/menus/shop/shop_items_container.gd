@@ -1,4 +1,4 @@
-extends ShopItemsContainer
+extends "res://ui/menus/shop/shop_items_container.gd"
 
 
 var effect_fengliu_stats_stop = Keys.generate_hash("fengliu_stats_stop")
