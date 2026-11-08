@@ -292,3 +292,5 @@ FENGLIU_ACID_PUDDLE_SIZE,% Acid Puddle Size,%酸液池尺寸
 EFFECT_FENGLIU_ACID_PUDDLE_SIZE,Acid puddle size {0},酸液池尺寸{0}
 EFFECT_FENGLIU_ACID_PUDDLE_REVERSE,"Acid puddles no longer damage you: each tick heals you for the un-armored acid damage and deals {0} ({1}) damage to enemies inside","酸液池每跳按未受护甲的酸液伤害为你回复生命，并对池内敌人造成{0}（{1}）点伤害"
 SPITTER,Spitter,喷溅者
+ITEM_FOSSIL_NAIL,Fossil: Nail,化石：指甲
+ITEM_FOSSIL_CARAPACE,Fossil: Carapace,化石：甲壳
