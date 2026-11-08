@@ -18,6 +18,14 @@ var _damage_tracking_key_hash: int = Keys.generate_hash("item_robot_vacuum")
 var _fengliu_attracted_items: Array = []
 
 
+var _fengliu_skip_consumable_hashes: Array = [
+	Keys.consumable_meca_fruit_hash,
+	Keys.consumable_mutant_fruit_hash,
+	Keys.consumable_meca_parts_hash,
+	Keys.consumable_mutation_fruit_hash
+]
+
+
 func init(zone_min_pos: Vector2, zone_max_pos: Vector2, p_players_ref: Array = [], entity_spawner_ref = null) -> void :
 	.init(zone_min_pos, zone_max_pos, p_players_ref, entity_spawner_ref)
 
@@ -190,15 +198,22 @@ func _fengliu_attractor_is_dead(item: Item) -> bool:
 	return (item.attracted_by as Unit).dead
 
 
+func _fengliu_is_evolution_consumable(consumable_data: ConsumableData) -> bool:
+	return _fengliu_skip_consumable_hashes.has(consumable_data.get_my_id_hash())
+
+
 func _fengliu_should_skip_consumable(item: Item) -> bool:
 	# 非消耗品不在此判定范围
 	if not (item is Consumable):
 		return false
 
 	var consumable = item as Consumable
-	# 数据未就绪时按安全处理，避免读取空数据
 	if consumable.consumable_data == null:
 		return false
+
+	# 进化相关消耗品跳过
+	if _fengliu_is_evolution_consumable(consumable.consumable_data):
+		return true
 
 	return not consumable.should_be_picked_up_at_end_of_wave()
 
