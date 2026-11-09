@@ -26,6 +26,13 @@ const FENGLIU_T0_INJECT_EXCLUDE_WEAPONS := [
 ]
 
 
+# 这些扩展的原版子类（Landmine / DartTrap / Turret / BuilderTurret）
+# 延迟到 _ready（autoload 已存在、主场景未加载）再安装。
+const FENGLIU_LATE_EXTENSIONS := [
+	"entities/structures/structure.gd",
+	"entities/structures/turret/turret.gd",
+]
+
 
 
 func _init():
@@ -67,9 +74,24 @@ func _install_extensions_from_dir(dir_path: String) -> void:
 		if dir.current_is_dir():
 			_install_extensions_from_dir(full_path)
 		elif file_name.get_extension() == "gd":
-			ModLoaderMod.install_script_extension(full_path)
+			# 延迟列表里的扩展留到 _ready 再装（见 FENGLIU_LATE_EXTENSIONS）
+			if not _is_late_extension(full_path):
+				ModLoaderMod.install_script_extension(full_path)
 		file_name = dir.get_next()
 	dir.list_dir_end()
+
+
+func _is_late_extension(path: String) -> bool:
+	for late_path in FENGLIU_LATE_EXTENSIONS:
+		if path.ends_with(late_path):
+			return true
+	return false
+
+
+func _install_late_extensions() -> void:
+	for late_path in FENGLIU_LATE_EXTENSIONS:
+		ModLoaderLog.info("install late extension: %s" % late_path, MOD_ID)
+		ModLoaderMod.install_script_extension(EXTENSIONS_DIR + late_path)
 
 
 func add_translations() -> void:
@@ -79,6 +101,8 @@ func add_translations() -> void:
 	ModLoaderMod.add_translation(MOD_DIR + "translations/translations.en.translation")
 
 func _ready()->void:
+	_install_late_extensions()
+
 	var dlc_probe_path = "res://dlcs/dlc_1/characters/builder/effects/builder_effect_1c.tres" 
 	if not ResourceLoader.exists(dlc_probe_path):
 		ModLoaderLog.info("DLC not load, load DLC...", MOD_ID)
