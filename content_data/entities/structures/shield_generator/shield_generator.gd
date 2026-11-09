@@ -155,7 +155,9 @@ func _physics_process(delta: float) -> void:
 		return
 
 	# 中继器加成：只加速节奏，不改「关闭前攻击次数」
-	_cooldown = fengliu_apply_relay_attack_speed_to_cooldown(WeaponService.apply_structure_attack_speed_effects(stats.cooldown, player_index))
+	var base_cooldown = WeaponService.apply_structure_attack_speed_effects(stats.cooldown, player_index)
+	_cooldown = call("fengliu_apply_relay_attack_speed_to_cooldown", base_cooldown)
+
 	var has_enemies: bool = _damage_enemies_in_area()
 	var has_players: bool = _regen_players_in_area()
 
