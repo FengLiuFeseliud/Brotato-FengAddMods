@@ -38,4 +38,4 @@ func unapply(player_index: int) -> void:
 	if not effects.has(custom_key_hash):
 		return
 		
-	effects[custom_key_hash].erase([key_hash, value
+	effects[custom_key_hash].erase([key_hash, value])
