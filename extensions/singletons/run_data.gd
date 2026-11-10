@@ -1136,14 +1136,6 @@ func fengliu_activate_pending_shop_character(player_index: int) -> bool:
 	# 原角色效果保持不动，商店角色作为第二份效果叠加
 	fengliu_remove_pending_notice(item)
 	state[1] = character_hash
-	# 属性改写：与 add_item 保持一致，apply/unapply 必须用同一份 effects
-	var rewritten_item = fengliu_apply_reset_stats_to_item(item, player_index)
-	if rewritten_item != item:
-		var items = players_data[player_index].items
-		var item_index = items.find(item)
-		if item_index != -1:
-			items[item_index] = rewritten_item
-		item = rewritten_item
 	players_data[player_index].current_character = item
 	RunData.apply_item_effects(item, player_index)
 	add_item_displayed(item, player_index)
@@ -1358,12 +1350,11 @@ func _fengliu_get_wave_end_remove_item_to_remove(item_hash: int, player_index: i
 func get_player_effect(key: int, player_index: int):
 	var effects = .get_player_effects(player_index)
 
-	# 缺失时取该效果自己声明的初始值
+	# 缺键时补一次该效果声明的初始值
 	if not effects.has(key):
 		effects[key] = ItemService.fengliu_get_effect_init_value(key)
 
-	assert (player_index >= 0, Keys.hash_to_string[key])
-	return effects[key]
+	return .get_player_effect(key, player_index)
 
 
 func handle_explode_effect(key: int, position: Vector2, player_index: int, use_second_args: = false) -> void :
@@ -1673,21 +1664,13 @@ func fengliu_remove_all_item_debuff_effects(effects: Array):
 	fengliu_remove_all_stats(effects)
 
 
-# 把「属性改写」落到真正会进背包的对象上（商店后处理已改写的会自然跳过）
-# 关键：apply 与 unapply 必须看到同一份 effects；在这里改写副本会让 stat_links 永久残留
-func fengliu_apply_reset_stats_to_item(item, player_index: int):
-	var mappings = RunData.get_player_effect(effect_fengliu_reset_item_stat, player_index)
-	for mapping in mappings:
-		item = ItemService.fengliu_reset_item_stat(item, mapping, false)
-
-	return item
-
-
 # 扩展应用道具效果
-# 注意：这里不再做 fengliu_reset_item_stat 改写（必须由 add_item 在入包前完成），
-# 否则 GainStatForEveryStatEffect 会把改写后的 key 写进 stat_links，而 unapply 用背包里的
-# 原 key 永远删不掉 ⇒ 联动条目逐波累积（护盾上限几千几千加）。
 func apply_item_effects(item_data: ItemParentData, player_index: int) -> void :
+	var effects = RunData.get_player_effect(effect_fengliu_reset_item_stat, player_index)
+	if effects.size() > 0:
+		for effect in effects:
+			item_data = ItemService.fengliu_reset_item_stat(item_data, effect)
+
 	# 备份原效果
 	var old_effects = item_data.effects.duplicate()
 	var new_effects = item_data.effects.duplicate()
@@ -1726,7 +1709,7 @@ func apply_item_effects(item_data: ItemParentData, player_index: int) -> void :
 			continue
 
 	# 概率删除全部负面效果
-	var effects = RunData.get_player_effect(effect_fengliu_apply_item_not_add_all_debuff, player_index)
+	effects = RunData.get_player_effect(effect_fengliu_apply_item_not_add_all_debuff, player_index)
 	if effects.size() > 0 and not effects[0][1] and Utils.get_chance_success(effects[0][0] / 100.0):
 		fengliu_remove_all_item_debuff_effects(new_effects)
 	
@@ -1798,13 +1781,10 @@ func fengliu_normalize_cursed_effects(item_data: ItemParentData, base_data: Item
 		effect.fengliu_apply_curse(base_effect, item_data.curse_factor)
 
 
-# 扩展添加道具：诅咒水壶入库前先还原树效果；属性改写在入包前落到真实对象上
+# 扩展添加道具：诅咒水壶入库前先还原树效果
 func add_item(item: ItemData, player_index: int, is_selection: bool = false) -> void:
 	# 入库前先还原被诅咒水壶的收获产树效果
 	fengliu_normalize_cursed_effect(item)
-	# 属性改写（蓝细胞 / 血牛等）必须在入包前完成：背包里存的与 apply/unapply 用的必须是同一份 effects
-	if not (item is ConsumableData):
-		item = fengliu_apply_reset_stats_to_item(item, player_index)
 	.add_item(item, player_index, is_selection)
 	# 满盾联动：道具变化后重新判定（延迟合并，避免复制多瓶瓶装水时递归）
 	fengliu_request_full_shield_link(player_index)
