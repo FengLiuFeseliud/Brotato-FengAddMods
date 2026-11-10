@@ -6,6 +6,9 @@ const FENGLIU_SLIDE_ACCELERATION: float = 900.0
 const FENGLIU_SLIDE_FRICTION: float = 300.0
 const FENGLIU_SLIDE_STOP_SPEED: float = 8.0
 
+# 护盾减伤上限
+const FENGLIU_MAX_SHIELD_DAMAGE_REDUCTION: int = 99
+
 var _fengliu_slippery_sources: Array = []
 var _fengliu_slide_velocity: Vector2 = Vector2.ZERO
 var _fengliu_was_on_slippery: bool = false
@@ -204,10 +207,13 @@ func take_damage(value: int, args: TakeDamageArgs) -> Array:
         var previous_armor_applied: bool = args.armor_applied
         var incoming_damage: int = value
         var shield_broken: bool = false
+        # 护盾减伤
         var reduce_shield_damage = RunData.get_player_effect(fengliu_reduce_shield_damage_hash, player_index)
 
         if reduce_shield_damage < 0:
             reduce_shield_damage = 0
+        elif reduce_shield_damage > FENGLIU_MAX_SHIELD_DAMAGE_REDUCTION:
+            reduce_shield_damage = FENGLIU_MAX_SHIELD_DAMAGE_REDUCTION
 
         # 抵消型护盾 每次受击固定消耗的护盾点数
         var shield_hit_protection_damage: int = RunData.get_player_effect(effect_fengliu_shield_set_hit_protection, player_index)
@@ -216,7 +222,7 @@ func take_damage(value: int, args: TakeDamageArgs) -> Array:
         if shield_hp_together:
             incoming_damage = incoming_damage / 2
 
-        var reduce = abs(100 - reduce_shield_damage) / 100.0
+        var reduce: float = (100.0 - reduce_shield_damage) / 100.0
         var shield_before: float = fengliu_shield
         var pool_before: float = _fengliu_shield_reduce_pool
         
