@@ -228,6 +228,10 @@ var _current_wave_intensity = 0
 var _high_wave_count = 0
 var _restart_wave = false
 
+# 满盾联动：待同步/已排队的玩家，复制多瓶瓶装水时合并成一次同步
+var _fengliu_pending_full_shield_link: Dictionary = {}
+var _fengliu_full_shield_link_flush_scheduled: Dictionary = {}
+
 
 # 波次结束移除的道具列表
 var wave_end_remove_items = [
@@ -1317,12 +1321,14 @@ func fengliu_remove_shop_items() -> void:
 	for player_index in get_player_count():
 		for wave_end_remove_item in wave_end_remove_items:
 			# 逐个移除可失效实例，箱子获取的道具保留
-			while true:
+			var guard: int = 0
+			while true and guard < 4096:
 				var item_data = _fengliu_get_wave_end_remove_item_to_remove(wave_end_remove_item, player_index)
 				if item_data == null:
 					break
 
 				remove_item(item_data, player_index)
+				guard += 1
 
 
 # 查找待移除的波次结束道具（跳过标记为箱子来源的实例）
@@ -1514,9 +1520,9 @@ func add_stat(stat_hsh: int, value: int, player_index: int) -> void :
 	# 变化检查后调用原逻辑
 	fengliu_check_stat(stat_hsh, value, player_index)
 	.add_stat(stat_hsh, value, player_index)
-	# 护盾上限变化：满盾联动需要重新判定
+	# 护盾上限变化：满盾联动需要重新判定（延迟合并，避免 LinkedStats.reset_player 递归）
 	if stat_hsh == Keys.generate_hash("stat_fengliu_shield"):
-		fengliu_notify_full_shield_link(player_index)
+		fengliu_request_full_shield_link(player_index)
 
 
 # 扩展移除属性
@@ -1524,9 +1530,9 @@ func remove_stat(stat_hsh: int, value: int, player_index: int) -> void :
 	# 变化检查后调用原逻辑
 	fengliu_check_stat(stat_hsh, -value, player_index)
 	.remove_stat(stat_hsh, value, player_index)
-	# 护盾上限变化：满盾联动需要重新判定
+	# 护盾上限变化：满盾联动需要重新判定（延迟合并，避免 LinkedStats.reset_player 递归）
 	if stat_hsh == Keys.generate_hash("stat_fengliu_shield"):
-		fengliu_notify_full_shield_link(player_index)
+		fengliu_request_full_shield_link(player_index)
 
 
 # 按属性价值比例把属性换算为材料（基础 60 材料）
@@ -1781,8 +1787,8 @@ func add_item(item: ItemData, player_index: int, is_selection: bool = false) -> 
 	# 入库前先还原被诅咒水壶的收获产树效果
 	fengliu_normalize_cursed_effect(item)
 	.add_item(item, player_index, is_selection)
-	# 满盾联动：道具变化后重新判定
-	fengliu_notify_full_shield_link(player_index)
+	# 满盾联动：道具变化后重新判定（延迟合并，避免复制多瓶瓶装水时递归）
+	fengliu_request_full_shield_link(player_index)
 	# 持有角色数可能变化：「每持有一个角色加属性」重新结算
 	fengliu_stat_per_character_sync(player_index)
 
@@ -1798,9 +1804,38 @@ func add_weapon(weapon: WeaponData, player_index: int, is_selection: bool = fals
 # 1.2.0 起原版 remove_item 新增第 4 个参数 apply_replacement，签名必须一致
 func remove_item(item: ItemData, player_index: int, by_id: bool = false, apply_replacement: bool = true) -> void :
 	.remove_item(item, player_index, by_id, apply_replacement)
-	fengliu_notify_full_shield_link(player_index)
+	fengliu_request_full_shield_link(player_index)
 	# 持有角色数可能变化：「每持有一个角色加属性」重新结算
 	fengliu_stat_per_character_sync(player_index)
+
+
+# 请求重算满盾联动
+func fengliu_request_full_shield_link(player_index: int) -> void:
+	if player_index < 0:
+		return
+
+	_fengliu_pending_full_shield_link[player_index] = true
+
+	# 已排队则不重复 call_deferred，等当前帧末尾统一 flush
+	if _fengliu_full_shield_link_flush_scheduled.has(player_index):
+		return
+
+	_fengliu_full_shield_link_flush_scheduled[player_index] = true
+	call_deferred("_fengliu_flush_full_shield_link", player_index)
+
+
+# 帧末统一执行
+func _fengliu_flush_full_shield_link(player_index: int) -> void:
+	_fengliu_full_shield_link_flush_scheduled.erase(player_index)
+
+	if not _fengliu_pending_full_shield_link.has(player_index):
+		return
+
+	if LinkedStats.has_method("fengliu_is_resetting") and LinkedStats.fengliu_is_resetting(player_index):
+		return
+
+	_fengliu_pending_full_shield_link.erase(player_index)
+	fengliu_notify_full_shield_link(player_index)
 
 
 # 通知玩家重新判定满盾联动（按 player_index 取 Main._players）

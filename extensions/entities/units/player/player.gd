@@ -56,6 +56,8 @@ var _exploding_on_clean_up_room
 var _scale_value = 1 
 
 var fengliu_shield = 0
+var _fengliu_last_shield_cap: float = 0.0
+var _fengliu_shield_cap_initialized: bool = false
 var fengliu_shield_regen_delay: float = 3.0
 var fengliu_shield_regen_tick: float = 1.0
 var fengliu_shield_regen_rate: float = 0.1
@@ -68,6 +70,8 @@ var _fengliu_no_hit_material_timers: Array = []
 var _fengliu_no_hit_material_disabled: Array = []
 var _fengliu_full_shield_link_active: bool = false
 var _fengliu_full_shield_link_effects: Array = []
+var _fengliu_full_shield_sync_running: bool = false
+var _fengliu_full_shield_sync_pending: bool = false
 
 
 var _fengliu_hold_attract_nearby_consumables = false
@@ -121,6 +125,9 @@ func _ready() -> void :
     
     # 配置盾值
     fengliu_shield = Utils.get_stat(fengliu_shield_hash, player_index)
+    # 记录上限基线，供局内上限变化时按差值补盾
+    _fengliu_last_shield_cap = fengliu_shield
+    _fengliu_shield_cap_initialized = true
 
     # 配置未受伤奖励材料（逐实例计时器）
     fengliu_sync_no_hit_material_timers()
@@ -191,6 +198,38 @@ func _physics_process(delta: float) -> void :
 
     if _fengliu_hold_attract_nearby_consumables:
         _attract_nearby_consumables()
+
+
+# 扩展属性刷新 护盾上限提高时按差值补充可用护盾
+func update_player_stats(reset_current_health: = false) -> void :
+    .update_player_stats(reset_current_health)
+
+    var shield_cap: float = Utils.get_stat(fengliu_shield_hash, player_index)
+    # 首次调用（_ready 尚未播种）只记基线，不补盾
+    if not _fengliu_shield_cap_initialized:
+        _fengliu_shield_cap_initialized = true
+        _fengliu_last_shield_cap = shield_cap
+        return
+
+    var shield_cap_increase: float = shield_cap - _fengliu_last_shield_cap
+    _fengliu_last_shield_cap = shield_cap
+
+    # 只处理上限提高
+    if shield_cap_increase <= 0.0:
+        return
+
+    var shield_before: float = fengliu_shield
+    # 已超上限的部分保持不动
+    fengliu_shield = max(shield_before, min(shield_before + shield_cap_increase, shield_cap))
+
+    if fengliu_shield != shield_before:
+        # 上限提高会让盾重新变满
+        fengliu_sync_full_shield_stat_link()
+
+    var gained: int = int(round(fengliu_shield)) - int(round(shield_before))
+    if gained > 0:
+        emit_signal("fengliu_shield_gained", gained, player_index)
+
 
 # 扩展受伤防护
 func take_damage(value: int, args: TakeDamageArgs) -> Array:
@@ -426,6 +465,14 @@ func fengliu_no_hit_material() -> void:
 
 # 满盾联动：护盾满时挂上「每 N 点属性加 M 点属性」，不满时摘下
 func fengliu_sync_full_shield_stat_link() -> void:
+    if _fengliu_full_shield_sync_running:
+        _fengliu_full_shield_sync_pending = true
+        return
+
+    if LinkedStats.has_method("fengliu_is_resetting") and LinkedStats.fengliu_is_resetting(player_index):
+        _fengliu_full_shield_sync_pending = true
+        return
+
     var shield_cap: float = Utils.get_stat(fengliu_shield_hash, player_index)
     var is_full: bool = shield_cap > 0.0 and fengliu_shield >= shield_cap
     var effects: Array = RunData.get_player_effect(effect_fengliu_full_shield_stat_link, player_index)
@@ -434,11 +481,13 @@ func fengliu_sync_full_shield_stat_link() -> void:
     if is_full == _fengliu_full_shield_link_active and effects == _fengliu_full_shield_link_effects:
         return
 
+    _fengliu_full_shield_sync_running = true
+
     # 期望条数：满盾时 = 同签名实例数；不满盾 = 0
     var wanted := {}
     for effect in effects:
         # value 为 0 会除零，不参与联动
-        if effect.value <= 0:
+        if int(effect.value) <= 0:
             continue
         var effect_sig: String = fengliu_stat_link_signature(effect)
         wanted[effect_sig] = wanted.get(effect_sig, 0) + 1
@@ -451,7 +500,7 @@ func fengliu_sync_full_shield_stat_link() -> void:
     for effect_sig in wanted:
         sigs[effect_sig] = true
     for old_effect in _fengliu_full_shield_link_effects:
-        if old_effect.value > 0:
+        if int(old_effect.value) > 0:
             sigs[fengliu_stat_link_signature(old_effect)] = true
 
     var player_effects: Dictionary = RunData.get_player_effects(player_index)
@@ -460,16 +509,28 @@ func fengliu_sync_full_shield_stat_link() -> void:
         player_effects[Keys.stat_links_hash] = []
     var stat_links: Array = player_effects[Keys.stat_links_hash]
 
-    # 多退少补（仅在翻转或槽变化时执行）
+    # 多退少补（按实际实例数，兼容复制出多瓶瓶装水）
     var changed: bool = false
     for effect_sig in sigs:
         var wanted_nb: int = wanted.get(effect_sig, 0)
-        while fengliu_count_stat_link_signature(stat_links, effect_sig) > wanted_nb:
+
+        var erase_guard: int = 0
+        while fengliu_count_stat_link_signature(stat_links, effect_sig) > wanted_nb and erase_guard < 4096:
             fengliu_erase_stat_link_signature(stat_links, effect_sig)
             changed = true
-        while fengliu_count_stat_link_signature(stat_links, effect_sig) < wanted_nb:
-            stat_links.push_back(fengliu_find_stat_link_tuple(effects, effect_sig))
+            erase_guard += 1
+
+        var add_guard: int = 0
+        while fengliu_count_stat_link_signature(stat_links, effect_sig) < wanted_nb and add_guard < 4096:
+            var link = fengliu_find_stat_link_tuple(effects, effect_sig)
+
+            # 找不到对应效果时说明状态已变化，先停下来等下一次同步，避免死循环
+            if link.size() < 4 or fengliu_tuple_signature(link) != effect_sig:
+                break
+
+            stat_links.push_back(link)
             changed = true
+            add_guard += 1
 
     _fengliu_full_shield_link_active = is_full
     _fengliu_full_shield_link_effects = effects.duplicate()
@@ -478,6 +539,13 @@ func fengliu_sync_full_shield_stat_link() -> void:
     if changed:
         LinkedStats.reset_player(player_index)
         Utils.reset_stat_cache(player_index)
+
+    _fengliu_full_shield_sync_running = false
+
+    # 同步期间被延后的请求合并成一次，避免复制多瓶时逐瓶递归
+    if _fengliu_full_shield_sync_pending:
+        _fengliu_full_shield_sync_pending = false
+        call_deferred("fengliu_sync_full_shield_stat_link")
 
 # 效果实例对应的联动签名（数值化，兼容读档后的浮点）
 func fengliu_stat_link_signature(effect) -> String:
