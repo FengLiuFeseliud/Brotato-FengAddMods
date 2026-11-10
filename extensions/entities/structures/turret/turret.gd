@@ -57,17 +57,11 @@ func fengliu_get_highest_hp_target(targets: Array, from: Vector2, min_distance: 
 
     return best_target
 
-# 扩展优先攻击最高血量
-func _physics_process(delta):
-    # 未启用则走原逻辑
-    if not _hp_current_target:
-        ._physics_process(delta)
-        return
-
-
-    ._physics_process(delta)
-    # 切换为血量最高目标
-    _current_target = fengliu_get_highest_hp_target(_targets_in_range, global_position, stats.min_range)
+# 优先攻击最高血量
+func should_shoot() -> bool:
+    if _hp_current_target:
+        _current_target = fengliu_get_highest_hp_target(_targets_in_range, global_position, stats.min_range)
+    return .should_shoot()
 
 
 # 扩展设置炮塔数据

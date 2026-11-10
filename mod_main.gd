@@ -34,8 +34,26 @@ const FENGLIU_LATE_EXTENSIONS := [
 ]
 
 
+# ModLoader 在安装 turret.gd 扩展后会 reload 它的全局子类。
+# 导出版里 BuilderTurret 等子类只有 .gdc（没有 .gd source），reload() 会用空源码
+# 重编译成 native base 为 Reference 的空脚本，典型表现是建造者炮台生成时闪退。
+# 办法：在 ModLoader 主安装之前给这些脚本各创建一个实例，让 reload() 直接返回
+# ERR_ALREADY_IN_USE，从而保留原脚本；_ready 再释放实例并做无源码刷新。
+const FENGLIU_TURRET_CHILD_SCRIPTS := [
+	"res://entities/structures/turret/builder/builder_turret.gd",
+	"res://entities/structures/turret/flame/flame_turret.gd",
+	"res://entities/structures/turret/garden/garden.gd",
+	"res://entities/structures/turret/wandering_bot/wandering_bot.gd",
+]
+
+var _fengliu_reload_guards := []
+
+
 
 func _init():
+	# 必须在 ModLoader 主安装之前创建 reload 保护实例
+	_fengliu_create_reload_guards()
+
 	# 先排除 The-BossRush 对 item_parent_data 的扩展
 	_block_boss_rush_item_parent_data_extension()
 	add_translations()
@@ -43,6 +61,30 @@ func _init():
 	# 安装 extensions 目录下的全部覆盖脚本
 	ModLoaderLog.info("add extensions...", MOD_ID)
 	_install_extensions_from_dir(EXTENSIONS_DIR)
+
+
+# 给只有 .gdc 的炮台子类各创建一个实例，让 ModLoader 的 script.reload() 返回
+# ERR_ALREADY_IN_USE，而不是用空 source 重编译成 Reference 空脚本。
+func _fengliu_create_reload_guards() -> void:
+	for path in FENGLIU_TURRET_CHILD_SCRIPTS:
+		var script = load(path)
+		if script == null or not script.can_instance():
+			ModLoaderLog.warning("reload guard: cannot instance %s" % path, MOD_ID)
+			continue
+		var guard = script.new()
+		if guard == null:
+			ModLoaderLog.warning("reload guard: new() returned null for %s" % path, MOD_ID)
+			continue
+		_fengliu_reload_guards.append(guard)
+	ModLoaderLog.info("reload guards created: %d" % _fengliu_reload_guards.size(), MOD_ID)
+
+
+func _fengliu_free_reload_guards() -> void:
+	for guard in _fengliu_reload_guards:
+		if is_instance_valid(guard):
+			guard.free()
+	_fengliu_reload_guards.clear()
+	ModLoaderLog.info("reload guards released.", MOD_ID)
 
 
 # 强兼 The-BossRush
@@ -102,6 +144,8 @@ func add_translations() -> void:
 
 func _ready()->void:
 	_install_late_extensions()
+	# 必须在 late extension 之后执行：恢复出来的 BuilderTurret 才会继承本 mod 的 turret 扩展
+	_fengliu_refresh_turret_children()
 
 	var dlc_probe_path = "res://dlcs/dlc_1/characters/builder/effects/builder_effect_1c.tres" 
 	if not ResourceLoader.exists(dlc_probe_path):
@@ -209,3 +253,95 @@ func _fengliu_register_effect_slot_keys() -> void:
 			RunData.effect_keys_full_serialization.push_back(slot_hash)
 
 	ModLoaderLog.info("Registered effect slot keys, total=%d." % RunData.effect_keys_full_serialization.size(), MOD_ID)
+
+
+# ── ModLoader 子类重载兼容修复 ────────────────────────────────────────────────
+# reload 保护实例在 _init 中阻止 .gdc 炮台子类被重编译成 Reference；
+# 主安装结束后只对四个炮台子类做一次刷新，让它们继承最终的 turret.gd 扩展链。
+var _fengliu_turret_refresh_done := false
+
+
+func _fengliu_refresh_turret_children() -> void:
+	if _fengliu_turret_refresh_done:
+		return
+	_fengliu_turret_refresh_done = true
+
+	_fengliu_free_reload_guards()
+
+	if not is_instance_valid(ModLoaderStore):
+		ModLoaderLog.error("ModLoaderStore not ready, skip turret refresh.", MOD_ID)
+		return
+
+	for path in FENGLIU_TURRET_CHILD_SCRIPTS:
+		if ModLoaderStore.saved_scripts.has(path):
+			_fengliu_rebuild_script_chain(path)
+		else:
+			_fengliu_refresh_script_path(path)
+
+		var current = load(path)
+		if current == null or current.get_instance_base_type() == "Reference":
+			ModLoaderLog.error("turret child invalid after refresh: %s" % path, MOD_ID)
+
+	var builder_turret = load("res://entities/structures/turret/builder/builder_turret.gd")
+	if builder_turret != null:
+		ModLoaderLog.info("turret refresh: builder base=%s" % [builder_turret.get_instance_base_type()], MOD_ID)
+
+
+func _fengliu_refresh_script_path(path: String) -> void:
+	var fresh = _fengliu_load_fresh_script(path)
+	if fresh == null:
+		ModLoaderLog.error("turret refresh: cannot load fresh script %s" % path, MOD_ID)
+		return
+	fresh.take_over_path(path)
+	ModLoaderLog.info("turret refresh: %s base=%s" % [path, fresh.get_instance_base_type()], MOD_ID)
+
+
+# 重载原版脚本后再按原顺序重放该路径上的所有脚本扩展
+func _fengliu_rebuild_script_chain(path: String) -> void:
+	var extension_paths := []
+	for entry in ModLoaderStore.saved_scripts.get(path, []):
+		if entry == null:
+			continue
+		var extension_path: String = entry.get_meta("extension_script_path", "")
+		if extension_path != "":
+			extension_paths.push_back(extension_path)
+
+	var fresh = _fengliu_load_fresh_script(path)
+	if fresh == null:
+		ModLoaderLog.error("turret refresh: cannot load fresh script %s" % path, MOD_ID)
+		return
+
+	# 先恢复原版路径，再按保存顺序重新应用扩展；apply_extension 会重新保存 base 脚本
+	ModLoaderStore.saved_scripts.erase(path)
+	fresh.take_over_path(path)
+	for extension_path in extension_paths:
+		_ModLoaderScriptExtension.apply_extension(extension_path)
+
+	var restored = load(path)
+	var restored_base := "?"
+	if restored != null:
+		restored_base = restored.get_instance_base_type()
+	ModLoaderLog.info("turret refresh: rebuilt %s with %d extension(s), base=%s" % [path, extension_paths.size(), restored_base], MOD_ID)
+
+
+# 从 pck 重新加载一份未被缓存污染的脚本；.gd 的 remap 仍命中旧缓存时退回 .gdc
+func _fengliu_load_fresh_script(path: String) -> Script:
+	var cached = load(path)
+	var fresh = ResourceLoader.load(path, "Script", true)
+	if fresh == null or fresh == cached:
+		var bytecode_path := path.replace(".gd", ".gdc")
+		if bytecode_path != path:
+			var bytecode_script = ResourceLoader.load(bytecode_path, "Script", true)
+			if bytecode_script != null:
+				fresh = bytecode_script
+
+	if fresh == null:
+		return null
+
+	# 无法绕过缓存时，只有“有源码、且不是 Reference 空脚本”的旧对象可以接受
+	if cached != null and fresh == cached:
+		if cached.get_source_code() != "" and cached.get_instance_base_type() != "Reference":
+			return cached
+		return null
+
+	return fresh

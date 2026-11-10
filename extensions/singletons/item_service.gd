@@ -438,19 +438,32 @@ func fengliu_prepend_random_character(extra_effects: Array, player_index: int, r
 
 
 # 道具属性改写
-func fengliu_reset_item_stat(item, effect) -> ItemParentData:
-    var new_item = item.duplicate()
-    for item_effect_index in new_item.effects.size():
-        var item_effect = new_item.effects[item_effect_index]
-        if item_effect.key_hash != effect[0]:
+# force_duplicate 默认 true（商店 / 升级生成路径保持原有的「总是复制」行为）；
+# 入包路径传 false：只在真的命中要改写的 key 时才复制，避免每次入包都复制、也不改商店池模板
+func fengliu_reset_item_stat(item, effect, force_duplicate: bool = true) -> ItemParentData:
+    if item == null or item.effects == null or effect == null or effect.size() < 2:
+        return item
+
+    var new_item = item.duplicate() if force_duplicate else null
+    var effects_copied := false
+    for item_effect_index in item.effects.size():
+        var item_effect = item.effects[item_effect_index]
+        if item_effect == null or item_effect.key_hash != effect[0]:
             continue
+
+        # 首次命中才准备副本，后续命中复用同一份副本
+        if new_item == null:
+            new_item = item.duplicate()
+        if not effects_copied:
+            new_item.effects = item.effects.duplicate()
+            effects_copied = true
 
         var new_item_effect = item_effect.duplicate()
         new_item_effect.key_hash = effect[1]
         new_item_effect.key = Keys.hash_to_string.get(effect[1], new_item_effect.key)
         new_item.effects[item_effect_index] = new_item_effect
 
-    return new_item
+    return new_item if new_item != null else item
 
 
 # 扩展商店道具
