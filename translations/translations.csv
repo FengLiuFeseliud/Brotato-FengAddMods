@@ -294,3 +294,6 @@ EFFECT_FENGLIU_ACID_PUDDLE_REVERSE,"Acid puddles no longer damage you: each tick
 SPITTER,Spitter,喷溅者
 ITEM_FOSSIL_NAIL,Fossil: Nail,化石：指甲
 ITEM_FOSSIL_CARAPACE,Fossil: Carapace,化石：甲壳
+EFFECT_REROLL_STAT_ONLY_ITEM,Items with only stat changes will not appear in shops,商店里不会出现只有主要属性的道具
+CONNOISSEUR,Connoisseur,讲究人
+EFFECT_REMOVE_PRIMARY_STAT_EFFECTS,"Items have no primary stat bonuses",道具不会出现主要属性效果

@@ -10,6 +10,11 @@ const FENGLIU_EXTRA_EFFECT_PROTOTYPES := [
 	"res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/creeper/creeper_exploding_effect.gd"
 ]
 
+# 纯属性道具重随：最多追加多少次排除项（池子里全是纯属性道具时优雅降级）
+const FENGLIU_STAT_ONLY_REROLL_MAX_ATTEMPTS := 10
+# 主属性白名单补充：DLC 未启用时 Utils.get_primary_stat_keys() 拿不到这两项
+const FENGLIU_PRIMARY_STAT_KEYS_FALLBACK := ["stat_curse", "stat_evolution"]
+
 # 1.2.0 物品套组
 const FENGLIU_ITEM_SET_ID = "fengliu_set"
 const FENGLIU_UPDATE_TRES = "res://mods-unpacked/FengLiu-FengAddMods/content_data/item_set/fengliu_update.tres"
@@ -47,6 +52,8 @@ var effect_fengliu_extra_wanted_item_tag = Keys.generate_hash("fengliu_extra_wan
 var effect_fengliu_extra_shop_item_chance = Keys.generate_hash("fengliu_extra_shop_item_chance")
 var effect_fengliu_add_random_character_to_shop = Keys.generate_hash("fengliu_add_random_character_to_shop")
 var effect_fengliu_reset_item_stat = Keys.generate_hash("fengliu_reset_item_stat")
+var effect_fengliu_reroll_stat_only_item = Keys.generate_hash("fengliu_reroll_stat_only_item")
+var effect_fengliu_remove_primary_stat_effects = Keys.generate_hash("fengliu_remove_primary_stat_effects")
 
 
 var fengliu_wanted_item_tag_chance_hash = Keys.generate_hash("fengliu_wanted_item_tag_chance")
@@ -483,6 +490,9 @@ func get_player_shop_items(wave: int, player_index: int, args: ItemServiceGetSho
         result[extra_shop_item_index] = [item_data, wave]
         extra_shop_item_index += 1
 
+    # 删除主属性效果：补上原版保证出售槽与 mod 额外商店槽
+    fengliu_remove_primary_stat_effects_from_shop(result, player_index)
+
     return result
 
 
@@ -641,21 +651,150 @@ func fengliu_roll_set_weapon_in_shop(shop_items: Array, locked_count: int, wave:
     return replaced
 
 
+# 取一件原始道具（先走原版池；玩家需要 wanted tag 时改走 mod 的池）
+func _fengliu_pick_rand_item_for_wave(wave: int, player_index: int, type: int, args: GetRandItemForWaveArgs) -> ItemParentData:
+	var effects = RunData.get_player_effects(player_index)
+	var item = ._get_rand_item_for_wave(wave, player_index, type, args)
+
+	# 需要 wanted tag 时改走 mod 的池
+	if effects[fengliu_wanted_item_tag_chance_hash] > 0:
+		item = fengliu_get_rand_item_for_wave(wave, player_index, type, args)
+	elif effects.has(effect_fengliu_extra_wanted_item_tag) and effects[effect_fengliu_extra_wanted_item_tag].size() > 0:
+		item = fengliu_get_rand_item_for_wave(wave, player_index, type, args)
+
+	return item
+
+
+# 整件道具的效果是否全部只是加减属性
+func fengliu_item_effects_all_stat_only(item) -> bool:
+	# 无效果道具不参与重随（本来就不含属性效果）
+	if item == null or item.effects == null or item.effects.size() == 0:
+		return false
+
+	for item_effect in item.effects:
+		if not fengliu_is_stat_only_effect(item_effect):
+			return false
+
+	return true
+
+
+# 是否主属性键：Utils 主属性列表 + DLC 未启用时的兜底
+func fengliu_is_primary_stat_key(key_hash: int) -> bool:
+	if key_hash in Utils.get_primary_stat_keys():
+		return true
+
+	for stat_key in FENGLIU_PRIMARY_STAT_KEYS_FALLBACK:
+		if key_hash == Keys.generate_hash(stat_key):
+			return true
+
+	return false
+
+
+# 单条效果是否只是加减属性：原版基类 Effect + 无 custom_key + key 是主属性键
+func fengliu_is_stat_only_effect(item_effect) -> bool:
+	if item_effect == null or item_effect.custom_key != "":
+		return false
+
+	# 只认原版基类脚本
+	var effect_script = item_effect.get_script()
+	if effect_script == null or effect_script.resource_path != "res://items/global/effect.gd":
+		return false
+
+	# 只有主属性算“纯属性”；次要属性（拾取范围 / 爆炸 / 敌人属性 / 道具价格等）保留在商店池里
+	return fengliu_is_primary_stat_key(item_effect.key_hash)
+
+
+# 复制一份并删除“只加主属性”的效果；没有可删项时返回原对象（不动商店池模板）
+func fengliu_remove_primary_stat_effects(item: ItemParentData) -> ItemParentData:
+	if item == null or item.effects == null or item.effects.size() == 0:
+		return item
+
+	var kept := []
+	for item_effect in item.effects:
+		if fengliu_is_stat_only_effect(item_effect):
+			continue
+		kept.push_back(item_effect)
+
+	# 没有可删项则保持原对象，避免无谓复制与 identity 变化
+	if kept.size() == item.effects.size():
+		return item
+
+	var new_item = item.duplicate()
+	new_item.effects = kept
+	return new_item
+
+
+# 商店结果后处理：仅道具；排除角色 / 升级项 / 消耗品（三者都继承 ItemData）
+func fengliu_remove_primary_stat_effects_from_shop(result: Array, player_index: int) -> void:
+	if RunData.get_player_effect(effect_fengliu_remove_primary_stat_effects, player_index).size() == 0:
+		return
+
+	for index in result.size():
+		var entry = result[index]
+		if entry == null or entry.size() < 2 or entry[0] == null:
+			continue
+
+		var item = entry[0]
+		if not (item is ItemData) or item is CharacterData or item is UpgradeData or item is ConsumableData:
+			continue
+
+		result[index] = [fengliu_remove_primary_stat_effects(item), entry[1]]
+
+
+# 重新随机一件非纯属性道具；池子耗尽时返回最后一次结果，避免死循环
+func fengliu_reroll_stat_only_item(wave: int, player_index: int, type: int, args: GetRandItemForWaveArgs, first_item) -> ItemParentData:
+	# 复制调用方参数，把被拒道具追加进排除列表（不改调用方的 args）
+	var reroll_args = GetRandItemForWaveArgs.new()
+	reroll_args.excluded_items = args.excluded_items.duplicate()
+	reroll_args.owned_and_shop_items = args.owned_and_shop_items
+	reroll_args.fixed_tier = args.fixed_tier
+	reroll_args.increase_tier = args.increase_tier
+	reroll_args.forced_shop_tag = args.forced_shop_tag
+	reroll_args.shared_tags = args.shared_tags.duplicate()
+	reroll_args.skip_item_effect_modifications = args.skip_item_effect_modifications
+	reroll_args.excluded_items.push_back([first_item, wave])
+
+	var item = first_item
+	for _attempt in range(FENGLIU_STAT_ONLY_REROLL_MAX_ATTEMPTS):
+		item = _fengliu_pick_rand_item_for_wave(wave, player_index, type, reroll_args)
+		if item == null:
+			return null
+
+		if not fengliu_item_effects_all_stat_only(item):
+			return item
+
+		if fengliu_excluded_has_item(reroll_args.excluded_items, item):
+			return item
+
+		reroll_args.excluded_items.push_back([item, wave])
+
+	return item
+
+
+# 排除列表里是否已有同 my_id 的候选
+func fengliu_excluded_has_item(excluded_items: Array, item) -> bool:
+	# 逐个比对排除项的 my_id
+	for shop_entry in excluded_items:
+		if shop_entry is Array and shop_entry.size() > 0 and shop_entry[0] != null and shop_entry[0].my_id_hash == item.my_id_hash:
+			return true
+	return false
+
+
 # 扩展随机道具
 func _get_rand_item_for_wave(wave: int, player_index: int, type: int, args: GetRandItemForWaveArgs) -> ItemParentData:
-    var effects = RunData.get_player_effects(player_index)
-    var item = ._get_rand_item_for_wave(wave, player_index, type, args)
-
-    if effects[fengliu_wanted_item_tag_chance_hash] > 0:
-        item = fengliu_get_rand_item_for_wave(wave, player_index, type, args)
-    elif effects.has(effect_fengliu_extra_wanted_item_tag) and effects[effect_fengliu_extra_wanted_item_tag].size() > 0:
-        item = fengliu_get_rand_item_for_wave(wave, player_index, type, args)
+    var item = _fengliu_pick_rand_item_for_wave(wave, player_index, type, args)
     
     if item == null:
         return item
 
     if item.effects == null:
         return item
+
+    # 纯属性道具重随 整件道具只有加减属性效果时换一件（
+    if type == TierData.ITEMS and RunData.get_player_effect(effect_fengliu_reroll_stat_only_item, player_index).size() > 0 and fengliu_item_effects_all_stat_only(item):
+        item = fengliu_reroll_stat_only_item(wave, player_index, type, args, item)
+        if item == null or item.effects == null:
+            return item
 
     # 先扫描是否存在需要重新随机预报的效果
     var has_reroll_effect = false
@@ -676,10 +815,14 @@ func _get_rand_item_for_wave(wave: int, player_index: int, type: int, args: GetR
 
         new_item.effects = new_effects
 
-    effects = RunData.get_player_effect(effect_fengliu_reset_item_stat, player_index)
+    var effects = RunData.get_player_effect(effect_fengliu_reset_item_stat, player_index)
     if effects.size() > 0:
         for effect in effects:
             new_item = ItemService.fengliu_reset_item_stat(new_item, effect)
+
+    # 删除主属性效果：商店 / 箱子 / 掉落等所有道具生成入口统一在这里处理（武器不走）
+    if type == TierData.ITEMS and RunData.get_player_effect(effect_fengliu_remove_primary_stat_effects, player_index).size() > 0:
+        new_item = fengliu_remove_primary_stat_effects(new_item)
 
     return new_item
 
