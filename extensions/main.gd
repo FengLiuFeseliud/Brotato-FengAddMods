@@ -34,6 +34,7 @@ var effect_fengliu_split_upgrade = Keys.generate_hash("fengliu_split_upgrade")
 var fengliu_item_auto_open_box_hash = Keys.generate_hash("item_auto_open_box")
 var fengliu_crate_gobbler_hash = Keys.generate_hash("crate_gobbler")
 var fengliu_item_kebab_hash = Keys.generate_hash("item_kebab")
+var fengliu_item_titration_solution_hash = Keys.generate_hash("item_titration_solution")
 
 
 var fengliu_shield_hash = Keys.generate_hash("stat_fengliu_shield")
@@ -524,6 +525,12 @@ func fengliu_add_hp_upgrade(player_index: int) -> void:
 # 扩展升级提升
 func on_levelled_up(player_index: int) -> void :
 	.on_levelled_up(player_index)
+
+	# 升级获得的计入已获得属性
+	for stat_level_up in RunData.get_player_effect(Keys.stats_on_level_up_hash, player_index):
+		# 滴定液
+		if stat_level_up[0] == fengliu_shield_hash:
+			RunData.add_tracked_value(player_index, fengliu_item_titration_solution_hash, stat_level_up[1])
 	
 	var effects = RunData.get_player_effect(effect_fengliu_random_stats_on_level_up, player_index)
 	for effect in effects:
