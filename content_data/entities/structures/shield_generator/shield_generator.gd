@@ -241,3 +241,19 @@ func _apply_curse_outline() -> void:
 	mat.set_shader_param("desaturation", 0.0)
 	mat.set_shader_param("outline_color_0", Utils.CURSE_COLOR)
 	_center_icon.material = mat
+
+# 中继器接口：直接实现在本脚本，避免依赖 late extension 的 Structure 扩展继承链
+func fengliu_set_relay_attack_speed(source: Object, percent: int) -> void:
+	WeaponService.fengliu_set_relay_attack_speed(self, source, percent)
+
+
+func fengliu_clear_relay_attack_speed(source: Object) -> void:
+	WeaponService.fengliu_clear_relay_attack_speed(self, source)
+
+
+func fengliu_get_relay_attack_speed_percent() -> int:
+	return WeaponService.fengliu_get_relay_attack_speed_percent(self)
+
+
+func fengliu_apply_relay_attack_speed_to_cooldown(base_cooldown: int) -> int:
+	return WeaponService.fengliu_apply_relay_attack_speed_to_cooldown(self, base_cooldown)

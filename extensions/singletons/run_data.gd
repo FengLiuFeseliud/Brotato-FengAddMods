@@ -66,6 +66,12 @@ const FENGLIU_EXTRA_PRIMARY_STAT_KEYS = [
 ]
 
 
+# 需要确保 gain_<属性> 槽位存在的原版属性（用于“修改倍率”效果）
+const FENGLIU_EXTRA_STAT_GAIN_KEYS = [
+	"fossil_count"
+]
+
+
 # 自定义次要属性
 const FENGLIU_EXTRA_SECONDARY_STAT_KEYS = [
 	"fengliu_bullet_scale",
@@ -645,6 +651,10 @@ func _fengliu_init_extra_stat_hashs() -> void :
 
 	# 自定义主要属性的修改键
 	for stat_key in FENGLIU_EXTRA_PRIMARY_STAT_KEYS:
+		_fengliu_extra_stat_hashs.append(Keys.generate_hash("gain_" + stat_key))
+
+	# 原版属性做“修改倍率”时，原版 init_effects 未预建对应的 gain_ 槽位
+	for stat_key in FENGLIU_EXTRA_STAT_GAIN_KEYS:
 		_fengliu_extra_stat_hashs.append(Keys.generate_hash("gain_" + stat_key))
 
 

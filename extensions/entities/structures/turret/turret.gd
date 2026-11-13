@@ -125,7 +125,24 @@ func on_target_died(target: Node, _args: Entity.DieArgs) -> void :
 
         fengliu_copy_turret(target)
 
+# 中继器接口
+func fengliu_set_relay_attack_speed(source: Object, percent: int) -> void:
+    WeaponService.fengliu_set_relay_attack_speed(self, source, percent)
+
+
+func fengliu_clear_relay_attack_speed(source: Object) -> void:
+    WeaponService.fengliu_clear_relay_attack_speed(self, source)
+
+
+func fengliu_get_relay_attack_speed_percent() -> int:
+    return WeaponService.fengliu_get_relay_attack_speed_percent(self)
+
+
+func fengliu_apply_relay_attack_speed_to_cooldown(base_cooldown: int) -> int:
+    return WeaponService.fengliu_apply_relay_attack_speed_to_cooldown(self, base_cooldown)
+
+
 # 覆盖：攻击间隔在原版口径（炮台攻速属性）之上再叠加中继器加成
 func _get_max_cooldown() -> int:
     # 先取原版口径（炮台攻速属性已生效），再叠加中继器加成
-    return .fengliu_apply_relay_attack_speed_to_cooldown(._get_max_cooldown())
+    return fengliu_apply_relay_attack_speed_to_cooldown(._get_max_cooldown())

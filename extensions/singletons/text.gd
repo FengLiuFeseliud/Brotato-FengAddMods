@@ -80,7 +80,8 @@ var fengliu_keys_needing_percent = {
 	"effect_weapon_killed_health": [0],
 	"effect_weapon_killed_add_temp_stat": [0],
 	"effect_add_random_character_to_shop": [0],
-	"effect_fengliu_acid_puddle_size": [0]
+	"effect_fengliu_acid_puddle_size": [0],
+	"effect_fossil_count_doubled": [1]
 }
 
 

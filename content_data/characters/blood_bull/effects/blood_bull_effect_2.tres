@@ -4,11 +4,11 @@
 
 [resource]
 script = ExtResource( 1 )
-key = "stat_melee_damage"
+from_stat = "stat_melee_damage"
 text_key = "EFFECT_RESET_ITEM_STAT"
 value = 0
 custom_key = "fengliu_reset_item_stat"
 storage_method = 0
 effect_sign = 3
 custom_args = [  ]
-to_stat = "stat_max_hp"
+key = "stat_max_hp"

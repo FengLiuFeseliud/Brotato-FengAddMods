@@ -64,3 +64,48 @@ func fengliu_spawn_fire_zone(effect, args: WeaponServiceExplodeArgs, explosion: 
 		main.move_child(fire_zone, ground.get_index() + 1)
 	fire_zone.global_position = args.pos
 	fire_zone.init_fire(args.burning_data, args.from_player_index, explosion_radius * effect.fire_scale, effect.fire_duration, effect.fire_tick_interval, effect.fire_particle_count)
+
+
+# 中继器攻速：数据挂在构筑物实例的 meta 上，避免依赖 Structure 扩展是否进入继承链
+const FENGLIU_RELAY_META_KEY = "fengliu_relay_attack_speed_sources"
+
+
+# 中继器：登记一座中继器给出的攻速加成
+func fengliu_set_relay_attack_speed(structure: Object, source: Object, percent: int) -> void:
+	var sources: Dictionary = structure.get_meta(FENGLIU_RELAY_META_KEY, {})
+	sources[source] = percent
+	structure.set_meta(FENGLIU_RELAY_META_KEY, sources)
+
+
+# 中继器：撤销一座中继器给出的加成（构筑物离开区域时调用）
+func fengliu_clear_relay_attack_speed(structure: Object, source: Object) -> void:
+	if not structure.has_meta(FENGLIU_RELAY_META_KEY):
+		return
+	var sources: Dictionary = structure.get_meta(FENGLIU_RELAY_META_KEY)
+	sources.erase(source)
+	structure.set_meta(FENGLIU_RELAY_META_KEY, sources)
+
+
+# 当前累计的中继器攻速加成（%）；顺手剔除已释放的来源（中继器被摧毁无需回调）
+func fengliu_get_relay_attack_speed_percent(structure: Object) -> int:
+	if not structure.has_meta(FENGLIU_RELAY_META_KEY):
+		return 0
+
+	var sources: Dictionary = structure.get_meta(FENGLIU_RELAY_META_KEY)
+	var total: int = 0
+	for source in sources.keys():
+		if not is_instance_valid(source):
+			sources.erase(source)
+			continue
+		total += int(sources[source])
+
+	return total
+
+
+# 把中继器加成叠加到一个攻击间隔上（0 加成时原样返回）
+func fengliu_apply_relay_attack_speed_to_cooldown(structure: Object, base_cooldown: int) -> int:
+	var percent: int = fengliu_get_relay_attack_speed_percent(structure)
+	if percent == 0:
+		return base_cooldown
+
+	return apply_attack_speed_mod_to_cooldown(base_cooldown, percent / 100.0)

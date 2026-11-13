@@ -79,11 +79,22 @@ func update_color() -> void :
     _fengliu_refresh_pay_display()
 
 
+# 材料原价（与基类同源：get_value + is_meca 武器的拆解价 markup）
+func fengliu_get_item_gold_value(p_item_data: ItemParentData, p_wave_value: int) -> int:
+    var gold_value: int = ItemService.get_value(p_wave_value, p_item_data.value, player_index, true, p_item_data is WeaponData, p_item_data.my_id_hash)
+    if p_item_data is WeaponData and p_item_data.is_meca:
+        var dlc_data = ItemService.get_dlc_data_by_id("primal_dread")
+        if dlc_data != null:
+            gold_value += dlc_data.get_dismantle_price(p_wave_value, player_index)
+    return gold_value
+
+
 # 扩展设置商店道具
 func set_shop_item(p_item_data: ItemParentData, p_wave_value: int = RunData.current_wave) -> void :
+    # 材料原价必须在基类调用前算：hp_shop 会把基类的 value 改成 ÷20 后的血量价
+    fengliu_item_gold_value = fengliu_get_item_gold_value(p_item_data, p_wave_value)
+
     .set_shop_item(p_item_data, p_wave_value)
-    
-    fengliu_item_gold_value = value
     _fengliu_refresh_pay_display()
     fengliu_refresh_item_set_icon(p_item_data)
 
