@@ -299,3 +299,5 @@ CONNOISSEUR,Connoisseur,讲究人
 EFFECT_REMOVE_PRIMARY_STAT_EFFECTS,"Items have no primary stat bonuses",道具不会出现主要属性效果
 ITEM_PICTURE_FRAME,Picture Frame,相框
 EFFECT_FOSSIL_COUNT_DOUBLED,Fossil count increased by {1},化石数增加 {1}
+WEAPON_CRESCENT_STAFF,Crescent Staff,月牙法杖
+EFFECT_CRESCENT_STAFF_MOON,"While held, summons a moon that orbits you; the moon is affected by Attack Speed and weapon Range.",持有时召唤月牙环绕玩家，月牙受攻速与武器范围影响
