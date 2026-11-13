@@ -14,13 +14,6 @@ extends Effect
 const FENGLIU_CUSTOM_FIELDS_KEY = "fengliu_custom_fields"
 const FENGLIU_PERSIST_VARS_KEY = "fengliu_persist_vars"
 
-# 复制后重算哈希：Resource.duplicate() 不会执行 _init，
-# 子类在 _generate_hashes() 里追加的自定义哈希（如 health_gain_stat_hash）否则为 null
-func duplicate(subresources := false) -> Resource:
-	var duplication = .duplicate(subresources)
-	duplication._generate_hashes()
-	return duplication
-
 
 # 本效果是否允许被异变复制（默认禁止；数值累加/遍历型效果显式覆写为 true）
 func fengliu_can_be_copied_by_mutation() -> bool:
@@ -30,6 +23,20 @@ func fengliu_can_be_copied_by_mutation() -> bool:
 # 本效果在玩家效果槽里的初始值（子类按需覆写：数值型返回 0，数组型返回 []）
 func fengliu_get_effect_init_value():
 	return []
+
+
+# 诅咒结算钩子
+# 物品被诅咒后调用 按需覆写以自定义诅咒对自身数值的影响。
+func fengliu_apply_curse(_base_effect: Resource, _curse_factor: float) -> void:
+	pass
+
+
+# 复制后重算哈希：Resource.duplicate() 不会执行 _init，
+# 子类在 _generate_hashes() 里追加的自定义哈希（如 health_gain_stat_hash）否则为 null
+func duplicate(subresources := false) -> Resource:
+	var duplication = .duplicate(subresources)
+	duplication._generate_hashes()
+	return duplication
 
 
 # 取实例相对其基类脚本新增的导出字段名（排除基类已持久化的字段）
@@ -116,6 +123,8 @@ static func deserialize_persist_vars(instance, persist_vars) -> void:
 
 	if instance.has_method("fengliu_on_persist_vars_restored"):
 		instance.fengliu_on_persist_vars_restored()
+
+
 # 编码字段值：资源引用存路径，数组逐元素处理，其余（数值/文本/布尔）原样
 static func fengliu_encode_value(value):
 	if value == null:

@@ -38,3 +38,12 @@ func unapply(player_index: int) -> void:
 	# 扣除 value，下限 0
 	var effects = RunData.get_player_effects(player_index)
 	effects[custom_key_hash] = max(0, effects.get(custom_key_hash, 0) - value)
+
+
+# 诅咒缩小
+func fengliu_apply_curse(base_effect: Resource, curse_factor: float) -> void:
+	if base_effect == null or base_effect.get_script() != get_script():
+		return
+
+	var cursed_value := int(floor(base_effect.value / (1.0 + curse_factor)))
+	value = int(max(cursed_value, 1))

@@ -4,13 +4,13 @@
 
 [resource]
 script = ExtResource( 1 )
-key = "stat_fengliu_shield"
+key = "stat_max_hp"
 text_key = "EFFECT_CONVERT_STAT_ON_APPLY"
-value = 1
+value = 3
 custom_key = ""
 storage_method = 0
 effect_sign = 3
 custom_args = [  ]
 pct_converted = 100.0
-to_stat = "stat_max_hp"
-to_value = 3
+from_stat = "stat_fengliu_shield"
+from_value = 1

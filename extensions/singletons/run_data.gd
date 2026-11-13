@@ -87,6 +87,13 @@ const FENGLIU_VANILLA_TREES_TEXT_KEYS = [
 ]
 
 
+# 原版「穿透」效果被诅咒后，原版会把整句文案换成 EFFECT_PIERCING_PLURAL；
+# 这些 key 属于原版逻辑，还原时不得用普通版文案覆盖
+const FENGLIU_VANILLA_PIERCING_TEXT_KEYS = [
+	"effect_piercing"
+]
+
+
 # 次要属性叠加台账
 const FENGLIU_SECONDARY_LEDGER_KEY := "fengliu_secondary_ledger"
 const FENGLIU_TEMP_LEDGER_KEY := "fengliu_secondary_ledger_temp"
@@ -1728,8 +1735,8 @@ func reset_to_start_wave_state() -> void :
 	_restart_wave = true
 	.reset_to_start_wave_state()
 
-# 还原树效果（只还原 mod 自己带收获/数值描述的复合树效果，
-# 原版「树」系道具保留原版诅咒文案，见 FENGLIU_VANILLA_TREES_TEXT_KEYS）
+# 还原文案被原版诅咒替换的效果（只还原 mod 自己带复合/自定义描述的效果，
+# 原版「树 / 穿透」类道具保留原版诅咒文案，见 FENGLIU_VANILLA_*_TEXT_KEYS）
 func fengliu_normalize_cursed_effect(item_data: ItemParentData) -> void:
 	if item_data == null:
 		return
@@ -1745,24 +1752,34 @@ func fengliu_normalize_cursed_effect(item_data: ItemParentData) -> void:
 	# 效果自身声明的诅咒放大（效果类实现 fengliu_apply_curse 即生效）
 	fengliu_normalize_cursed_effects(item_data, base_data)
 
-	# 找出原版对应树效果的文案键
-	var base_text_key: String = ""
-	for base_effect in base_data.effects:
-		if base_effect.key_hash != Keys.trees_hash or base_effect.text_key == "":
+	# 原版诅咒会把部分 key 的整句文案换成 *plural（树 / 穿透）；
+	# 只还原 mod 自己带复合/自定义描述的同类效果，原版道具保留原版诅咒文案
+	var restore_keys: Array = [
+		[Keys.trees_hash, FENGLIU_VANILLA_TREES_TEXT_KEYS],
+		[Keys.piercing_hash, FENGLIU_VANILLA_PIERCING_TEXT_KEYS]
+	]
+	for restore_key in restore_keys:
+		var key_hash: int = restore_key[0]
+		var vanilla_text_keys: Array = restore_key[1]
+
+		# 找出原版对应效果的文案键（同一 key 取第一条）
+		var base_text_key: String = ""
+		for base_effect in base_data.effects:
+			if base_effect.key_hash != key_hash or base_effect.text_key == "":
+				continue
+
+			base_text_key = base_effect.text_key
+			break
+
+		if base_text_key == "" or base_text_key.to_lower() in vanilla_text_keys:
 			continue
 
-		base_text_key = base_effect.text_key
-		break
+		# 还原为未被诅咒的文案
+		for effect in item_data.effects:
+			if effect.key_hash != key_hash:
+				continue
 
-	if base_text_key == "" or base_text_key.to_lower() in FENGLIU_VANILLA_TREES_TEXT_KEYS:
-		return
-
-	# 还原为未被诅咒的文案
-	for effect in item_data.effects:
-		if effect.key_hash != Keys.trees_hash:
-			continue
-
-		effect.text_key = base_text_key
+			effect.text_key = base_text_key
 
 
 # 通用诅咒放大自己实现
