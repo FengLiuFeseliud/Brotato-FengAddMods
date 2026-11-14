@@ -5,7 +5,7 @@ extends Node2D
 # 环绕/命中半径 = 武器面板射程 + 该值
 export (float) var radius_bonus: = 50.0
 # 命中判定圆半径 = 环绕半径 × 该比例（默认 1.0，两者一致）
-export (float) var hitbox_radius_ratio: = 1.0
+export (float) var hitbox_radius_ratio: = 0.8
 # 转一圈耗时 = 武器冷却秒数 × 该系数（越小转得越快）
 export (float) var orbit_cooldown_factor: = 4.0
 # 命中间隔 = 武器冷却秒数 × 该系数
