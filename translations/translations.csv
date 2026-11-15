@@ -304,3 +304,4 @@ EFFECT_CRESCENT_STAFF_MOON,"While held, summons a moon that orbits you; the moon
 STAFF_MAKER,Staff Maker,制杖
 WEAPON_WOOD_SPIRIT,Wood Spirit,木灵
 EFFECT_WEAPON_KILLED_SHIELD,"Killing an enemy has a {0} ({1}) chance to restore {2} ({3}) Shield to all players",击杀敌人时有{0}（{1}）概率为所有玩家回复{2}（{3}）点护盾
+WEAPON_MAGIC_WAND,Magic Wand,魔仙棒

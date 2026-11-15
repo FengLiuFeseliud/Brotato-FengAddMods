@@ -4,6 +4,7 @@ extends "res://entities/units/enemies/enemy.gd"
 var effect_fengliu_wave_intensity_damage = Keys.generate_hash("fengliu_wave_intensity_damage")
 var effect_fengliu_no_kill_enemy = Keys.generate_hash("fengliu_no_kill_enemy")
 var effect_fengliu_charm_enemy = Keys.generate_hash("fengliu_charm_enemy")
+var effect_fengliu_weapon_charm_enemy = Keys.generate_hash("fengliu_weapon_charm_enemy")
 var effect_fengliu_stronger_aliens_on_stats = Keys.generate_hash("fengliu_stronger_aliens_on_stats")
 var effect_fengliu_killed_regen_shield = Keys.generate_hash("fengliu_killed_regen_shield")
 
@@ -72,6 +73,12 @@ func fengliu_charm_enemy(effect: Array, args: TakeDamageArgs) -> void:
     if not Utils.get_chance_success(chance) and current_stats.health > health:
         return
     
+    # 应用魅惑
+    fengliu_apply_charm(args.from_player_index)
+
+
+# 挂上魅惑行为并魅惑本敌人
+func fengliu_apply_charm(from_player_index: int) -> void:
     # 检查是否已有魅惑行为
     var has_charm_behavior = false
     for effect_behavior in effect_behaviors.get_children():
@@ -87,7 +94,73 @@ func fengliu_charm_enemy(effect: Array, args: TakeDamageArgs) -> void:
             effect_behaviors.add_child(charm_behavior)
 
     # 应用魅惑
-    set_charmed(args.from_player_index)
+    set_charmed(from_player_index)
+
+
+# 武器命中魅惑（效果挂载在武器 effects 上，参考原版长笛）：
+#   敌人当前生命低于 hp_threshold% 时，按 value + 属性 × gain_value/100 的概率魅惑
+func fengliu_weapon_charm_enemy(hitbox: Hitbox = null) -> void:
+    # 无攻击来源则不处理
+    if hitbox == null or not is_instance_valid(hitbox.from):
+        return
+
+    # 敌人（含被魅惑的宠物）造成的伤害不触发
+    var from = hitbox.from
+    if from is Enemy:
+        return
+
+    var from_player_index = from.get("player_index")
+    if not (from_player_index is int) or from_player_index < 0:
+        return
+
+    # 掉落物 / 不可魅惑 / 已死亡 / 已魅惑 / 精英或 Boss 均跳过（同长笛）
+    if is_loot or not can_be_charmed or dead or _pending_die or _is_charmed:
+        return
+    if "is_elite" in self:
+        return
+
+    # 与原版魅惑行为一致：每个玩家同时最多魅惑 5 只
+    if RunData.current_charmed_enemies[from_player_index] >= 5:
+        return
+
+    # 汇总武器效果的概率（多个来源可叠加）
+    var charm_chance: float = fengliu_get_weapon_charm_chance(hitbox, from_player_index, current_stats.health, max_stats.health)
+    if charm_chance <= 0.0:
+        return
+
+    # 与原版魅惑行为一致：无尽模式按 factor / 2 衰减
+    charm_chance = charm_chance / max(1.0, RunData.get_endless_factor() / 2.0)
+    if not Utils.get_chance_success(charm_chance):
+        return
+
+    fengliu_apply_charm(from_player_index)
+
+
+# 汇总本次命中可触发的武器魅惑概率（0~1；不满足血线时不计入）
+func fengliu_get_weapon_charm_chance(hitbox: Hitbox, from_player_index: int, health: int, max_health: int) -> float:
+    var charm_chance: float = 0.0
+    if hitbox == null or max_health <= 0:
+        return charm_chance
+
+    for effect in hitbox.effects:
+        if effect == null or effect.custom_key_hash != effect_fengliu_weapon_charm_enemy:
+            continue
+
+        # 生命值阈值按当前（命中前）生命判定
+        var hp_threshold = effect.get("hp_threshold")
+        if hp_threshold == null:
+            continue
+        if float(health) / float(max_health) >= float(hp_threshold) / 100.0:
+            continue
+
+        # 概率 = 基础概率 + 缩放属性 × 倍率
+        var chance: float = effect.value
+        var gain_value = effect.get("gain_value")
+        if effect.key_hash != Keys.empty_hash and gain_value != null:
+            chance += Utils.get_stat(effect.key_hash, from_player_index) * (float(gain_value) / 100.0)
+        charm_chance += chance / 100.0
+
+    return charm_chance
 
 
 func fengliu_get_charm_behavior_scene() -> PackedScene:
@@ -136,6 +209,12 @@ func fengliu_get_killed_regen_shield_value(effects: Array) -> int:
     for effect in effects:
         total += int(effect[1])
     return total
+
+
+# 扩展受击前置（与原版魅惑行为同一时点：伤害结算前）
+func _on_hurt(hitbox: Hitbox) -> void:
+    ._on_hurt(hitbox)
+    fengliu_weapon_charm_enemy(hitbox)
 
 
 # 扩展受伤结算

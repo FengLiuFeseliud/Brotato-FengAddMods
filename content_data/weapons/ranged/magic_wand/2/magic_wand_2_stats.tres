@@ -1,0 +1,44 @@
+[gd_resource type="Resource" load_steps=7 format=2]
+
+[ext_resource path="res://weapons/ranged/double_barrel_shotgun/gun_shotgun_sawed_off_shot_03.wav" type="AudioStream" id=1]
+[ext_resource path="res://weapons/ranged/double_barrel_shotgun/gun_shotgun_sawed_off_shot_02.wav" type="AudioStream" id=2]
+[ext_resource path="res://weapons/ranged/double_barrel_shotgun/gun_shotgun_sawed_off_shot_01.wav" type="AudioStream" id=3]
+[ext_resource path="res://weapons/ranged/double_barrel_shotgun/gun_shotgun_sawed_off_shot_04.wav" type="AudioStream" id=4]
+[ext_resource path="res://weapons/weapon_stats/ranged_weapon_stats.gd" type="Script" id=5]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/projectiles/magic_wand/heart_projectile.tscn" type="PackedScene" id=6]
+
+[resource]
+script = ExtResource( 5 )
+cooldown = 70
+damage = 6
+accuracy = 0.95
+crit_chance = 0.03
+crit_damage = 2.0
+min_range = 0
+max_range = 350
+knockback = 0
+knockback_piercing = 0.0
+can_have_positive_knockback = true
+can_have_negative_knockback = false
+effect_scale = 1.0
+scaling_stats = [ [ "stat_elemental_damage", 0.5 ], [ "stat_luck", 0.15 ] ]
+lifesteal = 0.0
+shooting_sounds = [ ExtResource( 3 ), ExtResource( 2 ), ExtResource( 1 ), ExtResource( 4 ) ]
+sound_db_mod = -15
+is_healing = false
+recoil = 25
+recoil_duration = 0.1
+additional_cooldown_every_x_shots = -1
+additional_cooldown_multiplier = -1.0
+speed_percent_modifier = 0
+can_shoot_without_target = false
+nb_projectiles = 4
+projectile_spread = 0.5
+piercing = 0
+piercing_dmg_reduction = 0.3
+bounce = 0
+bounce_dmg_reduction = 0.5
+can_bounce = true
+projectile_speed = 3000
+increase_projectile_speed_with_range = false
+projectile_scene = ExtResource( 6 )
