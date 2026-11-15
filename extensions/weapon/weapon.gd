@@ -4,6 +4,7 @@ extends "res://weapons/weapon.gd"
 var effect_fengliu_gain_random_killed_stat = Keys.generate_hash("fengliu_gain_random_killed_stat")
 var effect_fengliu_weapon_killed_loot = Keys.generate_hash("fengliu_weapon_killed_loot")
 var effect_fengliu_weapon_killed_health = Keys.generate_hash("fengliu_weapon_killed_health")
+var effect_fengliu_weapon_killed_shield = Keys.generate_hash("fengliu_weapon_killed_shield")
 var effect_fengliu_wpapon_killed_add_temp_stat = Keys.generate_hash("fengliu_wpapon_killed_add_temp_stat")
 var effect_fengliu_weapon_hit_slow = Keys.generate_hash("fengliu_weapon_hit_slow")
 var effect_fengliu_waepon_shop_empty_slot_add_damage = Keys.generate_hash("fengliu_waepon_shop_empty_slot_add_damage")
@@ -102,6 +103,29 @@ func fengliu_weapon_killed_health(effect) -> void:
 		RunData.emit_signal("healing_effect", health, i, Keys.empty_hash)
 
 
+# 杀敌回复护盾（直接回盾，不加护盾上限）
+func fengliu_weapon_killed_shield(effect) -> void:
+	# 计算触发概率（基础概率 + 元素倍率），上限 100%
+	var chance = effect.value
+	if effect.key_hash != Keys.empty_hash:
+		chance += Utils.get_stat(effect.key_hash, player_index) * (effect.gain_value / 100.0)
+	# 概率未命中则跳过
+	if not Utils.get_chance_success(clamp(chance / 100.0, 0.0, 1.0)):
+		return
+
+	# 计算回盾量（基础值 + 属性倍率）；未配置倍率属性时只取基础值
+	var shield = effect.shield_value
+	if effect.shield_gain_stat_hash != Keys.empty_hash and effect.shield_gain_value != 0:
+		shield += int(Utils.get_stat(effect.shield_gain_stat_hash, player_index) * (effect.shield_gain_value / 100.0))
+	# 0 或负不回
+	if shield <= 0:
+		return
+
+	# 对全部玩家回复护盾（概率只掷一次，与武器击杀回血同口径）
+	for i in RunData.get_player_count():
+		RunData.emit_signal("fengliu_shield_regen", shield, i)
+
+
 # 杀敌添加临时属性
 func fengliu_wpapon_killed_add_temp_stat(effect) -> void:
 	# 计算触发概率（基础概率 + 属性倍率）
@@ -173,6 +197,11 @@ func on_killed_something(_thing_killed: Node, hitbox: Hitbox) -> void :
 		if effect.custom_key_hash == effect_fengliu_weapon_killed_health:
 			# 杀敌回复生命
 			fengliu_weapon_killed_health(effect)
+			continue
+
+		if effect.custom_key_hash == effect_fengliu_weapon_killed_shield:
+			# 杀敌回复护盾
+			fengliu_weapon_killed_shield(effect)
 			continue
 
 		# 杀敌添加临时属性

@@ -17,7 +17,8 @@ const FENGLIU_T0_INJECT_EXCLUDE_CHARACTERS := [
 	"baked_potato",
 	"blood_bull",
 	"steve",
-	"spitter"
+	"spitter",
+	"staff_maker"
 ]
 
 # 排除不希望自动注入到初始武器池的 t0 mod 武器（weapon_id）

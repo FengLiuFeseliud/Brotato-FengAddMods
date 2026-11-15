@@ -247,6 +247,10 @@ var _fengliu_pending_full_shield_link: Dictionary = {}
 var _fengliu_full_shield_link_flush_scheduled: Dictionary = {}
 
 
+# 原版 init_effects() 的默认值缓存（缺槽时按原版默认类型补齐）
+var _fengliu_default_effect_values: Dictionary = {}
+
+
 # 波次结束移除的道具列表
 var wave_end_remove_items = [
 	fengliu_item_forecast,
@@ -1369,9 +1373,18 @@ func _fengliu_get_wave_end_remove_item_to_remove(item_hash: int, player_index: i
 func get_player_effect(key: int, player_index: int):
 	var effects = .get_player_effects(player_index)
 
-	# 缺键时补一次该效果声明的初始值
+	# 缺键时按「原版默认槽 → mod 属性 → mod 效果槽声明值」补默认值
 	if not effects.has(key):
-		effects[key] = ItemService.fengliu_get_effect_init_value(key)
+		if _fengliu_default_effect_values.empty():
+			_fengliu_default_effect_values = PlayerRunData.init_effects()
+
+		if _fengliu_default_effect_values.has(key):
+			var default_value = _fengliu_default_effect_values[key]
+			effects[key] = default_value.duplicate() if default_value is Array or default_value is Dictionary else default_value
+		elif Utils.is_stat_key(key):
+			effects[key] = 0
+		else:
+			effects[key] = ItemService.fengliu_get_effect_init_value(key)
 
 	return .get_player_effect(key, player_index)
 

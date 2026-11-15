@@ -301,3 +301,6 @@ ITEM_PICTURE_FRAME,Picture Frame,相框
 EFFECT_FOSSIL_COUNT_DOUBLED,Fossil count increased by {1},化石数增加 {1}
 WEAPON_CRESCENT_STAFF,Crescent Staff,月牙法杖
 EFFECT_CRESCENT_STAFF_MOON,"While held, summons a moon that orbits you; the moon is affected by Attack Speed and weapon Range.",持有时召唤月牙环绕玩家，月牙受攻速与武器范围影响
+STAFF_MAKER,Staff Maker,制杖
+WEAPON_WOOD_SPIRIT,Wood Spirit,木灵
+EFFECT_WEAPON_KILLED_SHIELD,"Killing an enemy has a {0} ({1}) chance to restore {2} ({3}) Shield to all players",击杀敌人时有{0}（{1}）概率为所有玩家回复{2}（{3}）点护盾

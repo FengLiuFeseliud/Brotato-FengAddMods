@@ -47,6 +47,7 @@ var fengliu_keys_needing_operator = {
 	"effect_relay": [0],
 	"effect_weapon_shop_empty_slot_add_demage": [1],
 	"effect_weapon_killed_health": [0],
+	"effect_weapon_killed_shield": [0],
 	"effect_weapon_killed_loot": [1],
 	"effect_weapon_killed_add_temp_stat": [0, 2],
 	"effect_stat_for_every_character": [0, 2]
@@ -78,6 +79,7 @@ var fengliu_keys_needing_percent = {
 	"effect_weapon_burn_damage": [0],
 	"effect_relay": [0],
 	"effect_weapon_killed_health": [0],
+	"effect_weapon_killed_shield": [0],
 	"effect_weapon_killed_add_temp_stat": [0],
 	"effect_add_random_character_to_shop": [0],
 	"effect_fengliu_acid_puddle_size": [0],
