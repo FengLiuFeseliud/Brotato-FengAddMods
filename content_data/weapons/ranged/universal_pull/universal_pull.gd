@@ -7,14 +7,6 @@ extends "res://weapons/ranged/ranged_weapon.gd"
 #   在施放瞬间的角色位置召唤大陨石（从右上高处按水平 50° 斜落），
 #   落地后对「爆炸直径 = 武器射程」内所有敌人造成面板伤害，并留下与爆炸同大小的火圈。
 #   本武器不发射任何子弹（should_shoot 恒 false）。
-# ------------------------------------------------------------
-# 数值口径：
-#   伤害       = current_stats.damage（20 + 100% 元素 + 100% 生命 + 100% 护盾）
-#   伤害范围   = 圆形，直径 = current_stats.max_range（半径 = 射程 / 2，距离² < 半径²）
-#   爆炸缩放   = 半径 / 147.34（explosion.tscn 命中圆基础半径）
-#   火圈       = 半径 = 爆炸实际半径 × fire_scale(1.0)；燃烧数据来自武器词条 BurningEffect
-#   触发条件   = 生命满 且 范围内有活敌人（不要求护盾；负护盾上限也可施放）
-#   消耗       = 仅把血量压至 1 点（不扣护盾）
 # ============================================================
 
 const METEOR_SCENE = preload("res://mods-unpacked/FengLiu-FengAddMods/projectiles/meteor/meteor.tscn")
@@ -37,8 +29,11 @@ const METEOR_FIRE_DURATION := 7.0
 const METEOR_FIRE_TICK_INTERVAL := 0.5
 # 火圈火焰粒子数量（大范围需要较多粒子才不稀疏）
 const METEOR_FIRE_PARTICLE_COUNT := 32
-# 每波开局前 5 秒不施放（避免开波瞬间满血满盾直接空放）
-const METEOR_WAVE_START_DELAY := 5.0
+# 每波开局前 x 秒不施放
+const METEOR_WAVE_START_DELAY := 1.0
+# 陨石下降时长（秒）：基准 = cooldown/60（1~4 阶 = 4.0 / 3.5 / 3.0 / 2.5），再按玩家攻速缩短
+const METEOR_FALL_MIN := 0.25
+const METEOR_FALL_MAX := 6.0
 
 var _fengliu_cast_cooldown := 0.0
 # 正在下落中的陨石数量（同时只允许 1 颗，避免 2 秒内回满后叠放）
@@ -76,6 +71,27 @@ func fengliu_get_meteor_radius(weapon_range: float) -> float:
 # 目标半径换算成爆炸场景缩放
 func fengliu_get_meteor_scale(radius: float) -> float:
 	return max(0.1, radius / METEOR_BASE_RADIUS)
+
+
+# 陨石下降时长（秒）：基准 = cooldown/60（1~4 阶 = 4 / 3.5 / 3 / 2.5），再按玩家攻速缩短
+func fengliu_get_meteor_fall_duration() -> float:
+	var base_seconds: float = float(current_stats.cooldown) / 60.0
+	var attack_speed: float = 0.0
+	if player_index >= 0:
+		var attack_speed_value = Utils.get_stat(Keys.stat_attack_speed_hash, player_index)
+		if attack_speed_value is float or attack_speed_value is int:
+			attack_speed = float(attack_speed_value)
+
+	return fengliu_get_meteor_fall_duration_from(base_seconds, attack_speed)
+
+
+# 纯函数：按基准秒数与攻速百分比算下降时长（夹在 METEOR_FALL_MIN ~ METEOR_FALL_MAX）
+func fengliu_get_meteor_fall_duration_from(base_seconds: float, attack_speed: float) -> float:
+	return clamp(
+		base_seconds / (1.0 + max(0.0, attack_speed) / 100.0),
+		METEOR_FALL_MIN,
+		METEOR_FALL_MAX
+	)
 
 
 # 纯函数：本波已过的秒数是否已过开局延迟（便于探针断言）
@@ -172,7 +188,7 @@ func _fengliu_spawn_meteor(player, radius: float) -> void:
 	args.burning_data = current_stats.burning_data
 
 	var meteor = METEOR_SCENE.instance()
-	meteor.init(args.pos, effect, args)
+	meteor.init(args.pos, effect, args, fengliu_get_meteor_fall_duration())
 	meteor.connect("explosion_created", self, "_fengliu_on_meteor_explosion")
 
 	var main = Utils.get_scene_node()

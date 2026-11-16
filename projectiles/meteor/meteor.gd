@@ -15,8 +15,6 @@ signal explosion_created(explosion)
 const FALL_ANGLE_DEGREES := 35.0
 # 起点到落点的路径总长（像素）
 const FALL_DISTANCE := 1300.0
-# 下落时长（秒）
-const FALL_DURATION := 3.0
 
 var _target_pos: Vector2 = Vector2.ZERO
 var _exploding_effect: ExplodingEffect = null
@@ -24,6 +22,8 @@ var _explode_args: WeaponServiceExplodeArgs = null
 var _start_pos: Vector2 = Vector2.ZERO
 var _elapsed := 0.0
 var _landed := false
+# 下落时长（秒）：由武器按「面板攻击间隔 / 攻速」传入
+var _fall_duration := 3.0
 
 
 # 起点相对落点的偏移：右上高处，按轨迹角与路径总长推算
@@ -32,11 +32,12 @@ func get_fall_start_offset() -> Vector2:
 	return Vector2(cos(fall_angle), -sin(fall_angle)) * FALL_DISTANCE
 
 
-# 由武器脚本在加入场景树之前调用
-func init(target_pos: Vector2, exploding_effect: ExplodingEffect, explode_args: WeaponServiceExplodeArgs) -> void:
+# 由武器脚本在加入场景树之前调用（fall_duration = 下落时长，秒）
+func init(target_pos: Vector2, exploding_effect: ExplodingEffect, explode_args: WeaponServiceExplodeArgs, fall_duration: float = 3.0) -> void:
 	_target_pos = target_pos
 	_exploding_effect = exploding_effect
 	_explode_args = explode_args
+	_fall_duration = max(0.05, fall_duration)
 
 
 func _ready() -> void:
@@ -50,7 +51,7 @@ func _process(delta: float) -> void:
 		return
 
 	_elapsed += delta
-	var t: float = clamp(_elapsed / FALL_DURATION, 0.0, 1.0)
+	var t: float = clamp(_elapsed / max(0.05, _fall_duration), 0.0, 1.0)
 
 	# 加速下落（t² 曲线）；全程保持材质自身方向（不旋转）
 	global_position = _start_pos.linear_interpolate(_target_pos, t * t)
