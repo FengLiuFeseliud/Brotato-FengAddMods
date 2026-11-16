@@ -311,4 +311,4 @@ EFFECT_UNIVERSAL_PULL_NO_ATTACK,The weapon does not attack enemies.,武器不会
 WEAPON_CLASS_UNIQUE,Unique,独特
 WEAPON_CLASS_UNIQUE_DESCRIPTION,You can only own one of each unique weapon,每种独特武器只能拥有一把
 WEAPON_ORDINARY_GREATSWORD,Ordinary Greatsword,普通的大剑
-EFFECT_ORDINARY_GREATSWORD,"Every 5 attacks alternates between a slash and a spin sweep. The slash damages all targets in range; the spin sweep spins and attacks enemies for 2 seconds, and its spin speed is affected by attack speed. Both deal panel damage and are affected by the weapon's range.",每5次攻击在挥砍与旋转扫击交替使用，挥砍时对范围内所有目标造成伤害，旋转扫击时旋转攻击敌人2秒转速受攻击速度影响，挥砍与旋转扫击都会造成面板伤害并受武器范围影响
+EFFECT_ORDINARY_GREATSWORD,"Every 5 attacks alternates between a slash and a spin sweep. The slash damages all targets in range; the spin sweep spins and attacks enemies for 2 seconds, and its spin speed is affected by attack speed. Both deal panel damage and are affected by the weapon's range.",每5次攻击在挥砍与旋转扫击交替使用，挥砍时对范围内所有目标造成伤害，旋转扫击时旋转攻击敌人2秒转速受攻击速度影响，挥砍与旋转扫击都会造成面板伤害并受1.1倍武器范围影响
