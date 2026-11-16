@@ -1836,9 +1836,44 @@ func add_item(item: ItemData, player_index: int, is_selection: bool = false) -> 
 
 # 扩展添加武器：诅咒水壶入库前先还原树效果
 func add_weapon(weapon: WeaponData, player_index: int, is_selection: bool = false) -> WeaponData:
-	# 入库前先还原被诅咒水壶的收获产树效果
-	fengliu_normalize_cursed_effect(weapon)
-	return .add_weapon(weapon, player_index, is_selection)
+    # 入库前先还原被诅咒水壶的收获产树效果
+    fengliu_normalize_cursed_effect(weapon)
+    return .add_weapon(weapon, player_index, is_selection)
+
+
+# 已持有同家族同品阶独武时，商店购买强制走合成（即使有空槽）
+func has_weapon_slot_available(shop_weapon: WeaponData, player_index: int) -> bool:
+    if _fengliu_should_force_unique_combine(shop_weapon, player_index):
+        return false
+
+    return .has_weapon_slot_available(shop_weapon, player_index)
+
+
+# 是否应强制合成：已持有同家族、同品阶独武
+func _fengliu_should_force_unique_combine(shop_weapon: WeaponData, player_index: int) -> bool:
+    if not ItemService.fengliu_is_unique_weapon(shop_weapon):
+        return false
+
+    for owned_weapon in get_player_weapons_ref(player_index):
+        if owned_weapon.weapon_id == shop_weapon.weapon_id and owned_weapon.tier == shop_weapon.tier:
+            return true
+
+    return false
+
+
+# 查找玩家已拥有的同家族独特武器（取最高品阶）
+func fengliu_get_owned_unique_weapon(weapon: WeaponData, player_index: int):
+    if not ItemService.fengliu_is_unique_weapon(weapon):
+        return null
+
+    var highest_weapon = null
+    for owned_weapon in get_player_weapons_ref(player_index):
+        if owned_weapon.weapon_id != weapon.weapon_id:
+            continue
+        if highest_weapon == null or owned_weapon.tier > highest_weapon.tier:
+            highest_weapon = owned_weapon
+
+    return highest_weapon
 
 
 # 满盾联动事件钩子：道具移除时通知玩家重新判定（不再每帧轮询）

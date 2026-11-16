@@ -1,6 +1,9 @@
 extends "res://ui/menus/shop/inventory.gd"
 
 
+const FENGLIU_RAINBOW = preload("res://mods-unpacked/FengLiu-FengAddMods/ui/fengliu_unique/fengliu_rainbow_visuals.gd")
+
+
 # 判断道具是否为不可叠加类型
 func fengliu_is_one_element(element) -> bool:
 	return element != null and element.get("one_elements") == true
@@ -37,3 +40,13 @@ func add_element(element: ItemParentData, check_for_duplicates: bool = false, so
 		.add_element(element, false, sort_inventory, _display_banned, animated_entrance)
 	else:
 		.add_element(element, check_for_duplicates, sort_inventory, _display_banned, animated_entrance)
+
+
+# 独特武器：库存格右上→左下彩虹边框
+func _spawn_element(element: Resource, p_display_banned: float = 0, animated_entrance = false) -> InventoryElement:
+	var instance = ._spawn_element(element, p_display_banned, animated_entrance)
+
+	if FENGLIU_RAINBOW.is_unique(element):
+		FENGLIU_RAINBOW.apply_border(instance, 0.0, 8.0)
+
+	return instance

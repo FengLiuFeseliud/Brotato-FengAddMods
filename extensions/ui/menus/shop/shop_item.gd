@@ -1,6 +1,8 @@
 extends "res://ui/menus/shop/shop_item.gd"
 
 
+const FENGLIU_RAINBOW = preload("res://mods-unpacked/FengLiu-FengAddMods/ui/fengliu_unique/fengliu_rainbow_visuals.gd")
+
 var material_ui_icon = load("res://items/materials/material_ui.png")
 
 
@@ -77,6 +79,22 @@ func _fengliu_refresh_pay_display() -> void:
 func update_color() -> void :
     .update_color()
     _fengliu_refresh_pay_display()
+
+
+# 独特武器：商店卡片右上→左下彩虹边框 + 内部淡淡一层
+func _set_panel_lock_style() -> void:
+    if not RunData.is_coop_run:
+        FENGLIU_RAINBOW.clear_border(_panel)
+
+    ._set_panel_lock_style()
+
+    if RunData.is_coop_run:
+        return
+
+    if not FENGLIU_RAINBOW.is_unique(item_data):
+        return
+
+    FENGLIU_RAINBOW.apply_border(_panel, 0.06, 12.0)
 
 
 # 材料原价（与基类同源：get_value + is_meca 武器的拆解价 markup）

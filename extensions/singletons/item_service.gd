@@ -22,6 +22,13 @@ const FENGLIU_CONTENT_DIR = "res://mods-unpacked/FengLiu-FengAddMods/content_dat
 # 参与原生注册的子目录（其余目录只放子资源，不注册）
 const FENGLIU_DYNAMIC_CONTENT_SUBDIRS := ["characters", "items", "weapons", "sets", "upgrades"]
 
+# 独特标记套装：独武出现概率 1% 起、每波 +1%；另有图标/文字视觉
+const FENGLIU_UNIQUE_SET_ID = "set_fengliu_unique"
+const FENGLIU_UNIQUE_CHANCE_PER_WAVE = 0.01
+const FENGLIU_UNIQUE_MAX_CHANCE = 0.10
+const FENGLIU_UNIQUE_OWNED_BONUS = 0.05
+const FENGLIU_UNIQUE_OWNED_MAX_CHANCE = 0.15
+
 
 # 图鉴 / 道具套组只显示 previous_upgrade == null 的武器；
 # 这里只补「展示用前阶指针」，不写 upgrades_into ⇒ 商店升级 / 合成玩法不变
@@ -57,6 +64,9 @@ var effect_fengliu_remove_primary_stat_effects = Keys.generate_hash("fengliu_rem
 
 
 var fengliu_wanted_item_tag_chance_hash = Keys.generate_hash("fengliu_wanted_item_tag_chance")
+
+var fengliu_unique_set_hash = Keys.generate_hash(FENGLIU_UNIQUE_SET_ID)
+var _fengliu_unique_weapons: Array = []
 
 var fengliu_damage_upgrade_hash = Keys.generate_hash("fengliu_icon_damage_upgrade")
 var fengliu_hp_upgrade_hash = Keys.generate_hash("fengliu_icon_hp_upgrade")
@@ -666,6 +676,11 @@ func fengliu_roll_set_weapon_in_shop(shop_items: Array, locked_count: int, wave:
 
 # 取一件原始道具（先走原版池；玩家需要 wanted tag 时改走 mod 的池）
 func _fengliu_pick_rand_item_for_wave(wave: int, player_index: int, type: int, args: GetRandItemForWaveArgs) -> ItemParentData:
+	# 独武优先：按 1% + 每波 1% 的概率尝试
+	var unique_item = _fengliu_try_unique_weapon(wave, player_index, type, args)
+	if unique_item != null:
+		return unique_item
+
 	var effects = RunData.get_player_effects(player_index)
 	var item = ._get_rand_item_for_wave(wave, player_index, type, args)
 
@@ -1029,6 +1044,168 @@ func apply_item_effect_modifications(item: ItemParentData, player_index: int) ->
     var new_item = .apply_item_effect_modifications(item, player_index)
     RunData.fengliu_normalize_cursed_effect(new_item)
     return new_item
+
+
+# 该套装是否为「独特」标记套装
+func fengliu_is_unique_set(set_data) -> bool:
+	if set_data == null:
+		return false
+
+	# 哈希未生成时退回字符串比对，避免时序问题
+	if set_data.my_id_hash == fengliu_unique_set_hash:
+		return true
+	return set_data.my_id == FENGLIU_UNIQUE_SET_ID
+
+
+# 武器是否属于「独特」套装
+func fengliu_is_unique_weapon(item) -> bool:
+	if not (item is WeaponData) or item.sets == null:
+		return false
+
+	# 任一所属套装命中即视为独特武器
+	for weapon_set in item.sets:
+		if fengliu_is_unique_set(weapon_set):
+			return true
+
+	return false
+
+
+# 把独武从普通品阶池剔除，只通过概率抽取出现
+func init_unlocked_pool() -> void:
+    .init_unlocked_pool()
+
+    _fengliu_unique_weapons.clear()
+    for tier_data in _tiers_data:
+        var pool: Array = tier_data[TierData.WEAPONS]
+
+        # 倒序删除，避免边遍历边改下标
+        for i in range(pool.size() - 1, -1, -1):
+            var weapon = pool[i]
+            if not fengliu_is_unique_weapon(weapon):
+                continue
+
+            _fengliu_unique_weapons.append(weapon)
+            pool.remove(i)
+            tier_data[TierData.ALL_ITEMS].erase(weapon)
+
+
+# 独武出现概率：第 1~15 波 1%→10%，15 波后 10%
+func _fengliu_get_unique_chance(wave: int) -> float:
+    # 第 1~15 波按二次曲线从 1% 升到 10%，15 波后不再上升
+    var t = clamp((float(wave) - 1.0) / 14.0, 0.0, 1.0)
+    var chance = 0.01 + 0.012222 * t + 0.077778 * t * t
+    return min(FENGLIU_UNIQUE_MAX_CHANCE, chance)
+
+
+# 玩家是否持有金鱼（或其 reroll 升阶效果）
+func _fengliu_player_has_goldfish(player_index: int) -> bool:
+    if RunData.get_player_effect(Keys.increase_tier_on_reroll_hash, player_index).size() > 0:
+        return true
+
+    for item in RunData.get_player_items_ref(player_index):
+        if item != null and item.my_id_hash == Keys.item_goldfish_hash:
+            return true
+
+    return false
+
+
+# 独武抽取：命中返回武器，否则返回 null 交给普通池
+func _fengliu_try_unique_weapon(wave: int, player_index: int, type: int, args: GetRandItemForWaveArgs) -> ItemParentData:
+    if type != TierData.WEAPONS or _fengliu_unique_weapons.empty():
+        return null
+
+    # 持有金鱼时跳过整次独武判定
+    if _fengliu_player_has_goldfish(player_index):
+        return null
+
+    var candidates: Array = _fengliu_get_unique_weapon_candidates(wave, player_index, args)
+    if candidates.empty():
+        return null
+
+    # 按家族拆分：已持有家族 / 其他家族
+    var owned_candidates: Array = []
+    var other_candidates: Array = []
+    for weapon in candidates:
+        if RunData.fengliu_get_owned_unique_weapon(weapon, player_index) != null:
+            owned_candidates.append(weapon)
+        else:
+            other_candidates.append(weapon)
+
+    var base_chance: float = _fengliu_get_unique_chance(wave)
+
+    # 只有已持有家族可以 +5%，上限 15%
+    if not owned_candidates.empty():
+        var owned_chance: float = min(FENGLIU_UNIQUE_OWNED_MAX_CHANCE, base_chance + FENGLIU_UNIQUE_OWNED_BONUS)
+        if Utils.get_chance_success(owned_chance):
+            return apply_item_effect_modifications(Utils.get_rand_element(owned_candidates), player_index)
+
+    # 其他家族仍按基础概率，上限 10%
+    if not other_candidates.empty() and Utils.get_chance_success(base_chance):
+        return apply_item_effect_modifications(Utils.get_rand_element(other_candidates), player_index)
+
+    return null
+
+
+# 同家族已拥有时只允许同品阶；最高阶后该家族不再出现
+func _fengliu_get_unique_weapon_candidates(wave: int, player_index: int, args: GetRandItemForWaveArgs) -> Array:
+    var candidates: Array = []
+    var banned_items: Array = RunData.players_data[player_index].banned_items
+    var no_melee_weapons: bool = RunData.get_player_effect_bool(Keys.no_melee_weapons_hash, player_index)
+    var no_ranged_weapons: bool = RunData.get_player_effect_bool(Keys.no_ranged_weapons_hash, player_index)
+    var no_structures: bool = RunData.get_player_effect(Keys.remove_shop_items_hash, player_index).has(Keys.structure_hash)
+    var min_weapon_tier: int = RunData.get_player_effect(Keys.min_weapon_tier_hash, player_index)
+    var max_weapon_tier: int = RunData.get_player_effect(Keys.max_weapon_tier_hash, player_index)
+    var excluded_items: Array = args.excluded_items + RunData.get_player_locked_shop_items(player_index)
+
+    # 无持有独武时按当前波次品阶出；有持有独武时该家族锁定同品阶
+    var item_tier: int = get_tier_from_wave(wave, player_index, args.increase_tier)
+    if args.fixed_tier != -1:
+        item_tier = args.fixed_tier
+    item_tier = clamp(item_tier, min_weapon_tier, max_weapon_tier)
+
+    for weapon in _fengliu_unique_weapons:
+        if weapon.tier < min_weapon_tier or weapon.tier > max_weapon_tier:
+            continue
+
+        var owned_unique = RunData.fengliu_get_owned_unique_weapon(weapon, player_index)
+        if owned_unique != null:
+            # 最高阶后不再刷出这个家族
+            if owned_unique.tier >= Tier.LEGENDARY:
+                continue
+            # 同家族只允许与持有品阶相同的武器
+            if weapon.tier != owned_unique.tier:
+                continue
+        elif weapon.tier != item_tier:
+            continue
+
+        if no_melee_weapons and weapon.type == WeaponType.MELEE:
+            continue
+        if no_ranged_weapons and weapon.type == WeaponType.RANGED:
+            continue
+        if no_structures and EntityService.is_weapon_spawning_structure(weapon):
+            continue
+        if _fengliu_is_unique_weapon_banned(weapon, banned_items):
+            continue
+        if _fengliu_is_unique_weapon_excluded(weapon, excluded_items):
+            continue
+
+        candidates.append(weapon)
+
+    return candidates
+
+
+# 禁用名单同时支持 my_id / weapon_id 及其哈希
+func _fengliu_is_unique_weapon_banned(weapon, banned_items: Array) -> bool:
+    return banned_items.has(weapon.my_id) or banned_items.has(weapon.my_id_hash) or banned_items.has(weapon.weapon_id) or banned_items.has(weapon.weapon_id_hash)
+
+
+# 已锁定 / 本轮已排除的同家族武器不再重复出现
+func _fengliu_is_unique_weapon_excluded(weapon, excluded_items: Array) -> bool:
+    for entry in excluded_items:
+        if entry is Array and entry.size() > 0 and entry[0] is WeaponData and entry[0].weapon_id == weapon.weapon_id:
+            return true
+
+    return false
 
 
 # mod 魔改 _get_rand_item_for_wave 使其可以实现更复杂的操作

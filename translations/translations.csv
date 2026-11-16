@@ -305,3 +305,8 @@ STAFF_MAKER,Staff Maker,制杖
 WEAPON_WOOD_SPIRIT,Wood Spirit,木灵
 EFFECT_WEAPON_KILLED_SHIELD,"Killing an enemy has a {0} ({1}) chance to restore {2} ({3}) Shield to all players",击杀敌人时有{0}（{1}）概率为所有玩家回复{2}（{3}）点护盾
 WEAPON_MAGIC_WAND,Magic Wand,魔仙棒
+WEAPON_UNIVERSAL_PULL,Universal Pull,万象天引
+EFFECT_UNIVERSAL_PULL_METEOR,"When health is full, consumes health down to 1 HP to summon a meteor. After landing, it explodes with a diameter equal to the weapon's range and leaves a fire zone. Meteor explosion damage equals the weapon's panel damage. It cannot be summoned during the first 5 seconds of a wave.",在血量全满时，消耗血量至1点召唤陨石，陨石落下后造成直径为武器范围的爆炸并留下火圈，陨石爆炸伤害与武器面板一致，波次前5秒不会召唤
+EFFECT_UNIVERSAL_PULL_NO_ATTACK,The weapon does not attack enemies.,武器不会攻击敌人
+WEAPON_CLASS_UNIQUE,Unique,独特
+WEAPON_CLASS_UNIQUE_DESCRIPTION,You can only own one of each unique weapon,每种独特武器只能拥有一把
