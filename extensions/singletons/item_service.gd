@@ -1616,16 +1616,15 @@ func fengliu_trim_shop_item_count(items_data: Array, player_index: int) -> Array
 		else:
 			final_count = min(NB_SHOP_ITEMS, locked_size + final_count)
 
-	if final_count <= 0 or final_count >= items_data.size():
+	if final_count >= items_data.size():
 		return items_data
 
 	var trimmed := []
 
-	for index in range(final_count):
+	for index in range(max(0, final_count)):
 		trimmed.push_back(items_data[index])
 
 	return trimmed
-
 
 
 # 按缺少的格子加价（幂等：格子数量没变就不重复加）

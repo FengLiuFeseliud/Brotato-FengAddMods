@@ -5,6 +5,7 @@ var effect_fengliu_stats_stop = Keys.generate_hash("fengliu_stats_stop")
 var effect_fengliu_stats_buy_item = Keys.generate_hash("fengliu_stats_buy_item")
 var effect_fengliu_temporary_stats_stop = Keys.generate_hash("fengliu_temporary_stats_stop")
 var effect_fengliu_item_bought_spawn_boss = Keys.generate_hash("fengliu_item_bought_spawn_boss")
+var fengliu_shop_item_count_hash = Keys.generate_hash("fengliu_shop_item_count")
 
 # 替代材料支付方式（fengliu_resolve_substitute_payment 的返回值）
 const FENGLIU_PAY_NONE = 0          # 不接管，走原版金币流程
@@ -27,7 +28,7 @@ func set_shop_items(items_data: Array) -> void :
 		items_data = fengliu_apply_shop_modifications(items_data)
 
 	# 防御：加工后若变成空表（异常情况），回退原始数据，避免商店整体空白
-	if items_data == null or items_data.size() == 0:
+	if (items_data == null or items_data.size() == 0) and not RunData.get_player_effect(fengliu_shop_item_count_hash, player_index).size() > 0:
 		items_data = original
 
 	.set_shop_items(items_data)
