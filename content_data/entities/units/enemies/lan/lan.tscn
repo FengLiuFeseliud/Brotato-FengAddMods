@@ -1,0 +1,76 @@
+[gd_scene load_steps=10 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/entities/units/enemies/lan/lan_stats.tres" type="Resource" id=1]
+[ext_resource path="res://entities/units/enemies/enemy.tscn" type="PackedScene" id=2]
+[ext_resource path="res://entities/units/enemies/attack_behaviors/shooting_attack_behavior.gd" type="Script" id=3]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/projectiles/lan_bullets/lan_projectile.tscn" type="PackedScene" id=4]
+[ext_resource path="res://entities/units/movement_behaviors/stay_in_range_from_player_movement_behavior.gd" type="Script" id=5]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/entities/units/enemies/lan/lan.png" type="Texture" id=6]
+
+[sub_resource type="CircleShape2D" id=4]
+radius = 14.0
+
+[sub_resource type="CircleShape2D" id=5]
+radius = 22.0
+
+[node name="Enemy" instance=ExtResource( 2 )]
+stats = ExtResource( 1 )
+enemy_id = "lan"
+
+[node name="Animation" parent="." index="0"]
+modulate = Color( 0.45, 0.65, 1, 1 )
+
+[node name="Sprite" parent="Animation" index="0"]
+texture = ExtResource( 6 )
+
+[node name="Collision" parent="." index="1"]
+shape = SubResource( 4 )
+
+[node name="Collision" parent="Hitbox" index="0"]
+position = Vector2( 5, -6 )
+shape = SubResource( 5 )
+
+[node name="MovementBehavior" parent="." index="6"]
+script = ExtResource( 5 )
+target_range = 300
+target_range_randomization = 100
+
+[node name="AttackBehavior" parent="." index="7"]
+script = ExtResource( 3 )
+projectile_scene = ExtResource( 4 )
+projectile_speed = 600
+projectile_speed_randomization = 0
+speed_change_after_each_projectile = 0
+cooldown = 1.0
+initial_cooldown = 0
+max_cd_randomization = 0
+long_cooldown_every_x_shoots = 5
+long_cooldown = 180
+damage = 1
+damage_increase_each_wave = 0.75
+min_range = 0
+max_range = 600
+attack_anim_speed = 2.0
+base_direction_randomization = 0.0
+base_direction_constant_spread = false
+alternate_between_base_direction_spread = false
+random_direction = false
+number_projectiles = 1
+projectile_spread = 0.0
+spawn_projectiles_on_target = false
+projectile_spawn_spread = 0
+projectile_spawn_only_on_borders = false
+specific_degrees_spawns = [  ]
+constant_spread = false
+constant_spread_rand_base_pos = 0.0
+atleast_one_projectile_on_target = false
+shoot_towards_unit = false
+shoot_in_unit_direction = false
+shoot_away_from_unit = false
+shoot_from_proj_pos_towards_player = false
+random_rotation = 0.0
+rotate_projectile = true
+delete_projectile_on_death = false
+
+[editable path="Hurtbox"]
+[editable path="Hitbox"]

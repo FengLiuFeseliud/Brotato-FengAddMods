@@ -182,6 +182,9 @@ func _on_EntitySpawner_players_spawned(players: Array) -> void :
 	# 等 UI 节点完全就绪后再补一次，避免生成信号时 _players_ui 尚未填充
 	call_deferred("fengliu_update_player_status_bars")
 
+	# 区域事件：按本波 events_spawn 生成地面事件
+	call_deferred("_fengliu_try_spawn_wave_events")
+
 
 # 扩展切换场景（进入商店后清理波次结束失效的道具）
 func _change_scene(path: String) -> void :
@@ -690,6 +693,12 @@ func clean_up_room():
 	if not _end_wave_timer_timedout:
 		.clean_up_room()
 
+	# 区域事件：清理本波地面事件，允许下一波重新生成
+	if is_instance_valid(_fengliu_ground_events):
+		_fengliu_ground_events.queue_free()
+		_fengliu_ground_events = null
+	_fengliu_wave_event_spawned = false
+
 # 扩展领取箱子道具：标记来源，防止波次结束清理时将箱子道具一并失效
 func on_item_box_take_button_pressed(item_data: ItemParentData, consumable: UpgradesUI.ConsumableToProcess) -> void:
 	# 仅支持来源标记（ModItemData）的道具区分来源
@@ -920,3 +929,63 @@ func fengliu_get_structure_tracking_keys(player_index: int) -> Array:
 		tracking_keys.append(tracking_key)
 
 	return tracking_keys
+
+
+# ============================================================
+# 区域事件：地面事件容器与按波生成
+# ============================================================
+
+var _fengliu_ground_events: Node2D
+var _fengliu_wave_event_spawned: bool = false
+
+
+func _fengliu_try_spawn_wave_events() -> void:
+	if _fengliu_wave_event_spawned or _cleaning_up:
+		return
+	_fengliu_wave_event_spawned = true
+
+	var service = RunData.fengliu_get_zone_event_service()
+	if service == null:
+		return
+
+	var seen = {}
+	for entry in RunData.events_spawn:
+		if int(entry[0]) != RunData.current_wave:
+			continue
+
+		var event_id = String(entry[1])
+		if seen.has(event_id):
+			continue
+		seen[event_id] = true
+
+		var data = service.get_event(event_id)
+		if data == null:
+			continue
+
+		var scene = data.get("scene")
+		if scene == null:
+			continue
+
+		var event = scene.instance()
+		_fengliu_get_ground_events().add_child(event)
+
+
+func _fengliu_get_ground_events() -> Node2D:
+	if is_instance_valid(_fengliu_ground_events):
+		return _fengliu_ground_events
+
+	_fengliu_ground_events = Node2D.new()
+	_fengliu_ground_events.name = "FengliuGroundEvents"
+	add_child(_fengliu_ground_events)
+
+	# 渲染顺序：
+	# TileMap 之后 -> 盖住地板
+	# Materials/Entities 之前 -> 在金币、消耗品、玩家/敌人下方
+	var anchor = get_node_or_null("Materials")
+	if anchor == null:
+		anchor = get_node_or_null("Entities")
+	if anchor != null:
+		move_child(_fengliu_ground_events, anchor.get_index())
+
+	return _fengliu_ground_events
+
