@@ -598,6 +598,9 @@ func reset(restart: bool = false) -> void :
 	fengliu_reset_wave_intensity_tracking()
 	.reset(restart)
 
+	if ProgressData.has_method("fengliu_ensure_line_space_zone_last"):
+		ProgressData.call("fengliu_ensure_line_space_zone_last", "run reset")
+
 
 # 通用台账读取（is_linked_layer 区分层）
 func fengliu_read_secondary_ledger(player_index: int, is_linked_layer: bool) -> Dictionary:
@@ -1964,4 +1967,76 @@ func fengliu_repair_substitute_payment_stats(state: Dictionary) -> void :
 		if not effects.has(hp_start_wave_hash) or int(effects[hp_start_wave_hash]) <= 0:
 			print("FengAddMods: repaired hp_start_wave -> 100")
 			effects[hp_start_wave_hash] = 100
+
+
+
+# 覆盖: 进入区域时把背景收敛回区域自持的列表；本区域强制用自己的背景
+func reset_background() -> void :
+	if ProgressData.has_method("fengliu_restore_zone_own_backgrounds"):
+		ProgressData.call("fengliu_restore_zone_own_backgrounds", "reset background")
+
+	.reset_background()
+
+	var resolved_zone = null
+	if ProgressData.has_method("fengliu_resolve_zone"):
+		resolved_zone = ProgressData.call("fengliu_resolve_zone", current_zone)
+
+	var zone_name: String = "<none>"
+	var pool_size: int = 0
+	if resolved_zone != null:
+		zone_name = str(resolved_zone.name)
+		if resolved_zone.default_backgrounds != null:
+			pool_size = resolved_zone.default_backgrounds.size()
+
+	var own_zone = null
+	if ProgressData.has_method("fengliu_get_line_space_zone"):
+		own_zone = ProgressData.call("fengliu_get_line_space_zone")
+
+	if own_zone != null and resolved_zone == own_zone and ProgressData.has_method("fengliu_get_line_space_own_background"):
+		var own_background = ProgressData.call("fengliu_get_line_space_own_background")
+		if own_background != null:
+			current_background = own_background
+
+	ModLoaderLog.info("Background reset: zone=%s current_zone=%d pool=%d picked=%s" % [zone_name, current_zone, pool_size, str(current_background.name) if current_background != null else "<null>"], "FengAddMods")
+
+
+# ============================================================
+# 通用区域事件：动态注册 / 区块预排期
+# ============================================================
+
+func fengliu_get_zone_event_service():
+	var mod_main = get_node_or_null("/root/ModLoader/FengLiu-FengAddMods")
+	if mod_main == null:
+		return null
+	return mod_main.get("zone_event_service")
+
+
+func init_events_nightmare(base_wave: int = 10) -> void:
+	.init_events_nightmare(base_wave)
+	_fengliu_schedule_zone_events(base_wave)
+
+
+func _fengliu_schedule_zone_events(base_wave: int) -> void:
+	var service = fengliu_get_zone_event_service()
+	if service == null:
+		return
+
+	# 优先解析动态重排后的当前区域
+	var zone = null
+	if ProgressData.has_method("fengliu_resolve_zone"):
+		zone = ProgressData.call("fengliu_resolve_zone", RunData.current_zone)
+	if zone == null:
+		zone = ZoneService.get_zone_data(RunData.current_zone)
+	if zone == null:
+		return
+
+	service.schedule_events_for_base_wave(zone, base_wave, RunData.current_difficulty)
+
+
+func reset_events_nightmare() -> void:
+	.reset_events_nightmare()
+
+	var service = fengliu_get_zone_event_service()
+	if service != null:
+		service.reset_run_counts()
 

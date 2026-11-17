@@ -59,20 +59,28 @@ static func clear(host: Node) -> void :
 		overlay.queue_free()
 
 
-# 商店背景也叠护眼层：插在 Background 之后 ⇒ 背景之上、两侧 UI（Content/PauseMenu）之下
+# 商店背景也叠护眼层：插在 Background 之后 ⇒ 背景之上、两侧 UI 之下
+# 1.2.0 的 Background 是唯一名节点，这里按它的实际父级插入，避免 move_child 跨父级失败。
 static func apply_shop(shop: Control, enabled: bool) -> void :
 	if shop == null:
 		return
 
-	var rect = shop.get_node_or_null(SHOP_RECT_NAME)
+	var background = shop.get_node_or_null("%Background")
+	if background == null:
+		background = shop.get_node_or_null(SHOP_BACKGROUND_NAME)
+
+	if background == null:
+		return
+
+	var parent = background.get_parent()
+	if parent == null:
+		return
+
+	var rect = parent.get_node_or_null(SHOP_RECT_NAME)
 
 	if not enabled or not ENABLED:
 		if rect != null:
 			rect.queue_free()
-		return
-
-	var background = shop.get_node_or_null(SHOP_BACKGROUND_NAME)
-	if background == null:
 		return
 
 	if rect == null:
@@ -81,9 +89,8 @@ static func apply_shop(shop: Control, enabled: bool) -> void :
 		rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		rect.anchor_right = 1.0
 		rect.anchor_bottom = 1.0
-		shop.add_child(rect)
+		parent.add_child(rect)
 
 	rect.color = OVERLAY_COLOR
-	# 紧跟 Background，保证低于 PauseMenu / Content（两侧 UI）
-	shop.move_child(rect, background.get_index() + 1)
+	parent.move_child(rect, background.get_index() + 1)
 	ModLoaderLog.info("Eye care overlay applied to shop: index=%d color=%s" % [background.get_index() + 1, str(OVERLAY_COLOR)], LOG_ID)

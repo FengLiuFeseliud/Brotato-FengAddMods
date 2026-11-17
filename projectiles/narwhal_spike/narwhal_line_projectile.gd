@@ -25,7 +25,7 @@ func _physics_process(delta: float) -> void:
 		_force_stop()
 
 
-func stop() -> void:
+func stop(_from_screen_border: bool = false) -> void:
 	# slash 动画约 0.63s 调用的 stop：只结束动画，不回池
 	pass
 

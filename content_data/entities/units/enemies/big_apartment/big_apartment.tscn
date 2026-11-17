@@ -1,7 +1,7 @@
 [gd_scene load_steps=21 format=2]
 
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/entities/units/enemies/big_apartment/big_apartment.png" type="Texture" id=1]
-[ext_resource path="res://entities/units/enemies/boss/boss.tscn" type="PackedScene" id=2]
+[ext_resource path="res://entities/units/enemies/bosses/boss.tscn" type="PackedScene" id=2]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/entities/units/enemies/big_apartment/big_apartment_stats.tres" type="Resource" id=3]
 [ext_resource path="res://entities/units/movement_behaviors/movement_behavior.gd" type="Script" id=4]
 [ext_resource path="res://entities/units/enemies/attack_behaviors/shooting_attack_behavior.gd" type="Script" id=5]
@@ -12,7 +12,7 @@
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/entities/units/enemies/lan/lan.tscn" type="PackedScene" id=10]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/entities/units/enemies/lanche/lanche.tscn" type="PackedScene" id=11]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/entities/units/enemies/big_apartment/big_apartment.gd" type="Script" id=13]
-[ext_resource path="res://entities/units/enemies/boss/boss_state.tscn" type="PackedScene" id=14]
+[ext_resource path="res://entities/units/enemies/bosses/boss_state.tscn" type="PackedScene" id=14]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/entities/units/enemies/apartment/apartment.tscn" type="PackedScene" id=15]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/entities/units/enemies/metro/metro.tscn" type="PackedScene" id=16]
 

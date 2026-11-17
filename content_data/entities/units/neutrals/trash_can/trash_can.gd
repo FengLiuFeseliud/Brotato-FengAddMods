@@ -9,7 +9,7 @@ export (int) var extra_enemy_number = 4
 export (float) var extra_enemy_spread = 60.0
 
 
-func die(args: = Utils.default_die_args) -> void :
+func die(args: Entity.DieArgs = Utils.default_die_args) -> void :
 	# 已经死过就不再重复掉落（原版可能多次触发 die）
 	if dead:
 		return
@@ -43,4 +43,4 @@ func _fengliu_spawn_extra_enemies() -> void :
 	# 逐只塞进生成队列，位置在自身周围抖动
 	for i in extra_enemy_number:
 		var offset: Vector2 = Vector2(rand_range( - extra_enemy_spread, extra_enemy_spread), rand_range( - extra_enemy_spread, extra_enemy_spread))
-		_entity_spawner_ref.queue_to_spawn.push_back([EntityType.ENEMY, extra_enemy_scene, global_position + offset])
+		_entity_spawner_ref.queue_to_spawn.push_back(SpawnRequest.new(EntityType.ENEMY, extra_enemy_scene, global_position + offset))

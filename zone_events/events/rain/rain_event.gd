@@ -72,11 +72,11 @@ func _try_spawn_puddle() -> void:
 	var edge = int(max(half_size.x, half_size.y)) + 24
 
 	# 全图随机位置；尽量不直接压在玩家脚下
-	var pos = ZoneService.get_rand_pos(edge)
+	var pos = _fengliu_rand_pos_with_edge(edge)
 	for _i in range(5):
 		if _is_far_from_players(pos):
 			break
-		pos = ZoneService.get_rand_pos(edge)
+		pos = _fengliu_rand_pos_with_edge(edge)
 
 	var puddle = puddle_scene.instance()
 	puddle.setup(texture, p_scale, puddle_lifetime)
@@ -113,3 +113,14 @@ func _spawn_rain() -> void:
 	_rain_particles.texture = rain_drop_texture
 	_main._camera.add_child(_rain_particles)
 	_rain_particles.position = Vector2.ZERO
+
+
+# 1.2.0 的 ZoneService.get_rand_pos() 无参；这里保留旧版「全图随机 + 边缘余量」的语义
+func _fengliu_rand_pos_with_edge(edge: int) -> Vector2:
+	var min_pos: Vector2 = ZoneService.current_zone_min_position
+	var max_pos: Vector2 = ZoneService.current_zone_max_position
+	var margin: float = min(float(edge), min((max_pos.x - min_pos.x) * 0.45, (max_pos.y - min_pos.y) * 0.45))
+	return Vector2(
+		rand_range(min_pos.x + margin, max_pos.x - margin),
+		rand_range(min_pos.y + margin, max_pos.y - margin)
+	)

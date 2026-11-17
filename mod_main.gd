@@ -48,6 +48,7 @@ const FENGLIU_TURRET_CHILD_SCRIPTS := [
 ]
 
 var _fengliu_reload_guards := []
+var zone_event_service = null
 
 
 
@@ -157,6 +158,9 @@ func _ready()->void:
 	# 玩家效果槽里存的是效果实例的 custom_key 必须登记进原版全量序列化名单，
 	# 且必须在读档之前完成（否则槽位会被原样序列化写成字典）
 	_fengliu_register_effect_slot_keys()
+
+	# 动态区域事件服务（区域内的事件，如雨）
+	_init_zone_event_service()
 
 	# 把本 mod 的 t0 武器注入到各可用角色的初始武器池（含本 mod 角色，见排除名单）。
 	call_deferred("fengliu_inject_t0_starting_weapons")
@@ -346,3 +350,18 @@ func _fengliu_load_fresh_script(path: String) -> Script:
 		return null
 
 	return fresh
+
+
+
+# 动态区域事件服务：加载 zone_events/events/ 下的 .tres（雨等）
+func _init_zone_event_service() -> void:
+	var service_script = load("res://mods-unpacked/FengLiu-FengAddMods/zone_events/zone_event_service.gd")
+	if service_script == null:
+		ModLoaderLog.error("Failed to load ZoneEventService script", MOD_ID)
+		return
+
+	zone_event_service = service_script.new()
+	zone_event_service.name = "ZoneEventService"
+	add_child(zone_event_service)
+	zone_event_service.load_events_from_dir("res://mods-unpacked/FengLiu-FengAddMods/zone_events/events/")
+	ModLoaderLog.info("ZoneEventService initialized", MOD_ID)

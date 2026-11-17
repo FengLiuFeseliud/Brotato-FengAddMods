@@ -1,7 +1,7 @@
 [gd_scene load_steps=12 format=2]
 
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/entities/units/enemies/train_station/train_station.png" type="Texture" id=1]
-[ext_resource path="res://entities/units/enemies/boss/boss.tscn" type="PackedScene" id=2]
+[ext_resource path="res://entities/units/enemies/bosses/boss.tscn" type="PackedScene" id=2]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/entities/units/enemies/train_station/train_station_stats.tres" type="Resource" id=3]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/entities/units/enemies/rail_train/rail_train_car.tscn" type="PackedScene" id=4]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/entities/units/enemies/train_station/train_station.gd" type="Script" id=6]
