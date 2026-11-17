@@ -100,6 +100,18 @@ const FENGLIU_VANILLA_PIERCING_TEXT_KEYS = [
 ]
 
 
+# 需要跳过诅咒的物品
+const FENGLIU_CURSED_KEEP_VALUE_ITEM_IDS = [
+	"item_plastic_candy_jar"
+]
+
+
+# 需要跳过诅咒的物品的哪些效果
+const FENGLIU_CURSED_KEEP_VALUE_EFFECT_KEYS = [
+	"extra_elite_next_wave_chance"
+]
+
+
 # 次要属性叠加台账
 const FENGLIU_SECONDARY_LEDGER_KEY := "fengliu_secondary_ledger"
 const FENGLIU_TEMP_LEDGER_KEY := "fengliu_secondary_ledger_temp"
@@ -1778,6 +1790,9 @@ func fengliu_normalize_cursed_effect(item_data: ItemParentData) -> void:
 	# 效果自身声明的诅咒放大（效果类实现 fengliu_apply_curse 即生效）
 	fengliu_normalize_cursed_effects(item_data, base_data)
 
+	# 参照原版糖果袋：这些效果被诅咒后数值保持不变
+	fengliu_restore_cursed_keep_values(item_data, base_data)
+
 	# 原版诅咒会把部分 key 的整句文案换成 *plural（树 / 穿透）；
 	# 只还原 mod 自己带复合/自定义描述的同类效果，原版道具保留原版诅咒文案
 	var restore_keys: Array = [
@@ -1824,6 +1839,24 @@ func fengliu_normalize_cursed_effects(item_data: ItemParentData, base_data: Item
 
 		# 放大规则由效果决定
 		effect.fengliu_apply_curse(base_effect, item_data.curse_factor)
+
+
+# 诅咒保持数值
+func fengliu_restore_cursed_keep_values(item_data: ItemParentData, base_data: ItemParentData) -> void:
+	if not (item_data.my_id in FENGLIU_CURSED_KEEP_VALUE_ITEM_IDS):
+		return
+
+	for effect in item_data.effects:
+		if not (effect.key in FENGLIU_CURSED_KEEP_VALUE_EFFECT_KEYS):
+			continue
+
+		# 同一 key 取未诅咒原型的第一条数值
+		for base_effect in base_data.effects:
+			if base_effect.key != effect.key:
+				continue
+
+			effect.value = base_effect.value
+			break
 
 
 # 扩展添加道具：诅咒水壶入库前先还原树效果
