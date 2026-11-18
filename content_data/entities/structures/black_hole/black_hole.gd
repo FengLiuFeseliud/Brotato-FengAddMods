@@ -7,19 +7,20 @@ extends Structure
 #   每 stats.cooldown 帧（受建筑攻速影响）对半径内所有敌人：
 #     1) 结算面板伤害（stats.damage 5 + 50/75/100/150% 工程学缩放，按档位）
 #     2) 朝黑洞中心吸引「武器面板击退」的距离
-#   共（10 + 50/75/100/125% 工程学）次后，核心与光环淡出并自毁。
-#   半径 = stats.max_range（300 + 构筑物射程）× (1 + 1% × 本黑洞击杀数)；光环按半径缩放（参考护盾发生器）
-#   视觉：BlackHoleCore 96x96（(0,-28)，淡出淡入）+ Aura 范围光环
-#   能量条：开放期=剩余伤害次数，消失期=冷却进度（暗紫）
+#   共（10 + 50/75/100/125% 工程学）次后，核心淡出并自毁。
+#   半径 = stats.max_range（300 + 构筑物射程）× (1 + 1% × 本黑洞击杀数)
+#   视觉：BlackHoleCore（256×256，运行时归一化）按「范围直径」缩放代表范围，绘制在草之上、玩家/敌人之下
 # ============================================================
 
 const DAMAGE_TRACKING_KEY := "item_black_hole_generator"
 const CORE_FADE_TIME := 0.3
-const AURA_TEXTURE_RADIUS := 125.0
-# 光环不再染色（完全看材质），只保留 alpha 做淡出
-const AURA_ALPHA_OPEN := 1.0
-# 光环可视半径的平滑追赶速度（像素/秒）；判定圆仍然即时生效
-const AURA_GROW_SPEED := 250.0
+const CORE_TEXTURE_PATH := 'res://mods-unpacked/FengLiu-FengAddMods/content_data/entities/structures/black_hole/black_hole_core.png'
+const CORE_TEXTURE_SIZE := 256
+const CORE_GROW_SPEED := 250.0
+const VISUAL_OFFSET := Vector2(0, 0)
+const PLAYER_PULL_RATIO := 1.0
+const DEVOUR_ATTACK_BONUS := 3
+const DEVOUR_SCAN_INTERVAL := 0.25
 const DEFAULT_PULL_DISTANCE := 25.0
 # 吸引距离 = 发生器面板击退 × 该倍数
 const PULL_DISTANCE_RATIO := 2.0
@@ -30,31 +31,36 @@ const MIN_RESIST_FACTOR := 0.2
 const BLACK_HOLE_WEAPON_ID := "weapon_black_hole_generator"
 const CLOSE_AFTER_ATTACKS_BASE := 10
 const ENGINEERING_ATTACK_RATE := 0.5
+const GRASS_STATE_INTERVAL := 0.5
 # 每击杀 1 个敌人：本波内黑洞半径 +1%（存 RunData 的玩家 meta，换波自动清零）
 const KILL_RANGE_RATE := 0.01
 const WAVE_KILLS_META := "fengliu_black_hole_wave_kills"
 const WAVE_KILLS_WAVE_META := "fengliu_black_hole_wave_kills_wave"
-# 范围环要挂到的容器（main 里位于 TileMap 之后、Entities 之前）
-const AURA_CONTAINER_NAME := "GameplayElements"
+# 视觉专用层的名字：挂在 main 下、索引固定在 Entities 前一位
+# ⇒ 绘制顺序在「草/材料/消耗品/出生标记」之后、「玩家/敌人/黑洞本体/投射物」之前
+const VISUAL_LAYER_NAME := "FengliuAuraLayer"
 
 onready var _hole_shape: CollisionShape2D = $HoleArea/CollisionShape2D
-onready var _aura: Sprite = $HoleArea/Aura
 onready var _core: Sprite = $BlackHoleCore
-onready var _energy_bar: UIProgressBar = $EnergyBar
 onready var _hitbox: Hitbox = $Hitbox
 
-var _aura_attached_to_container: bool = false
+var _core_attached_to_container: bool = false
 var _enemies_in_area: Array = []
+var _players_in_area: Array = []
 var _cooldown: float = 0.0
 var _attacks_before_close: int = CLOSE_AFTER_ATTACKS_BASE
 var _attacks_done: int = 0
 var _finish_time_left: float = -1.0
+var _grass_state_time_left: float = 0.0
+var _player_pull_cooldown: float = 0.0
+var _devoured_damage: int = 0
+var _devour_scan_cooldown: float = 0.0
 var _close_after_attacks_base: int = CLOSE_AFTER_ATTACKS_BASE
 var _engineering_attack_rate: float = ENGINEERING_ATTACK_RATE
 var _pull_distance: float = DEFAULT_PULL_DISTANCE
 var _core_alpha_target: float = 1.0
-var _aura_alpha_target: float = AURA_ALPHA_OPEN
-var _aura_radius_current: float = -1.0
+var _core_radius_current: float = -1.0
+var _core_texture_loaded: bool = false
 var _hitbox_args: = Hitbox.HitboxArgs.new()
 
 
@@ -72,7 +78,8 @@ func set_data(data: Resource) -> void:
 	_attacks_before_close = int(max(1, _close_after_attacks_base + int(engineering * _engineering_attack_rate)))
 
 	_apply_area_shape(true)
-	_attach_aura_to_container()
+	_attach_core_to_layer()
+	_apply_core_texture()
 	_apply_hitbox_stats()
 
 	_hitbox.damage_tracking_key_hash = Keys.generate_hash(DAMAGE_TRACKING_KEY)
@@ -85,7 +92,6 @@ func set_data(data: Resource) -> void:
 	_attacks_done = 0
 	_finish_time_left = -1.0
 	_set_area_closed(false, true)
-	_update_energy_bar()
 	_cooldown = 0.0
 
 
@@ -134,7 +140,7 @@ func _add_wave_kill() -> void:
 	prd.set_meta(WAVE_KILLS_META, kills + 1)
 
 
-# 击杀即时放大判定圆与光环（本波内持续生效）
+# 击杀即时放大判定圆与本体（本波内持续生效）
 func _on_hitbox_killed_something(_thing_killed) -> void:
 	if dead:
 		return
@@ -143,45 +149,43 @@ func _on_hitbox_killed_something(_thing_killed) -> void:
 	_apply_area_shape()
 
 
-# 判定圆即时按半径刷新；光环可视尺寸由 _update_aura_scale 平滑追上（instant = 立即对齐）
 func _apply_area_shape(instant: bool = false) -> void:
 	var radius: float = get_black_hole_radius()
 
 	_hole_shape.shape.radius = radius
-	if _aura == null:
+	if _core == null:
 		return
 
-	# 完全看材质，不再染色，只保留 alpha 用于淡出
-	_aura.modulate = Color(1, 1, 1, _aura.modulate.a)
-
-	if instant or _aura_radius_current < 0.0:
-		_aura_radius_current = radius
-		_apply_aura_scale()
+	if instant or _core_radius_current < 0.0:
+		_core_radius_current = radius
+		_apply_core_scale()
 
 
-func _apply_aura_scale() -> void:
-	if _aura == null or _aura_radius_current < 0.0:
+func _apply_core_scale() -> void:
+	if _core == null or _core_radius_current < 0.0:
 		return
 
-	var scale_factor: float = _aura_radius_current / AURA_TEXTURE_RADIUS
-	_aura.scale = Vector2(scale_factor, scale_factor)
+	var tex_width: float = float(CORE_TEXTURE_SIZE)
+	if _core.texture != null:
+		tex_width = max(1.0, float(_core.texture.get_width()))
+
+	var scale_factor: float = (_core_radius_current * 2.0) / tex_width
+	_core.scale = Vector2(scale_factor, scale_factor)
 
 
-# 光环平滑放大：可视半径按 AURA_GROW_SPEED 追赶判定半径
-func _update_aura_scale(delta: float) -> void:
-	if _aura == null:
+func _update_core_scale(delta: float) -> void:
+	if _core == null:
 		return
 
 	var target: float = get_black_hole_radius()
-	if _aura_radius_current < 0.0:
-		_aura_radius_current = target
+	if _core_radius_current < 0.0:
+		_core_radius_current = target
 
-	_aura_radius_current = move_toward(_aura_radius_current, target, AURA_GROW_SPEED * delta)
-	_apply_aura_scale()
+	_core_radius_current = move_toward(_core_radius_current, target, CORE_GROW_SPEED * delta)
+	_apply_core_scale()
 
-	# 环已被移到实体之前的容器 ⇒ 每帧跟随黑洞位置
-	if _aura_attached_to_container:
-		_aura.global_position = global_position
+	if _core_attached_to_container:
+		_core.global_position = global_position + VISUAL_OFFSET
 
 
 func _apply_hitbox_stats() -> void:
@@ -191,33 +195,34 @@ func _apply_hitbox_stats() -> void:
 	_hitbox_args.set_from_weapon_stats(stats)
 	_hitbox.effect_scale = stats.effect_scale
 	_hitbox.from = self
-	_hitbox.set_damage(stats.damage, _hitbox_args)
+	_hitbox.set_damage(stats.damage + _devoured_damage, _hitbox_args)
 	_hitbox.speed_percent_modifier = stats.speed_percent_modifier
 	_hitbox.set_knockback(Vector2.ZERO, 0, 0)
 
 
 func _on_HoleArea_body_entered(body: Node) -> void:
-	if not (body is Enemy):
-		return
-	if _enemies_in_area.has(body):
-		return
-
-	_enemies_in_area.append(body)
+	if body is Enemy:
+		if not _enemies_in_area.has(body):
+			_enemies_in_area.append(body)
+	elif body is Player:
+		if not _players_in_area.has(body):
+			_players_in_area.append(body)
 
 
 func _on_HoleArea_body_exited(body: Node) -> void:
 	_enemies_in_area.erase(body)
+	_players_in_area.erase(body)
 
 
 func _physics_process(delta: float) -> void:
 	_update_core_fade(delta)
-	_update_aura_scale(delta)
-	_update_energy_bar()
+	_update_core_scale(delta)
+	_update_grass_state(delta)
 
 	if dead or stats == null:
 		return
 
-	# 用完：核心与光环淡出后自毁
+	# 用完：核心淡出后自毁
 	if _finish_time_left >= 0.0:
 		_finish_time_left -= delta
 		if _finish_time_left <= 0.0:
@@ -230,6 +235,17 @@ func _physics_process(delta: float) -> void:
 
 	_cooldown = WeaponService.apply_structure_attack_speed_effects(stats.cooldown, player_index)
 
+	# devour structures inside the range (open phase only)
+	_devour_scan_cooldown -= delta
+	if _devour_scan_cooldown <= 0.0:
+		_devour_scan_cooldown = DEVOUR_SCAN_INTERVAL
+		_devour_structures_in_area()
+
+	_player_pull_cooldown -= 60.0 * delta
+	if _player_pull_cooldown <= 0.0:
+		_player_pull_cooldown = WeaponService.apply_structure_attack_speed_effects(stats.cooldown, player_index)
+		_pull_players_in_area()
+
 	if not _damage_and_pull_enemies_in_area():
 		return
 
@@ -240,13 +256,12 @@ func _physics_process(delta: float) -> void:
 		_set_area_closed(true)
 
 
-# 核心与光环的淡出/淡入（任何状态下每帧推进）
+# 核心的淡出（任何状态下每帧推进）
 func _update_core_fade(delta: float) -> void:
 	var step: float = delta / max(0.01, CORE_FADE_TIME)
 	if _core != null:
 		_core.modulate.a = move_toward(_core.modulate.a, _core_alpha_target, step)
-	if _aura != null:
-		_aura.modulate.a = move_toward(_aura.modulate.a, _aura_alpha_target, step)
+
 
 
 func _damage_and_pull_enemies_in_area() -> bool:
@@ -327,29 +342,12 @@ func _resolve_pull_distance() -> float:
 	return best * PULL_DISTANCE_RATIO
 
 
-# closed = true：核心与光环淡出、停止结算；instant = true 时立即设为目标透明度
+# closed = true：核心淡出、停止结算；instant = true 时立即设为目标透明度
 func _set_area_closed(closed: bool, instant: bool = false) -> void:
 	_core_alpha_target = 0.0 if closed else 1.0
-	_aura_alpha_target = 0.0 if closed else AURA_ALPHA_OPEN
 	if instant:
 		if _core != null:
 			_core.modulate.a = _core_alpha_target
-		if _aura != null:
-			_aura.modulate.a = _aura_alpha_target
-
-
-# 能量条：开放期 = 剩余伤害次数；消失期 = 冷却进度
-func _update_energy_bar() -> void:
-	if _energy_bar == null:
-		return
-
-	var total: float = float(max(1, _attacks_before_close))
-	var remaining: float = max(0.0, total - float(_attacks_done))
-	_energy_bar.visible = not dead and _finish_time_left < 0.0
-	if not _energy_bar.visible:
-		return
-
-	_energy_bar.value = remaining / total * 100.0
 
 
 # ---------- 中继器（建筑攻速加成）接口 ----------
@@ -377,37 +375,141 @@ func die(args = Utils.default_die_args) -> void:
 	.die(args)
 
 
-# 把范围环挂到实体之前的容器（TileMap 之后 / Entities 之前），使其绘制在玩家、敌人与黑洞本体之下
-func _attach_aura_to_container() -> void:
-	if _aura == null:
+func _attach_core_to_layer() -> void:
+	if _core == null:
 		return
 
 	var main = Utils.get_scene_node()
 	if main == null:
 		return
 
-	var container = main.get_node_or_null(AURA_CONTAINER_NAME)
+	var container = _fengliu_get_visual_layer(main)
 	if container == null:
 		return
 
-	if _aura.get_parent() == container:
-		_aura_attached_to_container = true
+	if _core.get_parent() == container:
+		_core_attached_to_container = true
 		return
 
-	_aura.get_parent().remove_child(_aura)
-	container.add_child(_aura)
-	_aura.z_index = 0
-	_aura.global_position = global_position
-	_aura_attached_to_container = true
+	_core.get_parent().remove_child(_core)
+	container.add_child(_core)
+	_core.z_index = 0
+	_core.global_position = global_position + VISUAL_OFFSET
+	_core_attached_to_container = true
 
 
-# 退出场景时把环移回 HoleArea（兼容对象池复用，避免残留到下一只黑洞）
+func _fengliu_get_visual_layer(main) -> Node2D:
+	var layer = main.get_node_or_null(VISUAL_LAYER_NAME) as Node2D
+	if layer != null:
+		return layer
+
+	var entities = main.get_node_or_null('Entities')
+	if entities == null:
+		return null
+
+	layer = Node2D.new()
+	layer.name = VISUAL_LAYER_NAME
+	main.add_child(layer)
+	main.move_child(layer, entities.get_index())
+	return layer
+
+
 func _exit_tree() -> void:
-	_aura_attached_to_container = false
-	var home = get_node_or_null("HoleArea")
-	if home == null or _aura == null or not is_instance_valid(_aura):
+	_core_attached_to_container = false
+	if _core != null and is_instance_valid(_core) and _core.get_parent() != self:
+		_core.get_parent().remove_child(_core)
+		add_child(_core)
+		_core.position = VISUAL_OFFSET
+
+
+func _update_grass_state(delta: float) -> void:
+	_grass_state_time_left -= delta
+	if _grass_state_time_left > 0.0:
+		return
+	_grass_state_time_left = GRASS_STATE_INTERVAL
+
+	var main = Utils.get_scene_node()
+	if main == null or not ('_entities_container' in main) or main._entities_container == null:
 		return
 
-	if _aura.get_parent() != home:
-		_aura.get_parent().remove_child(_aura)
-		home.add_child(_aura)
+	var radius: float = get_black_hole_radius()
+	var center: Vector2 = global_position
+	for child in main._entities_container.get_children():
+		if not is_instance_valid(child) or not (child is SpriteDestructible):
+			continue
+		if child.global_position.distance_to(center) <= radius:
+			child.fengliu_apply_range_state()
+
+
+func _apply_core_texture() -> void:
+	if _core == null or _core_texture_loaded:
+		return
+
+	var img: = Image.new()
+	if img.load(CORE_TEXTURE_PATH) != OK:
+		return
+
+	if img.get_width() != CORE_TEXTURE_SIZE or img.get_height() != CORE_TEXTURE_SIZE:
+		img.resize(CORE_TEXTURE_SIZE, CORE_TEXTURE_SIZE, Image.INTERPOLATE_BILINEAR)
+
+	var tex: = ImageTexture.new()
+	tex.create_from_image(img)
+	_core.texture = tex
+	_core_texture_loaded = true
+
+	if _core_radius_current > 0.0:
+		_apply_core_scale()
+
+
+func _pull_players_in_area() -> void:
+	var pull_distance: float = _resolve_pull_distance() * PLAYER_PULL_RATIO
+	if pull_distance <= 0.0:
+		return
+
+	var center: Vector2 = global_position
+	for player in _players_in_area:
+		if player == null or not is_instance_valid(player) or player.dead:
+			continue
+
+		_apply_pull(player, center, pull_distance)
+
+
+const DEVOUR_SKIP_SCRIPTS := ['black_hole.gd', 'black_hole_device.gd']
+
+
+func _devour_structures_in_area() -> void:
+	var main = Utils.get_scene_node()
+	if main == null or not ('_entity_spawner' in main) or main._entity_spawner == null:
+		return
+
+	var radius: float = get_black_hole_radius()
+	var center: Vector2 = global_position
+	for st in main._entity_spawner.structures.duplicate():
+		if st == null or not is_instance_valid(st) or st.dead:
+			continue
+		
+		var st_script = st.get_script()
+		if st_script != null and st_script.resource_path.get_file() in DEVOUR_SKIP_SCRIPTS:
+			continue
+		if st.global_position.distance_to(center) > radius:
+			continue
+
+		_devour_structure(st)
+		
+		main._entity_spawner.structures.erase(st)
+		if ('structures_to_remove_in_priority' in main._entity_spawner):
+			main._entity_spawner.structures_to_remove_in_priority.erase(st)
+
+
+func _devour_structure(st) -> void:
+	if st.dead:
+		return
+	if st.stats != null:
+		_devoured_damage += int(st.stats.damage)
+
+	_attacks_before_close += DEVOUR_ATTACK_BONUS
+	_apply_hitbox_stats()
+
+	_add_wave_kill()
+	_apply_area_shape()
+	st.die()

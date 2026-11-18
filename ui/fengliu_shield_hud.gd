@@ -25,7 +25,7 @@ func _ready() -> void:
 	set_process(true)
 
 
-func set_player_status(player_index: int, items: Array, life_bar, overhead_life_bar = null, overhead_visible: bool = true) -> void:
+func set_player_status(player_index: int, items: Array, life_bar, overhead_life_bar = null, overhead_visible: bool = true, screen_anchor_node = null, screen_size_bar = null) -> void:
 	if player_index < 0:
 		return
 
@@ -50,11 +50,15 @@ func set_player_status(player_index: int, items: Array, life_bar, overhead_life_
 			"bars": [],
 			"overhead_bars": [],
 			"overhead_visible": overhead_visible,
+			"screen_anchor_node": screen_anchor_node,
+			"screen_size_bar": screen_size_bar,
 		}
 		_entries[player_index] = entry
 
 	entry["overhead_life_bar"] = overhead_life_bar
 	entry["overhead_visible"] = overhead_visible
+	entry["screen_anchor_node"] = screen_anchor_node
+	entry["screen_size_bar"] = screen_size_bar
 	entry["items"] = items.duplicate(true)
 
 	_ensure_bars(entry)
@@ -185,14 +189,41 @@ func _update_entry(entry) -> void:
 	var life_bar = entry["life_bar"]
 	var overhead_life_bar = entry["overhead_life_bar"]
 	var items: Array = entry["items"]
+	var screen_anchor_node = entry.get("screen_anchor_node")
+	var screen_size_bar = entry.get("screen_size_bar")
+
+	var anchor_active: bool = false
+	if screen_anchor_node != null and is_instance_valid(screen_anchor_node):
+		if screen_anchor_node is CanvasItem:
+			anchor_active = screen_anchor_node.is_visible_in_tree()
+		else:
+			anchor_active = true
 
 	var screen_visible: bool = (
-		life_bar != null
-		and is_instance_valid(life_bar)
-		and life_bar.visible
-		and items.size() > 0
+		items.size() > 0
+		and (
+			(
+				life_bar != null
+				and is_instance_valid(life_bar)
+				and life_bar.visible
+			)
+			or anchor_active
+		)
 	)
-	_update_bar_set(entry["bars"], life_bar, items, screen_visible)
+	var anchor_node_used = null
+	var size_bar_used = null
+	if anchor_active:
+		anchor_node_used = screen_anchor_node
+		size_bar_used = screen_size_bar
+
+	_update_bar_set(
+		entry["bars"],
+		life_bar,
+		items,
+		screen_visible,
+		anchor_node_used,
+		size_bar_used
+	)
 
 	var overhead_visible: bool = (
 		entry["overhead_visible"]
@@ -203,7 +234,7 @@ func _update_entry(entry) -> void:
 	_update_bar_set(entry["overhead_bars"], overhead_life_bar, items, overhead_visible)
 
 
-func _update_bar_set(bars: Array, reference_bar, items: Array, should_show: bool) -> void:
+func _update_bar_set(bars: Array, reference_bar, items: Array, should_show: bool, screen_anchor_node = null, screen_size_bar = null) -> void:
 	if not should_show:
 		for bar_data in bars:
 			var hidden_bar = bar_data["bar"]
@@ -212,6 +243,10 @@ func _update_bar_set(bars: Array, reference_bar, items: Array, should_show: bool
 		return
 
 	var bar_size: Vector2 = reference_bar.rect_size
+	if screen_size_bar != null and is_instance_valid(screen_size_bar):
+		var anchored_size: Vector2 = screen_size_bar.rect_size
+		if anchored_size.x > 0.0 and anchored_size.y > 0.0:
+			bar_size = anchored_size
 	if bar_size.x <= 0.0 or bar_size.y <= 0.0:
 		bar_size = reference_bar.rect_min_size
 	if bar_size.x <= 0.0 or bar_size.y <= 0.0:
@@ -222,6 +257,12 @@ func _update_bar_set(bars: Array, reference_bar, items: Array, should_show: bool
 		return
 
 	var reference_position: Vector2 = reference_bar.rect_global_position
+	if screen_anchor_node != null and is_instance_valid(screen_anchor_node):
+		# 参照血条被原版隐藏时，用 HUD 容器顶部充当「血条本该在的位置」
+		reference_position = screen_anchor_node.rect_global_position + Vector2(
+			0.0,
+			bar_size.y + STATUS_SPACING
+		)
 
 	for i in bars.size():
 		var bar_data = bars[i]

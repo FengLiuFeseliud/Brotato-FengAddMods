@@ -823,18 +823,44 @@ func fengliu_set_player_status_bars(player_index: int, items: Array) -> void :
 				shield_space.visible = show_shield_space
 				hud_container.queue_sort()
 
+	var player = null
+	if player_index >= 0 and player_index < _players.size():
+		player = _players[player_index]
+
+	var materials_as_health: bool = (
+		player != null
+		and is_instance_valid(player)
+		and player.has_method("uses_materials_as_health")
+		and player.uses_materials_as_health()
+	)
+
 	var player_life_bar = player_ui.player_life_bar
 	fengliu_refresh_player_life_bar_visibility(player_index)
 	var overhead_visible: bool = player_life_bar != null and player_life_bar.visible
+	if materials_as_health:
+		# 血条保持隐藏，头顶只显示盾条
+		overhead_visible = (
+			ProgressData.settings.hp_bar_on_character
+			and items.size() > 0
+			and not player.dead
+		)
 
 	var life_bar = player_ui.life_bar
+	var screen_anchor_node = null
+	var screen_size_bar = null
+	if materials_as_health and life_bar != null and not life_bar.visible and hud_container != null:
+		screen_anchor_node = hud_container
+		screen_size_bar = player_ui.xp_bar
+
 	if _fengliu_shield_hud != null and is_instance_valid(_fengliu_shield_hud):
 		_fengliu_shield_hud.set_player_status(
 			player_index,
 			items,
 			life_bar,
 			player_life_bar,
-			overhead_visible
+			overhead_visible,
+			screen_anchor_node,
+			screen_size_bar
 		)
 
 
@@ -850,6 +876,12 @@ func fengliu_refresh_player_life_bar_visibility(player_index: int, current_healt
 
 	var player_life_bar = player_ui.player_life_bar
 	if player_life_bar == null:
+		return
+
+	# 机械土豆（Droid）等「材料即生命」角色：原版就隐藏 HUD 血条，
+	# 头顶也只显示独立的盾条，不再显示 1/1 的满血条。
+	if player.has_method("uses_materials_as_health") and player.uses_materials_as_health():
+		player_life_bar.visible = false
 		return
 
 	var hp_not_full: bool
