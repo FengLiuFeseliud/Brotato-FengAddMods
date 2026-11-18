@@ -1,0 +1,27 @@
+[gd_resource type="Resource" load_steps=4 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/effects/structures/effect_black_hole.gd" type="Script" id=1]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/entities/structures/black_hole/black_hole_device.tscn" type="PackedScene" id=2]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/entities/structures/black_hole/black_hole_stats_2.tres" type="Resource" id=3]
+
+[resource]
+script = ExtResource( 1 )
+key = ""
+text_key = "EFFECT_BLACK_HOLE_GENERATOR"
+value = 1
+custom_key = ""
+storage_method = 0
+effect_sign = 3
+custom_args = [  ]
+spawn_cooldown = -1
+scene = ExtResource( 2 )
+stats = ExtResource( 3 )
+effects = [  ]
+spawn_in_center = 200
+spawn_around_player = -1
+can_be_grouped = true
+is_pet = false
+tracking_key = ""
+default_pull_distance = 25.0
+close_after_attacks_base = 10
+engineering_attack_rate = 0.75

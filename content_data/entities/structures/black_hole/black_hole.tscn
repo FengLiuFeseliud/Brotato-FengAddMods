@@ -1,0 +1,64 @@
+[gd_scene load_steps=10 format=2]
+
+[ext_resource path="res://entities/structures/structure.tscn" type="PackedScene" id=1]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/entities/structures/black_hole/black_hole_structure.png" type="Texture" id=2]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/entities/structures/black_hole/black_hole_core.png" type="Texture" id=3]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/entities/structures/black_hole/black_hole.gd" type="Script" id=4]
+[ext_resource path="res://overlap/hitbox.gd" type="Script" id=5]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/entities/structures/black_hole/black_hole_aura.png" type="Texture" id=6]
+[ext_resource path="res://ui/hud/ui_progress_bar.tscn" type="PackedScene" id=7]
+
+[sub_resource type="CircleShape2D" id=1]
+resource_local_to_scene = true
+radius = 100.0
+
+[sub_resource type="CircleShape2D" id=2]
+radius = 40.0
+
+[node name="BlackHole" instance=ExtResource( 1 )]
+collision_layer = 2048
+collision_mask = 0
+script = ExtResource( 4 )
+
+[node name="Sprite" parent="Animation" index="0"]
+visible = false
+
+[node name="Muzzle" parent="Animation" index="1"]
+position = Vector2( 0, 0 )
+
+[node name="BlackHoleCore" type="Sprite" parent="."]
+position = Vector2( 0, -28 )
+texture = ExtResource( 3 )
+
+[node name="HoleArea" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 6
+monitorable = false
+
+[node name="Aura" type="Sprite" parent="HoleArea"]
+texture = ExtResource( 6 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HoleArea"]
+shape = SubResource( 1 )
+
+[node name="Hitbox" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 0
+script = ExtResource( 5 )
+
+[node name="Collision" type="CollisionShape2D" parent="Hitbox"]
+disabled = true
+shape = SubResource( 2 )
+
+[node name="EnergyBar" parent="." instance=ExtResource( 7 )]
+margin_left = -32.0
+margin_top = -100.0
+margin_right = 32.0
+margin_bottom = -84.0
+nine_patch_stretch = true
+value = 100.0
+progress_color = Color( 0.55, 0.25, 0.85, 1 )
+tint_progress = Color( 0.55, 0.25, 0.85, 1 )
+
+[connection signal="body_entered" from="HoleArea" to="." method="_on_HoleArea_body_entered"]
+[connection signal="body_exited" from="HoleArea" to="." method="_on_HoleArea_body_exited"]

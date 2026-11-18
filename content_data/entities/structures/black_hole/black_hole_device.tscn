@@ -1,0 +1,24 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://entities/structures/structure.tscn" type="PackedScene" id=1]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/entities/structures/black_hole/black_hole_structure.png" type="Texture" id=2]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/entities/structures/black_hole/black_hole_warning.png" type="Texture" id=4]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/entities/structures/black_hole/black_hole_device.gd" type="Script" id=3]
+
+[node name="BlackHoleDevice" instance=ExtResource( 1 )]
+collision_layer = 0
+collision_mask = 0
+script = ExtResource( 3 )
+
+[node name="Sprite" parent="Animation" index="0"]
+visible = false
+
+[node name="Muzzle" parent="Animation" index="1"]
+position = Vector2( 0, 0 )
+
+[node name="StructureBody" type="Sprite" parent="."]
+texture = ExtResource( 2 )
+
+[node name="WarningCircle" type="Sprite" parent="."]
+modulate = Color( 1, 1, 1, 0.5 )
+texture = ExtResource( 4 )
