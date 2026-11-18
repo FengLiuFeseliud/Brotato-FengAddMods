@@ -33,6 +33,8 @@ const SLASH_BLADE_HALF_RATIO := 17.0 / 225.0
 const SLASH_TANGENT_OFFSET_RATIO := SLASH_CANVAS_HALF_RATIO + SLASH_BLADE_HALF_RATIO
 # 剑影径向中心（占射程比例）：0.65 ⇒ 弧弦在 0.65R、弧顶在 0.864R（不超剑尖）
 const SLASH_RADIAL_OFFSET_RATIO := 0.65
+# 剑影宽度并入主命中框的倍率（1.0 = 精确覆盖到剑影外缘；小于 1 更贴身）
+const SLASH_HITBOX_WIDTH_SCALE := 1.0
 # 旋转/下挥的有效半径倍数：2 ⇒ 实际半径 = 武器射程 × 2（视觉与伤害范围一起放大）
 const REACH_MULTIPLIER := 1.10
 # 地裂斩：每 5 次挥砍的奇数档触发，剑放大到射程后下挥，对「以角色为圆心、半径 = 射程」内所有目标造成面板伤害并留下地裂
@@ -213,16 +215,25 @@ func _fengliu_get_blade_scale_x(radius: float) -> float:
 
 
 # 命中矩形拉长到覆盖 0~radius（形状复制，避免改动共享 sub_resource；旋转与下挥共用）
-func _fengliu_stretch_hitbox(radius: float) -> void:
+func _fengliu_stretch_hitbox(radius: float, include_slash_width: bool = false) -> void:
 	var safe_radius: float = max(1.0, radius)
 	var scale_x: float = _fengliu_get_blade_scale_x(safe_radius)
+
+	var half_width: float = _fengliu_saved_hitbox_extents.y
+	var y_offset: float = 0.0
+	if include_slash_width:
+		# 剑影半边 = 96 ×（R×0.75/168）= 0.4286R；剑影外缘 = 切向偏移 0.5041R + 半边
+		var slash_half: float = 96.0 * (safe_radius * SLASH_LENGTH_RATIO / SLASH_ARC_CHORD) * SLASH_HITBOX_WIDTH_SCALE
+		var slash_outer: float = safe_radius * SLASH_TANGENT_OFFSET_RATIO + slash_half
+		half_width = (slash_outer + _fengliu_saved_hitbox_extents.y) * 0.5
+		y_offset = -(slash_outer - _fengliu_saved_hitbox_extents.y) * 0.5
 
 	var hitbox_collision = _hitbox.get_node_or_null("Collision")
 	if hitbox_collision != null and hitbox_collision.shape is RectangleShape2D:
 		var shape = hitbox_collision.shape.duplicate()
-		shape.extents = Vector2(safe_radius * 0.5 / scale_x, _fengliu_saved_hitbox_extents.y)
+		shape.extents = Vector2(safe_radius * 0.5 / scale_x, half_width)
 		hitbox_collision.shape = shape
-		hitbox_collision.position = Vector2.ZERO
+		hitbox_collision.position = Vector2(0, y_offset)
 
 
 # 旋转姿态：剑根贴到角色中心、剑身沿 +X 拉长到「武器射程」，命中矩形同步覆盖 0~射程
@@ -238,7 +249,7 @@ func _fengliu_apply_spin_pose() -> void:
 	sprite.position = Vector2(radius * 0.5, 0.0)
 	sprite.rotation = 0.0
 
-	_fengliu_stretch_hitbox(radius)
+	_fengliu_stretch_hitbox(radius, true)
 
 	# 划动特效：径向 0.65R 处、画布边刚好不压剑身（凸起朝外），6 张不同弧度素材每 60° 换一张
 	if _spin_slash != null:

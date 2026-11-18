@@ -33,7 +33,6 @@ func serialize() -> Dictionary:
 
 
 func deserialize_and_merge(serialized: Dictionary) -> void :
-    # 还原新增字段，旧存档缺失时使用默认值
     .deserialize_and_merge(serialized)
-    wait_time = serialized.get("wait_time", 0.0)
-    exploding_on_clean_up_room = serialized.get("exploding_on_clean_up_room", false)
+    wait_time = serialized.wait_time
+    exploding_on_clean_up_room = serialized.exploding_on_clean_up_room

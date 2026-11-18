@@ -66,6 +66,6 @@ func deserialize_and_merge(serialized: Dictionary) -> void :
 		return
 
 	# 按存档记录的类型重建，远程宠物才能还原成远程属性
-	var stats = RangedWeaponStats.new() if serialized.get("weapon_stats_is_ranged", false) else MeleeWeaponStats.new()
+	var stats = RangedWeaponStats.new() if serialized.weapon_stats_is_ranged else MeleeWeaponStats.new()
 	stats.deserialize_and_merge(serialized.weapon_stats)
 	weapon_stats = stats

@@ -113,7 +113,6 @@ const FENGLIU_CURSED_KEEP_VALUE_EFFECT_KEYS = [
 
 
 # 次要属性叠加台账
-const FENGLIU_SECONDARY_LEDGER_KEY := "fengliu_secondary_ledger"
 const FENGLIU_TEMP_LEDGER_KEY := "fengliu_secondary_ledger_temp"
 const FENGLIU_LINKED_LEDGER_KEY := "fengliu_secondary_ledger_linked"
 
@@ -132,10 +131,6 @@ const FENGLIU_EFFECT_SLOT_KEYS := [
 	"fengliu_full_shield_stat_link",
 	"fengliu_acid_puddle_reverse"
 ]
-
-
-# 每个玩家是否需要「旧档 rebase」（读档时判定，取用后即清；仅 linked 层使用）
-var fengliu_legacy_rebase_pending := [false, false, false, false]
 
 
 # 各属性升级比例字典
@@ -304,7 +299,7 @@ func _ready() -> void :
 		all_secondary_abs_debuff_stats_hashs.append(Keys.generate_hash(item_debuff))
 
 
-# 扩展读取玩家效果字典：保证本 mod 次要属性的槽位存在（新开档 / 读档 / 旧档都兜底）
+# 扩展读取玩家效果字典：保证本 mod 次要属性的槽位存在（新开档 / 读档）
 func get_player_effects(player_index: int) -> Dictionary:
 	var effects = .get_player_effects(player_index)
 	# 假玩家与越界索引不处理，保持原版行为
@@ -332,59 +327,10 @@ func fengliu_secondary_ledger_key_hash(is_linked_layer: bool = false) -> int:
 	return Keys.generate_hash(FENGLIU_LINKED_LEDGER_KEY if is_linked_layer else FENGLIU_TEMP_LEDGER_KEY)
 
 
-# 上一版单台账键（只用于读档迁移）
-func fengliu_legacy_ledger_key_hash() -> int:
-	return Keys.generate_hash(FENGLIU_SECONDARY_LEDGER_KEY)
-
-
-# 读取并清除某玩家的旧档 rebase 标记
-func fengliu_take_legacy_rebase(player_index: int) -> bool:
-	# 越界索引视为无标记
-	if player_index < 0 or player_index >= fengliu_legacy_rebase_pending.size():
-		return false
-	# 取用即清，保证每次读档只 rebase 一轮
-	var pending: bool = fengliu_legacy_rebase_pending[player_index]
-	fengliu_legacy_rebase_pending[player_index] = false
-	return pending
-
-
-# 清空全部旧档 rebase 标记
-func fengliu_clear_legacy_rebase() -> void :
-	# 新局 / 重开时不会有烘焙值残留
-	for index in fengliu_legacy_rebase_pending.size():
-		fengliu_legacy_rebase_pending[index] = false
-
-
-# 按待读入的存档标记「台账缺失」的玩家
-func fengliu_mark_legacy_rebase(state: Dictionary) -> void :
-	# 每次都先清空，避免上一份存档的标记串到本次
-	fengliu_clear_legacy_rebase()
-	if not state.has("players_data"):
-		return
-
-	# 判定依据：该玩家 effects 里有没有 linked 层台账号（只有它会随存档烘焙）
-	var ledger_hash: int = fengliu_secondary_ledger_key_hash(true)
-	var players = state.players_data
-	for index in players.size():
-		if index >= fengliu_legacy_rebase_pending.size():
-			break
-		var player_data = players[index]
-		if player_data == null or not player_data is PlayerRunData:
-			continue
-		fengliu_legacy_rebase_pending[index] = not player_data.effects.has(ledger_hash)
-
-
-# 扩展读档：先标记旧档（无台账）玩家，再把 JSON 浮点归一化为 int，其余交给原逻辑
+# 扩展读档：读档前把 JSON 浮点归一化为 int，其余交给原逻辑
 func resume_from_state(state: Dictionary) -> void :
-	# 三步都必须在原版读档前完成（原版末段会立刻重算 LinkedStats）
-	fengliu_mark_legacy_rebase(state)
+	# 必须在原版读档前完成（原版末段会立刻重算 LinkedStats）
 	fengliu_normalize_state_effects(state)
-	# 旧档效果槽可能被写成实例 id，读档前先修复
-	fengliu_repair_effect_slots(state)
-	# 旧档「所需标签」槽可能存的是标签哈希，读档前统一还原成标签名
-	fengliu_normalize_wanted_tag_slot(state)
-	# 旧档兜底：修复「替代材料支付透支最大生命」造成的异常值
-	fengliu_repair_substitute_payment_stats(state)
 
 	if state.has(FENGLIU_WAVE_INTENSITY_STATE_KEY):
 		fengliu_restore_wave_intensity_state(state)
@@ -396,26 +342,10 @@ func fengliu_normalize_state_effects(state: Dictionary) -> void :
 	# 没有玩家数据（空档）直接跳过
 	if not state.has("players_data"):
 		return
-	# 先把上一版单台账迁到 linked 层，再做数字归一化
-	fengliu_migrate_legacy_ledger(state)
 	for player_data in state.players_data:
 		if player_data == null or not player_data is PlayerRunData:
 			continue
 		player_data.effects = fengliu_normalize_effect_values(player_data.effects)
-
-
-# 把上一版单台账迁到 linked 层后清掉旧键
-func fengliu_migrate_legacy_ledger(state: Dictionary) -> void :
-	# 旧键里的量是「上次重算后 effects 被叠加的部分」，按 linked 层处理最安全
-	var legacy_hash: int = fengliu_legacy_ledger_key_hash()
-	var linked_hash: int = fengliu_secondary_ledger_key_hash(true)
-	for player_data in state.players_data:
-		if player_data == null or not player_data is PlayerRunData:
-			continue
-		# 新键已存在时直接丢弃旧键，避免两本账并存
-		if player_data.effects.has(legacy_hash) and not player_data.effects.has(linked_hash):
-			player_data.effects[linked_hash] = player_data.effects[legacy_hash]
-		player_data.effects.erase(legacy_hash)
 
 
 # 递归归一化效果容器：数字转 int（整值浮点），数组递归，其余原样
@@ -435,136 +365,6 @@ func fengliu_normalize_effect_values(value):
 			normalized_array.push_back(fengliu_normalize_effect_values(element))
 		return normalized_array
 	return value
-
-
-# 修复旧档里 int 的残留
-func fengliu_repair_effect_slots(state: Dictionary) -> void :
-	# 空档直接跳过
-	if not state.has("players_data"):
-		return
-
-	var slot_hashs := {}
-	for slot_key in FENGLIU_EFFECT_SLOT_KEYS:
-		slot_hashs[Keys.generate_hash(slot_key)] = true
-
-	for player_data in state.players_data:
-		if player_data == null or not player_data is PlayerRunData:
-			continue
-
-		var effects: Dictionary = player_data.effects
-		var corrupted := {}
-
-		# 第一步：剔除不是效果实例的残留（未登记全量序列化时会被写成实例 id）
-		for slot_hash in slot_hashs.keys():
-			if not effects.has(slot_hash):
-				continue
-			var raw = effects[slot_hash]
-			var dirty := false
-			if raw is Array:
-				var kept := []
-				for element in raw:
-					if element is Effect:
-						kept.push_back(element)
-					else:
-						dirty = true
-				if not dirty:
-					continue
-				effects[slot_hash] = kept
-			else:
-				effects[slot_hash] = []
-			corrupted[slot_hash] = true
-
-		# 未损坏则无需补回
-		if corrupted.empty():
-			continue
-
-		# 第二步：按槽位键从道具 / 角色自带效果里补回实例（等价于各效果 apply 的 push self）
-		for item in player_data.items:
-			if item == null:
-				continue
-			for effect in item.effects:
-				if effect == null or not effect is Effect:
-					continue
-				var effect_slot_hash: int = effect.custom_key_hash if effect.custom_key != "" else effect.key_hash
-				if not corrupted.has(effect_slot_hash):
-					continue
-				var slot_effects: Array = effects[effect_slot_hash]
-				if not slot_effects.has(effect):
-					slot_effects.push_back(effect)
-
-		for slot_hash in corrupted.keys():
-			if not effects.has(slot_hash):
-				effects[slot_hash] = []
-
-
-# 旧档「所需标签」槽里可能存的是标签哈希（int / 数字串），读档前统一还原成标签名
-# 说明：item_service 的标签命中用 wanted_tags.has(item_tag) 比字符串，
-#       槽里若残留数字则永远不命中（同时道具卡上的标签也会显示成数字）
-func fengliu_normalize_wanted_tag_slot(state: Dictionary) -> void :
-	# 空档直接跳过
-	if not state.has("players_data"):
-		return
-
-	var slot_hash: int = effect_fengliu_extra_wanted_item_tag
-	for player_data in state.players_data:
-		if player_data == null or not player_data is PlayerRunData:
-			continue
-
-		var effects: Dictionary = player_data.effects
-		if not effects.has(slot_hash):
-			continue
-
-		var raw = effects[slot_hash]
-		if not raw is Array:
-			effects[slot_hash] = []
-			continue
-
-		var normalized := []
-		var dirty := false
-		for element in raw:
-			var tag_name: String = fengliu_resolve_item_tag_name(element)
-			# 解析不出来的（已失效标签）直接丢弃
-			if tag_name == "":
-				dirty = true
-				continue
-			if tag_name != str(element):
-				dirty = true
-			normalized.push_back(tag_name)
-
-		if dirty:
-			effects[slot_hash] = normalized
-
-
-# 把「标签名 / 标签哈希 / 数字字符串」统一还原成标签名；无法识别返回 ""
-# 兼容旧版存档：标签曾经以 Keys.generate_hash(tag) 的形式落盘
-func fengliu_resolve_item_tag_name(value) -> String:
-	if value == null:
-		return ""
-
-	var text: String = str(value)
-	# 已经是合法标签名
-	if all_item_tags.has(text):
-		return text
-
-	# 取数字形态的哈希：int / float / "1234567890" / "1234567890.0"
-	var numeric_hash: int = 0
-	if value is int or value is float:
-		numeric_hash = int(value)
-	elif value is String and (value as String).is_valid_float():
-		numeric_hash = int(float(value))
-	else:
-		return ""
-
-	# 先查原版哈希表（运行时 generate_hash 会登记名字）
-	if Keys.hash_to_string.has(numeric_hash) and all_item_tags.has(Keys.hash_to_string[numeric_hash]):
-		return Keys.hash_to_string[numeric_hash]
-
-	# 再遍历标签表逐个比对（覆盖当前进程内还没登记进 hash_to_string 的情况）
-	for tag in all_item_tags:
-		if Keys.generate_hash(tag) == numeric_hash:
-			return tag
-
-	return ""
 
 
 # 兜底：给道具里「需要重随但还没有数据」的效果补一次 roll
@@ -602,10 +402,8 @@ func fengliu_ensure_item_roll(item, player_index: int) -> void :
 		effect.fengliu_roll_effect(player_index)
 
 
-# 扩展新局 / 重开：effects 全新重建，不存在需要 rebase 的烘焙值
+# 扩展新局 / 重开：effects 全新重建
 func reset(restart: bool = false) -> void :
-	# 先清标记再走原版重置，避免旧档标记影响新局
-	fengliu_clear_legacy_rebase()
 	# 清空上一局的波次强度统计，避免新局误判高质量波次 / _high_wave_count 跨局累加
 	fengliu_reset_wave_intensity_tracking()
 	.reset(restart)
@@ -1172,6 +970,14 @@ func fengliu_activate_pending_shop_character(player_index: int) -> bool:
 			state[2] = current_character.my_id_hash
 
 	# 原角色效果保持不动，商店角色作为第二份效果叠加
+	# 改写后同步替换背包里的那一件，否则 remove_item 时 unapply 对不上 key
+	var rewritten = fengliu_apply_reset_stats_to_item(item, player_index)
+	if rewritten != item:
+		var owned_items = players_data[player_index].items
+		var owned_index = owned_items.find(item)
+		if owned_index >= 0:
+			owned_items[owned_index] = rewritten
+		item = rewritten
 	fengliu_remove_pending_notice(item)
 	state[1] = character_hash
 	players_data[player_index].current_character = item
@@ -1711,13 +1517,24 @@ func fengliu_remove_all_item_debuff_effects(effects: Array):
 	fengliu_remove_all_stats(effects)
 
 
+# 入包前把「最大生命 → 护盾」的改写落到道具本体：
+# 保证 apply 与 unapply 用的是同一个 key，避免 stat_links 留下删不掉的孤儿条目
+func fengliu_apply_reset_stats_to_item(item, player_index: int):
+	if item == null or item is ConsumableData or item.effects == null:
+		return item
+
+	var mappings = RunData.get_player_effect(effect_fengliu_reset_item_stat, player_index)
+	if mappings.empty():
+		return item
+
+	for mapping in mappings:
+		item = ItemService.fengliu_reset_item_stat(item, mapping, false)
+
+	return item
+
+
 # 扩展应用道具效果
 func apply_item_effects(item_data: ItemParentData, player_index: int) -> void :
-	var effects = RunData.get_player_effect(effect_fengliu_reset_item_stat, player_index)
-	if effects.size() > 0:
-		for effect in effects:
-			item_data = ItemService.fengliu_reset_item_stat(item_data, effect)
-
 	# 备份原效果
 	var old_effects = item_data.effects.duplicate()
 	var new_effects = item_data.effects.duplicate()
@@ -1756,7 +1573,7 @@ func apply_item_effects(item_data: ItemParentData, player_index: int) -> void :
 			continue
 
 	# 概率删除全部负面效果
-	effects = RunData.get_player_effect(effect_fengliu_apply_item_not_add_all_debuff, player_index)
+	var effects = RunData.get_player_effect(effect_fengliu_apply_item_not_add_all_debuff, player_index)
 	if effects.size() > 0 and not effects[0][1] and Utils.get_chance_success(effects[0][0] / 100.0):
 		fengliu_remove_all_item_debuff_effects(new_effects)
 	
@@ -1863,6 +1680,8 @@ func fengliu_restore_cursed_keep_values(item_data: ItemParentData, base_data: It
 func add_item(item: ItemData, player_index: int, is_selection: bool = false) -> void:
 	# 入库前先还原被诅咒水壶的收获产树效果
 	fengliu_normalize_cursed_effect(item)
+	# 入库前把「最大生命 → 护盾」改写落到道具本体（背包对象 = apply 对象）
+	item = fengliu_apply_reset_stats_to_item(item, player_index)
 	.add_item(item, player_index, is_selection)
 	# 满盾联动：道具变化后重新判定（延迟合并，避免复制多瓶瓶装水时递归）
 	fengliu_request_full_shield_link(player_index)
@@ -1874,6 +1693,8 @@ func add_item(item: ItemData, player_index: int, is_selection: bool = false) -> 
 func add_weapon(weapon: WeaponData, player_index: int, is_selection: bool = false) -> WeaponData:
     # 入库前先还原被诅咒水壶的收获产树效果
     fengliu_normalize_cursed_effect(weapon)
+    # 入库前把「最大生命 → 护盾」改写落到武器本体（背包对象 = apply 对象）
+    weapon = fengliu_apply_reset_stats_to_item(weapon, player_index)
     return .add_weapon(weapon, player_index, is_selection)
 
 
@@ -1974,33 +1795,6 @@ func fengliu_normalize_locked_shop_items() -> void :
 		for locked_item in locked_items:
 			if locked_item is Array and locked_item.size() > 0 and locked_item[0] != null:
 				fengliu_normalize_cursed_effect(locked_item[0])
-
-
-# 旧档兜底：修复「替代材料支付曾可透支最大生命」造成的异常值
-#   stat_max_hp 为负 → 归 0（保底 0，允许扣到 0 但不允许负数）
-#   hp_start_wave 缺失或 <= 0 → 回填 100（否则进波只剩 max(1, 0) = 1 点血）
-func fengliu_repair_substitute_payment_stats(state: Dictionary) -> void :
-	if not state.has("players_data"):
-		return
-
-	var max_hp_hash: int = Keys.stat_max_hp_hash
-	var hp_start_wave_hash: int = Keys.hp_start_wave_hash
-	for player_data in state.players_data:
-		if player_data == null or not player_data is PlayerRunData:
-			continue
-
-		var effects: Dictionary = player_data.effects
-
-		# 最大生命不允许为负（透支兜底）
-		if effects.has(max_hp_hash) and int(effects[max_hp_hash]) < 0:
-			print("FengAddMods: repaired negative max hp %d -> 0" % int(effects[max_hp_hash]))
-			effects[max_hp_hash] = 0
-
-		# 进波血量百分比缺失或非正数 → 回填默认 100
-		if not effects.has(hp_start_wave_hash) or int(effects[hp_start_wave_hash]) <= 0:
-			print("FengAddMods: repaired hp_start_wave -> 100")
-			effects[hp_start_wave_hash] = 100
-
 
 
 # 覆盖: 进入区域时把背景收敛回区域自持的列表；本区域强制用自己的背景

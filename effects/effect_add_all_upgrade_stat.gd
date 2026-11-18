@@ -25,6 +25,7 @@ func apply(player_index: int) -> void:
 
     for upgrade_id_hashs in ItemService.fengliu_get_all_upgrade_id_hashs():
         var upgrade_data = ItemService.fengliu_get_upgrade_data(value, player_index, upgrade_id_hashs).duplicate()
+        upgrade_data = RunData.fengliu_apply_reset_stats_to_item(upgrade_data, player_index)
         RunData.apply_item_effects(upgrade_data, player_index)
 
 

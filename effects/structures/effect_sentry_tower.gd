@@ -49,7 +49,7 @@ func get_args(player_index: int) -> Array:
 
 
 func serialize() -> Dictionary:
-	# 三个新增数值随效果一起存档（旧档缺字段时由反序列化补默认值）
+	# 三个新增数值随效果一起存档
 	var serialized = .serialize()
 	serialized.close_after_attacks_base = close_after_attacks_base
 	serialized.engineering_attack_rate = engineering_attack_rate
@@ -58,14 +58,10 @@ func serialize() -> Dictionary:
 
 
 func deserialize_and_merge(serialized: Dictionary) -> void:
-	# 旧存档没有这些字段时保持默认值
 	.deserialize_and_merge(serialized)
-	if serialized.has("close_after_attacks_base"):
-		close_after_attacks_base = serialized.close_after_attacks_base
-	if serialized.has("engineering_attack_rate"):
-		engineering_attack_rate = serialized.engineering_attack_rate
-	if serialized.has("close_duration"):
-		close_duration = serialized.close_duration
+	close_after_attacks_base = serialized.close_after_attacks_base
+	engineering_attack_rate = serialized.engineering_attack_rate
+	close_duration = serialized.close_duration
 
 
 # 诅咒放大：攻击次数与射程按 (1 + 诅咒强度) 放大；以未诅咒原型为基准绝对赋值，重复调用不叠加

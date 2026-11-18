@@ -76,7 +76,7 @@ func get_args(player_index: int) -> Array:
 
 
 func serialize() -> Dictionary:
-	# 新增的 3 个数值一并存档（旧档缺字段时由反序列化补默认值）
+	# 新增的 3 个数值一并存档
 	var serialized = .serialize()
 	serialized.shield_regen = shield_regen
 	serialized.close_after_attacks_base = close_after_attacks_base
@@ -86,13 +86,8 @@ func serialize() -> Dictionary:
 
 
 func deserialize_and_merge(serialized: Dictionary) -> void:
-	# 旧存档没有这些字段时保持默认值
 	.deserialize_and_merge(serialized)
-	if serialized.has("shield_regen"):
-		shield_regen = serialized.shield_regen
-	if serialized.has("close_after_attacks_base"):
-		close_after_attacks_base = serialized.close_after_attacks_base
-	if serialized.has("engineering_attack_rate"):
-		engineering_attack_rate = serialized.engineering_attack_rate
-	if serialized.has("close_duration"):
-		close_duration = serialized.close_duration
+	shield_regen = serialized.shield_regen
+	close_after_attacks_base = serialized.close_after_attacks_base
+	engineering_attack_rate = serialized.engineering_attack_rate
+	close_duration = serialized.close_duration

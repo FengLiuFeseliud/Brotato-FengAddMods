@@ -97,7 +97,7 @@ func unapply(player_index: int) -> void:
 # 返回数组按顺序填充描述文本 {0}~{3} 占位符：
 #   [0]~[3] = 四个固定升级项名称（绿色）
 func get_args(player_index: int) -> Array:
-	# 旧档 / 商店预览还没有抽取结果时补抽一次（正式版 base_shop 扩展可能未安装）
+	# 商店预览还没有抽取结果时补抽一次（正式版 base_shop 扩展可能未安装）
 	if all_fixed_upgrade_id_hashs.size() == 0 and player_index >= 0 and player_index < RunData.players_data.size():
 		fengliu_roll_effect(player_index)
 

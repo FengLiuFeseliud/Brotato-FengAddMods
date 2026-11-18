@@ -198,7 +198,7 @@ func _schedule_block(zone, from_wave: int, to_wave: int, difficulty: int) -> voi
 	if _scheduled_blocks.has(block_key):
 		return
 
-	# 读档/旧存档中已有本区块的注册事件时，保持原样，不重抽
+	# 读档后已有本区块的注册事件时，保持原样，不重抽
 	if _has_registered_event_in_range(from_wave, to_wave):
 		_scheduled_blocks[block_key] = true
 		return

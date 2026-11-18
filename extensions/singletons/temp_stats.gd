@@ -57,8 +57,6 @@ var _fengliu_secondary_stats_hashs: Array = []
 var fengliu_secondary_ledger_key_hash: int = Keys.empty_hash
 
 
-# 每个玩家「旧档 rebase」标记：台账缺失时只登记台账、不再回写，避免读档重复叠加
-var _fengliu_rebase_pending: Array = [false, false, false, false]
 
 
 # 懒生成台账键（Keys 先于本 autoload 加载；本实例按层取键：TempStats / LinkedStats 各一本）
@@ -86,7 +84,7 @@ func init_stats() -> Dictionary:
 		if not stats.has(stat_hsh):
 			stats[stat_hsh] = 0
 
-	# 物品套组注册的属性（套组未启用也补齐：旧档仍可能持有对应内容）
+	# 物品套组注册的属性（套组未启用也补齐）
 	if ItemService.update_data_list != null:
 		for update_data in ItemService.update_data_list:
 			if update_data == null or update_data.item_set == null:
@@ -111,33 +109,14 @@ func reset_player(player_index: int) -> void :
 	if player_index < RunData.players_data.size():
 		var effects: Dictionary = RunData.get_player_effects(player_index)
 		# 本次只登记台账不再追加，否则每次读档都会把链接层数值再叠一份
-		var ledger_missing: bool = not effects.has(fengliu_secondary_ledger_key_hash)
 		if _fengliu_revert_secondary_ledger(effects):
 			are_player_stats_dirty[player_index] = true
 			Utils.reset_stat_cache(player_index)
 		# 立刻补回空台账：读档判定只看「键是否存在」，后续叠加恢复正常记账
 		_fengliu_clear_secondary_ledger(effects)
-		# 只有 StatLink 层的叠加量会随存档烘焙进 effects，所以旧档 rebase 只在 linked 层生效；
-		# TempStats 层是波内临时量（原版会自行回收），无需 rebase，也不要消费 linked 层的标记
-		if _fengliu_is_linked_stats_layer():
-			var legacy_rebase: bool = RunData.fengliu_take_legacy_rebase(player_index)
-			_fengliu_rebase_pending[player_index] = ledger_missing and legacy_rebase
-		else:
-			_fengliu_rebase_pending[player_index] = false
 
 	.reset_player(player_index)
 
-	# 非链接层（TempStats 自身）：本实例重置后没有后续重算循环，rebase 周期到此结束
-	if not _fengliu_is_linked_stats_layer():
-		_fengliu_rebase_pending[player_index] = false
-
-
-# 清空全部 rebase 标记（新局/重开时 effects 全新重建，不存在需要 rebase 的烘焙值）
-func reset() -> void :
-	# 先清标记再走原版重置（原版会逐玩家调用 reset_player 重新判定）
-	for index in _fengliu_rebase_pending.size():
-		_fengliu_rebase_pending[index] = false
-	.reset()
 
 
 # 取出 effects 里的数值并归一化为 int
@@ -156,10 +135,6 @@ func _fengliu_as_int(value) -> int:
 func _fengliu_apply_secondary_overlay(player_index: int, stat_hsh: int, delta: int) -> void :
 	_fengliu_ensure_ledger_key()
 	var effects: Dictionary = RunData.get_player_effects(player_index)
-	# 旧档 rebase：现值已含一份，只登记台账、不回写
-	if _fengliu_rebase_pending[player_index]:
-		_fengliu_add_ledger(effects, stat_hsh, delta)
-		return
 	# 缺失时先归零；已有值（含读档后的 float）先归一化为 int 再累加
 	if not effects.has(stat_hsh):
 		effects[stat_hsh] = 0
@@ -188,7 +163,7 @@ func _fengliu_get_secondary_ledger(effects: Dictionary) -> Dictionary:
 	return ledger
 
 
-# 写回台账（空台账也保留键：读档判定靠「键是否存在」区分新旧档）
+# 写回台账（空台账也保留键：读档判定靠「键是否存在」）
 func _fengliu_store_secondary_ledger(effects: Dictionary, ledger: Dictionary) -> void :
 	# 只存非 0 项，统一写成 [stat_hash, amount] 数组
 	var raw: Array = []
@@ -217,7 +192,7 @@ func _fengliu_clear_secondary_ledger(effects: Dictionary) -> void :
 
 # 按台账把链接层叠加量从 effects 减回去；返回是否真的回滚过
 func _fengliu_revert_secondary_ledger(effects: Dictionary) -> bool:
-	# 空台账无需回滚（旧档首次重算走 rebase 分支）
+	# 空台账无需回滚
 	var ledger: Dictionary = _fengliu_get_secondary_ledger(effects)
 	if ledger.empty():
 		return false
@@ -234,11 +209,6 @@ func _fengliu_is_linked_stats_layer() -> bool:
 	return String(name) == "LinkedStats"
 
 
-# 结束本玩家的 rebase 周期（由 LinkedStats 扩展在重算循环结束后调用）
-func fengliu_clear_rebase_pending(player_index: int) -> void :
-	# 越界索引直接忽略（假玩家 / coop 变更过程中可能出现）
-	if player_index >= 0 and player_index < _fengliu_rebase_pending.size():
-		_fengliu_rebase_pending[player_index] = false
 
 
 func _fengliu_ensure_player_stat_key(stat_hsh: int, player_index: int) -> void:

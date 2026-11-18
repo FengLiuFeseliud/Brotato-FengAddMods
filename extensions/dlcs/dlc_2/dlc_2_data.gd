@@ -29,3 +29,26 @@ func _fengliu_refresh_meca_stats() -> void:
 		elif not has_set and has_stat:
 			stats.erase(stat_hash)
 			meca_stat_categories[category] = stats
+
+
+const FENGLIU_NO_MUTATION_COPY_EFFECT_PATHS := [
+	"res://mods-unpacked/FengLiu-FengAddMods/effects/effect_convert_stat_on_apply.gd",
+	"res://mods-unpacked/FengLiu-FengAddMods/effects/effect_reset_item_stat.gd"
+]
+
+
+func _get_copy_candidates(mutated_item: ItemParentData, player_index: int) -> Array:
+	var candidates: Array = ._get_copy_candidates(mutated_item, player_index)
+	var filtered: Array = []
+	for effect in candidates:
+		if effect == null:
+			continue
+
+		var effect_script = effect.get_script()
+		var effect_path: String = effect_script.resource_path if effect_script != null else ""
+		if FENGLIU_NO_MUTATION_COPY_EFFECT_PATHS.has(effect_path):
+			continue
+
+		filtered.push_back(effect)
+		
+	return filtered

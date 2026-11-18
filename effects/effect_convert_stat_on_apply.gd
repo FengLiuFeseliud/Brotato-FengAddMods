@@ -12,12 +12,6 @@ extends "res://mods-unpacked/FengLiu-FengAddMods/effects/global/mod_effect.gd"
 #   但按本效果字段名（from_stat / from_value / key / value）自持实现。
 #   本效果不登记运行期槽位，custom_key 留空。
 # ------------------------------------------------------------
-# 注意：一次性副作用靠「不落在工具 mod 的临时预览白名单类型里」规避——
-#   ImprovedTooltips 会对 ConvertStatEffect / GainStatForEveryStatEffect /
-#   StatGainsModificationEffect 三类在 tooltip 里成对 apply→unapply
-#   （current/extensions/singletons/text.gd:1017-1027）；原版 axolotl 之所以
-#   安全正因为它 extends Effect 独立成类，本效果同此写法，不再继承原版转换效果。
-# ------------------------------------------------------------
 # 效果值：
 #   from_stat      被转换的属性
 #   from_value     每多少点被转换属性算一组
@@ -107,19 +101,8 @@ func _convert_stats(player_index: int, permanent: bool = true) -> void:
 			RunData.emit_signal("stat_added", stat_to_add, base_nb_stat_added, 0.0, player_index)
 
 
-# 旧存档兼容：旧格式把「源属性 / 每组源点数」放在基类 key / value，
-# 把「目标属性 / 每组目标点数」放在自定义字段 to_stat / to_value。
 func deserialize_and_merge(serialized: Dictionary) -> void:
 	.deserialize_and_merge(serialized)
-
-	var legacy_custom_fields = serialized.get(FENGLIU_CUSTOM_FIELDS_KEY, null)
-	if legacy_custom_fields != null and legacy_custom_fields.has("to_stat"):
-		var legacy_from_stat = key
-		var legacy_from_value = value
-		from_stat = legacy_from_stat
-		from_value = legacy_from_value
-		key = String(legacy_custom_fields.get("to_stat", "stat_max_hp"))
-		value = int(legacy_custom_fields.get("to_value", 1))
 
 	from_stat_hash = Keys.generate_hash(from_stat)
 	key_hash = Keys.generate_hash(key)

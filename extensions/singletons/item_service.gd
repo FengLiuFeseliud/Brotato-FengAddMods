@@ -448,8 +448,6 @@ func fengliu_prepend_random_character(extra_effects: Array, player_index: int, r
 
 
 # 道具属性改写
-# force_duplicate 默认 true（商店 / 升级生成路径保持原有的「总是复制」行为）；
-# 入包路径传 false：只在真的命中要改写的 key 时才复制，避免每次入包都复制、也不改商店池模板
 func fengliu_reset_item_stat(item, effect, force_duplicate: bool = true) -> ItemParentData:
     if item == null or item.effects == null or effect == null or effect.size() < 2:
         return item
@@ -1306,11 +1304,8 @@ func fengliu_get_rand_item_for_wave(wave: int, player_index: int, type: int, arg
         # 修改道具 tags 
 		wanted_item_tag_chance += RunData.get_player_effect(fengliu_wanted_item_tag_chance_hash, player_index) / 100.0
 		var wanted_tags: Array = player_character.wanted_tags.duplicate()
-		# 旧档槽位里可能是标签哈希，统一还原成标签名后再比对
 		for extra_wanted_tag in RunData.get_player_effect(effect_fengliu_extra_wanted_item_tag, player_index):
-			var extra_wanted_tag_name: String = RunData.fengliu_resolve_item_tag_name(extra_wanted_tag)
-			if extra_wanted_tag_name != "":
-				wanted_tags.push_back(extra_wanted_tag_name)
+			wanted_tags.push_back(str(extra_wanted_tag))
 
 		if Utils.get_chance_success(wanted_item_tag_chance) and wanted_tags.size() > 0:
 			for item in pool:

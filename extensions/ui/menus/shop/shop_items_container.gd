@@ -14,7 +14,6 @@ const FENGLIU_PAY_STATS = 2         # 已扣属性（调用方需把价格归零
 const FENGLIU_PAY_BY_CURRENCY = 3   # RunData.remove_currency 会扣属性（不要归零）
 
 
-
 func set_shop_items(items_data: Array) -> void :
 	# 兜底补 roll：预报类效果即使没人刷新也会自愈
 	var original: Array = items_data
@@ -23,21 +22,13 @@ func set_shop_items(items_data: Array) -> void :
 			continue
 		RunData.fengliu_ensure_item_roll(entry[0], player_index)
 
-	# 旧版 base_shop 扩展生效时由它处理这些逻辑，避免重复计算
-	if not fengliu_legacy_shop_extension_active():
-		items_data = fengliu_apply_shop_modifications(items_data)
+	items_data = fengliu_apply_shop_modifications(items_data)
 
 	# 防御：加工后若变成空表（异常情况），回退原始数据，避免商店整体空白
 	if (items_data == null or items_data.size() == 0) and not RunData.get_player_effect(fengliu_shop_item_count_hash, player_index).size() > 0:
 		items_data = original
 
 	.set_shop_items(items_data)
-
-
-# 旧版 base_shop 扩展是否生效（生效时数量 / 价格 / 重随由它负责）
-func fengliu_legacy_shop_extension_active() -> bool:
-	var shop = fengliu_get_shop_node()
-	return shop != null and shop.has_method("fengliu_roll_swap_enemies_in_shop")
 
 
 # 向上找到 BaseShop 节点（数量裁剪需要同步它内部的 _shop_items 数据表）
@@ -145,7 +136,6 @@ func fengliu_resolve_substitute_payment(shop_item) -> int:
 
 	RunData.remove_stat(effect[0], cost, player_index)
 	return FENGLIU_PAY_STATS
-
 
 
 func fengliu_grant_stats_buy_item() -> void :

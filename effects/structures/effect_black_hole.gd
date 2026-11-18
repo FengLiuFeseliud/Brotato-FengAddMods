@@ -84,9 +84,6 @@ func serialize() -> Dictionary:
 
 func deserialize_and_merge(serialized: Dictionary) -> void:
 	.deserialize_and_merge(serialized)
-	if serialized.has("default_pull_distance"):
-			default_pull_distance = serialized.default_pull_distance
-	if serialized.has("close_after_attacks_base"):
-			close_after_attacks_base = serialized.close_after_attacks_base
-	if serialized.has("engineering_attack_rate"):
-			engineering_attack_rate = serialized.engineering_attack_rate
+	default_pull_distance = serialized.default_pull_distance
+	close_after_attacks_base = serialized.close_after_attacks_base
+	engineering_attack_rate = serialized.engineering_attack_rate

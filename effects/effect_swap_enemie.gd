@@ -31,11 +31,6 @@ func fengliu_persist_var_names() -> Array:
 	return ["wave_enemy_x", "wave_enemy_y", "wave_enemy_x_id", "wave_enemy_y_id"]
 
 
-# 读档归一化：id 字段统一成字符串（旧档可能是 null / 数字）
-func fengliu_on_persist_vars_restored() -> void:
-	wave_enemy_x_id = "" if wave_enemy_x_id == null else str(wave_enemy_x_id)
-	wave_enemy_y_id = "" if wave_enemy_y_id == null else str(wave_enemy_y_id)
-
 
 # 是否已经有预报数据
 func fengliu_has_roll_data() -> bool:
@@ -118,7 +113,7 @@ func fengliu_roll_effect(player_index: int) -> void:
 
 
 func apply(player_index: int) -> void:
-	# 旧档 / 商店侧刷新没跑到时没有预报数据：这里先补一次，保证机制与文案都有内容
+	# 商店侧刷新没跑到时没有预报数据：这里先补一次，保证机制与文案都有内容
 	if not fengliu_has_roll_data():
 		fengliu_roll_effect(player_index)
 	# 把预报效果挂到玩家身上，下一波开始时由 WaveManager 统一收集并应用替换

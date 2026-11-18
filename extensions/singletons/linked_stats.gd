@@ -26,9 +26,6 @@ func reset_player(player_index: int) -> void :
 	_fengliu_apply_negative_nb_clamp(player_index)
 	_fengliu_reset_depth.erase(player_index)
 
-	# 未加载 mod 扩展时静默跳过（缺接口不算错误）
-	if has_method("fengliu_clear_rebase_pending"):
-		call("fengliu_clear_rebase_pending", player_index)
 
 	# 重算期间被压住的满盾联动，重算结束后只补一次
 	if RunData.has_method("fengliu_request_full_shield_link"):
