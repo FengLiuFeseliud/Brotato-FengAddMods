@@ -9,6 +9,95 @@ const FENGLIU_FIRE_EFFECT_SCRIPT = preload("res://mods-unpacked/FengLiu-FengAddM
 
 var effect_fengliu_structure_add_range = Keys.generate_hash("fengliu_structure_add_range")
 
+# 通用进化缩放：负系数只吃负进化，正系数只吃正进化
+func sum_scaling_stat_values(p_scaling_stats: Array, player_index: int) -> float:
+	var normal_stats: = []
+	var evolution_coefficient: float = 0.0
+
+	for scaling_stat in p_scaling_stats:
+		assert (scaling_stat[0] is int)
+
+		if Utils.is_fengliu_evolution_scaling_key(scaling_stat[0]):
+			evolution_coefficient += float(scaling_stat[1])
+		else:
+			normal_stats.append(scaling_stat)
+
+	var value: float = .sum_scaling_stat_values(normal_stats, player_index)
+
+	if evolution_coefficient == 0.0 or player_index < 0:
+		return value
+
+	var evolution: float = Utils.get_stat(Keys.stat_evolution_hash, player_index)
+	var magnitude: float = abs(evolution_coefficient)
+
+	if evolution_coefficient < 0.0:
+		value += max(0.0, - evolution) * magnitude
+	else:
+		value += max(0.0, evolution) * magnitude
+
+	return value
+
+
+# 通用进化缩放显示：+x/-x 在进化 0 时合并为一条 ±x%
+func get_scaling_stats_icon_text(p_scaling_stats: Array, compared_scaling_stats: Array = []) -> String:
+	var normal_stats: = []
+	var normal_compared_stats: = []
+	var special_entries: = []
+	var special_compared_entries: = []
+
+	for scaling_stat in p_scaling_stats:
+		assert (scaling_stat[0] is int)
+
+		if Utils.is_fengliu_evolution_scaling_key(scaling_stat[0]):
+			special_entries.append(scaling_stat)
+		else:
+			normal_stats.append(scaling_stat)
+
+	for scaling_stat in compared_scaling_stats:
+		if not (scaling_stat is Array) or scaling_stat.size() < 2:
+			continue
+
+		assert (scaling_stat[0] is int)
+		if Utils.is_fengliu_evolution_scaling_key(scaling_stat[0]):
+			special_compared_entries.append(scaling_stat)
+		else:
+			normal_compared_stats.append(scaling_stat)
+
+	var text: String = .get_scaling_stats_icon_text(normal_stats, normal_compared_stats)
+
+	if special_entries.empty():
+		return text
+
+	var positive: float = 0.0
+	var negative: float = 0.0
+
+	for entry in special_entries:
+		var value: float = float(entry[1])
+		if value > 0.0:
+			positive += value
+		elif value < 0.0:
+			negative += value
+
+	if positive > 0.0 and negative < 0.0 and is_equal_approx(positive, abs(negative)):
+		text += Utils.get_fengliu_evolution_pm_icon_text(positive)
+	else:
+		for entry in special_entries:
+			var color_override: String = _get_fengliu_compare_color(entry, special_compared_entries)
+			text += Utils.get_scaling_stat_icon_text(entry[0], float(entry[1]), true, color_override)
+
+	return text
+
+
+func _get_fengliu_compare_color(entry: Array, compared_entries: Array) -> String:
+	var entry_key = entry[0]
+	var entry_value: float = float(entry[1])
+
+	for compared_entry in compared_entries:
+		if compared_entry[0] == entry_key and entry_value > float(compared_entry[1]):
+			return "#" + ProgressData.settings.color_positive
+
+	return ""
+
 
 # 扩展构造物属性初始化（叠加全体玩家的射程加成）
 func init_structure_stats(from_stats: RangedWeaponStats, player_index: int, args: WeaponServiceInitStatsArgs = _init_stats_args_service) -> RangedWeaponStats:

@@ -1,0 +1,45 @@
+[gd_resource type="Resource" load_steps=8 format=2]
+
+[ext_resource path="res://weapons/ranged/flamethrower/lighter_gas_flame_ignite_02.wav" type="AudioStream" id=1]
+[ext_resource path="res://weapons/ranged/flamethrower/gas_med_flame_ignite_02.wav" type="AudioStream" id=2]
+[ext_resource path="res://weapons/ranged/flamethrower/gas_small_flame_ignite_01.wav" type="AudioStream" id=3]
+[ext_resource path="res://weapons/ranged/flamethrower/gas_small_flame_ignite_02.wav" type="AudioStream" id=4]
+[ext_resource path="res://weapons/ranged/flamethrower/gas_med_flame_ignite_01.wav" type="AudioStream" id=5]
+[ext_resource path="res://weapons/weapon_stats/ranged_weapon_stats.gd" type="Script" id=6]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/projectiles/waters/waters_projectile.tscn" type="PackedScene" id=7]
+
+[resource]
+script = ExtResource( 6 )
+cooldown = 12
+damage = 15
+accuracy = 0.9
+crit_chance = 0.1
+crit_damage = 2.5
+min_range = 0
+max_range = 400
+knockback = 10
+knockback_piercing = 0.0
+can_have_positive_knockback = true
+can_have_negative_knockback = false
+effect_scale = 1.0
+scaling_stats = [ [ "stat_ranged_damage", 1.25 ], [ "fengliu_evolution_scaling", 0.3 ] ]
+lifesteal = 0.0
+shooting_sounds = [ ExtResource( 2 ), ExtResource( 4 ), ExtResource( 5 ), ExtResource( 3 ), ExtResource( 1 ) ]
+sound_db_mod = -10
+is_healing = false
+recoil = 20
+recoil_duration = 0.1
+additional_cooldown_every_x_shots = 5
+additional_cooldown_multiplier = 6.5
+speed_percent_modifier = 0
+can_shoot_without_target = false
+nb_projectiles = 8
+projectile_spread = 0.5
+piercing = 2
+piercing_dmg_reduction = 0.3
+bounce = 0
+bounce_dmg_reduction = 0.5
+can_bounce = false
+projectile_speed = 3000
+increase_projectile_speed_with_range = false
+projectile_scene = ExtResource( 7 )

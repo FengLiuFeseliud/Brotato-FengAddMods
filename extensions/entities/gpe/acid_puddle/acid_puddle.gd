@@ -1,7 +1,6 @@
 extends "res://entities/gpe/acid_puddle/acid_puddle.gd"
 
 
-var stat_fengliu_acid_puddle_size_hash: int = Keys.generate_hash("fengliu_acid_puddle_size")
 var effect_fengliu_acid_puddle_reverse: int = Keys.generate_hash("fengliu_acid_puddle_reverse")
 
 # 反转生效时：池内敌人（每 tick 结算一次）
@@ -9,9 +8,9 @@ var _fengliu_enemies: Array = []
 var _fengliu_enemy_tick: float = 0.0
 
 
-# 酸液池尺寸受次要属性影响
+# 泥潭尺寸受次要属性影响
 func init(size: Vector2 = Vector2(1, 1)) -> void:
-	var size_multiplier: float = max(0.01, 1.0 + Utils.sum_all_player_stats(stat_fengliu_acid_puddle_size_hash) / 100.0)
+	var size_multiplier: float = Utils.get_fengliu_puddle_size_multiplier()
 	.init(size * size_multiplier)
 
 	# 让 Area2D 也能检测敌人（玩家层 2 + 敌人层 4）

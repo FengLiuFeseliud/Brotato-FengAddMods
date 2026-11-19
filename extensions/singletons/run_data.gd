@@ -35,7 +35,7 @@ const ALL_SECONDARY_STATS = [
 	"fengliu_consumable_shield_regen",
 	"fengliu_wanted_item_tag_chance",
 	"fengliu_hit_shield_drop_consumable",
-	"fengliu_acid_puddle_size",
+	"fengliu_puddle_size",
 ]
 
 
@@ -81,7 +81,7 @@ const FENGLIU_EXTRA_SECONDARY_STAT_KEYS = [
 	"fengliu_consumable_shield_regen",
 	"fengliu_wanted_item_tag_chance",
 	"fengliu_hit_shield_drop_consumable",
-	"fengliu_acid_puddle_size",
+	"fengliu_puddle_size",
 ]
 
 

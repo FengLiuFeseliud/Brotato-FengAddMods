@@ -1,0 +1,15 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://effects/weapons/carbon_bow_stat_effect.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+key = "fengliu_tech_water_gun_meca"
+text_key = "EFFECT_TECH_WATER_GUN_MECA"
+value = 50
+custom_key = ""
+storage_method = 0
+effect_sign = 5
+custom_args = [  ]
+stat_name = "stat_evolution"
+duration = 3.0

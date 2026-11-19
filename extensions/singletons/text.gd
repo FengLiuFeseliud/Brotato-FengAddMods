@@ -7,7 +7,7 @@ var fengliu_keys_needing_operator = {
 	"info_neg_stat_fengliu_shield": [0],
 	"effect_consumable_shield_regen_value": [0],
 	"fengliu_bullet_scale": [0],
-	"effect_fengliu_acid_puddle_size": [0],
+	"effect_fengliu_puddle_size": [0],
 	"effect_tree_drop_double_value": [0],
 	"effect_rekindling_value": [0],
 	"effect_reduce_shield_damage_value": [0],
@@ -82,7 +82,7 @@ var fengliu_keys_needing_percent = {
 	"effect_weapon_killed_shield": [0],
 	"effect_weapon_killed_add_temp_stat": [0],
 	"effect_add_random_character_to_shop": [0],
-	"effect_fengliu_acid_puddle_size": [0],
+	"effect_fengliu_puddle_size": [0],
 	"effect_fossil_count_doubled": [1]
 }
 
