@@ -6,6 +6,8 @@ const FENGLIU_STATUS_COLOR_SHIELD: = Color(0.25, 0.6, 1.0, 1.0)   # 蓝色
 const FENGLIU_HUD_TOP_SPACER_HEIGHT: = 52
 # 伤害表源同步的检查间隔（秒）
 const FENGLIU_DAMAGE_METER_SYNC_INTERVAL: = 1.0
+const FENGLIU_FORCED_FOG_META := "fengliu_forced_fog_wave"
+
 
 var _fengliu_damage_meter_sync_timer: float = 0.0
 var _fengliu_shield_wave_max: = [0.0, 0.0, 0.0, 0.0]
@@ -1021,3 +1023,27 @@ func _fengliu_get_ground_events() -> Node2D:
 
 	return _fengliu_ground_events
 
+
+func _init_half_second_timers() -> void:
+	._init_half_second_timers()
+	fengliu_spawn_bullet_hell_on_forced_fog()
+
+
+#扩展强制迷雾波补生成弹幕 (迷雾 + 弹幕)
+func fengliu_spawn_bullet_hell_on_forced_fog() -> void:
+	# 只处理本 mod 强制迷雾的波
+	if not has_meta(FENGLIU_FORCED_FOG_META) or not bool(get_meta(FENGLIU_FORCED_FOG_META)):
+		return
+
+	# 与 main.gd 的弹幕条件一致，仅去掉 _is_fog_wave == false 限制
+	var could_be_bullet_hell = RunData.get_player_effect(Keys.bullet_hell_event_hash, 0) and RunData.constant_projectile != 0
+	var wave = RunData.current_wave
+	if not (RunData.constant_projectile == 2 or (wave in RunData.events_bullet_hell)) or not could_be_bullet_hell:
+		return
+
+	if wave > 20:
+		wave = 20
+
+	var rand_bullet_hell: BulletHell = ZoneService.bullets_hell.pick_random().instance()
+	rand_bullet_hell._update_bullet_hell_parameters(wave, _is_elite_wave, _is_horde_wave)
+	_enemy_projectiles.add_child(rand_bullet_hell)

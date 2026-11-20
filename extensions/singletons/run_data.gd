@@ -228,6 +228,7 @@ var fengliu_need_reroll_effect = [
 var fengliu_item_forecast = Keys.generate_hash("item_forecast") # 天气预报道具哈希
 var fengliu_item_directed_training = Keys.generate_hash("item_directed_training") # 定向训练道具哈希
 var fengliu_item_clown_fish = Keys.generate_hash("item_clown_fish") # 小丑鱼道具哈希
+var fengliu_item_mysterious_potion = Keys.generate_hash("item_mysterious_potion") # 神秘药瓶道具哈希
 
 
 var fengliu_item_auto_open_box_hash = Keys.generate_hash("item_auto_open_box") # 自动化箱子道具哈希
@@ -265,6 +266,7 @@ var wave_end_remove_items = [
 	fengliu_item_forecast,
 	fengliu_item_directed_training,
 	fengliu_item_clown_fish,
+	fengliu_item_mysterious_potion,
 ]
 
 
@@ -281,6 +283,7 @@ func _enter_tree() -> void:
 	init_tracked_items[Keys.generate_hash("item_plastic_bag")] = 0
 	init_tracked_items[Keys.generate_hash("item_shield_generator")] = 0
 	init_tracked_items[Keys.generate_hash("item_sentry_tower")] = 0
+	init_tracked_items[Keys.generate_hash("item_mysterious_potion")] = 0
 
 
 func _ready() -> void :

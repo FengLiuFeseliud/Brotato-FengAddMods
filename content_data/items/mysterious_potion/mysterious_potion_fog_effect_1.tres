@@ -1,0 +1,14 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/effects/effect_fog_wave_chance.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+key = ""
+text_key = "EFFECT_FOG_WAVE_CHANCE"
+value = 60
+custom_key = "fengliu_fog_wave_chance"
+storage_method = 0
+effect_sign = 1
+custom_args = [  ]
+stat_deductions = [ [ "stat_max_hp", 0.1 ], [ "stat_speed", 1 ], [ "stat_armor", 0.1 ] ]

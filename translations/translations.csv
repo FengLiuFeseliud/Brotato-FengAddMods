@@ -361,3 +361,12 @@ EFFECT_THRUST_BARRAGE,Every {0} attacks: continuously thrusts for {1} seconds at
 FENGLIU_OVERHEAL,% Overheal,%过量恢复
 ITEM_BUOY,Buoy,浮标
 EFFECT_OVERHEAL_VALUE,{0} % Overheal,{0} %过量恢复
+ITEM_MYSTERIOUS_POTION,Mysterious Potion,神秘药瓶
+EFFECT_RANDOM_PRIMARY_STATS_ON_OBTAIN,{1} chance to gain {0} random primary stats when obtained,获得时有{1}概率随机获得{0}点主要属性
+EFFECT_FOG_WAVE_CHANCE,有{0}概率使下一波进入迷雾状态，触发时永久扣除{1},有{0}概率使下一波进入迷雾状态，触发时永久扣除{1}
+STAT_MAX_HP_SHORT,最大生命,最大生命
+STAT_SPEED_SHORT,移速,移速
+STAT_ARMOR_SHORT,护甲,护甲
+ITEM_EMPTY_POTION,Empty Potion,空药瓶
+EFFECT_EMPTY_POTION,This potion is empty,这瓶药已经空了
+EFFECT_MYSTERIOUS_POTION_WAVE_END,Expires at the end of each wave,每波敌袭结束后失效

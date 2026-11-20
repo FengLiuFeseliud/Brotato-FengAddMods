@@ -84,7 +84,9 @@ var fengliu_keys_needing_percent = {
 	"effect_weapon_killed_add_temp_stat": [0],
 	"effect_add_random_character_to_shop": [0],
 	"effect_fengliu_puddle_size": [0],
-	"effect_fossil_count_doubled": [1]
+	"effect_fossil_count_doubled": [1],
+	"effect_random_primary_stats_on_obtain": [1],
+	"effect_fog_wave_chance": [0]
 }
 
 

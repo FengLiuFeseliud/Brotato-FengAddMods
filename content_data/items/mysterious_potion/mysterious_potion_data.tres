@@ -1,0 +1,28 @@
+[gd_resource type="Resource" load_steps=7 format=2]
+
+[ext_resource path="res://items/global/item_data.gd" type="Script" id=1]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/mysterious_potion/mysterious_potion_icon.png" type="Texture" id=2]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/mysterious_potion/mysterious_potion_effect_0.tres" type="Resource" id=3]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/mysterious_potion/mysterious_potion_fog_effect_1.tres" type="Resource" id=4]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/mysterious_potion/empty_potion_data.tres" type="Resource" id=5]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/mysterious_potion/mysterious_potion_wave_end_effect_2.tres" type="Resource" id=6]
+
+[resource]
+script = ExtResource( 1 )
+my_id = "item_mysterious_potion"
+unlocked_by_default = true
+can_be_looted = true
+icon = ExtResource( 2 )
+name = "ITEM_MYSTERIOUS_POTION"
+tier = 0
+value = 20
+effects = [ ExtResource( 3 ), ExtResource( 4 ), ExtResource( 6 ) ]
+tracking_text = "stats_gained"
+is_lockable = true
+unlock_codex_descr_after_get_it = 1
+is_cursed = false
+curse_factor = 0.0
+max_nb = -1
+item_appearances = [  ]
+tags = [  ]
+replaced_by = ExtResource( 5 )
