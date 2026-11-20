@@ -284,7 +284,8 @@ func _damage_and_pull_enemies_in_area() -> bool:
 		var args: = TakeDamageArgs.new(player_index, _hitbox)
 		args.from = self
 		var dmg_taken: Array = enemy.take_damage(_hitbox.damage, args)
-		_hitbox.hit_something(enemy, dmg_taken[1])
+		if dmg_taken.size() > 1:
+			_hitbox.hit_something(enemy, dmg_taken[1])
 
 		if pull_distance <= 0.0:
 			continue
@@ -391,7 +392,9 @@ func _attach_core_to_layer() -> void:
 		_core_attached_to_container = true
 		return
 
-	_core.get_parent().remove_child(_core)
+	var core_parent = _core.get_parent()
+	if core_parent != null:
+		core_parent.remove_child(_core)
 	container.add_child(_core)
 	_core.z_index = 0
 	_core.global_position = global_position + VISUAL_OFFSET
@@ -417,7 +420,9 @@ func _fengliu_get_visual_layer(main) -> Node2D:
 func _exit_tree() -> void:
 	_core_attached_to_container = false
 	if _core != null and is_instance_valid(_core) and _core.get_parent() != self:
-		_core.get_parent().remove_child(_core)
+		var core_parent = _core.get_parent()
+		if core_parent != null:
+			core_parent.remove_child(_core)
 		add_child(_core)
 		_core.position = VISUAL_OFFSET
 
@@ -487,6 +492,8 @@ func _devour_structures_in_area() -> void:
 	for st in main._entity_spawner.structures.duplicate():
 		if st == null or not is_instance_valid(st) or st.dead:
 			continue
+		if st.is_queued_for_deletion() or not st.is_inside_tree():
+			continue
 		
 		var st_script = st.get_script()
 		if st_script != null and st_script.resource_path.get_file() in DEVOUR_SKIP_SCRIPTS:
@@ -502,9 +509,11 @@ func _devour_structures_in_area() -> void:
 
 
 func _devour_structure(st) -> void:
-	if st.dead:
+	if st == null or not is_instance_valid(st):
 		return
-	if st.stats != null:
+	if not ("dead" in st) or st.dead:
+		return
+	if "stats" in st and st.stats != null:
 		_devoured_damage += int(st.stats.damage)
 
 	_attacks_before_close += DEVOUR_ATTACK_BONUS
@@ -512,4 +521,10 @@ func _devour_structure(st) -> void:
 
 	_add_wave_kill()
 	_apply_area_shape()
-	st.die()
+	if st.has_method("die"):
+		st.die()
+
+
+# Capybara 蓝鲸兼容：允许被蓝鲸环绕/拖动（收束中的黑洞不再被拖动）
+func fengliu_capybara_can_orbit() -> bool:
+	return not dead and _finish_time_left < 0.0

@@ -169,7 +169,9 @@ func _attach_warning_to_layer() -> void:
 		_warning_attached_to_container = true
 		return
 
-	_warning.get_parent().remove_child(_warning)
+	var warning_parent = _warning.get_parent()
+	if warning_parent != null:
+		warning_parent.remove_child(_warning)
 	container.add_child(_warning)
 	_warning.z_index = 0
 	_warning.global_position = global_position
@@ -197,7 +199,9 @@ func _fengliu_get_visual_layer(main) -> Node2D:
 func _exit_tree() -> void:
 	_warning_attached_to_container = false
 	if _warning != null and is_instance_valid(_warning) and _warning.get_parent() != self:
-		_warning.get_parent().remove_child(_warning)
+		var warning_parent = _warning.get_parent()
+		if warning_parent != null:
+			warning_parent.remove_child(_warning)
 		add_child(_warning)
 		_warning.position = Vector2.ZERO
 
@@ -220,3 +224,8 @@ func _update_grass_state(delta: float) -> void:
 			continue
 		if child.global_position.distance_to(center) <= radius:
 			child.fengliu_apply_range_state()
+
+
+# Capybara 蓝鲸兼容：允许被蓝鲸环绕/拖动（蓄力完成的装置不再被拖动）
+func fengliu_capybara_can_orbit() -> bool:
+	return not dead and not _finished

@@ -25,7 +25,9 @@ func spawn_entity(scene: PackedScene, args: EntitySpawner.SpawnEntityArgs, data:
 	elif args != null and _fengliu_is_random_interior_spawn(scene):
 		args.position = _fengliu_random_interior_spawn_pos()
 
-	return .spawn_entity(scene, args, data, source, charmed_by)
+	var result = .spawn_entity(scene, args, data, source, charmed_by)
+	_fengliu_track_capybara_turret(result)
+	return result
 
 
 # 是否为本 mod 需要「固定居中生成」的场景
@@ -57,3 +59,29 @@ func _fengliu_random_interior_spawn_pos() -> Vector2:
 		rand_range(_zone_min_pos.x + margin.x, _zone_max_pos.x - margin.x),
 		rand_range(_zone_min_pos.y + margin.y, _zone_max_pos.y - margin.y)
 	)
+
+
+# Capybara 的 player.capybara_turrets 只加不删；炮塔离开场景树时把它从列表移除，
+# 避免 crystal_sword.gd 在水晶剑击杀时遍历到已释放的炮塔引用。
+func _fengliu_track_capybara_turret(entity) -> void:
+	if entity == null or not is_instance_valid(entity):
+		return
+	if not ("capybara_my_id" in entity):
+		return
+	if not entity.is_connected("tree_exiting", self, "_fengliu_on_capybara_turret_tree_exiting"):
+		entity.connect("tree_exiting", self, "_fengliu_on_capybara_turret_tree_exiting", [entity])
+
+
+func _fengliu_on_capybara_turret_tree_exiting(turret) -> void:
+	if turret == null or not is_instance_valid(turret):
+		return
+	if not ("player_index" in turret):
+		return
+	var index = turret.player_index
+	if index < 0 or index >= _players.size():
+		return
+	var player = _players[index]
+	if not is_instance_valid(player) or not ("capybara_turrets" in player):
+		return
+	if player.capybara_turrets.has(turret):
+		player.capybara_turrets.erase(turret)

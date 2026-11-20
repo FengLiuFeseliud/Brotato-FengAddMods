@@ -3,6 +3,7 @@ extends Node
 const MOD_ID = "FengAddMods"
 const MOD_DIR = "res://mods-unpacked/FengLiu-FengAddMods/"
 const EXTENSIONS_DIR = MOD_DIR + "extensions/"
+const COMPAT_EXTENSIONS_DIR = EXTENSIONS_DIR + "mods/"
 const CONTENT_DATA_DIR = MOD_DIR + "content_data.tres"
 const CONTENT_DIR = MOD_DIR + "content_data/"
 # 参与动态注册的子目录（其余目录只放子资源，不注册）
@@ -116,13 +117,69 @@ func _install_extensions_from_dir(dir_path: String) -> void:
 	while file_name != "":
 		var full_path := dir_path.plus_file(file_name)
 		if dir.current_is_dir():
-			_install_extensions_from_dir(full_path)
+			if dir_path == EXTENSIONS_DIR and file_name == "mods":
+				_install_compat_extensions(full_path)
+			else:
+				_install_extensions_from_dir(full_path)
 		elif file_name.get_extension() == "gd":
 			# 延迟列表里的扩展留到 _ready 再装（见 FENGLIU_LATE_EXTENSIONS）
 			if not _is_late_extension(full_path):
 				ModLoaderMod.install_script_extension(full_path)
 		file_name = dir.get_next()
 	dir.list_dir_end()
+
+
+# 跨 mod 兼容层：extensions/mods/<mod名>/<原mod路径>
+# 仅当对应 mod 激活/可加载，且镜像基类存在时才安装。
+func _install_compat_extensions(compat_dir: String) -> void:
+	var dir := Directory.new()
+	if dir.open(compat_dir) != OK:
+		ModLoaderLog.error("Failed to open compat extensions directory: %s" % compat_dir, MOD_ID)
+		return
+
+	dir.list_dir_begin(true, true)
+	var mod_id := dir.get_next()
+	while mod_id != "":
+		if dir.current_is_dir():
+			var mod_data = ModLoaderStore.mod_data.get(mod_id)
+			if mod_data == null or not mod_data.is_active or not mod_data.is_loadable:
+				ModLoaderLog.info("Skip compat extensions for inactive mod: %s" % mod_id, MOD_ID)
+			else:
+				_install_compat_mod_extensions(compat_dir.plus_file(mod_id), mod_id)
+		mod_id = dir.get_next()
+	dir.list_dir_end()
+
+
+func _install_compat_mod_extensions(dir_path: String, mod_id: String) -> void:
+	var dir := Directory.new()
+	if dir.open(dir_path) != OK:
+		ModLoaderLog.error("Failed to open compat mod directory: %s" % dir_path, MOD_ID)
+		return
+
+	dir.list_dir_begin(true, true)
+	var file_name := dir.get_next()
+	while file_name != "":
+		var full_path := dir_path.plus_file(file_name)
+		if dir.current_is_dir():
+			_install_compat_mod_extensions(full_path, mod_id)
+		elif file_name.get_extension() == "gd":
+			var relative_path := full_path.trim_prefix(COMPAT_EXTENSIONS_DIR + mod_id + "/")
+			var base_path := "res://mods-unpacked/" + mod_id + "/" + relative_path
+			if _fengliu_resource_exists(base_path):
+				ModLoaderMod.install_script_extension(full_path)
+				ModLoaderLog.info("Installed compat extension: %s (mod %s)" % [full_path, mod_id], MOD_ID)
+			else:
+				ModLoaderLog.warning("Compat base not found, skip: %s -> %s" % [full_path, base_path], MOD_ID)
+		file_name = dir.get_next()
+	dir.list_dir_end()
+
+
+# ModLoader 虚拟 zip 上 ResourceLoader.exists 不一定命中，补 File 检查兜底
+func _fengliu_resource_exists(path: String) -> bool:
+	if ResourceLoader.exists(path):
+		return true
+	var file = File.new()
+	return file.file_exists(path)
 
 
 func _is_late_extension(path: String) -> bool:
