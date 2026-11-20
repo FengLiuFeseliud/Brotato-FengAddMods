@@ -21,6 +21,28 @@ func _ready() -> void:
 	_fengliu_init_actions()
 
 
+# 投射物生成：先走原版连接，再把事件转给当前激活的远程动作
+func on_projectile_shot(projectile: Node2D) -> void:
+	.on_projectile_shot(projectile)
+
+	if _fengliu_active_actions.empty() or not is_instance_valid(projectile):
+		return
+
+	for action in _fengliu_active_actions:
+		if action != null and is_instance_valid(action) and action.fengliu_is_ranged_action():
+			action.fengliu_on_projectile_shot(projectile)
+
+	if projectile.has_signal("hit_something") and not projectile.is_connected("hit_something", self, "_fengliu_on_action_projectile_hit"):
+		var _error = projectile.connect("hit_something", self, "_fengliu_on_action_projectile_hit", [projectile])
+
+
+# 投射物命中：转发给当前激活的远程动作
+func _fengliu_on_action_projectile_hit(thing_hit, damage_dealt, projectile) -> void:
+	for action in _fengliu_active_actions:
+		if action != null and is_instance_valid(action) and action.fengliu_is_ranged_action():
+			action.fengliu_on_projectile_hit(thing_hit, damage_dealt, projectile)
+
+
 func _fengliu_init_actions() -> void:
 	for action_resource in actions:
 		if action_resource == null or not (action_resource is Resource):

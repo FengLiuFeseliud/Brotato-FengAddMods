@@ -20,7 +20,7 @@ func shoot_projectile(rotation: float = _parent.rotation, knockback: Vector2 = V
 	)
 
 	if is_instance_valid(projectile):
-		projectile.set_meta(_parent.PROJECTILE_FORM_META, form)
+		projectile.set_meta(_parent.get_projectile_form_meta(), form)
 		_parent.apply_projectile_form(projectile, form)
 
 	emit_signal("projectile_shot", projectile)

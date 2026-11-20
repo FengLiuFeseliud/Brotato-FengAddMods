@@ -1,0 +1,37 @@
+[gd_resource type="Resource" load_steps=3 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/weapons/actions/ranged/tech_puddle_action.gd" type="Script" id=1]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/projectiles/tech_puddles/tech_puddle.tscn" type="PackedScene" id=2]
+
+[resource]
+script = ExtResource( 1 )
+trigger_count = 0
+trigger_interval = 0
+repeat = true
+action_id = "tech_water_gun_puddle"
+action_name = ""
+block_normal_shoot = false
+count_as_normal_attack = true
+projectile_form_meta = "tech_water_gun_form"
+form_mutant = 0
+form_meca = 1
+form_neutral = 2
+form_effect_keys = {
+0: "fengliu_tech_water_gun_mutant",
+1: "fengliu_tech_water_gun_meca"
+}
+form_tints = {
+0: Color( 0.416, 0.745, 0.188, 1 ),
+1: Color( 0.7, 0.7, 0.7, 1 ),
+2: Color( 1, 1, 1, 1 )
+}
+puddle_scene = ExtResource( 2 )
+puddle_radius = 60.0
+puddle_radius_tier_multipliers = [ 1.25, 1.5, 1.75, 2.0 ]
+puddle_lifetime = 3.0
+puddle_tick_interval = 0.5
+puddle_mode_acid = 0
+puddle_mode_slow = 1
+puddle_slow_percent = 30.0
+puddle_slow_hold = 3.0
+puddle_damage_percent = 50.0

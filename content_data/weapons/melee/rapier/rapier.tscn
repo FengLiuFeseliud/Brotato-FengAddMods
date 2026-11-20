@@ -4,7 +4,7 @@
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/melee/rapier/rapier.png" type="Texture" id=2]
 [ext_resource path="res://weapons/shooting_behaviors/melee_weapon_shooting_behavior.gd" type="Script" id=4]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/weapons/melee/melee_weapon.gd" type="Script" id=9]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/weapons/actions/melee/thrust_barrage.tres" type="Resource" id=17]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/melee/rapier/rapier_thrust_barrage.tres" type="Resource" id=17]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 140, 16 )

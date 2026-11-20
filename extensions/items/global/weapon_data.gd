@@ -76,6 +76,11 @@ func get_effects_text(player_index: int, with_tracking_text: bool = true) -> Str
 	return action_text + "\n" + original_text
 
 
+# 供炮塔动作桥接：读取武器场景 actions（公开包装）
+func fengliu_get_actions() -> Array:
+	return _fengliu_get_scene_actions()
+
+
 func _fengliu_get_action_effects_text(player_index: int) -> String:
 	var lines := []
 

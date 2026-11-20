@@ -120,7 +120,7 @@ func fengliu_should_take_over_process() -> bool:
 	return false
 
 
-# 强制连刺类动作在无目标/移动中继续开火；默认关闭
+# 强制动作在无目标/移动中继续开火；默认关闭
 func fengliu_should_force_shoot() -> bool:
 	return false
 

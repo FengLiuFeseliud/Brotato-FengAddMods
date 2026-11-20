@@ -4,8 +4,8 @@
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/melee/ordinary_greatsword/ordinary_greatsword.png" type="Texture" id=2]
 [ext_resource path="res://weapons/shooting_behaviors/melee_weapon_shooting_behavior.gd" type="Script" id=4]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/melee/ordinary_greatsword/ordinary_greatsword.gd" type="Script" id=9]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/weapons/actions/melee/ordinary_greatsword_slam.tres" type="Resource" id=17]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/weapons/actions/melee/ordinary_greatsword_spin.tres" type="Resource" id=18]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/melee/ordinary_greatsword/ordinary_greatsword_slam.tres" type="Resource" id=17]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/melee/ordinary_greatsword/ordinary_greatsword_spin.tres" type="Resource" id=18]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 112, 32 )
