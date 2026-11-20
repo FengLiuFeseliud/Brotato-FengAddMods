@@ -370,3 +370,7 @@ STAT_ARMOR_SHORT,护甲,护甲
 ITEM_EMPTY_POTION,Empty Potion,空药瓶
 EFFECT_EMPTY_POTION,This potion is empty,这瓶药已经空了
 EFFECT_MYSTERIOUS_POTION_WAVE_END,Expires at the end of each wave,每波敌袭结束后失效
+WEAPON_SYRINGE,Syringe,注射器
+EFFECT_SYRINGE_MUTANT,"When Evolution < 0 melee hits transform enemies into mutants.",进化<0时近战命中时将敌人转化为异变怪
+EFFECT_SYRINGE_MECA,"When Evolution > 0 melee hits transform enemies into mecha.",进化>0时近战命中时将敌人转化为机械怪
+EFFECT_SYRINGE_NEUTRAL,At 0 Evolution no extra on-hit effect.,0进化时命中无额外效果

@@ -19,6 +19,7 @@ extends Resource
 #   fengliu_should_force_shoot       激活时即使无目标/移动中也强制开火
 #   fengliu_should_lock_rotation     激活时是否锁定武器朝向
 #   fengliu_get_locked_rotation      锁定的武器朝向（弧度）
+#   fengliu_on_hit                   近战武器本体命中时触发
 # ============================================================
 
 export(int) var trigger_count
@@ -161,4 +162,9 @@ func fengliu_on_before_shoot() -> void:
 
 
 func fengliu_on_after_shoot() -> void:
+	pass
+
+
+# 近战武器本体命中钩子；由近战武器类在 hitbox == 武器本体 hitbox 时调用
+func fengliu_on_hit(_thing_hit, _damage_dealt: int) -> void:
 	pass

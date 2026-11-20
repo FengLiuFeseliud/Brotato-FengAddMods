@@ -1,0 +1,13 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/weapons/actions/melee/evolution_on_hit.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+trigger_count = 0
+trigger_interval = 0
+repeat = true
+action_id = "syringe_evolution_on_hit"
+action_name = ""
+block_normal_shoot = false
+count_as_normal_attack = true

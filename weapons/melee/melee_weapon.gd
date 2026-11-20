@@ -183,6 +183,20 @@ func _fengliu_check_action_triggers() -> void:
 	_fengliu_sync_attack_type_override()
 
 
+func on_weapon_hit_something(thing_hit: Node, damage_dealt: int, hitbox: Hitbox) -> void:
+	.on_weapon_hit_something(thing_hit, damage_dealt, hitbox)
+
+	if hitbox != _hitbox:
+		return
+
+	for action in _fengliu_active_actions:
+		if action == null or not is_instance_valid(action):
+			continue
+
+		if action.has_method("fengliu_on_hit"):
+			action.fengliu_on_hit(thing_hit, damage_dealt)
+
+
 func should_shoot() -> bool:
 	if _fengliu_any_action_blocks_shoot():
 		return false
