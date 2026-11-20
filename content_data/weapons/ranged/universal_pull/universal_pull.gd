@@ -1,4 +1,4 @@
-extends "res://weapons/ranged/ranged_weapon.gd"
+extends "res://mods-unpacked/FengLiu-FengAddMods/weapons/ranged/ranged_weapon.gd"
 
 
 # ============================================================
@@ -6,7 +6,7 @@ extends "res://weapons/ranged/ranged_weapon.gd"
 #   血量全满时：消耗血量至 1 点（不消耗护盾），
 #   在施放瞬间的角色位置召唤大陨石（从右上高处按水平 50° 斜落），
 #   落地后对「爆炸直径 = 武器射程」内所有敌人造成面板伤害，并留下与爆炸同大小的火圈。
-#   本武器不发射任何子弹（should_shoot 恒 false）。
+#   本武器不发射任何子弹（由 universal_pull_no_attack 动作禁止普通攻击）。
 # ============================================================
 
 const METEOR_SCENE = preload("res://mods-unpacked/FengLiu-FengAddMods/projectiles/meteor/meteor.tscn")
@@ -40,11 +40,7 @@ var _fengliu_cast_cooldown := 0.0
 var _fengliu_meteors_in_flight := 0
 
 
-# 屏蔽原版射击流程（0 子弹时会每帧空转）
-func should_shoot() -> bool:
-	return false
-
-
+# 屏蔽原版射击流程由 universal_pull_no_attack 动作负责
 func _physics_process(delta: float) -> void:
 	._physics_process(delta)
 

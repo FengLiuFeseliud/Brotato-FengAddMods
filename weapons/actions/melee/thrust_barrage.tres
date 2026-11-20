@@ -1,0 +1,20 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/weapons/actions/melee/thrust_barrage.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+trigger_count = 10
+trigger_interval = 10
+repeat = true
+action_id = "thrust_barrage"
+action_name = "EFFECT_THRUST_BARRAGE"
+duration = 3.0
+animation_speed_multiplier = 2.0
+cooldown_multiplier = 0.5
+attack_type_override = 0
+block_normal_shoot = false
+count_as_normal_attack = false
+shorten_cooldown_on_start = true
+compensate_recoil_duration = true
+min_cooldown_ticks = 1.0

@@ -311,7 +311,6 @@ EFFECT_UNIVERSAL_PULL_NO_ATTACK,The weapon does not attack enemies.,武器不会
 WEAPON_CLASS_UNIQUE,Unique,独特
 WEAPON_CLASS_UNIQUE_DESCRIPTION,You can only own one of each unique weapon,每种独特武器只能拥有一把
 WEAPON_ORDINARY_GREATSWORD,Ordinary Greatsword,普通的大剑
-EFFECT_ORDINARY_GREATSWORD,"Every 5 attacks alternates between a slash and a spin sweep. The slash damages all targets in range; the spin sweep spins and attacks enemies for 2 seconds, and its spin speed is affected by attack speed. Both deal panel damage and are affected by the weapon's range.",每5次攻击在挥砍与旋转扫击交替使用，挥砍时对范围内所有目标造成伤害，旋转扫击时旋转攻击敌人2秒转速受攻击速度影响，挥砍与旋转扫击都会造成面板伤害并受1.1倍武器范围影响
 WEAPON_BLACK_HOLE_GENERATOR,Black Hole Generator,黑洞发生器
 ZONE_LINE_SPACE,Line Space,线条空间
 BG_LINE_SPACE,Line Space,线条空间
@@ -355,3 +354,6 @@ EFFECT_TECH_WATER_GUN_MUTANT,"MUTANT form: hits leave an acid puddle that deals 
 EFFECT_TECH_WATER_GUN_MECA,"MECHA form: hits leave a mechanical puddle that slows enemies inside by {0}% for {1}s.",机械形态：命中留下机械泥潭，泥潭内敌人减速{0}%，持续{1}秒
 EFFECT_TECH_WATER_GUN_NEUTRAL,Neutral: fires normal water bullets with no extra on-hit effect.,普通形态：发射普通水弹，命中无额外效果
 EFFECT_TECH_WATER_GUN_TIER_PUDDLE,Puddle size increases with each weapon tier and is affected by Puddle Size.,武器每阶泥潭大小都会增大，并受泥潭尺寸影响
+EFFECT_ORDINARY_GREATSWORD_SLAM,Every {0} attacks: ground slam damages all targets in range and leaves a crack; affected by {1}x weapon range.,每{0}次攻击触发地裂斩，对射程内所有目标造成面板伤害并留下地裂，受{1}倍武器范围影响
+EFFECT_ORDINARY_GREATSWORD_SPIN,Every {0} attacks: spin sweep attacks enemies for {1} seconds; spin speed is affected by attack speed; affected by {2}x weapon range.,每{0}次攻击触发旋转扫击，旋转攻击敌人{1}秒，转速受攻击速度影响，受{2}倍武器范围影响
+EFFECT_THRUST_BARRAGE,Every {0} attacks: continuously thrusts for {1} seconds at {2}x attack speed.,每{0}次攻击触发连刺，连续戳刺{1}秒，频率为攻速的{2}倍

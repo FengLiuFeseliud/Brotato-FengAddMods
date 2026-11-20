@@ -1,4 +1,4 @@
-[gd_resource type="Resource" load_steps=10 format=2]
+[gd_resource type="Resource" load_steps=9 format=2]
 
 [ext_resource path="res://items/global/weapon_data.gd" type="Script" id=1]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/melee/ordinary_greatsword/4/ordinary_greatsword_4_stats.tres" type="Resource" id=2]
@@ -8,7 +8,6 @@
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/sets/unique/unique_set_data.tres" type="Resource" id=6]
 [ext_resource path="res://items/sets/medieval/medieval_set_data.tres" type="Resource" id=7]
 [ext_resource path="res://items/sets/blade/blade_set_data.tres" type="Resource" id=8]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/melee/ordinary_greatsword/ordinary_greatsword_effect_desc.tres" type="Resource" id=9]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/melee/ordinary_greatsword/ordinary_greatsword_effect_deflect.tres" type="Resource" id=10]
 
 [resource]
@@ -20,7 +19,7 @@ icon = ExtResource( 4 )
 name = "WEAPON_ORDINARY_GREATSWORD"
 tier = 3
 value = 280
-effects = [ ExtResource( 9 ), ExtResource( 10 ) ]
+effects = [ ExtResource( 10 ) ]
 tracking_text = ""
 is_lockable = true
 unlock_codex_descr_after_get_it = 1

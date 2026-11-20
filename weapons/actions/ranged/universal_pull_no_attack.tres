@@ -1,0 +1,13 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/weapons/actions/ranged/ranged_action.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+trigger_count = 0
+trigger_interval = 0
+repeat = true
+action_id = "universal_pull_no_attack"
+action_name = "EFFECT_UNIVERSAL_PULL_NO_ATTACK"
+block_normal_shoot = true
+count_as_normal_attack = false

@@ -1,0 +1,31 @@
+[gd_resource type="Resource" load_steps=8 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/weapons/actions/melee/greatsword_spin.gd" type="Script" id=1]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/melee/ordinary_greatsword/ordinary_greatsword_slash_1.png" type="Texture" id=2]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/melee/ordinary_greatsword/ordinary_greatsword_slash_2.png" type="Texture" id=3]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/melee/ordinary_greatsword/ordinary_greatsword_slash_3.png" type="Texture" id=4]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/melee/ordinary_greatsword/ordinary_greatsword_slash_4.png" type="Texture" id=5]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/melee/ordinary_greatsword/ordinary_greatsword_slash_5.png" type="Texture" id=6]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/melee/ordinary_greatsword/ordinary_greatsword_slash_6.png" type="Texture" id=7]
+
+[resource]
+script = ExtResource( 1 )
+trigger_count = 10
+trigger_interval = 10
+repeat = true
+action_id = "greatsword_spin"
+action_name = "EFFECT_ORDINARY_GREATSWORD_SPIN"
+block_normal_shoot = true
+count_as_normal_attack = false
+reach_multiplier = 1.1
+spin_duration = 2.0
+spin_hit_reset_interval = 0.5
+slash_fade_time = 0.3
+slash_textures = [ ExtResource( 2 ), ExtResource( 3 ), ExtResource( 4 ), ExtResource( 5 ), ExtResource( 6 ), ExtResource( 7 ) ]
+slash_arc_chord = 168.0
+slash_length_ratio = 0.75
+slash_base_rotation = 1.5707963267949
+slash_canvas_half_ratio = 0.42857142857143
+slash_blade_half_ratio = 0.075555555555556
+slash_radial_offset_ratio = 0.65
+slash_hitbox_width_scale = 1.0

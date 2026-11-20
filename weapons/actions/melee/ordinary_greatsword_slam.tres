@@ -1,0 +1,30 @@
+[gd_resource type="Resource" load_steps=4 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/weapons/actions/melee/greatsword_slam.gd" type="Script" id=1]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/melee/ordinary_greatsword/ordinary_greatsword_slam.tscn" type="PackedScene" id=2]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/melee/ordinary_greatsword/ordinary_greatsword_slam.png" type="Texture" id=3]
+
+[resource]
+script = ExtResource( 1 )
+trigger_count = 5
+trigger_interval = 10
+repeat = true
+action_id = "greatsword_slam"
+action_name = "EFFECT_ORDINARY_GREATSWORD_SLAM"
+block_normal_shoot = true
+count_as_normal_attack = false
+reach_multiplier = 1.5
+slam_scene = ExtResource( 2 )
+slam_texture = ExtResource( 3 )
+slam_base_radius = 150.0
+slam_smoke_amount = 12
+slam_sound_db_mod = -10
+slam_duration_scale = 1.0
+slam_windup_ratio = 0.27272727272727
+slam_sweep_ratio = 0.45454545454545
+slam_recover_ratio = 0.27272727272727
+slam_min_duration = 0.3
+slam_max_duration = 1.6
+slam_pose_angle_start = -1.5707963267949
+slam_pose_angle_end = 0.0
+ground_layer_name = "FirePuddles"

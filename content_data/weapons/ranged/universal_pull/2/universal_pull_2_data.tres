@@ -1,4 +1,4 @@
-[gd_resource type="Resource" load_steps=12 format=2]
+[gd_resource type="Resource" load_steps=11 format=2]
 
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/ranged/universal_pull/2/universal_pull_2_stats.tres" type="Resource" id=1]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/ranged/universal_pull/3/universal_pull_3_data.tres" type="Resource" id=2]
@@ -9,7 +9,6 @@
 [ext_resource path="res://items/sets/precise/precise_set_data.tres" type="Resource" id=7]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/ranged/universal_pull/universal_pull_effect_meteor.tres" type="Resource" id=8]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/ranged/universal_pull/2/universal_pull_2_effect_burning.tres" type="Resource" id=9]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/ranged/universal_pull/universal_pull_effect_no_attack.tres" type="Resource" id=10]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/sets/unique/unique_set_data.tres" type="Resource" id=11]
 
 [resource]
@@ -21,7 +20,7 @@ icon = ExtResource( 5 )
 name = "WEAPON_UNIVERSAL_PULL"
 tier = 1
 value = 80
-effects = [ ExtResource( 8 ), ExtResource( 9 ), ExtResource( 10 ) ]
+effects = [ ExtResource( 8 ), ExtResource( 9 ) ]
 tracking_text = ""
 is_lockable = true
 unlock_codex_descr_after_get_it = 1

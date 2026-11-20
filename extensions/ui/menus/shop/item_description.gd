@@ -3,6 +3,7 @@ extends "res://ui/menus/shop/item_description.gd"
 
 const FENGLIU_RAINBOW = preload("res://mods-unpacked/FengLiu-FengAddMods/ui/fengliu_unique/fengliu_rainbow_visuals.gd")
 const FENGLIU_ZONE_EVENT_LINE_PREFIX := "FengliuZoneEventText"
+const FENGLIU_ACTION_LINE_PREFIX := "FengliuActionText"
 
 
 # 独特武器：名称/图标同渐变（图标本身不加边框）
@@ -17,6 +18,8 @@ func set_item(item_data: ItemParentData, player_index: int, item_count: = 1) -> 
 	# 区域事件说明（仅难度选择面板）
 	if item_data is DifficultyData:
 		_fengliu_append_zone_event_texts(item_data)
+
+	_fengliu_prepend_action_effects(item_data, player_index)
 
 
 # 自定义标题（非道具）时清掉上一次的彩虹
@@ -77,6 +80,46 @@ func _fengliu_append_zone_event_texts(item_data: DifficultyData) -> void:
 			String(description.get("text")),
 			description.get("icon")
 		)
+
+	effects.visible = true
+
+
+# 武器动作翻译：插到武器效果列表最前面
+func _fengliu_prepend_action_effects(item_data, player_index: int) -> void:
+	if not (item_data is WeaponData):
+		return
+
+	if hide_description_if_locked_in_codex and item_data._is_locked_in_codex():
+		return
+
+	if not item_data.has_method("_fengliu_get_action_effects_text"):
+		return
+
+	var effects = get_effects()
+	if effects == null or effect_line == null:
+		return
+
+	for child in effects.get_children():
+		if String(child.name).begins_with(FENGLIU_ACTION_LINE_PREFIX):
+			effects.remove_child(child)
+			child.queue_free()
+
+	var action_text: String = item_data._fengliu_get_action_effects_text(player_index)
+	if action_text == "":
+		return
+
+	var lines = action_text.split("\n")
+	var prepend_index := 0
+	for line_text in lines:
+		if String(line_text).strip_edges() == "":
+			continue
+
+		var line = effect_line.instance()
+		line.name = FENGLIU_ACTION_LINE_PREFIX + str(prepend_index)
+		effects.add_child(line)
+		line.call("_display_special_text", String(line_text), null)
+		effects.move_child(line, prepend_index)
+		prepend_index += 1
 
 	effects.visible = true
 

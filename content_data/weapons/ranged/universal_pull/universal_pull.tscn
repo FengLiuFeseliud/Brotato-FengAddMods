@@ -1,9 +1,10 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://weapons/weapon.tscn" type="PackedScene" id=1]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/ranged/universal_pull/universal_pull.gd" type="Script" id=2]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/ranged/universal_pull/universal_pull.png" type="Texture" id=3]
 [ext_resource path="res://resources/shaders/outline.gdshader" type="Shader" id=4]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/weapons/actions/ranged/universal_pull_no_attack.tres" type="Resource" id=5]
 
 [sub_resource type="ShaderMaterial" id=2]
 resource_local_to_scene = true
@@ -23,6 +24,7 @@ radius = 72.4431
 
 [node name="UniversalPull" instance=ExtResource( 1 )]
 script = ExtResource( 2 )
+actions = [ ExtResource( 5 ) ]
 outline_shader_mat = SubResource( 2 )
 
 [node name="Sprite" parent="." index="0"]
