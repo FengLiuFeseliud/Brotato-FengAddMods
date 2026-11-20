@@ -11,6 +11,7 @@ var fengliu_keys_needing_operator = {
 	"effect_tree_drop_double_value": [0],
 	"effect_rekindling_value": [0],
 	"effect_reduce_shield_damage_value": [0],
+	"effect_overheal_value": [0],
 	"effect_gain_stat_for_every_stat_full_shield": [0, 4],
 	"effect_gain_stat_for_every_living_tree": [0, 4],
 	"fengliu_wanted_item_tag_chance": [0],

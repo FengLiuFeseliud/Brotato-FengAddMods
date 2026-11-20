@@ -39,6 +39,7 @@ var fengliu_shield_hash: int = Keys.generate_hash("stat_fengliu_shield")
 var fengliu_reduce_shield_damage_hash = Keys.generate_hash("fengliu_reduce_shield_damage")
 var fengliu_consumable_shield_regen_hash = Keys.generate_hash("fengliu_consumable_shield_regen")
 var fengliu_hit_shield_drop_consumable_hash = Keys.generate_hash("fengliu_hit_shield_drop_consumable")
+var fengliu_overheal_hash: int = Keys.generate_hash("fengliu_overheal")
 
 
 var fengliu_item_plastic_fruit_basket_hash = Keys.generate_hash("item_plastic_fruit_basket")
@@ -65,6 +66,8 @@ var fengliu_shield_regen_rate: float = 0.1
 var _fengliu_shield_regen_timer: = FixedTimer.new(3.0)
 var _fengliu_shield_regen_pool: float = 0.0
 var _fengliu_shield_reduce_pool: float = 0.0
+var _fengliu_in_hp_regen: bool = false
+
 var _fengliu_no_hit_material_effects: Array = []
 var _fengliu_no_hit_material_timers: Array = []
 var _fengliu_no_hit_material_disabled: Array = []
@@ -185,6 +188,10 @@ func _physics_process(delta: float) -> void :
     var shield_regen_loop: int = _fengliu_shield_regen_timer.try_loop(delta)
     if shield_regen_loop > 0:
         fengliu_on_shield_regen(shield_regen_loop)
+
+    # 生命满但护盾低于「过量恢复」上限：让生命恢复计时继续跑，溢出量转盾
+    if _health_regen_timer.is_stopped() and fengliu_can_continue_hp_regen():
+        _health_regen_timer.start()
 
     # 未受伤计时：每个效果实例各自计时，满一轮结算一次材料（先同步槽位变化）
     fengliu_sync_no_hit_material_timers()
@@ -624,6 +631,132 @@ func fengliu_shield_regen(regen: int) -> int:
         fengliu_sync_full_shield_stat_link()
 
     return gained
+
+
+# 纯计算：本次溢出治疗按过量恢复能补多少盾（0 表示不生效）
+#   属性按百分比解释；超过 100% 视为 100%（上限就是护盾满）
+static func fengliu_get_overheal_gain(shield: float, shield_cap: float, stat_value: float, overflow: int) -> int:
+	if overflow <= 0 or shield_cap <= 0.0 or stat_value <= 0.0:
+		return 0
+
+	var limit: float = shield_cap * min(stat_value, 100.0) / 100.0
+	if shield >= limit:
+		return 0
+
+	return int(min(float(overflow), limit - shield))
+
+
+# 过量恢复的护盾上限：护盾上限 × 属性百分比
+func fengliu_get_overheal_limit() -> float:
+	var stat_value: float = Utils.get_stat(fengliu_overheal_hash, player_index)
+	if stat_value <= 0.0:
+		return 0.0
+
+	var shield_cap: float = Utils.get_stat(fengliu_shield_hash, player_index)
+	if shield_cap <= 0.0:
+		return 0.0
+
+	return shield_cap * min(stat_value, 100.0) / 100.0
+
+
+# 生命已满且护盾低于过量恢复上限：还有可转盾空间
+func fengliu_can_overheal() -> bool:
+	if dead or cleaning_up or current_stats.health < max_stats.health:
+		return false
+
+	var stat_value: float = Utils.get_stat(fengliu_overheal_hash, player_index)
+	var shield_cap: float = Utils.get_stat(fengliu_shield_hash, player_index)
+	return fengliu_get_overheal_gain(fengliu_shield, shield_cap, stat_value, 1) > 0
+
+
+# 生命已满时仍需要跑生命恢复计时：靠溢出治疗补盾
+func fengliu_can_continue_hp_regen() -> bool:
+	# 护盾无法恢复时不再空转
+	if RunData.get_player_effect(effect_fengliu_shield_not_regen, player_index) > 0:
+		return false
+
+	if not fengliu_can_overheal():
+		return false
+
+	# 没有生命恢复来源时不会产生治疗，不必启动计时
+	return RunData.get_player_effect(Keys.torture_hash, player_index) > 0 or Utils.get_stat(Keys.stat_hp_regeneration_hash, player_index) > 0.0
+
+
+# 溢出治疗转盾：只补到过量恢复
+func fengliu_apply_overheal(overflow: int) -> int:
+	if overflow <= 0 or dead:
+		return 0
+
+	var stat_value: float = Utils.get_stat(fengliu_overheal_hash, player_index)
+	var shield_cap: float = Utils.get_stat(fengliu_shield_hash, player_index)
+	var gain: int = fengliu_get_overheal_gain(fengliu_shield, shield_cap, stat_value, overflow)
+	if gain <= 0:
+		return 0
+
+	# 走现有回盾入口：+盾飘字、盾条刷新、护盾无法恢复的判定都复用
+	return fengliu_shield_regen(gain)
+
+
+# 扩展治疗结算：生命满后的溢出治疗按过量恢复转为护盾
+func on_healing_effect(value: int, tracking_key: int = Keys.empty_hash, from_torture: bool = false) -> int:
+	var health_before: int = current_stats.health
+	var healed: int = .on_healing_effect(value, tracking_key, from_torture)
+
+	# 无法治疗 
+	if dead or RunData.get_player_effect_bool(Keys.no_heal_hash, player_index):
+		return healed
+
+	if not cleaning_up and RunData.get_player_effect(Keys.torture_hash, player_index) > 0 and not from_torture:
+		return healed
+
+	# 溢出量 = 本次治疗量 - 实际补到生命的量
+	var overflow: int = value - (current_stats.health - health_before)
+	# 生命恢复的溢出由 on_health_regen 统一结算，避免父类回调时重复加盾
+	if not _fengliu_in_hp_regen and overflow > 0:
+		fengliu_apply_overheal(overflow)
+
+	return healed
+
+
+# 本次生命恢复的理论总量：仅用于推断溢出量，实际治疗由父类 on_health_regen 执行
+func _fengliu_get_hp_regen_amount(loop_count: int) -> int:
+	var bonus_hp_regen_effects = RunData.get_player_effect(Keys.hp_regen_bonus_hash, player_index)
+
+	var hp_regen_val = _hp_regen_val
+	if bonus_hp_regen_effects.size() > 0:
+		var multiplier = 0
+		for effect in bonus_hp_regen_effects:
+			if current_stats.health < max_stats.health * (effect[1] / 100.0):
+				multiplier += effect[0]
+		hp_regen_val = _hp_regen_val * (1.0 + multiplier)
+
+	var torture_effect = RunData.get_player_effect(Keys.torture_hash, player_index)
+	var base_val = torture_effect if torture_effect > 0 else hp_regen_val
+	return int(base_val * loop_count)
+
+
+# 扩展生命恢复
+func on_health_regen(loop_count: int) -> void:
+	var health_before: int = current_stats.health
+	var missing_before: int = max(0, max_stats.health - health_before)
+	var full_amount: int = _fengliu_get_hp_regen_amount(loop_count)
+
+	# 父类负责实际治疗、音效、挑战统计与满血停表
+	var previous_in_regen: bool = _fengliu_in_hp_regen
+	_fengliu_in_hp_regen = true
+	.on_health_regen(loop_count)
+	_fengliu_in_hp_regen = previous_in_regen
+
+	# 只在实际治满生命时结算溢出；无法治疗 / 死亡不产盾
+	if not dead and not RunData.get_player_effect_bool(Keys.no_heal_hash, player_index):
+		if current_stats.health >= max_stats.health:
+			var overflow: int = full_amount - missing_before
+			if overflow > 0:
+				fengliu_apply_overheal(overflow)
+
+	# 父类满血会停表，继续跑生命恢复
+	if _health_regen_timer.is_stopped() and fengliu_can_continue_hp_regen():
+		_health_regen_timer.start()
 
 
 # 回盾：每跳回盾上限的 10%（严格 10%/秒、零头累积），回满即停
