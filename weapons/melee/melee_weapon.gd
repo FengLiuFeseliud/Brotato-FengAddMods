@@ -6,6 +6,7 @@ extends "res://weapons/melee/melee_weapon.gd"
 #   场景根节点使用本脚本，并通过 actions 数组直接传入动作资源（.tres）。
 #   每个动作自带触发次数、重复规则与参数；本类只负责调度。
 #   动作可影响：是否禁止普通攻击、是否计入攻击次数、攻击类型、动画速度与冷却。
+#   动作还可强制无目标/移动中开火，并锁定触发瞬间的武器朝向。
 #   trigger_count <= 0 的动作在初始化时直接常驻激活。
 # ============================================================
 
@@ -70,6 +71,8 @@ func _physics_process(delta: float) -> void:
 		return
 
 	._physics_process(delta)
+	_fengliu_sync_action_aim_targets()
+	_fengliu_apply_rotation_lock()
 	_fengliu_check_action_triggers()
 
 
@@ -183,6 +186,22 @@ func _fengliu_check_action_triggers() -> void:
 func should_shoot() -> bool:
 	if _fengliu_any_action_blocks_shoot():
 		return false
+
+	if _fengliu_any_action_forces_shoot():
+		if _is_shooting:
+			return false
+
+		if weapon_pos < 0:
+			return false
+
+		if _parent == null or not is_instance_valid(_parent):
+			return false
+
+		if "cleaning_up" in _parent and _parent.cleaning_up:
+			return false
+
+		return _current_cooldown <= 0
+
 	return .should_shoot()
 
 
@@ -204,6 +223,7 @@ func shoot() -> void:
 			action.fengliu_on_before_shoot()
 
 	.shoot()
+	_fengliu_apply_rotation_lock()
 
 	for action in _fengliu_active_actions:
 		if action != null and is_instance_valid(action):
@@ -229,6 +249,61 @@ func _fengliu_any_action_blocks_shoot() -> bool:
 		if action != null and is_instance_valid(action) and action.fengliu_should_block_shoot():
 			return true
 	return false
+
+
+func _fengliu_any_action_forces_shoot() -> bool:
+	for action in _fengliu_active_actions:
+		if action == null or not is_instance_valid(action):
+			continue
+
+		if action.has_method("fengliu_should_force_shoot") and action.fengliu_should_force_shoot():
+			return true
+
+	return false
+
+
+func _fengliu_apply_rotation_lock() -> void:
+	for action in _fengliu_active_actions:
+		if action == null or not is_instance_valid(action):
+			continue
+
+		if not action.has_method("fengliu_should_lock_rotation") or not action.fengliu_should_lock_rotation():
+			continue
+
+		if action.has_method("fengliu_get_locked_rotation"):
+			rotation = action.fengliu_get_locked_rotation()
+		return
+
+
+func _fengliu_sync_action_aim_targets() -> void:
+	for action in _fengliu_active_actions:
+		if action == null or not is_instance_valid(action):
+			continue
+
+		if action.has_method("fengliu_sync_aim_target"):
+			action.fengliu_sync_aim_target()
+
+
+func fengliu_get_aim_target():
+	if _targets_in_range.size() == 0 or current_stats == null:
+		return null
+
+	var nearest = Utils.get_nearest_no_max(_targets_in_range, global_position, current_stats.min_range)
+	if nearest.size() == 0:
+		return null
+
+	var target = nearest[0]
+	if target == null or not is_instance_valid(target):
+		return null
+
+	return target
+
+
+func fengliu_get_target_direction(target) -> float:
+	if target == null or not is_instance_valid(target):
+		return rotation
+
+	return (Utils.get_target_position(target, global_position) - global_position).angle()
 
 
 func _fengliu_any_action_takes_over_physics() -> bool:

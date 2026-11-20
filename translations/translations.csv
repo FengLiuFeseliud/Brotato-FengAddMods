@@ -311,6 +311,7 @@ EFFECT_UNIVERSAL_PULL_NO_ATTACK,The weapon does not attack enemies.,武器不会
 WEAPON_CLASS_UNIQUE,Unique,独特
 WEAPON_CLASS_UNIQUE_DESCRIPTION,You can only own one of each unique weapon,每种独特武器只能拥有一把
 WEAPON_ORDINARY_GREATSWORD,Ordinary Greatsword,普通的大剑
+WEAPON_RAPIER,Rapier,刺剑
 WEAPON_BLACK_HOLE_GENERATOR,Black Hole Generator,黑洞发生器
 ZONE_LINE_SPACE,Line Space,线条空间
 BG_LINE_SPACE,Line Space,线条空间

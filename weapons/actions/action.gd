@@ -14,6 +14,11 @@ extends Resource
 #   action_name              动作翻译键
 #   block_normal_shoot       激活时是否禁止普通攻击
 #   count_as_normal_attack   激活时自身攻击是否计入触发次数
+# ------------------------------------------------------------
+# 可选钩子（由子类覆写）：
+#   fengliu_should_force_shoot       激活时即使无目标/移动中也强制开火
+#   fengliu_should_lock_rotation     激活时是否锁定武器朝向
+#   fengliu_get_locked_rotation      锁定的武器朝向（弧度）
 # ============================================================
 
 export(int) var trigger_count
@@ -113,6 +118,26 @@ func fengliu_should_take_over_physics() -> bool:
 
 func fengliu_should_take_over_process() -> bool:
 	return false
+
+
+# 强制连刺类动作在无目标/移动中继续开火；默认关闭
+func fengliu_should_force_shoot() -> bool:
+	return false
+
+
+# 动作是否需要固定武器朝向；默认关闭
+func fengliu_should_lock_rotation() -> bool:
+	return false
+
+
+# 固定朝向（弧度）；仅在 fengliu_should_lock_rotation() 为 true 时使用
+func fengliu_get_locked_rotation() -> float:
+	return 0.0
+
+
+# 目标切换时由武器类调用；默认不处理
+func fengliu_sync_aim_target() -> void:
+	pass
 
 
 func fengliu_process(_delta: float) -> void:
