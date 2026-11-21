@@ -298,7 +298,7 @@ EFFECT_REROLL_STAT_ONLY_ITEM,Items with only stat changes will not appear in sho
 CONNOISSEUR,Connoisseur,讲究人
 EFFECT_REMOVE_PRIMARY_STAT_EFFECTS,"Items have no primary stat bonuses",道具不会出现主要属性效果
 ITEM_PICTURE_FRAME,Picture Frame,相框
-EFFECT_FOSSIL_COUNT_DOUBLED,Fossil count increased by {1},化石数增加 {1}
+EFFECT_FOSSIL_COUNT_DOUBLED,Fossil count modifier increased by {1},化石数量的修改增加{1}
 WEAPON_CRESCENT_STAFF,Crescent Staff,月牙法杖
 EFFECT_CRESCENT_STAFF_MOON,"While held, summons a moon that orbits you; the moon is affected by Attack Speed and weapon Range.",持有时召唤月牙环绕玩家，月牙受攻速与武器范围影响
 STAFF_MAKER,Staff Maker,制杖
@@ -358,18 +358,18 @@ EFFECT_TECH_WATER_GUN_TIER_PUDDLE,Puddle size increases with each weapon tier an
 EFFECT_ORDINARY_GREATSWORD_SLAM,Every {0} attacks: ground slam damages all targets in range and leaves a crack; affected by {1}x weapon range.,每{0}次攻击触发地裂斩，对射程内所有目标造成面板伤害并留下地裂，受{1}倍武器范围影响
 EFFECT_ORDINARY_GREATSWORD_SPIN,Every {0} attacks: spin sweep attacks enemies for {1} seconds; spin speed is affected by attack speed; affected by {2}x weapon range.,每{0}次攻击触发旋转扫击，旋转攻击敌人{1}秒，转速受攻击速度影响，受{2}倍武器范围影响
 EFFECT_THRUST_BARRAGE,Every {0} attacks: continuously thrusts for {1} seconds at {2}x attack speed.,每{0}次攻击触发连刺，连续戳刺{1}秒，频率为攻速的{2}倍
-FENGLIU_OVERHEAL,% Overheal,%过量恢复
+FENGLIU_OVERHEAL,% Full HP Healing Shield,%满血治疗护盾
 ITEM_BUOY,Buoy,浮标
-EFFECT_OVERHEAL_VALUE,{0} % Overheal,{0} %过量恢复
+EFFECT_OVERHEAL_VALUE,{0} % Full HP Healing Shield,{0} %满血治疗护盾
 ITEM_MYSTERIOUS_POTION,Mysterious Potion,神秘药瓶
 EFFECT_RANDOM_PRIMARY_STATS_ON_OBTAIN,{1} chance to gain {0} random primary stats when obtained,获得时有{1}概率随机获得{0}点主要属性
 EFFECT_FOG_WAVE_CHANCE,有{0}概率使下一波进入迷雾状态，触发时永久扣除{1},有{0}概率使下一波进入迷雾状态，触发时永久扣除{1}
-STAT_MAX_HP_SHORT,最大生命,最大生命
-STAT_SPEED_SHORT,移速,移速
-STAT_ARMOR_SHORT,护甲,护甲
 ITEM_EMPTY_POTION,Empty Potion,空药瓶
 EFFECT_EMPTY_POTION,This potion is empty,这瓶药已经空了
 EFFECT_MYSTERIOUS_POTION_WAVE_END,Expires at the end of each wave,每波敌袭结束后失效
+DRUG_ADDICT,Drug Addict,药物依赖者
+EFFECT_FREE_ITEM_EVERY_X_WAVES,"Every {0} waves, gain a free {1}",每{0}波免费获得一个{1}
+EFFECT_GAIN_RANDOM_PRIMARY_STATS_ON_OBTAIN,{0} chance to double the random primary stats gained; {1} chance to lose random primary stats instead and start the next wave with 1 HP,有{0}概率使获得时随机主属性翻倍，有{1}概率获得时随机主属性改为扣除随机主属性，并在下一波以1点生命开始
 WEAPON_SYRINGE,Syringe,注射器
 EFFECT_SYRINGE_MUTANT,"When Evolution < 0 melee hits transform enemies into mutants.",进化<0时近战命中时将敌人转化为异变怪
 EFFECT_SYRINGE_MECA,"When Evolution > 0 melee hits transform enemies into mecha.",进化>0时近战命中时将敌人转化为机械怪

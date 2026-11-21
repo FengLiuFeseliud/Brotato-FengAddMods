@@ -17,13 +17,6 @@ extends "res://mods-unpacked/FengLiu-FengAddMods/effects/global/mod_effect.gd"
 
 # 迷雾波概率
 
-# 扣除说明使用的属性短名翻译键（原版 STAT_MAX_HP / STAT_SPEED 的显示不适合本描述）
-const FENGLIU_DEDUCTION_STAT_NAME_KEYS := {
-	"stat_max_hp": "STAT_MAX_HP_SHORT",
-	"stat_speed": "STAT_SPEED_SHORT",
-	"stat_armor": "STAT_ARMOR_SHORT"
-}
-
 export (Array) var stat_deductions = []
 
 
@@ -94,7 +87,7 @@ func fengliu_get_deductions_text() -> String:
 
 		var stat_id = str(entry[0])
 		var raw_amount = float(entry[1])
-		var stat_name = tr(FENGLIU_DEDUCTION_STAT_NAME_KEYS.get(stat_id, stat_id.to_upper()))
+		var stat_name = tr(stat_id.to_upper())
 		var amount_text = ""
 
 		# 小数按百分比显示（去掉多余的 0）

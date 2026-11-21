@@ -86,7 +86,8 @@ var fengliu_keys_needing_percent = {
 	"effect_fengliu_puddle_size": [0],
 	"effect_fossil_count_doubled": [1],
 	"effect_random_primary_stats_on_obtain": [1],
-	"effect_fog_wave_chance": [0]
+	"effect_fog_wave_chance": [0],
+	"effect_gain_random_primary_stats_on_obtain": [0, 1]
 }
 
 

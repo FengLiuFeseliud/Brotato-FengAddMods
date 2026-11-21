@@ -1027,6 +1027,7 @@ func _fengliu_get_ground_events() -> Node2D:
 func _init_half_second_timers() -> void:
 	._init_half_second_timers()
 	fengliu_spawn_bullet_hell_on_forced_fog()
+	fengliu_grant_free_item_every_x_waves()
 
 
 #扩展强制迷雾波补生成弹幕 (迷雾 + 弹幕)
@@ -1047,3 +1048,32 @@ func fengliu_spawn_bullet_hell_on_forced_fog() -> void:
 	var rand_bullet_hell: BulletHell = ZoneService.bullets_hell.pick_random().instance()
 	rand_bullet_hell._update_bullet_hell_parameters(wave, _is_elite_wave, _is_horde_wave)
 	_enemy_projectiles.add_child(rand_bullet_hell)
+
+
+# ============================================================
+# 扩展：每 x 波免费获得一个指定道具
+# ============================================================
+
+var effect_free_item_every_x_waves_hash = Keys.generate_hash("fengliu_free_item_every_x_waves")
+
+
+func fengliu_grant_free_item_every_x_waves() -> void:
+	for player_index in range(RunData.get_player_count()):
+		var entries = RunData.get_player_effect(effect_free_item_every_x_waves_hash, player_index)
+		if not (entries is Array):
+			continue
+
+		for entry in entries:
+			if not (entry is Array) or entry.size() < 2:
+				continue
+
+			var interval = int(entry[0])
+			var item_id_hash = int(entry[1])
+			if interval <= 0 or item_id_hash == Keys.empty_hash:
+				continue
+			if RunData.current_wave % interval != 0:
+				continue
+
+			var item = ItemService.get_element(ItemService.items, item_id_hash)
+			if item != null and item is ItemData:
+				RunData.add_item(item, player_index)

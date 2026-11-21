@@ -1,0 +1,15 @@
+[gd_resource type="Resource" load_steps=3 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/effects/effect_free_item_every_x_waves.gd" type="Script" id=1]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/mysterious_potion/mysterious_potion_data.tres" type="Resource" id=2]
+
+[resource]
+script = ExtResource( 1 )
+key = ""
+text_key = "EFFECT_FREE_ITEM_EVERY_X_WAVES"
+value = 3
+custom_key = "fengliu_free_item_every_x_waves"
+storage_method = 0
+effect_sign = 0
+custom_args = [  ]
+item_data = ExtResource( 2 )

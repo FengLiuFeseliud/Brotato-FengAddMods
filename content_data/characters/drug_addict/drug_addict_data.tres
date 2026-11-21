@@ -1,0 +1,37 @@
+[gd_resource type="Resource" load_steps=8 format=2]
+
+[ext_resource path="res://items/characters/character_data.gd" type="Script" id=1]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/drug_addict/drug_addict_icon.png" type="Texture" id=2]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/drug_addict/appearance/drug_addict_hat_appearance.tres" type="Resource" id=9]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/drug_addict/appearance/drug_addict_eyes_appearance.tres" type="Resource" id=8]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/drug_addict/effects/drug_addict_effect_0.tres" type="Resource" id=3]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/drug_addict/effects/drug_addict_effect_1.tres" type="Resource" id=4]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/drug_addict/effects/drug_addict_effect_2.tres" type="Resource" id=5]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/drug_addict/effects/drug_addict_effect_3.tres" type="Resource" id=6]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/characters/drug_addict/effects/drug_addict_effect_4.tres" type="Resource" id=7]
+
+[resource]
+script = ExtResource( 1 )
+my_id = "drug_addict"
+unlocked_by_default = true
+can_be_looted = false
+icon = ExtResource( 2 )
+name = "DRUG_ADDICT"
+tier = 0
+value = 1
+effects = [ ExtResource( 3 ), ExtResource( 4 ), ExtResource( 5 ), ExtResource( 6 ), ExtResource( 7 ) ]
+tracking_text = ""
+is_lockable = false
+unlock_codex_descr_after_get_it = 1
+is_cursed = false
+curse_factor = 0.0
+max_nb = -1
+item_appearances = [ ExtResource( 9 ), ExtResource( 8 ) ]
+tags = [  ]
+wanted_tags = [  ]
+banned_item_groups = [  ]
+banned_items = [  ]
+banned_upgrades = [  ]
+starting_weapons = [  ]
+starting_items = [  ]
+required_item_set = "fengliu"

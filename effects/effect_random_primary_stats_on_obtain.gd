@@ -20,6 +20,8 @@ export (int) var chance = 40 # 触发概率（%）
 export (String) var tracking_item_id = "" # 统计道具 id
 var tracking_item_hash: int = Keys.empty_hash
 
+var effect_fengliu_gain_random_primary_stats_on_obtain_hash = Keys.generate_hash("fengliu_gain_random_primary_stats_on_obtain")
+
 
 static func get_id() -> String:
 	return "fengliu_random_primary_stats_on_obtain"
@@ -39,11 +41,34 @@ func apply(player_index: int) -> void:
 	if not Utils.get_chance_success(min(chance, 100) / 100.0):
 		return
 
+	# 读取概率
+	var double_chance := 0
+	var debuff_chance := 0
+	var gain_entries = RunData.get_player_effect(effect_fengliu_gain_random_primary_stats_on_obtain_hash, player_index)
+	if gain_entries is Array:
+		for entry in gain_entries:
+			if entry is Array and entry.size() >= 2:
+				double_chance += int(entry[0])
+				debuff_chance += int(entry[1])
+
+	double_chance = min(double_chance, 100)
+	debuff_chance = min(debuff_chance, 100)
+
+	var per_point := 1
+	if double_chance > 0 and Utils.get_chance_success(double_chance / 100.0):
+		# value% 翻倍
+		per_point = 2
+	elif debuff_chance > 0 and Utils.get_chance_success(debuff_chance / 100.0):
+		# 增加改为减
+		per_point = -1
+		# 下一波 1 血开始
+		RunData.get_player_effects(player_index)[Keys.hp_start_next_wave_hash] = -100
+
 	# 每点独立随机一项主属性
 	for _i in range(value):
-		RunData.add_stat(RunData.get_random_primary_stats(), 1, player_index)
+		RunData.add_stat(RunData.get_random_primary_stats(), per_point, player_index)
 		if tracking_item_hash != Keys.empty_hash:
-			RunData.add_tracked_value(player_index, tracking_item_hash, 1)
+			RunData.add_tracked_value(player_index, tracking_item_hash, per_point)
 
 
 # 一次性效果：移除道具不退还属性

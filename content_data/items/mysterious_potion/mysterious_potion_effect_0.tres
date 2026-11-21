@@ -11,5 +11,5 @@ custom_key = "fengliu_random_primary_stats_on_obtain"
 storage_method = 0
 effect_sign = 3
 custom_args = [  ]
-chance = 40
+chance = 50
 tracking_item_id = "item_mysterious_potion"
