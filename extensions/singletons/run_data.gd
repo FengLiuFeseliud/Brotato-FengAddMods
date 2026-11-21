@@ -413,8 +413,8 @@ func reset(restart: bool = false) -> void :
 	fengliu_reset_wave_intensity_tracking()
 	.reset(restart)
 
-	if ProgressData.has_method("fengliu_ensure_line_space_zone_last"):
-		ProgressData.call("fengliu_ensure_line_space_zone_last", "run reset")
+	if ProgressData.has_method("fengliu_ensure_line_space_zone_progress"):
+		ProgressData.call("fengliu_ensure_line_space_zone_progress")
 
 
 # 通用台账读取（is_linked_layer 区分层）

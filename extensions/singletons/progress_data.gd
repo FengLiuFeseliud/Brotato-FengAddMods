@@ -1,13 +1,15 @@
 extends "res://singletons/progress_data.gd"
 
-# 1.2.0 区域集成：zone_service.gd 负责把 ZoneData 追加进 ZoneService.zones，
-# 这里负责解锁、每个角色的难度条目、背景收敛与下标自愈。
+# 1.2.0 区域集成：zone_service.gd 负责按稳定 my_id 注册 ZoneData，
+# 这里负责解锁、每个角色的难度条目与背景收敛。
 
 
 const FENGLIU_MOD_ID = "FengAddMods"
 const FENGLIU_MOD_DIR = "res://mods-unpacked/FengLiu-FengAddMods/"
 const FENGLIU_LINE_SPACE_ZONE_PATH = FENGLIU_MOD_DIR + "zones/zone_line_space/zone_line_space_data.tres"
 const FENGLIU_LINE_SPACE_BACKGROUND_NAME = "BG_LINE_SPACE"
+# 稳定 id：与 .tres / boss / elite 的 my_id 一致，禁止按数组下标改写（参考 NCL）
+const FENGLIU_LINE_SPACE_ZONE_ID: int = 3
 
 
 var _fengliu_line_space_zone = null
@@ -53,6 +55,10 @@ func unlock_all() -> void :
 
 # 幂等：保证区域已入列、my_id/归属正确、已解锁、每个角色都有难度条目、背景收敛
 func _fengliu_ensure_line_space_zone_progress() -> void :
+	# 先确保区域仍在 ZoneService.zones 里（NCL 过滤 / 其它 mod 重建数组后仍然在位）
+	if ZoneService.has_method("fengliu_ensure_line_space_zone_registered"):
+		ZoneService.call("fengliu_ensure_line_space_zone_registered")
+
 	var zone = fengliu_get_line_space_zone()
 	if zone == null:
 		return
@@ -60,14 +66,7 @@ func _fengliu_ensure_line_space_zone_progress() -> void :
 	if ZoneService.zones == null:
 		return
 
-	if not ZoneService.zones.has(zone):
-		ZoneService.zones.push_back(zone)
-
-	var zone_id: int = ZoneService.zones.find(zone)
-	if zone_id < 0:
-		return
-
-	zone.my_id = zone_id
+	var zone_id: int = int(zone.my_id)
 	_fengliu_apply_zone_id(zone_id)
 
 	# NCL 类 mod 会把依赖方背景塞进所有区域；本区域只保留自己的背景
@@ -107,10 +106,26 @@ func _fengliu_ensure_line_space_zone_progress() -> void :
 	set_max_selectable_difficulty()
 
 
-# 本区域对象（替代旧版的 dlc_data.zones[0]）
+# 本区域对象（替代旧版的 dlc_data.zones[0]）：优先用 ZoneService 里已注册的实例
 func fengliu_get_line_space_zone():
+	if ZoneService.has_method("fengliu_get_line_space_zone"):
+		var zone = ZoneService.call("fengliu_get_line_space_zone")
+		if zone != null:
+			_fengliu_line_space_zone = zone
+			return zone
+
+	if ZoneService.has_method("fengliu_ensure_line_space_zone_registered"):
+		var registered_zone = ZoneService.call("fengliu_ensure_line_space_zone_registered")
+		if registered_zone != null:
+			_fengliu_line_space_zone = registered_zone
+			return registered_zone
+
+	# 兼容：ZoneService 扩展不可用时退回直接加载（仍保持固定 id）
 	if _fengliu_line_space_zone == null:
 		_fengliu_line_space_zone = load(FENGLIU_LINE_SPACE_ZONE_PATH)
+
+	if _fengliu_line_space_zone != null:
+		_fengliu_line_space_zone.my_id = FENGLIU_LINE_SPACE_ZONE_ID
 
 	return _fengliu_line_space_zone
 
@@ -130,105 +145,9 @@ func _fengliu_apply_zone_id(p_zone_id: int) -> void :
 			elite.zone_id = p_zone_id
 
 
-# 原版按下标取区域：把本区域移到末尾并保持 my_id == 下标（幂等、只动本区域）
-func fengliu_ensure_line_space_zone_last(reason: String = "") -> void :
-	var zone = fengliu_get_line_space_zone()
-	if zone == null:
-		return
-
-	if ZoneService.zones == null:
-		return
-
-	var our_index: int = ZoneService.zones.find(zone)
-	if our_index < 0:
-		return
-
-	# 本区域的默认背景收敛（幂等）
-	_fengliu_enforce_line_space_own_backgrounds()
-	fengliu_restore_zone_own_backgrounds("zone heal")
-
-	if zone.my_id != our_index:
-		zone.my_id = our_index
-		_fengliu_apply_zone_id(our_index)
-
-	var before: int = _fengliu_zone_mismatch_count()
-
-	var simulated: Array = ZoneService.zones.duplicate()
-	simulated.remove(our_index)
-	simulated.push_back(zone)
-	var after: int = _fengliu_zone_mismatch_count(simulated, zone, simulated.size() - 1)
-
-	if after >= before:
-		if before > 0:
-			ModLoaderLog.warning("Line space zone stayed at index %d: mismatch kept at %d (moving would make it %d), reason=%s" % [our_index, before, after, reason], FENGLIU_MOD_ID)
-		return
-
-	var run_was_in_our_zone: bool = RunData.current_zone == our_index
-	var selection_was_our_zone: bool = settings != null and int(settings.get("zone_selected", -1)) == our_index
-	var zones_before: String = _fengliu_zone_list_text()
-
-	ZoneService.zones.remove(our_index)
-	ZoneService.zones.push_back(zone)
-
-	zone.my_id = ZoneService.zones.size() - 1
-	_fengliu_apply_zone_id(zone.my_id)
-
-	if run_was_in_our_zone:
-		RunData.current_zone = zone.my_id
-
-	if selection_was_our_zone:
-		settings["zone_selected"] = zone.my_id
-
-	_fengliu_migrate_zone_difficulty_info(our_index, zone.my_id)
-
-	ModLoaderLog.info("Line space zone moved to the end: index %d -> %d (mismatch %d -> %d, run_zone_repointed=%s, selection_repointed=%s, reason=%s) before=[%s] after=[%s]" % [our_index, zone.my_id, before, after, str(run_was_in_our_zone), str(selection_was_our_zone), reason, zones_before, _fengliu_zone_list_text()], FENGLIU_MOD_ID)
-
-
-func _fengliu_zone_mismatch_count(p_zones: Array = [], p_override_zone = null, p_override_id: int = -1) -> int :
-	var zones_to_check: Array = ZoneService.zones if p_zones.size() == 0 else p_zones
-	var count: int = 0
-
-	for index in range(zones_to_check.size()):
-		var zone = zones_to_check[index]
-		if zone == null:
-			continue
-
-		var zone_id: int = p_override_id if zone == p_override_zone else zone.my_id
-		if zone_id != index:
-			count += 1
-
-	return count
-
-
-# 本区域 my_id 变化后，把老存档里挂在旧下标上的难度条目复制到新下标（取最大合并）
-func _fengliu_migrate_zone_difficulty_info(p_old_id: int, p_new_id: int) -> void :
-	if p_old_id < 0 or p_old_id == p_new_id:
-		return
-
-	for difficulty_info in difficulties_unlocked:
-		if difficulty_info == null:
-			continue
-
-		var source: ZoneDifficultyInfo = null
-		var target: ZoneDifficultyInfo = null
-
-		for zone_difficulty_info in difficulty_info.zones_difficulty_info:
-			if zone_difficulty_info.zone_id == p_old_id and source == null:
-				source = zone_difficulty_info
-			elif zone_difficulty_info.zone_id == p_new_id:
-				target = zone_difficulty_info
-
-		if source == null:
-			continue
-
-		var payload: Dictionary = source.serialize()
-		payload["zone_id"] = p_new_id
-
-		if target == null:
-			target = ZoneDifficultyInfo.new(p_new_id)
-			difficulty_info.zones_difficulty_info.push_back(target)
-
-		target.deserialize_and_merge_take_max(payload)
+# 兼容旧调用点：区域 id 已固定，这里只补一次区域进度（不再移动数组 / 改写 my_id）
+func fengliu_ensure_line_space_zone_last(_reason: String = "") -> void :
+	_fengliu_ensure_line_space_zone_progress()
 
 
 func _fengliu_is_own_background(background) -> bool:
@@ -274,11 +193,8 @@ func _fengliu_enforce_line_space_own_backgrounds() -> void :
 
 func fengliu_resolve_zone(p_zone_id: int):
 	for zone in ZoneService.zones:
-		if zone != null and zone.my_id == p_zone_id:
+		if zone != null and int(zone.my_id) == p_zone_id:
 			return zone
-
-	if p_zone_id >= 0 and p_zone_id < ZoneService.zones.size():
-		return ZoneService.zones[p_zone_id]
 
 	return null
 
@@ -350,19 +266,23 @@ func fengliu_restore_zone_own_backgrounds(reason: String = "") -> void :
 		ModLoaderLog.info("Zone backgrounds restored (%s): %s" % [reason, "; ".join(restored)], FENGLIU_MOD_ID)
 
 
-func _fengliu_zone_list_text() -> String:
-	var zones_info = []
-	for index in range(ZoneService.zones.size()):
-		zones_info.append("%d:%s/my_id%d" % [index, ZoneService.zones[index].name, ZoneService.zones[index].my_id])
-
-	return ", ".join(zones_info)
-
-
-# 一次性 info 日志：区域列表 + 下标/my_id 一致性
+# 一次性 info 日志：区域列表（index:name/my_id）+ 重复 id 诊断（NCL 风格）
 func _fengliu_log_zone_state(p_zone_id: int) -> void :
 	var zones_info = []
-	for zone in ZoneService.zones:
-		zones_info.append("%s/my_id%d" % [zone.name, zone.my_id])
+	var seen_ids: Dictionary = {}
+	var duplicates: Array = []
+
+	for index in range(ZoneService.zones.size()):
+		var zone = ZoneService.zones[index]
+		if zone == null:
+			continue
+
+		var zone_id: int = int(zone.my_id)
+		zones_info.append("%d:%s/my_id%d" % [index, str(zone.name), zone_id])
+		if seen_ids.has(zone_id):
+			duplicates.push_back(str(zone_id))
+		else:
+			seen_ids[zone_id] = true
 
 	var own_zone = fengliu_get_line_space_zone()
 	var own_bosses: int = own_zone.bosses.size() if own_zone != null else 0
@@ -371,6 +291,5 @@ func _fengliu_log_zone_state(p_zone_id: int) -> void :
 
 	ModLoaderLog.info("Line space zone ready: zone_id=%d zones=%d[%s] backgrounds=%d global_bosses=%d (zone bosses=%d, zone elites=%d)" % [p_zone_id, ZoneService.zones.size(), ", ".join(zones_info), ItemService.backgrounds.size(), global_bosses, own_bosses, own_elites], FENGLIU_MOD_ID)
 
-	var mismatch: int = _fengliu_zone_mismatch_count()
-	if mismatch != 0:
-		ModLoaderLog.warning("Zone id mismatch remains: %d zone(s) have my_id != index (a third-party mod may hardcode its my_id)" % mismatch, FENGLIU_MOD_ID)
+	if duplicates.size() > 0:
+		ModLoaderLog.error("Duplicate zone my_id detected: %s" % ", ".join(duplicates), FENGLIU_MOD_ID)

@@ -21,6 +21,10 @@ const FENGLIU_UPDATE_TRES = "res://mods-unpacked/FengLiu-FengAddMods/content_dat
 const FENGLIU_CONTENT_DIR = "res://mods-unpacked/FengLiu-FengAddMods/content_data/"
 # 参与原生注册的子目录（其余目录只放子资源，不注册）
 const FENGLIU_DYNAMIC_CONTENT_SUBDIRS := ["characters", "items", "weapons", "sets", "upgrades"]
+# 依赖 DLC 的角色：对应 DLC 不可用时不注册，避免预览/开局引用缺失的 DLC 内容
+const FENGLIU_DLC_DEPENDENT_CHARACTERS := {
+	"main_server": "abyssal_terrors",
+}
 
 # 独特标记套装：独武出现概率 1% 起、每波 +1%；另有图标/文字视觉
 const FENGLIU_UNIQUE_SET_ID = "set_fengliu_unique"
@@ -1549,6 +1553,20 @@ func _fengliu_collect_content_dir(dir_path: String, content: Dictionary) -> void
 			_fengliu_collect_content_file(full_path, content)
 
 
+# 角色依赖的 DLC 是否可用；没有登记依赖的角色一律通过
+func _fengliu_is_character_dlc_available(data) -> bool:
+	var character_id: String = str(data.my_id)
+	var dlc_id: String = FENGLIU_DLC_DEPENDENT_CHARACTERS.get(character_id, "")
+	if dlc_id == "":
+		return true
+
+	if ProgressData.is_dlc_available(dlc_id):
+		return true
+
+	ModLoaderLog.info("Skip DLC-dependent character %s: DLC %s not available." % [character_id, dlc_id], FENGLIU_MOD_ID)
+	return false
+
+
 func _fengliu_collect_content_file(file_path: String, content: Dictionary) -> void:
 	var data = load(file_path)
 	if data == null:
@@ -1556,7 +1574,8 @@ func _fengliu_collect_content_file(file_path: String, content: Dictionary) -> vo
 		return
 
 	if data is CharacterData:
-		content["characters"].push_back(data)
+		if _fengliu_is_character_dlc_available(data):
+			content["characters"].push_back(data)
 	elif data is WeaponData:
 		content["weapons"].push_back(data)
 	elif data is SetData:
