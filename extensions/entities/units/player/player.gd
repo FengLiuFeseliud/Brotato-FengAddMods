@@ -84,6 +84,8 @@ var _fengliu_hold_attract_nearby_consumables = false
 signal fengliu_shield_gained(value, player_index)
 # 盾扣减信号
 signal fengliu_shield_lost(value, player_index)
+# 盾上限变化信号（涨/跌都发；只用于刷新 HUD，上限下降时盾值保留）
+signal fengliu_shield_cap_changed(value, player_index)
 
 
 # 计算动态概率
@@ -220,6 +222,10 @@ func update_player_stats(reset_current_health: = false) -> void :
 
     var shield_cap_increase: float = shield_cap - _fengliu_last_shield_cap
     _fengliu_last_shield_cap = shield_cap
+
+    # 上限变化（涨/跌都算）通知 HUD：盾值保留，只让条与文本按新上限刷新
+    if abs(shield_cap_increase) > 0.0001:
+        emit_signal("fengliu_shield_cap_changed", shield_cap, player_index)
 
     # 只处理上限提高
     if shield_cap_increase <= 0.0:

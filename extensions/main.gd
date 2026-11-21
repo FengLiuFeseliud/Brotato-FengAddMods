@@ -165,6 +165,10 @@ func _on_EntitySpawner_players_spawned(players: Array) -> void :
 		if player.has_signal("fengliu_shield_lost") and not player.is_connected("fengliu_shield_lost", self, "fengliu_on_player_shield_changed"):
 			var _error_lost = player.connect("fengliu_shield_lost", self, "fengliu_on_player_shield_changed")
 
+		# 上限变化刷新ui
+		if player.has_signal("fengliu_shield_cap_changed") and not player.is_connected("fengliu_shield_cap_changed", self, "fengliu_on_player_shield_changed"):
+			var _error_cap = player.connect("fengliu_shield_cap_changed", self, "fengliu_on_player_shield_changed")
+
 		# 生成时立即推一次
 		if player.player_index >= 0 and player.player_index < _players_ui.size():
 			fengliu_set_player_status_bars(
@@ -771,16 +775,24 @@ func fengliu_update_player_status_bars() -> void :
 
 
 # 组装状态项[[ratio, Color, 文本], ...]
-# 护盾上限 <= 0 时返回空，不显示盾条；
-# 上限 > 0 时当前盾为 0 也显示空条。
+# 上限 <= 0 且当前盾也为 0 时返回空，不显示盾条；
+# 上限 > 0 时当前盾为 0 也显示空条；
+# 上限 <= 0 但仍有保留盾（上限下降不裁剪盾值）时按满条显示 N / 0。
 func fengliu_get_player_status_items(player: Player, player_index: int) -> Array:
 	var items: = []
 
 	var basis: float = Utils.get_stat(fengliu_shield_hash, player_index)
-	if basis <= 0.0:
+	var shield: float = player.fengliu_shield
+
+	# 没有上限也没有盾：不占位
+	if basis <= 0.0 and shield <= 0.0:
 		return []
 
-	var shield: float = player.fengliu_shield
+	# 上限为 0 但盾还在：按满条显示，文本如实写当前值 / 0
+	if basis <= 0.0:
+		items.push_back([1.0, FENGLIU_STATUS_COLOR_SHIELD, fengliu_get_shield_text(shield, basis)])
+		return items
+
 	var ratio: float = 0.0
 	if shield > 0.0:
 		ratio = clamp(shield / basis, 0.0, 1.0)
@@ -892,7 +904,9 @@ func fengliu_refresh_player_life_bar_visibility(player_index: int, current_healt
 	else:
 		hp_not_full = player.current_stats.health != player.max_stats.health
 
-	var shield_not_full: bool = player.fengliu_shield < Utils.get_stat(fengliu_shield_hash, player_index)
+	var shield_cap: float = Utils.get_stat(fengliu_shield_hash, player_index)
+	# 上限下降后保留的盾也要看得见：上限 <= 0 且盾 > 0 时同样按「有盾」处理
+	var shield_not_full: bool = player.fengliu_shield < shield_cap or (shield_cap <= 0.0 and player.fengliu_shield > 0.0)
 	var status_visible: bool = ProgressData.settings.hp_bar_on_character and (hp_not_full or shield_not_full) and not player.dead
 	player_life_bar.visible = status_visible
 
