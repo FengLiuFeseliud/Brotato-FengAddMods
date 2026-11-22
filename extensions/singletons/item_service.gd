@@ -53,6 +53,10 @@ const FENGLIU_UPGRADE_POOL_STATS := {
 }
 
 
+# 拆分升级键的等级上限；两池 hash 相差 39199865，远大于该上限 ⇒ 反解无歧义
+const FENGLIU_SPLIT_UPGRADE_LEVEL_MAX = 1000000
+
+
 var effect_fengliu_can_all_drop_box = Keys.generate_hash("fengliu_can_all_drop_box")
 var effect_fengliu_guaranteed_shop_items = Keys.generate_hash("fengliu_guaranteed_shop_items")
 var effect_fengliu_get_fixed_upgrade = Keys.generate_hash("fengliu_get_fixed_upgrade")
@@ -977,7 +981,21 @@ func fengliu_up_upgrade_data_tier(effect: Array, upgrades: Array, player_index: 
     return new_upgrades
 
 
-func _fengliu_get_upgrades_pool(pool_id_hash: int, player_index: int) -> Array:
+# 反解池 hash + 该次升级等级命中返回 [池 hash, 等级]，否则空数组
+func _fengliu_get_split_upgrade_context(value: int) -> Array:
+	# 两池 hash 相差 39199865，逐一判断偏移量即可唯一反解出池子与等级
+	var damage_level = value - fengliu_damage_upgrade_hash
+	if damage_level >= 1 and damage_level <= FENGLIU_SPLIT_UPGRADE_LEVEL_MAX:
+		return [fengliu_damage_upgrade_hash, damage_level]
+
+	var hp_level = value - fengliu_hp_upgrade_hash
+	if hp_level >= 1 and hp_level <= FENGLIU_SPLIT_UPGRADE_LEVEL_MAX:
+		return [fengliu_hp_upgrade_hash, hp_level]
+
+	return []
+
+
+func _fengliu_get_upgrades_pool(pool_id_hash: int, level: int, player_index: int) -> Array:
     var upgrades_ids = []
     var build_pool = []
     var banned_upgrades = RunData.get_player_character(player_index).banned_upgrades
@@ -998,7 +1016,6 @@ func _fengliu_get_upgrades_pool(pool_id_hash: int, player_index: int) -> Array:
         upgrades_ids.append(upgrade_id)
 
     var upgrades = []
-    var level = RunData.get_player_level(player_index)
     for id_hash in upgrades_ids:
         upgrades.append(fengliu_get_fixed_upgrade_data(level, player_index, id_hash))
 
@@ -1008,8 +1025,18 @@ func _fengliu_get_upgrades_pool(pool_id_hash: int, player_index: int) -> Array:
 # 扩展生成升级项
 func get_upgrades(level: int, number: int, old_upgrades: Array, player_index: int) -> Array:
     var is_fengliu_upgrades_pool = false
+    var pool_id_hash = level
+    var upgrade_level = level
     if level in fengliu_upgrades_pools:
         is_fengliu_upgrades_pool = true
+        upgrade_level = RunData.get_player_level(player_index)
+    else:
+        # 拆分升级键 = 池 hash + 该次升级等级，先反解出池子与真实等级
+        var split_context = _fengliu_get_split_upgrade_context(level)
+        if split_context.size() > 0:
+            is_fengliu_upgrades_pool = true
+            pool_id_hash = split_context[0]
+            upgrade_level = split_context[1]
     
     var upgrades = []
     if not is_fengliu_upgrades_pool:
@@ -1019,12 +1046,12 @@ func get_upgrades(level: int, number: int, old_upgrades: Array, player_index: in
     var effects = RunData.get_player_effect(effect_fengliu_get_fixed_upgrade, player_index)
     if effects.size() > 0 and effects[0].all_fixed_upgrade_id_hashs.size() >= 4:
         if is_fengliu_upgrades_pool:
-            level = RunData.get_player_level(player_index)
+            level = upgrade_level
 
         upgrades = fengliu_get_fixed_upgrade(level, effects[0], player_index)
 
     if is_fengliu_upgrades_pool and effects.size() <= 0:
-        upgrades = _fengliu_get_upgrades_pool(level, player_index)
+        upgrades = _fengliu_get_upgrades_pool(pool_id_hash, upgrade_level, player_index)
 
     # 应用升级项品阶提升效果
     for effect in RunData.get_player_effect(effect_fengliu_up_upgrade_data_tier, player_index):

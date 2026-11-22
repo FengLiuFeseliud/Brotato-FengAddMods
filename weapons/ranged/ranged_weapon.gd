@@ -89,8 +89,10 @@ func _physics_process(delta: float) -> void:
 	if _fengliu_any_action_takes_over_physics():
 		return
 
-	._physics_process(delta)
+	# 先检查触发：极短冷却武器在射击结束后可能立即进入下一次射击，
+	# 放在父类之后会因 _is_shooting 再次为 true 而错过触发
 	_fengliu_check_action_triggers()
+	._physics_process(delta)
 
 
 func _process(delta: float) -> void:
@@ -197,11 +199,28 @@ func _fengliu_check_action_triggers() -> void:
 
 func should_shoot() -> bool:
 	if _fengliu_any_action_blocks_shoot():
-		return false
+		# 有接管动作时仍按原版条件判断，冷却结束后交给 shoot() 接管
+		if _fengliu_get_take_over_shoot_action() == null:
+			return false
+			
+		return .should_shoot()
 	return .should_shoot()
 
 
 func shoot() -> void:
+	var take_over_action = _fengliu_get_take_over_shoot_action()
+	if take_over_action != null:
+		_nb_shots_taken += 1
+
+		if _fengliu_should_count_attack():
+			_fengliu_normal_attack_count += 1
+
+		take_over_action.fengliu_take_over_shoot()
+		_current_cooldown = get_next_cooldown()
+		_fengliu_finish_take_over_action(take_over_action)
+		set_shooting(false)
+		return
+
 	if _fengliu_any_action_blocks_shoot():
 		return
 
@@ -239,6 +258,28 @@ func get_next_cooldown(at_wave_begin: bool = false) -> float:
 			cooldown = action.fengliu_modify_cooldown(cooldown)
 
 	return max(1.0, cooldown)
+
+
+func _fengliu_get_take_over_shoot_action():
+	for action in _fengliu_active_actions:
+		if action == null or not is_instance_valid(action):
+			continue
+
+		if not action.has_method("fengliu_should_take_over_shoot"):
+			continue
+
+		if action.fengliu_should_take_over_shoot():
+			return action
+
+	return null
+
+
+func _fengliu_finish_take_over_action(action) -> void:
+	if action == null or not is_instance_valid(action):
+		return
+
+	action.fengliu_finish()
+	_fengliu_active_actions.erase(action)
 
 
 func _fengliu_any_action_blocks_shoot() -> bool:

@@ -511,22 +511,25 @@ func fengliu_burning_kill_extra_material(enemy: Enemy, args: Entity.DieArgs) -> 
 	RunData.add_tracked_value(player_index, fengliu_item_kebab_hash, extra_count)
 
 
-func fengliu_add_damage_upgrade(player_index: int) -> void:
+# 拆分升级键 = 池 hash + 该次升级等级，交给 ItemService.get_upgrades 反解
+func fengliu_add_damage_upgrade(player_index: int, level: int) -> void:
+	var upgrade_key = fengliu_damage_upgrade_hash + level
 	_things_to_process_player_containers[player_index].upgrades.add_element(
-		fengliu_damage_upgrade_icon_data.icon, fengliu_damage_upgrade_hash)
+		fengliu_damage_upgrade_icon_data.icon, upgrade_key)
 
 	var upgrade_to_process = UpgradesUI.UpgradeToProcess.new()
-	upgrade_to_process.level = fengliu_damage_upgrade_hash
+	upgrade_to_process.level = upgrade_key
 	upgrade_to_process.player_index = player_index
 	_upgrades_to_process[player_index].push_back(upgrade_to_process)
 
 
-func fengliu_add_hp_upgrade(player_index: int) -> void:
+func fengliu_add_hp_upgrade(player_index: int, level: int) -> void:
+	var upgrade_key = fengliu_hp_upgrade_hash + level
 	_things_to_process_player_containers[player_index].upgrades.add_element(
-		fengliu_hp_upgrade_icon_data.icon, fengliu_hp_upgrade_hash)
+		fengliu_hp_upgrade_icon_data.icon, upgrade_key)
 
 	var upgrade_to_process = UpgradesUI.UpgradeToProcess.new()
-	upgrade_to_process.level = fengliu_hp_upgrade_hash
+	upgrade_to_process.level = upgrade_key
 	upgrade_to_process.player_index = player_index
 	_upgrades_to_process[player_index].push_back(upgrade_to_process)
 
@@ -554,8 +557,8 @@ func on_levelled_up(player_index: int) -> void :
 
 		_players_ui[player_index].update_level_label()
 
-		fengliu_add_damage_upgrade(player_index)
-		fengliu_add_hp_upgrade(player_index)
+		fengliu_add_damage_upgrade(player_index, level)
+		fengliu_add_hp_upgrade(player_index, level)
 
 
 # 自动开箱

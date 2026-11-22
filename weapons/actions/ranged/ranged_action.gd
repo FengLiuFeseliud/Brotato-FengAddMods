@@ -3,13 +3,24 @@ extends "res://mods-unpacked/FengLiu-FengAddMods/weapons/actions/action.gd"
 
 # ============================================================
 # 远程动作基类
-#   在通用动作基类上增加远程类型标记，供后续远程武器类与远程动作使用。
-#   本轮不包含任何具体远程动作。
+#   在通用动作基类上增加远程类型标记，供远程武器类与远程动作使用。
+#   远程专属的「接管一次开火」也在这里声明：武器开火前询问是否接管，
+#   接管时由动作自行生成子弹，武器不再执行普通攻击。
 # ============================================================
 
 
 func fengliu_is_ranged_action() -> bool:
 	return true
+
+
+# 是否由本动作接管本次开火；返回 true 时不执行武器普通攻击
+func fengliu_should_take_over_shoot() -> bool:
+	return false
+
+
+# 接管开火时由武器调用一次；动作自行生成子弹
+func fengliu_take_over_shoot() -> void:
+	pass
 
 
 # 投射物生成钩子：武器生成子弹后调用；默认不处理
