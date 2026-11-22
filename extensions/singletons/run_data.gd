@@ -37,6 +37,7 @@ const ALL_SECONDARY_STATS = [
 	"fengliu_hit_shield_drop_consumable",
 	"fengliu_puddle_size",
 	"fengliu_overheal",
+	"fengliu_ignore_knockback_resistance",
 ]
 
 
@@ -84,6 +85,7 @@ const FENGLIU_EXTRA_SECONDARY_STAT_KEYS = [
 	"fengliu_hit_shield_drop_consumable",
 	"fengliu_puddle_size",
 	"fengliu_overheal",
+	"fengliu_ignore_knockback_resistance",
 ]
 
 

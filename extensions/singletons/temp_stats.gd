@@ -45,7 +45,8 @@ const ALL_SECONDARY_STATS = [
 	"fengliu_wanted_item_tag_chance",
 	"fengliu_hit_shield_drop_consumable",
 	"fengliu_puddle_size",
-	"fengliu_overheal"
+	"fengliu_overheal",
+	"fengliu_ignore_knockback_resistance"
 ]
 
 

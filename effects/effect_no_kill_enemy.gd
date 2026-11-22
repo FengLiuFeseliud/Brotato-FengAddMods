@@ -29,6 +29,10 @@ func unapply(player_index: int) -> void:
 
 
 func get_args(player_index: int) -> Array:
+	# 通配符：描述里显示“所有”而不是 "*"
+	if key == "*":
+		return ["[color=lime]%s[/color]" % tr("ALL")]
+		
 	# 返回数组按顺序填充描述文本 {0} 占位符：
 	#   [0] = 触发该效果的攻击类型名（基类 args[1]）
 	var args = .get_args(player_index)

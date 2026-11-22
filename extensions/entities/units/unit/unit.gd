@@ -4,6 +4,7 @@ extends "res://entities/units/unit/unit.gd"
 var fengliu_rekindling = Keys.generate_hash("fengliu_rekindling")
 var burning_slow_hash = Keys.generate_hash("fengliu_burning_slow")
 var weapon_burn_damage_hash = Keys.generate_hash("fengliu_weapon_burn_damage")
+var _fengliu_ignore_knockback_resistance_percent: int = 0
 
 
 # 覆盖: 燃烧跳伤结算 → 多重燃烧补刀、燃烧伤害减速与武器燃烧伤害并入
@@ -77,3 +78,22 @@ func _fengliu_apply_burning_slow(player_index: int) -> void:
 		# 减速值 = 基础值 + 倍率属性 × gain_value/100
 		var slow_value = burning_slow_effect[1] + int(Utils.get_stat(burning_slow_effect[0], player_index) * (burning_slow_effect[2] / 100.0))
 		add_decaying_speed(-slow_value)
+
+
+# 有效击退抗性：按攻击玩家的「无视击退抗性」次要属性忽略 value% 的抗性
+func get_effective_knockback_resistance() -> float:
+	if stats == null:
+		return 0.0
+		
+	var ignore: int = int(clamp(_fengliu_ignore_knockback_resistance_percent, 0, 100))
+	return stats.knockback_resistance * (1.0 - ignore / 100.0)
+
+
+# 覆盖：击退速度使用有效抗性
+func get_knockback_value() -> Vector2:
+	return knockback_vector * (100.0 - get_effective_knockback_resistance() * 100.0)
+
+
+# 覆盖：贯通击退使用有效抗性
+func get_increased_piercing_knockback_amount(amount: float, piercing: float, _resistance: float) -> float:
+	return .get_increased_piercing_knockback_amount(amount, piercing, get_effective_knockback_resistance())

@@ -7,14 +7,26 @@ var effect_fengliu_charm_enemy = Keys.generate_hash("fengliu_charm_enemy")
 var effect_fengliu_weapon_charm_enemy = Keys.generate_hash("fengliu_weapon_charm_enemy")
 var effect_fengliu_stronger_aliens_on_stats = Keys.generate_hash("fengliu_stronger_aliens_on_stats")
 var effect_fengliu_killed_regen_shield = Keys.generate_hash("fengliu_killed_regen_shield")
+var effect_fengliu_knockback_out_of_map = Keys.generate_hash("fengliu_knockback_out_of_map")
+var fengliu_ignore_knockback_resistance_hash = Keys.generate_hash("fengliu_ignore_knockback_resistance")
 
 
 var _fengliu_charm_behavior_scene: PackedScene = null
 var _fengliu_charm_behavior_scene_resolved := false
 
 
+const FENGLIU_KNOCKBACK_DECAY_STEP := 0.1
+const FENGLIU_KNOCK_OUT_DEATH_KNOCKBACK := 1.5
+
+var _fengliu_knock_out_started := false
+var _fengliu_scene_should_collide_with_borders := true
+
+
 # 判断攻击来源是否匹配指定类型
 func fengliu_key_in_class(key: String, hitbox: Hitbox = null) -> bool:
+    # 通配符：匹配所有攻击来源（含 hitbox 为空的燃烧跳伤）
+    if key == "*":
+        return true
     # 无攻击来源则不匹配
     if hitbox == null or hitbox.from == null:
         return false
@@ -187,6 +199,9 @@ func fengliu_get_charm_behavior_scene() -> PackedScene:
 
 # 扩展初始化：按波次强敌效果提高本敌人属性
 func init(zone_min_pos: Vector2, zone_max_pos: Vector2, p_players_ref: Array = [], entity_spawner_ref = null) -> void :
+    # 记录场景原值：击出时临时关闭边界 clamp，池化复用时恢复
+    _fengliu_scene_should_collide_with_borders = should_collide_with_borders
+    _fengliu_knock_out_started = false
     .init(zone_min_pos, zone_max_pos, p_players_ref, entity_spawner_ref)
 
     # 汇总所有玩家对该敌人的强敌加成
@@ -200,6 +215,14 @@ func init(zone_min_pos: Vector2, zone_max_pos: Vector2, p_players_ref: Array = [
 
     if enemy_factor > 0:
         reset_health_stat(enemy_factor)
+
+
+# 池化复用：恢复边界 clamp 与击出状态
+func respawn() -> void :
+    .respawn()
+    _fengliu_knock_out_started = false
+    set("_fengliu_ignore_knockback_resistance_percent", 0)
+    should_collide_with_borders = _fengliu_scene_should_collide_with_borders
 
 
 # 击杀回盾量：汇总槽内全部实例的效果数值
@@ -217,8 +240,24 @@ func _on_hurt(hitbox: Hitbox) -> void:
     fengliu_weapon_charm_enemy(hitbox)
 
 
+# 命中前读取攻击玩家的「无视击退抗性」次要属性
+func _fengliu_apply_ignore_knockback_resistance(player_index: int) -> void:
+    # 非玩家来源（DUMMY_PLAYER_INDEX，例如被魅惑的敌人打敌人）与越界索引不读属性：
+    # Utils.get_stat 会直接访问 _stat_caches[player_index]，缓存只有 4 个槽位，
+    # release 构建下越界得到 Nil，随后 Nil.get(hash) 会直接触发引擎 trap 闪退
+    if player_index < 0 or player_index == RunData.DUMMY_PLAYER_INDEX or player_index >= RunData.get_player_count():
+        set("_fengliu_ignore_knockback_resistance_percent", 0)
+        return
+        
+    var value: float = Utils.get_stat(fengliu_ignore_knockback_resistance_hash, player_index)
+    set("_fengliu_ignore_knockback_resistance_percent", int(clamp(int(value), 0, 100)))
+
+
 # 扩展受伤结算
 func take_damage(value: int, args: TakeDamageArgs) -> Array:
+    var was_pending: bool = _pending_die
+    var health_before: int = current_stats.health
+    _fengliu_apply_ignore_knockback_resistance(args.from_player_index)
     var damage_taken = .take_damage(value, args)
 
     # 命中后触发魅惑
@@ -232,7 +271,139 @@ func take_damage(value: int, args: TakeDamageArgs) -> Array:
         if regen > 0:
             RunData.emit_signal("fengliu_shield_regen", regen, args.from_player_index)
 
+    # 命中时判定：效果 + 武器面板伤害 + 击退是否足以推出地图
+    _fengliu_try_knock_out_of_map(args, value, health_before, was_pending)
+
     return damage_taken
+
+
+# 读取攻击玩家的「击退出地图」效果阈值
+# 返回 -1 = 没有效果；0 = 直接击出；>0 = 武器面板伤害阈值百分比
+func _fengliu_get_knock_out_threshold(player_index: int) -> int:
+    if player_index < 0:
+        return -1
+
+    var values = RunData.get_player_effect(effect_fengliu_knockback_out_of_map, player_index)
+
+    # 兼容单值存档
+    if values is int or values is float:
+        return int(max(0, int(values)))
+
+    if not (values is Array) or values.empty():
+        return -1
+
+    var threshold: int = -1
+    for effect_value in values:
+        if not (effect_value is int or effect_value is float):
+            continue
+        var current: int = int(max(0, int(effect_value)))
+        # 多份效果取最宽松的阈值（0 最宽松）
+        if threshold < 0 or current < threshold:
+            threshold = current
+
+    return threshold
+
+
+# 命中时判定：效果 + 武器面板伤害 + 击退是否足以推出地图
+func _fengliu_try_knock_out_of_map(args: TakeDamageArgs, weapon_damage: int, health_before: int, was_pending: bool) -> void:
+    if was_pending or dead or cleaning_up or _fengliu_knock_out_started:
+        return
+
+    # 被魅惑的敌人是玩家侧单位，不参与击出
+    if _is_charmed:
+        return
+
+    # 静态 / 运动学单位不参与（例如本 mod 的居民楼、地铁站 mode=3）
+    if mode == MODE_KINEMATIC or mode == MODE_STATIC:
+        return
+
+    if stats == null:
+        return
+
+    if args == null or args.hitbox == null:
+        return
+
+    if not is_instance_valid(args.hitbox.from) or not (args.hitbox.from is Weapon):
+        return
+
+    if args.from_player_index < 0:
+        return
+
+    if weapon_damage <= 0 or health_before <= 0:
+        return
+
+    var threshold: int = _fengliu_get_knock_out_threshold(args.from_player_index)
+    if threshold < 0:
+        return
+
+    # value = 0 时无伤害门槛；value > 0 时面板伤害必须严格超过当前生命的 value%
+    if threshold > 0 and weapon_damage * 100 <= health_before * threshold:
+        return
+
+    # 已致死：只修饰原版死亡击退，不重复 die，保留全部原版击杀效果
+    if _pending_die:
+        var death_knockback: Vector2 = _die_args_unit.knockback_vector
+        var resist_factor: float = 100.0 - stats.knockback_resistance * 100.0
+        if not _fengliu_knock_out_reaches_edge(death_knockback * resist_factor):
+            return
+
+        _fengliu_knock_out_started = true
+        should_collide_with_borders = false
+        _die_args_unit.knockback_vector = death_knockback * FENGLIU_KNOCK_OUT_DEATH_KNOCKBACK
+        return
+
+    # 未致死：按击杀结算并击出
+    if not _fengliu_knock_out_reaches_edge(get_knockback_value()):
+        return
+
+    _fengliu_knock_out_of_map(args)
+
+
+# 剩余击退位移是否足以让当前位置越过区域边缘
+func _fengliu_knock_out_reaches_edge(knockback_velocity: Vector2) -> bool:
+    if knockback_velocity.length_squared() <= 0:
+        return false
+
+    var zone_rect: Rect2 = ZoneService.get_current_zone_rect()
+    if zone_rect.size.x <= 0.0 or zone_rect.size.y <= 0.0:
+        return false
+
+    # 已经在区域外（例如出生在边缘）不处理，避免误杀
+    if not zone_rect.has_point(global_position):
+        return false
+
+    # Unit.get_next_knockback_value() 每物理帧把 knockback_vector 乘 0.9，
+    # 因此剩余总位移 ≈ 当前击退速度 × 物理帧 delta ÷ 0.1
+    var remaining: Vector2 = knockback_velocity * (get_physics_process_delta_time() / FENGLIU_KNOCKBACK_DECAY_STEP)
+    return not zone_rect.has_point(global_position + remaining)
+
+
+# 击出地图：按击杀结算，并让尸体继续朝外飞出边界
+func _fengliu_knock_out_of_map(args: TakeDamageArgs) -> void :
+    _fengliu_knock_out_started = true
+    _pending_die = true
+    _can_move = false
+    # 跳过 Unit._integrate_forces() 的边界 clamp；Entity.die() 会关闭碰撞，尸体可穿墙
+    should_collide_with_borders = false
+
+    # 与原版致死命中同一时点触发武器侧击杀效果
+    if args != null and args.hitbox != null:
+        args.hitbox.killed_something(self)
+
+    var player_index: int = args.from_player_index if args != null else - 1
+    if player_index < 0 or player_index >= players_ref.size():
+        player_index = 0 if players_ref.size() > 0 else - 1
+
+    var die_args = Entity.DieArgs.new()
+    die_args.knockback_vector = knockback_vector * FENGLIU_KNOCK_OUT_DEATH_KNOCKBACK
+    die_args.enemy_killed_by_player = true
+    die_args.killed_by_player_index = player_index
+    die_args.killing_blow_dmg_value = 0
+    die_args.is_burning = _is_burning
+    if player_index >= 0 and player_index < players_ref.size() and is_instance_valid(players_ref[player_index]):
+        die_args.from = players_ref[player_index]
+
+    call_deferred("die", die_args)
 
 
 
