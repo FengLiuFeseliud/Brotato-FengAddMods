@@ -75,6 +75,7 @@ var _fengliu_full_shield_link_active: bool = false
 var _fengliu_full_shield_link_effects: Array = []
 var _fengliu_full_shield_sync_running: bool = false
 var _fengliu_full_shield_sync_pending: bool = false
+var _fengliu_shield_hud_refresh_pending: bool = false
 
 
 var _fengliu_hold_attract_nearby_consumables = false
@@ -84,8 +85,6 @@ var _fengliu_hold_attract_nearby_consumables = false
 signal fengliu_shield_gained(value, player_index)
 # 盾扣减信号
 signal fengliu_shield_lost(value, player_index)
-# 盾上限变化信号（涨/跌都发；只用于刷新 HUD，上限下降时盾值保留）
-signal fengliu_shield_cap_changed(value, player_index)
 
 
 # 计算动态概率
@@ -186,7 +185,7 @@ func _physics_process(delta: float) -> void :
     if _clean_up_room_timer != null and _clean_up_room_timer.try_loop(delta) > 0:
         fengliu_on_clean_up_room()
 
-    # 回盾计时：满 3 秒静默后开始，之后每「1 秒 + 每 20 护盾上限 1 秒」一跳
+    # 回盾计时：满 3 秒静默后开始，之后固定 1 秒一跳
     var shield_regen_loop: int = _fengliu_shield_regen_timer.try_loop(delta)
     if shield_regen_loop > 0:
         fengliu_on_shield_regen(shield_regen_loop)
@@ -223,12 +222,11 @@ func update_player_stats(reset_current_health: = false) -> void :
     var shield_cap_increase: float = shield_cap - _fengliu_last_shield_cap
     _fengliu_last_shield_cap = shield_cap
 
-    # 上限变化（涨/跌都算）通知 HUD：盾值保留，只让条与文本按新上限刷新
-    if abs(shield_cap_increase) > 0.0001:
-        emit_signal("fengliu_shield_cap_changed", shield_cap, player_index)
-
     # 只处理上限提高
     if shield_cap_increase <= 0.0:
+        # 上限下降：数值保留，只让条与文本按新上限刷新
+        if abs(shield_cap_increase) > 0.0001:
+            fengliu_request_shield_hud_refresh()
         return
 
     var shield_before: float = fengliu_shield
@@ -242,6 +240,9 @@ func update_player_stats(reset_current_health: = false) -> void :
     var gained: int = int(round(fengliu_shield)) - int(round(shield_before))
     if gained > 0:
         emit_signal("fengliu_shield_gained", gained, player_index)
+    elif fengliu_shield != shield_before:
+        # 小数位补盾（取整后 0）：不发 +x，但盾条要按小数变化刷新
+        fengliu_request_shield_hud_refresh()
 
 
 # 扩展受伤防护
@@ -326,6 +327,8 @@ func take_damage(value: int, args: TakeDamageArgs) -> Array:
         if damage_taken.size() > 2 and damage_taken[2]:
             fengliu_shield = min(fengliu_shield + shield_lost, Utils.get_stat(fengliu_shield_hash, player_index))
             _fengliu_shield_reduce_pool = pool_before
+            # 静默退还也要让盾条恢复
+            fengliu_request_shield_hud_refresh()
         else:
             if shield_lost > 0:
                 emit_signal("fengliu_shield_lost", shield_lost, player_index)
@@ -403,6 +406,9 @@ func _fengliu_take_shield(amount: int) -> int:
     var lost: int = int(round(shield_before)) - int(round(fengliu_shield))
 
     if lost <= 0:
+        # 只扣了零头（取整后 0）：不发 -x，但盾条要按小数变化刷新
+        if fengliu_shield != shield_before:
+            fengliu_request_shield_hud_refresh()
         return 0
 
     # 打穿时零头池一并结算
@@ -463,6 +469,24 @@ func fengliu_restart_shield_regen_delay() -> void:
     _fengliu_shield_regen_pool = 0.0
     _fengliu_shield_regen_timer.wait_time = fengliu_shield_regen_delay
     _fengliu_shield_regen_timer.start()
+
+
+# 盾 HUD 刷新：合并到帧末执行，避免同帧多次重建状态项
+# 约定：任何修改 fengliu_shield 且不发 gained / lost / cap_changed 的新路径，都必须调用本函数
+func fengliu_request_shield_hud_refresh() -> void:
+    if _fengliu_shield_hud_refresh_pending:
+        return
+
+    _fengliu_shield_hud_refresh_pending = true
+    call_deferred("_fengliu_flush_shield_hud_refresh")
+
+
+func _fengliu_flush_shield_hud_refresh() -> void:
+    _fengliu_shield_hud_refresh_pending = false
+    var main = Utils.get_scene_node()
+    if main != null and main.has_method("fengliu_on_player_shield_changed"):
+        # 只刷当前玩家；该函数自带 _players / _players_ui 边界与 dead 判断
+        main.fengliu_on_player_shield_changed(0, player_index)
 
 
 # 材料计时开了 disable_on_hit 的实例本波失效，其余重新计时
@@ -629,6 +653,9 @@ func fengliu_shield_regen(regen: int) -> int:
     # +x 恢复显示
     if gained > 0:
         emit_signal("fengliu_shield_gained", gained, player_index)
+    elif fengliu_shield != shield_before:
+        # 小数位恢复（取整后 0）：不发 +x，但盾条要按小数变化刷新
+        fengliu_request_shield_hud_refresh()
     if fengliu_shield >= max_shield:
         if not _fengliu_shield_regen_timer.is_stopped():
             _fengliu_shield_regen_timer.stop()
@@ -779,7 +806,7 @@ func fengliu_on_shield_regen(loop_count: int) -> void:
         _fengliu_shield_regen_pool -= pool_gain
         fengliu_shield_regen(pool_gain)
 
-    # 3 秒静默后的首跳起，改为「1 秒 + 每 20 护盾上限 1 秒」一跳
+    # 首跳（3 秒静默）之后固定 1 秒一跳
     _fengliu_shield_regen_timer.wait_time = fengliu_shield_regen_tick
     _fengliu_shield_regen_timer.start()
 

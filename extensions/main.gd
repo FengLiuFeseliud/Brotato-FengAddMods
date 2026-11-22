@@ -10,7 +10,6 @@ const FENGLIU_FORCED_FOG_META := "fengliu_forced_fog_wave"
 
 
 var _fengliu_damage_meter_sync_timer: float = 0.0
-var _fengliu_shield_wave_max: = [0.0, 0.0, 0.0, 0.0]
 var _fengliu_shield_hud = null
 
 
@@ -164,10 +163,6 @@ func _on_EntitySpawner_players_spawned(players: Array) -> void :
 
 		if player.has_signal("fengliu_shield_lost") and not player.is_connected("fengliu_shield_lost", self, "fengliu_on_player_shield_changed"):
 			var _error_lost = player.connect("fengliu_shield_lost", self, "fengliu_on_player_shield_changed")
-
-		# 上限变化刷新ui
-		if player.has_signal("fengliu_shield_cap_changed") and not player.is_connected("fengliu_shield_cap_changed", self, "fengliu_on_player_shield_changed"):
-			var _error_cap = player.connect("fengliu_shield_cap_changed", self, "fengliu_on_player_shield_changed")
 
 		# 生成时立即推一次
 		if player.player_index >= 0 and player.player_index < _players_ui.size():
@@ -686,8 +681,6 @@ func fengliu_add_stat_fron_wave_intensity(effect: Array, player_index: int) -> v
 
 # 扩展清理房间
 func clean_up_room():
-	# 波末重置盾值条的满格基准
-	_fengliu_shield_wave_max = [0.0, 0.0, 0.0, 0.0]
 	for player_index in RunData.get_player_count():
 		var effects = RunData.get_player_effect(effect_fengliu_add_xp_gold_from_wave_time, player_index)
 		if effects.size() > 0:
@@ -766,15 +759,7 @@ func spawn_loot(unit: Unit, entity_type: int, args: Entity.DieArgs) -> void:
 # 把盾值推给 HUD 血条与头顶血条
 func fengliu_update_player_status_bars() -> void :
 	for player_index in _players.size():
-		if player_index >= _players_ui.size():
-			continue
-
-		var player: Player = _players[player_index]
-		if not is_instance_valid(player) or player.dead:
-			fengliu_set_player_status_bars(player_index, [])
-			continue
-
-		fengliu_set_player_status_bars(player_index, fengliu_get_player_status_items(player, player_index))
+		fengliu_on_player_shield_changed(0, player_index)
 
 
 # 组装状态项[[ratio, Color, 文本], ...]
@@ -783,6 +768,10 @@ func fengliu_update_player_status_bars() -> void :
 # 上限 <= 0 但仍有保留盾（上限下降不裁剪盾值）时按满条显示 N / 0。
 func fengliu_get_player_status_items(player: Player, player_index: int) -> Array:
 	var items: = []
+
+	# 死亡（或节点已失效）时不显示盾条：死亡那一击的 health_updated 也会走到这里
+	if player == null or player.dead:
+		return []
 
 	var basis: float = Utils.get_stat(fengliu_shield_hash, player_index)
 	var shield: float = player.fengliu_shield
@@ -882,7 +871,7 @@ func fengliu_set_player_status_bars(player_index: int, items: Array) -> void :
 
 
 # 头顶血条显隐
-func fengliu_refresh_player_life_bar_visibility(player_index: int, current_health: int = -1, max_health: int = -1) -> void :
+func fengliu_refresh_player_life_bar_visibility(player_index: int) -> void :
 	if player_index < 0 or player_index >= _players.size() or player_index >= _players_ui.size():
 		return
 
@@ -901,11 +890,7 @@ func fengliu_refresh_player_life_bar_visibility(player_index: int, current_healt
 		player_life_bar.visible = false
 		return
 
-	var hp_not_full: bool
-	if current_health >= 0 and max_health >= 0:
-		hp_not_full = current_health != max_health
-	else:
-		hp_not_full = player.current_stats.health != player.max_stats.health
+	var hp_not_full: bool = player.current_stats.health != player.max_stats.health
 
 	var shield_cap: float = Utils.get_stat(fengliu_shield_hash, player_index)
 	# 上限下降后保留的盾也要看得见：上限 <= 0 且盾 > 0 时同样按「有盾」处理
