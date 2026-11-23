@@ -23,6 +23,7 @@ outline_shader_mat = SubResource( 2 )
 
 [node name="Sprite" parent="." index="0"]
 position = Vector2( 24, 0 )
+scale = Vector2( 0.8, 0.8 )
 texture = ExtResource( 3 )
 
 [node name="Muzzle" parent="Sprite" index="1"]
