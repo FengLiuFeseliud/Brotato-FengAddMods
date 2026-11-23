@@ -83,9 +83,8 @@ func fengliu_on_passive_after_shoot() -> void:
 		attack_id = weapon._shooting_behavior._get_next_attack_id()
 
 	var spawn_args = WeaponServiceSpawnProjectileArgs.new()
-	spawn_args.effects = []
+	spawn_args.effects = weapon.effects.duplicate() if weapon.effects != null else []
 	spawn_args.from_player_index = weapon.player_index
-	spawn_args.damage_tracking_key_hash = weapon.damage_tracking_key_hash
 
 	var muzzle = weapon.get("muzzle")
 	var spawn_position: Vector2 = muzzle.global_position if muzzle != null else weapon.global_position

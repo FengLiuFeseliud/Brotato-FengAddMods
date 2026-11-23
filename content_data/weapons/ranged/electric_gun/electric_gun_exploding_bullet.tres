@@ -1,0 +1,24 @@
+[gd_resource type="Resource" load_steps=7 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/weapons/actions/ranged/explosion_bullet_action.gd" type="Script" id=1]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/projectiles/ball_lightning/ball_lightning_projectile.tscn" type="PackedScene" id=2]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/ranged/electric_gun/electric_gun_explosion_effect_1.tres" type="Resource" id=3]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/ranged/electric_gun/electric_gun_explosion_effect_2.tres" type="Resource" id=4]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/ranged/electric_gun/electric_gun_explosion_effect_3.tres" type="Resource" id=5]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/ranged/electric_gun/electric_gun_explosion_effect_4.tres" type="Resource" id=6]
+
+[resource]
+script = ExtResource( 1 )
+trigger_count = 3
+trigger_interval = 3
+repeat = true
+action_id = "electric_gun_exploding_bullet"
+action_name = "EFFECT_ELECTRIC_GUN_EXPLODING_BULLET"
+block_normal_shoot = false
+count_as_normal_attack = false
+bullet_scene = ExtResource( 2 )
+nb_projectiles = 1
+bullet_spread = 0.0
+explosion_effects = [ ExtResource( 3 ), ExtResource( 4 ), ExtResource( 5 ), ExtResource( 6 ) ]
+explosion_damage_percent = 100.0
+play_shoot_sound = true
