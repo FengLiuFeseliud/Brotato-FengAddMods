@@ -69,4 +69,4 @@ func fengliu_on_projectile_hit(thing_hit, damage_dealt, projectile) -> void:
 
 
 func _fengliu_spawn_puddle_deferred(data: Dictionary) -> void:
-	PUDDLE_BEHAVIOR.spawn_puddle(data, fengliu_get_host_player_index(), self)
+	PUDDLE_BEHAVIOR.spawn_puddle(data, fengliu_get_host_player_index(), self, _fengliu_weapon)

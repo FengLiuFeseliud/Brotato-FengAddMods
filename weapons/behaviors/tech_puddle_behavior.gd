@@ -97,7 +97,7 @@ static func build_puddle_data(form: int, thing_hit: Node, damage_dealt: int, pro
 
 
 # 在主场景生成泥潭；返回生成的泥潭节点
-static func spawn_puddle(data: Dictionary, player_index: int, config):
+static func spawn_puddle(data: Dictionary, player_index: int, config, weapon = null):
 	if data.empty():
 		return null
 
@@ -121,7 +121,8 @@ static func spawn_puddle(data: Dictionary, player_index: int, config):
 			float(config.puddle_lifetime),
 			float(data.tick),
 			0.0,
-			0.0
+			0.0,
+			weapon
 		)
 	else:
 		puddle.init_puddle(
@@ -132,7 +133,8 @@ static func spawn_puddle(data: Dictionary, player_index: int, config):
 			float(config.puddle_lifetime),
 			float(config.puddle_tick_interval),
 			float(data.slow_percent),
-			float(data.slow_hold)
+			float(data.slow_hold),
+			weapon
 		)
 
 	return puddle

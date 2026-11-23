@@ -19,6 +19,7 @@ var damage: = 1
 var slow_percent: = 30.0
 var slow_hold: = 3.0
 var player_index: = - 1
+var weapon = null
 
 var _slowed: = {}
 var _fade_tween: Tween = null
@@ -33,12 +34,13 @@ onready var _fade_timer: Timer = $FadeTimer
 
 
 # p_mode 使用与武器脚本一致的 0=酸液 / 1=机械
-func init_puddle(p_mode: int, p_damage: int, p_player_index: int, radius: float, duration: float, tick_interval: float, p_slow_percent: float, p_slow_hold: float) -> void :
+func init_puddle(p_mode: int, p_damage: int, p_player_index: int, radius: float, duration: float, tick_interval: float, p_slow_percent: float, p_slow_hold: float, p_weapon = null) -> void :
 	mode = p_mode
 	damage = max(1, p_damage)
 	player_index = p_player_index
 	slow_percent = p_slow_percent
 	slow_hold = p_slow_hold
+	weapon = p_weapon
 
 	var shape: = CircleShape2D.new()
 	shape.radius = max(1.0, radius)
@@ -114,7 +116,12 @@ func _damage_enemy(body: Node) -> void :
 	if main != null and "_players" in main and player_index >= 0 and player_index < main._players.size():
 		args.from = main._players[player_index]
 
-	body.take_damage(damage, args)
+	var dmg_taken = body.take_damage(damage, args)
+	var damage_dealt: int = 0
+	if dmg_taken is Array and dmg_taken.size() > 1:
+		damage_dealt = int(dmg_taken[1])
+	if damage_dealt > 0 and weapon != null and is_instance_valid(weapon) and weapon.has_method("on_weapon_hit_something"):
+		weapon.on_weapon_hit_something(body, damage_dealt, null)
 
 
 func _on_LifeTimer_timeout() -> void :
