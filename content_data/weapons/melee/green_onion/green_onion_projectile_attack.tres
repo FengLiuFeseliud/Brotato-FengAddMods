@@ -1,0 +1,21 @@
+[gd_resource type="Resource" load_steps=3 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/weapons/actions/melee/melee_projectile_attack.gd" type="Script" id=1]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/projectiles/green_onion_bullets/green_onion_projectile.tscn" type="PackedScene" id=2]
+
+[resource]
+script = ExtResource( 1 )
+trigger_count = 0
+trigger_interval = 0
+repeat = true
+action_id = "green_onion_projectile_attack"
+action_name = "EFFECT_GREEN_ONION_PROJECTILE"
+block_normal_shoot = false
+count_as_normal_attack = true
+projectile_scene = ExtResource( 2 )
+nb_projectiles = 1
+range_multiplier = 2.3
+projectile_speed = 1000
+piercing = 0
+bounce = 0
+spread = 0.5

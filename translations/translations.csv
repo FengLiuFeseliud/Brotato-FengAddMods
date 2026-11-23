@@ -379,3 +379,5 @@ EFFECT_SYRINGE_NEUTRAL,At 0 Evolution no extra on-hit effect.,0进化时命中�
 BOXER,Boxer,拳击手
 ALL,all,所有
 EFFECT_KNOCKBACK_OUT_OF_MAP,Weapon damage over {0} of target HP knocks it out of the map (counts as a kill),武器伤害超过目标当前生命的{0}时可以将其击出地图
+WEAPON_GREEN_ONION,Green Onion,大葱
+EFFECT_GREEN_ONION_PROJECTILE,"Targeting range is based on the blade wave's range; each attack also fires a blade wave that deals weapon panel damage, with a range of {0}x the weapon's range",索敌范围依据剑气射程，每次攻击额外发射一次剑气造成武器面板伤害，剑气射程为武器范围的{0}倍

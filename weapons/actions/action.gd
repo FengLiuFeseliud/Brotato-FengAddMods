@@ -20,6 +20,8 @@ extends Resource
 #   fengliu_should_lock_rotation     激活时是否锁定武器朝向
 #   fengliu_get_locked_rotation      锁定的武器朝向（弧度）
 #   fengliu_on_hit                   近战武器本体命中时触发
+#   fengliu_on_passive_after_shoot   未激活时每次普通攻击后触发
+#   fengliu_on_passive_physics_process 未激活时每物理帧触发
 # ============================================================
 
 export(int) var trigger_count
@@ -162,6 +164,21 @@ func fengliu_on_before_shoot() -> void:
 
 
 func fengliu_on_after_shoot() -> void:
+	pass
+
+
+# 被动攻击后钩子：动作未被激活时也会在每次普通攻击后调用
+func fengliu_on_passive_after_shoot() -> void:
+	pass
+
+
+# 被动物理帧钩子：动作未被激活时也会每物理帧调用
+func fengliu_on_passive_physics_process(_delta: float) -> void:
+	pass
+
+
+# 武器属性重建后钩子：由近战武器在 init_stats 后调用
+func fengliu_on_weapon_stats_initialized() -> void:
 	pass
 
 

@@ -1,6 +1,7 @@
 extends "res://weapons/melee/melee_weapon.gd"
 
 
+
 # ============================================================
 # 通用近战武器类：按攻击次数触发动作
 #   场景根节点使用本脚本，并通过 actions 数组直接传入动作资源（.tres）。
@@ -16,11 +17,27 @@ var _fengliu_action_entries := []
 var _fengliu_active_actions := []
 var _fengliu_normal_attack_count := 0
 var _fengliu_attack_type_overridden := false
+var _fengliu_attack_range_override := 0
 
 
 func _ready() -> void:
 	._ready()
 	_fengliu_init_actions()
+
+
+func init_stats(at_wave_begin: bool = true) -> void:
+	.init_stats(at_wave_begin)
+	_fengliu_notify_stats_initialized()
+
+
+func _fengliu_notify_stats_initialized() -> void:
+	for entry in _fengliu_action_entries:
+		var action = entry["action"]
+		if action == null or not is_instance_valid(action):
+			continue
+
+		if action.has_method("fengliu_on_weapon_stats_initialized"):
+			action.fengliu_on_weapon_stats_initialized()
 
 
 func _fengliu_init_actions() -> void:
@@ -66,6 +83,8 @@ func _physics_process(delta: float) -> void:
 		return
 
 	_fengliu_update_actions(delta)
+	_fengliu_update_passive_actions(delta)
+
 	if _fengliu_any_action_takes_over_physics():
 		_fengliu_sync_attack_type_override()
 		return
@@ -216,7 +235,14 @@ func should_shoot() -> bool:
 
 		return _current_cooldown <= 0
 
-	return .should_shoot()
+	if _fengliu_attack_range_override <= 0 or current_stats == null:
+		return .should_shoot()
+
+	var original_max_range: int = current_stats.max_range
+	current_stats.max_range = _fengliu_attack_range_override
+	var result: bool = .should_shoot()
+	current_stats.max_range = original_max_range
+	return result
 
 
 func shoot() -> void:
@@ -242,6 +268,8 @@ func shoot() -> void:
 	for action in _fengliu_active_actions:
 		if action != null and is_instance_valid(action):
 			action.fengliu_on_after_shoot()
+
+	_fengliu_call_passive_after_shoot()
 
 	current_stats.animation_speed = saved_animation_speed
 
@@ -318,6 +346,40 @@ func fengliu_get_target_direction(target) -> float:
 		return rotation
 
 	return (Utils.get_target_position(target, global_position) - global_position).angle()
+
+
+func _fengliu_update_passive_actions(delta: float) -> void:
+	for entry in _fengliu_action_entries:
+		var action = entry["action"]
+		if action == null or not is_instance_valid(action):
+			continue
+		if action.has_method("fengliu_on_passive_physics_process"):
+			action.fengliu_on_passive_physics_process(delta)
+
+
+func _fengliu_call_passive_after_shoot() -> void:
+	for entry in _fengliu_action_entries:
+		var action = entry["action"]
+		if action == null or not is_instance_valid(action):
+			continue
+		if action.has_method("fengliu_on_passive_after_shoot"):
+			action.fengliu_on_passive_after_shoot()
+
+
+# 供被动动作覆盖索敌/开火判定；面板与挥击保持原射程
+func fengliu_set_attack_range_override(value: int) -> void:
+	_fengliu_attack_range_override = value
+
+	if _range_shape == null or not (_range_shape.shape is CircleShape2D):
+		return
+
+	var target_radius: float = float(value) + DETECTION_RANGE
+	if is_equal_approx(_range_shape.shape.radius, target_radius):
+		return
+
+	var shape = _range_shape.shape.duplicate()
+	shape.radius = target_radius
+	_range_shape.shape = shape
 
 
 func _fengliu_any_action_takes_over_physics() -> bool:
