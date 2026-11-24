@@ -1,7 +1,7 @@
 [gd_resource type="Resource" load_steps=3 format=2]
 
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/stick/stick_icon.png" type="Texture" id=1]
-[ext_resource path="res://items/global/item_data.gd" type="Script" id=2]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/global/mod_item_data.gd" type="Script" id=2]
 
 [resource]
 script = ExtResource( 2 )
@@ -21,3 +21,4 @@ curse_factor = 0.0
 max_nb = 0
 item_appearances = [  ]
 tags = [  ]
+hide_in_codex = true

@@ -1541,6 +1541,15 @@ func _fengliu_hide_weapons_from_codex() -> void:
 		next_weapon.previous_upgrade = base_weapon
 
 
+# 图鉴 / 物品套组统一隐藏判定：由 ModItemData.hide_in_codex 标记（合成材料等）
+func fengliu_is_hidden_in_codex(item) -> bool:
+	if item == null:
+		return false
+		
+	# 用 get() 兼容原版 ItemData（没有该属性时返回 null）
+	return item.get("hide_in_codex") == true
+
+
 # 读档前登记效果实例槽位（mod_main 已登记一次，这里幂等兜底，与本函数的读档顺序无关）
 func _fengliu_ensure_effect_slot_keys() -> void:
 	var mod_node = get_node_or_null("/root/ModLoader/FengLiu-FengAddMods")
