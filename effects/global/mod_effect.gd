@@ -20,6 +20,18 @@ func fengliu_can_be_copied_by_mutation() -> bool:
 	return false
 
 
+# 自定义异变复制：返回 false 走原版正常复制（duplicate + 缩放 + 合并）；
+# 返回 true 表示已在本方法内完成复制（效果脚本自行把副本加入肿瘤）
+func fengliu_custom_mutation_copy(_player_index: int, _dlc_data) -> bool:
+	return false
+
+
+# 自定义异变复制缩放：返回复制后的 value（默认沿用原版缩放结果；
+# 间隔/次数型效果可返回 original_value 保持原值）
+func fengliu_custom_mutation_scale(original_value: int, scaled_value: int, _player_index: int, _dlc_data) -> int:
+	return scaled_value
+
+
 # 本效果在玩家效果槽里的初始值（子类按需覆写：数值型返回 0，数组型返回 []）
 func fengliu_get_effect_init_value():
 	return []

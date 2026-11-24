@@ -1874,3 +1874,20 @@ func reset_events_nightmare() -> void:
 	if service != null:
 		service.reset_run_counts()
 
+
+# 查找玩家当前肿瘤（自定义复制完成后的返回值）
+func fengliu_find_tumor(player_index: int, dlc_data) -> ItemParentData:
+	for item in players_data[player_index].items:
+		if dlc_data.is_tumor(item):
+			return item
+			
+	return null
+
+
+# 覆写：效果声明自定义复制（返回 true）时由效果脚本接管，否则走原版
+func _add_mutation_to_tumor(copied_effect: Effect, player_index: int, dlc_data) -> ItemParentData:
+	if copied_effect != null and copied_effect.has_method("fengliu_custom_mutation_copy") and bool(copied_effect.call("fengliu_custom_mutation_copy", player_index, dlc_data)):
+		return fengliu_find_tumor(player_index, dlc_data)
+
+	return ._add_mutation_to_tumor(copied_effect, player_index, dlc_data)
+

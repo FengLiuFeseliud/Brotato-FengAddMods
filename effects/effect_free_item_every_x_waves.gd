@@ -25,6 +25,17 @@ func fengliu_can_be_copied_by_mutation() -> bool:
 	return true
 
 
+# 间隔型效果：复制后保持原间隔
+func fengliu_custom_mutation_scale(original_value: int, _scaled_value: int, _player_index: int, _dlc_data) -> int:
+	return original_value
+
+
+# 复制 = 让父类多追加一条独立条目并 apply（不合并，避免间隔相加）
+func fengliu_custom_mutation_copy(_player_index: int, _dlc_data) -> bool:
+	storage_method = Effect.StorageMethod.REPLACE
+	return false
+
+
 func fengliu_get_item_id_hash() -> int:
 	if item_data != null and item_data is ItemData:
 		return item_data.my_id_hash

@@ -45,3 +45,15 @@ func can_effect_be_copied_by_mutation(effect: Effect, player_index: int = - 1) -
 
 	return .can_effect_be_copied_by_mutation(effect, player_index)
 
+
+# 复制缩放：先走原版，再让效果返回值覆盖最终 value（无 bool、无副作用）
+func _scale_copied_effect(effect: Effect, player_index: int) -> void:
+	if effect == null:
+		return
+
+	var original_value: int = effect.value
+	._scale_copied_effect(effect, player_index)
+
+	if effect.has_method("fengliu_custom_mutation_scale"):
+		effect.value = int(effect.call("fengliu_custom_mutation_scale", original_value, effect.value, player_index, self))
+
