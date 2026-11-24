@@ -9,5 +9,5 @@ text_key = "effect_dodge_cap"
 value = 30
 custom_key = ""
 storage_method = 2
-effect_sign = 3
+effect_sign = 1
 custom_args = [  ]

@@ -6,19 +6,15 @@ const FENGLIU_BULLET_SCALE_MAX: float = 10.0
 
 var effect_fengliu_bullet_scale = Keys.generate_hash("fengliu_bullet_scale")
 
-# 子弹场景自带缩放
-var _fengliu_base_sprite_scale: Vector2 = Vector2.ONE
-var _fengliu_base_hitbox_scale: Vector2 = Vector2.ONE
+# 弹丸根节点自带缩放
+var _fengliu_base_projectile_scale: Vector2 = Vector2.ONE
 
 
-# 缓存子弹场景自带的基础缩放（发射时叠加玩家体型）
+# 缓存弹丸根节点基础缩放（发射时叠加玩家体型）
 func _ready() -> void:
 	._ready()
-	# 记录精灵与碰撞体的初始缩放
-	if is_instance_valid(_sprite):
-		_fengliu_base_sprite_scale = _sprite.scale
-	if is_instance_valid(_hitbox):
-		_fengliu_base_hitbox_scale = _hitbox.scale
+	# 记录弹丸根节点初始缩放
+	_fengliu_base_projectile_scale = scale
 
 
 # 发射时按开枪玩家的体型设置本颗子弹的大小
@@ -35,9 +31,8 @@ func _fengliu_apply_player_scale() -> void:
 	if scale_factor <= 0.0:
 		return
 
-	# 同步缩放精灵与碰撞体
-	_sprite.scale = _fengliu_base_sprite_scale * scale_factor
-	_hitbox.scale = _fengliu_base_hitbox_scale * scale_factor
+	# 缩放弹丸根节点，避免 AnimationPlayer 的 Sprite:scale 覆盖
+	scale = _fengliu_base_projectile_scale * scale_factor
 
 
 # 从子弹归属者缩放
@@ -68,7 +63,6 @@ func _fengliu_get_player_scale_factor() -> float:
 
 # 子弹回池时还原缩放，避免污染之后取用的子弹
 func _return_to_pool() -> void:
-	# 还原精灵与碰撞盒缩放
-	_sprite.scale = _fengliu_base_sprite_scale
-	_hitbox.scale = _fengliu_base_hitbox_scale
+	# 还原弹丸缩放，避免污染池对象
+	scale = _fengliu_base_projectile_scale
 	._return_to_pool()
