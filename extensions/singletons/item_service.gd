@@ -227,7 +227,12 @@ func fengliu_collect_effect_metadata() -> void :
 			if not effect.has_method("fengliu_can_be_copied_by_mutation"):
 				continue
 
+			# 声明可复制：清掉黑名单里可能残留的同名条目，与当前声明保持一致
 			if effect.fengliu_can_be_copied_by_mutation():
+				var blacklist_index: int = mutation_dlc.mutation_copy_blacklist.find(key)
+				if blacklist_index != -1:
+					mutation_dlc.mutation_copy_blacklist.remove(blacklist_index)
+					
 				continue
 
 			if not mutation_dlc.mutation_copy_blacklist.has(key):
@@ -1545,7 +1550,7 @@ func _fengliu_hide_weapons_from_codex() -> void:
 func fengliu_is_hidden_in_codex(item) -> bool:
 	if item == null:
 		return false
-		
+
 	# 用 get() 兼容原版 ItemData（没有该属性时返回 null）
 	return item.get("hide_in_codex") == true
 

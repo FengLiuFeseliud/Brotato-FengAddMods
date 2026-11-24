@@ -31,24 +31,17 @@ func _fengliu_refresh_meca_stats() -> void:
 			meca_stat_categories[category] = stats
 
 
-const FENGLIU_NO_MUTATION_COPY_EFFECT_PATHS := [
-	"res://mods-unpacked/FengLiu-FengAddMods/effects/effect_convert_stat_on_apply.gd",
-	"res://mods-unpacked/FengLiu-FengAddMods/effects/effect_reset_item_stat.gd"
-]
+# 本 mod 的 key-less 效果以 custom_key 作为唯一键：判定前临时借用 custom_key 的 hash，
+# 使其能走完原版判定链（脚本声明 / 文本 / 正负号 / 上限 / 黑名单），原版 key-less 效果不受影响
+func can_effect_be_copied_by_mutation(effect: Effect, player_index: int = - 1) -> bool:
+	if effect != null and effect.key_hash == Keys.empty_hash and effect.custom_key != "" and effect.has_method("fengliu_can_be_copied_by_mutation"):
+		var original_key_hash: int = effect.key_hash
+		effect.key_hash = Keys.generate_hash(effect.custom_key)
 
+		var result: bool = .can_effect_be_copied_by_mutation(effect, player_index)
 
-func _get_copy_candidates(mutated_item: ItemParentData, player_index: int) -> Array:
-	var candidates: Array = ._get_copy_candidates(mutated_item, player_index)
-	var filtered: Array = []
-	for effect in candidates:
-		if effect == null:
-			continue
+		effect.key_hash = original_key_hash
+		return result
 
-		var effect_script = effect.get_script()
-		var effect_path: String = effect_script.resource_path if effect_script != null else ""
-		if FENGLIU_NO_MUTATION_COPY_EFFECT_PATHS.has(effect_path):
-			continue
+	return .can_effect_be_copied_by_mutation(effect, player_index)
 
-		filtered.push_back(effect)
-		
-	return filtered
