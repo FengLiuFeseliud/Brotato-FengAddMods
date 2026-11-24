@@ -10,21 +10,20 @@ const CONTENT_DIR = MOD_DIR + "content_data/"
 const FENGLIU_DYNAMIC_CONTENT_SUBDIRS := ["characters", "items", "weapons", "sets", "upgrades"]
 
 
-# 排除不希望自动获得 t0 mod 初始武器角色
-const FENGLIU_T0_INJECT_EXCLUDE_CHARACTERS := [
+# 排除不希望自动获得 mod 初始武器的角色
+const FENGLIU_INJECT_EXCLUDE_CHARACTERS := [
 	# 原版角色示例（带 character_ 前缀）
 	# "character_well_rounded",
-	"cleaner",
 	"baked_potato",
-	"blood_bull",
-	"steve",
-	"spitter",
-	"staff_maker"
+	"steve"
 ]
 
-# 排除不希望自动注入到初始武器池的 t0 mod 武器（weapon_id）
-const FENGLIU_T0_INJECT_EXCLUDE_WEAPONS := [
-	"wood_pickaxe"
+# 排除不希望自动注入到初始武器池的 mod 武器（my_id 或 weapon_id）
+const FENGLIU_INJECT_EXCLUDE_WEAPONS := [
+	"wood_pickaxe",
+	"stone_pickaxe",
+	"iron_pickaxe",
+	"diamond_pickaxe"
 ]
 
 
@@ -219,60 +218,106 @@ func _ready()->void:
 	# 动态区域事件服务（区域内的事件，如雨）
 	_init_zone_event_service()
 
-	# 把本 mod 的 t0 武器注入到各可用角色的初始武器池（含本 mod 角色，见排除名单）。
-	call_deferred("fengliu_inject_t0_starting_weapons")
+	# 把本 mod 的武器按品阶注入到各可用角色的初始武器池（含本 mod 角色，见排除名单）。
+	call_deferred("fengliu_inject_starting_weapons")
 
 
-# 注：宠物伤害说明效果的原型注册已移入 extensions/singletons/item_service.gd 的 _enter_tree()，
-# 因为它必须早于原生注册触发的那次读档（详见该文件注释）。
-func fengliu_inject_t0_starting_weapons() -> void:
+# 把初始武器注入到各可用角色的初始武器池：
+#   - 本 Mod 武器：所有角色（排除名单除外），按角色原池品阶注入，带套装限制的角色只注入对应套装
+#   - 原版/DLC 武器：只注入给带 fengliu_can_rand_set_weapon 的角色，且只注入该效果 key 锁定的套装
+func fengliu_inject_starting_weapons() -> void:
 	if not is_instance_valid(ItemService) or ItemService.characters.size() == 0 or ItemService.weapons.size() == 0:
-		ModLoaderLog.warning("ItemService.characters/weapons is empty, skip t0 starting weapon injection.", MOD_ID)
+		ModLoaderLog.warning("ItemService.characters/weapons is empty, skip starting weapon injection.", MOD_ID)
 		return
 
-	# 动态收集 mod 的武器（1.2.0：按资源路径前缀识别，不再依赖 ContentLoader）
-	var t0_weapons := []
+	# 动态收集武器并按品阶分组：本 Mod 武器 / 原版（含 DLC）武器
+	var mod_weapons_by_tier := {}
+	var base_weapons_by_tier := {}
 	for weapon in ItemService.weapons:
 		if weapon == null or not (weapon is WeaponData):
 			continue
-		if weapon.tier != 0:
-			continue
-		if not weapon.resource_path.begins_with(MOD_DIR):
-			continue
-		# 武器排除名单：my_id 或 weapon_id 命中即跳过
-		if FENGLIU_T0_INJECT_EXCLUDE_WEAPONS.has(weapon.my_id) or FENGLIU_T0_INJECT_EXCLUDE_WEAPONS.has(weapon.weapon_id):
-			continue
-		t0_weapons.push_back(weapon)
 
-	if t0_weapons.size() == 0:
-		ModLoaderLog.warning("No FengAddMods t0 weapon registered in ItemService.weapons, skip injection.", MOD_ID)
+		if weapon.resource_path.begins_with(MOD_DIR):
+			# 武器排除名单：my_id 或 weapon_id 命中即跳过
+			if FENGLIU_INJECT_EXCLUDE_WEAPONS.has(weapon.my_id) or FENGLIU_INJECT_EXCLUDE_WEAPONS.has(weapon.weapon_id):
+				continue
+			_fengliu_push_weapon_by_tier(mod_weapons_by_tier, weapon)
+		elif _fengliu_is_base_weapon(weapon):
+			# 诅咒武器不进入初始武器池
+			if weapon.is_cursed:
+				continue
+			_fengliu_push_weapon_by_tier(base_weapons_by_tier, weapon)
+
+	if mod_weapons_by_tier.size() == 0:
+		ModLoaderLog.warning("No FengAddMods weapon registered in ItemService.weapons, skip injection.", MOD_ID)
 		return
 
-	var total_injected := 0
-	for weapon in t0_weapons:
-		var injected_count := 0
-		for character in ItemService.characters:
-			if character == null:
-				continue
+	# 注入前快照：角色原池品阶、套装限制、fengliu_can_rand_set_weapon 的 key 套装、缩放属性负向修改
+	var character_tiers := {}
+	var character_restricted_sets := {}
+	var character_key_sets := {}
+	var character_stat_reductions := {}
+	for character in ItemService.characters:
+		if character == null:
+			continue
 
-			if not _fengliu_t0_can_inject(character, weapon):
-				continue
-				
-			if _fengliu_t0_character_has_weapon(character, weapon.my_id):
-				continue
+		character_tiers[character.my_id] = _fengliu_get_starting_weapon_tier(character)
+		character_restricted_sets[character.my_id] = _fengliu_get_restricted_weapon_set_ids(character)
+		character_stat_reductions[character.my_id] = _fengliu_get_character_stat_reductions(character)
 
-			character.starting_weapons.push_back(weapon)
-			injected_count += 1
+		var key_set_ids := _fengliu_get_can_rand_set_weapon_set_ids(character)
+		if key_set_ids.size() > 0:
+			character_key_sets[character.my_id] = key_set_ids
 
-		total_injected += injected_count
+	# 本 Mod 武器：所有角色（排除名单 / 武器类型冲突 / 套装限制在函数内判定）
+	var reduction_counts := {}
+	var mod_tier_counts := {}
+	var total_mod_injected := _fengliu_inject_weapons_by_tier(mod_weapons_by_tier, character_tiers, character_restricted_sets, character_stat_reductions, false, mod_tier_counts, reduction_counts)
 
-	ModLoaderLog.info("FengAddMods t0 starting weapon injection finished, total=%d." % total_injected, MOD_ID)
+	# 原版（含 DLC）武器：只注入给带 fengliu_can_rand_set_weapon 的角色，且只注入 key 套装
+	var base_tier_counts := {}
+	var total_base_injected := _fengliu_inject_weapons_by_tier(base_weapons_by_tier, character_tiers, character_key_sets, character_stat_reductions, true, base_tier_counts, reduction_counts)
+
+	var restricted_characters := {}
+	for character_id in character_restricted_sets:
+		if character_restricted_sets[character_id].size() > 0:
+			restricted_characters[character_id] = character_restricted_sets[character_id]
+
+	var total_reduction_blocked := 0
+	var stat_reduction_characters := {}
+	for character_id in reduction_counts:
+		var blocked_count: int = int(reduction_counts[character_id])
+		if blocked_count <= 0:
+			continue
+		total_reduction_blocked += blocked_count
+		stat_reduction_characters[character_id] = {"blocked": blocked_count, "stats": character_stat_reductions[character_id]}
+
+	ModLoaderLog.info("FengAddMods starting weapon injection finished, mod=%d, base=%d, total=%d, mod_tiers=%s, base_tiers=%s, weapon_reduction_blocked=%d, restricted_characters=%s, stat_reduction_characters=%s." % [total_mod_injected, total_base_injected, total_mod_injected + total_base_injected, str(mod_tier_counts), str(base_tier_counts), total_reduction_blocked, str(restricted_characters), str(stat_reduction_characters)], MOD_ID)
 
 
-# 判断该角色是否可以接收这把 t0 武器
-func _fengliu_t0_can_inject(character, weapon) -> bool:
+# 角色初始武器池只有单一品阶时返回该品阶；混阶、空池或取不到品阶时返回 0（沿用 t0 注入）
+func _fengliu_get_starting_weapon_tier(character) -> int:
+	if character.starting_weapons == null:
+		return 0
+
+	var single_tier := -1
+	for starting_weapon in character.starting_weapons:
+		if starting_weapon == null or not (starting_weapon is WeaponData):
+			continue
+
+		if single_tier == -1:
+			single_tier = starting_weapon.tier
+
+		elif single_tier != starting_weapon.tier:
+			return 0
+
+	return single_tier if single_tier >= 0 else 0
+
+
+# 判断该角色是否可以接收这把武器
+func _fengliu_can_inject_starting_weapon(character, weapon, restricted_set_ids: Array) -> bool:
 	# 排除名单内的角色
-	if FENGLIU_T0_INJECT_EXCLUDE_CHARACTERS.has(character.my_id):
+	if FENGLIU_INJECT_EXCLUDE_CHARACTERS.has(character.my_id):
 		return false
 
 	var is_ranged: bool = weapon.type == WeaponData.Type.RANGED
@@ -289,11 +334,232 @@ func _fengliu_t0_can_inject(character, weapon) -> bool:
 		if not is_ranged and effect.key == "no_melee_weapons":
 			return false
 
+	# 角色带套装限制（武器类别加成 / fengliu_can_rand_set_weapon）时，只注入对应套装的武器
+	if restricted_set_ids.size() > 0 and not _fengliu_weapon_has_any_set(weapon, restricted_set_ids):
+		return false
+
 	return true
 
 
+# 按品阶把武器放进对应数组
+func _fengliu_push_weapon_by_tier(weapons_by_tier: Dictionary, weapon) -> void:
+	if not weapons_by_tier.has(weapon.tier):
+		weapons_by_tier[weapon.tier] = []
+
+	weapons_by_tier[weapon.tier].push_back(weapon)
+
+
+# 是否为原版（含 DLC）武器（mods-unpacked 下的武器不算）
+func _fengliu_is_base_weapon(weapon) -> bool:
+	var path: String = weapon.resource_path
+	return path.begins_with("res://weapons/") or path.begins_with("res://dlcs/")
+
+
+# 按品阶把武器池注入给角色
+# only_filtered_characters=true 时只处理 character_filter_sets 里登记过的角色（用于「原版武器仅给 key 角色」）
+func _fengliu_inject_weapons_by_tier(weapons_by_tier: Dictionary, character_tiers: Dictionary, character_filter_sets: Dictionary, character_stat_reductions: Dictionary, only_filtered_characters: bool, tier_counts: Dictionary, reduction_counts: Dictionary) -> int:
+	var total_injected := 0
+	for tier in weapons_by_tier:
+		for weapon in weapons_by_tier[tier]:
+			for character in ItemService.characters:
+				if character == null:
+					continue
+
+				# 只给「原初始武器池为该品阶」的角色注入
+				if character_tiers.get(character.my_id, 0) != tier:
+					continue
+
+				var set_ids: Array = character_filter_sets.get(character.my_id, [])
+				if only_filtered_characters and set_ids.size() == 0:
+					continue
+
+				if not _fengliu_can_inject_starting_weapon(character, weapon, set_ids):
+					continue
+
+				if _fengliu_character_has_starting_weapon(character, weapon.my_id):
+					continue
+
+				# 角色效果削减了这把武器的缩放属性 → 不注入
+				var stat_reductions: Dictionary = character_stat_reductions.get(character.my_id, {})
+				if _fengliu_weapon_blocked_by_stat_reduction(weapon, stat_reductions):
+					reduction_counts[character.my_id] = int(reduction_counts.get(character.my_id, 0)) + 1
+					continue
+
+				character.starting_weapons.push_back(weapon)
+				total_injected += 1
+				tier_counts[tier] = int(tier_counts.get(tier, 0)) + 1
+
+	return total_injected
+
+
+# 是否为「X的修改」效果（StatGainsModificationEffect）
+func _fengliu_is_stat_gains_modification(effect) -> bool:
+	if effect is StatGainsModificationEffect:
+		return true
+	return "stats_modified" in effect and "stat_displayed" in effect
+
+
+# 收集角色对武器缩放属性的负向修改（直接属性负值 + X的修改；排除伤害 / 百分比伤害）
+func _fengliu_get_character_stat_reductions(character) -> Dictionary:
+	var reductions := {}
+	for effect in character.effects:
+		if effect == null:
+			continue
+
+		if _fengliu_is_stat_gains_modification(effect):
+			# 排除「伤害的修改 / %伤害的修改」整条效果
+			var displayed := str(effect.stat_displayed)
+			if displayed == "stat_damage" or displayed == "stat_percent_damage":
+				continue
+
+			if effect.value >= 0:
+				continue
+				
+			for stat in effect.stats_modified:
+				_fengliu_add_stat_reduction(reductions, str(stat), effect.value)
+
+			continue
+
+		# 条件性效果（custom_key 非空）视为随状态变化，不参与
+		if effect.custom_key != "":
+			continue
+
+		if effect.value >= 0:
+			continue
+
+		_fengliu_add_stat_reduction(reductions, str(effect.key), effect.value)
+
+	return reductions
+
+
+func _fengliu_add_stat_reduction(reductions: Dictionary, stat: String, value: int) -> void:
+	if stat == "" or stat == "stat_damage" or stat == "stat_percent_damage":
+		return
+
+	reductions[stat] = int(reductions.get(stat, 0)) + value
+
+
+# 武器缩放属性（面板「缩放」）的属性名列表
+func _fengliu_get_weapon_scaling_stats(weapon) -> Array:
+	var stats := []
+	if weapon.stats == null or weapon.stats.scaling_stats == null:
+		return stats
+
+	for entry in weapon.stats.scaling_stats:
+		if entry == null or entry.size() < 1:
+			continue
+
+		var stat = entry[0]
+		var stat_name := ""
+		if stat is String:
+			stat_name = stat
+
+		elif stat is int or stat is float:
+			stat_name = str(Keys.hash_to_string.get(int(stat), ""))
+
+		if stat_name != "" and not stats.has(stat_name):
+			stats.push_back(stat_name)
+
+	return stats
+
+
+# 武器的任一缩放属性被角色负向修改时不注入
+func _fengliu_weapon_blocked_by_stat_reduction(weapon, reductions: Dictionary) -> bool:
+	if reductions.size() == 0:
+		return false
+
+	for stat_name in _fengliu_get_weapon_scaling_stats(weapon):
+		if reductions.has(stat_name):
+			return true
+
+	return false
+
+
+# 收集角色「武器套装限制」：武器类别加成（ClassBonusEffect）+ 只允许指定套装（fengliu_can_rand_set_weapon）
+func _fengliu_get_restricted_weapon_set_ids(character) -> Array:
+	var set_ids := []
+	for effect in character.effects:
+		if effect == null:
+			continue
+
+		if _fengliu_is_class_bonus_effect(effect):
+			_fengliu_push_set_id(set_ids, str(effect.set_id))
+			
+		elif _fengliu_is_can_rand_set_weapon_effect(effect):
+			_fengliu_push_set_id(set_ids, _fengliu_get_can_rand_set_weapon_set_id(effect))
+
+	return set_ids
+
+
+# 收集角色 fengliu_can_rand_set_weapon 锁定的套装 id
+func _fengliu_get_can_rand_set_weapon_set_ids(character) -> Array:
+	var set_ids := []
+	for effect in character.effects:
+		if effect == null:
+			continue
+
+		if not _fengliu_is_can_rand_set_weapon_effect(effect):
+			continue
+
+		_fengliu_push_set_id(set_ids, _fengliu_get_can_rand_set_weapon_set_id(effect))
+
+	return set_ids
+
+
+# fengliu_can_rand_set_weapon 的锁定套装（运行时随机的效果优先取已抽中的 roll_set）
+func _fengliu_get_can_rand_set_weapon_set_id(effect) -> String:
+	var set_id := str(effect.key)
+	if set_id == "" and "roll_set" in effect:
+		var roll_set = effect.roll_set
+		if roll_set != null and "my_id" in roll_set:
+			set_id = str(roll_set.my_id)
+
+	return set_id
+
+
+func _fengliu_push_set_id(set_ids: Array, set_id: String) -> void:
+	if set_id == "" or set_ids.has(set_id):
+		return
+
+	set_ids.push_back(set_id)
+
+
+# 是否为 fengliu_can_rand_set_weapon（只允许指定套装的武器）
+func _fengliu_is_can_rand_set_weapon_effect(effect) -> bool:
+	if effect is CanRandSetWeapon:
+		return true
+
+	return effect.custom_key == "fengliu_can_rand_set_weapon"
+
+
+# 是否为「武器类别加成」效果（兼容 ModLoader 重载脚本后类型判断失效）
+func _fengliu_is_class_bonus_effect(effect) -> bool:
+	if effect is ClassBonusEffect:
+		return true
+
+	if not ("set_id" in effect):
+		return false
+
+	return effect.key == "effect_weapon_class_bonus" or effect.key == "EFFECT_WEAPON_CLASS_BONUS"
+
+
+# 武器是否属于给定套装（任一匹配即可）
+func _fengliu_weapon_has_any_set(weapon, set_ids: Array) -> bool:
+	if weapon.sets == null:
+		return false
+
+	for set in weapon.sets:
+		if set == null or not ("my_id" in set):
+			continue
+
+		if set_ids.has(set.my_id):
+			return true
+
+	return false
+
+
 # 该角色初始武器池中是否已有同 id 武器
-func _fengliu_t0_character_has_weapon(character, weapon_my_id: String) -> bool:
+func _fengliu_character_has_starting_weapon(character, weapon_my_id: String) -> bool:
 	# 遍历初始武器池，存在同 id 武器即视为已拥有
 	for starting_weapon in character.starting_weapons:
 		if starting_weapon != null and starting_weapon.my_id == weapon_my_id:
