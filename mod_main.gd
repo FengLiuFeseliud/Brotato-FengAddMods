@@ -526,9 +526,6 @@ func _fengliu_push_set_id(set_ids: Array, set_id: String) -> void:
 
 # 是否为 fengliu_can_rand_set_weapon（只允许指定套装的武器）
 func _fengliu_is_can_rand_set_weapon_effect(effect) -> bool:
-	if effect is CanRandSetWeapon:
-		return true
-
 	return effect.custom_key == "fengliu_can_rand_set_weapon"
 
 
