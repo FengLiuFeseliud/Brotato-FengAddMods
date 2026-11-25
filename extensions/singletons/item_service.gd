@@ -880,6 +880,13 @@ func fengliu_get_all_upgrade_id_hashs() -> Array:
     return _all_upgrade_ids.values()
 
 
+# 获取指定品阶的升级项池（只读副本）
+func fengliu_get_tier_upgrade_pool(tier: int) -> Array:
+    if tier < 0 or tier >= _tiers_data.size():
+        return []
+    return _tiers_data[tier][TierData.UPGRADES].duplicate()
+
+
 # 获取指定品阶与 id 的升级数据
 func fengliu_get_upgrade_data(tier: int, player_index: int, upgrade_id_hash: int) -> UpgradeData:
     var upgrade_data = null

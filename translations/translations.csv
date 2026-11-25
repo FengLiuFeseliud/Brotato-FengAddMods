@@ -384,3 +384,5 @@ BG_LINE_SPACE,Line Space,线条空间
 ZONE_LINE_SPACE,Line Space,线条空间
 ALL,all,所有
 WEAPON_BAGUETTE,Baguette,法棍
+ITEM_GOLDEN_APPLE,Golden Apple,金苹果
+EFFECT_GOLDEN_APPLE,"When health is below {0}, fully restore health and shield and gain the stats of all survival-oriented Tier {1} upgrades; this item disappears after triggering",生命低于{0}时回满生命与护盾并获得所有生存向{1}级升级项的属性，触发后本道具消失

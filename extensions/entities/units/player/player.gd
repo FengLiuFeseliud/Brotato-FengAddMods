@@ -33,6 +33,7 @@ var effect_fengliu_random_primary_stats_on_shield_broken = Keys.generate_hash("f
 var effect_fengliu_hold_attract_nearby_consumables_hash = Keys.generate_hash("fengliu_hold_attract_nearby_consumables")
 var effect_fengliu_mutation_fruit_extra_mutation = Keys.generate_hash("fengliu_mutation_fruit_extra_mutation")
 var effect_fengliu_acid_puddle_reverse: int = Keys.generate_hash("fengliu_acid_puddle_reverse")
+var effect_fengliu_below_hp: int = Keys.generate_hash("fengliu_below_hp")
 
 
 var fengliu_shield_hash: int = Keys.generate_hash("stat_fengliu_shield")
@@ -206,6 +207,51 @@ func _physics_process(delta: float) -> void :
 
     if _fengliu_hold_attract_nearby_consumables:
         _attract_nearby_consumables()
+
+    # 低于生命阈值效果：进入低血量时执行子类操作
+    fengliu_update_below_hp_effects()
+
+
+# 低于生命阈值效果分发：每帧检查，只在进入低血量时触发一次
+func fengliu_update_below_hp_effects() -> void:
+	var effects = RunData.get_player_effects(player_index)
+	if not effects.has(effect_fengliu_below_hp) or not (effects[effect_fengliu_below_hp] is Array):
+		return
+
+	var below_hp_effects: Array = effects[effect_fengliu_below_hp]
+	if below_hp_effects.size() == 0:
+		return
+
+	# 死亡 / 清场：强制退出，撤销低血量期间的临时状态
+	if dead or cleaning_up:
+		for effect in below_hp_effects:
+			if effect != null and effect.has_method("fengliu_below_hp_force_reset"):
+				effect.fengliu_below_hp_force_reset(player_index)
+		return
+
+	if max_stats.health <= 0:
+		return
+
+	for effect in below_hp_effects:
+		if effect == null or not effect.has_method("fengliu_below_hp_tick_state"):
+			continue
+
+		# 每个效果执行前重新算比例：前一个效果回血后，后续效果应看到新血量
+		if max_stats.health <= 0:
+			return
+		var health_ratio: float = float(current_stats.health) / float(max_stats.health) * 100.0
+		effect.fengliu_below_hp_tick_state(player_index, health_ratio)
+
+
+# 波末复位：退出低血量状态（由 main.clean_up_room 调用）
+func fengliu_below_hp_reset_all() -> void:
+	var effects = RunData.get_player_effects(player_index)
+	if not effects.has(effect_fengliu_below_hp) or not (effects[effect_fengliu_below_hp] is Array):
+		return
+
+	for effect in effects[effect_fengliu_below_hp]:
+		if effect != null and effect.has_method("fengliu_below_hp_force_reset"):
+			effect.fengliu_below_hp_force_reset(player_index)
 
 
 # 扩展属性刷新 护盾上限提高时按差值补充可用护盾

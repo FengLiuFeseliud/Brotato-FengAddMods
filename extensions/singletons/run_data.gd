@@ -133,7 +133,8 @@ const FENGLIU_EFFECT_SLOT_KEYS := [
 	"fengliu_get_highest_stat_fixed_upgrade_data",
 	"fengliu_no_hit_material",
 	"fengliu_full_shield_stat_link",
-	"fengliu_acid_puddle_reverse"
+	"fengliu_acid_puddle_reverse",
+	"fengliu_below_hp"
 ]
 
 

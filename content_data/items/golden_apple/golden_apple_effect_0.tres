@@ -1,0 +1,16 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/effects/effect_golden_apple.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+key = ""
+text_key = "EFFECT_GOLDEN_APPLE"
+value = 0
+custom_key = "fengliu_below_hp"
+storage_method = 0
+effect_sign = 0
+custom_args = [  ]
+hp_threshold_pct = 50.0
+once_per_wave = false
+owner_item_id = "item_golden_apple"

@@ -681,6 +681,9 @@ func fengliu_add_stat_fron_wave_intensity(effect: Array, player_index: int) -> v
 
 # 扩展清理房间
 func clean_up_room():
+	# 低血量效果：波末强制退出，撤销本波临时状态
+	_fengliu_reset_below_hp_effects()
+
 	for player_index in RunData.get_player_count():
 		var effects = RunData.get_player_effect(effect_fengliu_add_xp_gold_from_wave_time, player_index)
 		if effects.size() > 0:
@@ -700,6 +703,14 @@ func clean_up_room():
 		_fengliu_ground_events.queue_free()
 		_fengliu_ground_events = null
 	_fengliu_wave_event_spawned = false
+
+
+# 波末退出所有低于生命阈值效果
+func _fengliu_reset_below_hp_effects() -> void:
+	for player in _players:
+		if player != null and is_instance_valid(player) and player.has_method("fengliu_below_hp_reset_all"):
+			player.call("fengliu_below_hp_reset_all")
+
 
 # 扩展领取箱子道具：标记来源，防止波次结束清理时将箱子道具一并失效
 func on_item_box_take_button_pressed(item_data: ItemParentData, consumable: UpgradesUI.ConsumableToProcess) -> void:
