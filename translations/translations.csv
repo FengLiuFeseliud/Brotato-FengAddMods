@@ -210,7 +210,7 @@ EFFECT_GET_FIXED_UPGRADE,"Next wave's upgrade options are fixed to {0}, {1}, {2}
 EFFECT_GET_HIGHEST_STAT_FIXED_UPGRADE,Directed Training always includes an upgrade option for your current highest Primary stat,定向训练必包含当前最高主要属性的升级项
 EFFECT_GIN_RANDOM_KILLED_STAT,Gain {3} to {4} {1} for every {2} enemies killed with this weapon during a wave,使用该武器在敌袭中每击杀{2}名敌人便会{3}至{4}{1}
 EFFECT_GOLD_LOW_SET_STAT_SHOP,"When lacking Materials, use {1} substitute Materials to purchase items ({1} replaces {0} Materials)",材料不足时使用{1}替代材料购买道具（{1}替代{0}材料）
-EFFECT_GREEN_ONION_PROJECTILE,"Targeting range is based on the blade wave's range; each attack also fires a blade wave that deals weapon panel damage, with a range of {0}x the weapon's range",索敌范围依据剑气射程，每次攻击额外发射一次剑气造成武器面板伤害，剑气射程为武器范围的{0}倍
+EFFECT_GREEN_ONION_PROJECTILE,"Targeting range is based on the blade wave's range; each attack also fires a blade wave that deals weapon panel damage, with a range of {0}x the weapon's range, and the blade wave is affected by Piercing",索敌范围依据剑气射程，每次攻击额外发射一次剑气造成武器面板伤害，剑气射程为武器范围的{0}倍，剑气受贯通影响
 EFFECT_GUARANTEED_SHOP_ITEMS,Shop guarantees {0} (up to its max count),商店必定出现{0}（不超过其数量上限）
 EFFECT_HIT_SHIELD_DROP_CONSUMABLE_VALUE,{0}% chance to drop a Consumable when your Shield takes a hit,护盾受击时有{0}%概率掉落一份消耗品
 EFFECT_HOLD_ATTRACT_NEARBY_CONSUMABLES,You always attract nearby Consumables,不管什么时候你都会吸取消耗品

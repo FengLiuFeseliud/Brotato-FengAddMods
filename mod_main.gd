@@ -256,14 +256,14 @@ func fengliu_inject_starting_weapons() -> void:
 	var character_tiers := {}
 	var character_restricted_sets := {}
 	var character_key_sets := {}
-	var character_stat_reductions := {}
+	var character_stat_modifiers := {}
 	for character in ItemService.characters:
 		if character == null:
 			continue
 
 		character_tiers[character.my_id] = _fengliu_get_starting_weapon_tier(character)
 		character_restricted_sets[character.my_id] = _fengliu_get_restricted_weapon_set_ids(character)
-		character_stat_reductions[character.my_id] = _fengliu_get_character_stat_reductions(character)
+		character_stat_modifiers[character.my_id] = _fengliu_get_character_stat_modifiers(character)
 
 		var key_set_ids := _fengliu_get_can_rand_set_weapon_set_ids(character)
 		if key_set_ids.size() > 0:
@@ -272,11 +272,11 @@ func fengliu_inject_starting_weapons() -> void:
 	# 本 Mod 武器：所有角色（排除名单 / 武器类型冲突 / 套装限制在函数内判定）
 	var reduction_counts := {}
 	var mod_tier_counts := {}
-	var total_mod_injected := _fengliu_inject_weapons_by_tier(mod_weapons_by_tier, character_tiers, character_restricted_sets, character_stat_reductions, false, mod_tier_counts, reduction_counts)
+	var total_mod_injected := _fengliu_inject_weapons_by_tier(mod_weapons_by_tier, character_tiers, character_restricted_sets, character_stat_modifiers, false, mod_tier_counts, reduction_counts)
 
 	# 原版（含 DLC）武器：只注入给带 fengliu_can_rand_set_weapon 的角色，且只注入 key 套装
 	var base_tier_counts := {}
-	var total_base_injected := _fengliu_inject_weapons_by_tier(base_weapons_by_tier, character_tiers, character_key_sets, character_stat_reductions, true, base_tier_counts, reduction_counts)
+	var total_base_injected := _fengliu_inject_weapons_by_tier(base_weapons_by_tier, character_tiers, character_key_sets, character_stat_modifiers, true, base_tier_counts, reduction_counts)
 
 	var restricted_characters := {}
 	for character_id in character_restricted_sets:
@@ -290,7 +290,7 @@ func fengliu_inject_starting_weapons() -> void:
 		if blocked_count <= 0:
 			continue
 		total_reduction_blocked += blocked_count
-		stat_reduction_characters[character_id] = {"blocked": blocked_count, "stats": character_stat_reductions[character_id]}
+		stat_reduction_characters[character_id] = {"blocked": blocked_count, "stats": character_stat_modifiers[character_id]}
 
 	ModLoaderLog.info("FengAddMods starting weapon injection finished, mod=%d, base=%d, total=%d, mod_tiers=%s, base_tiers=%s, weapon_reduction_blocked=%d, restricted_characters=%s, stat_reduction_characters=%s." % [total_mod_injected, total_base_injected, total_mod_injected + total_base_injected, str(mod_tier_counts), str(base_tier_counts), total_reduction_blocked, str(restricted_characters), str(stat_reduction_characters)], MOD_ID)
 
@@ -357,7 +357,7 @@ func _fengliu_is_base_weapon(weapon) -> bool:
 
 # 按品阶把武器池注入给角色
 # only_filtered_characters=true 时只处理 character_filter_sets 里登记过的角色（用于「原版武器仅给 key 角色」）
-func _fengliu_inject_weapons_by_tier(weapons_by_tier: Dictionary, character_tiers: Dictionary, character_filter_sets: Dictionary, character_stat_reductions: Dictionary, only_filtered_characters: bool, tier_counts: Dictionary, reduction_counts: Dictionary) -> int:
+func _fengliu_inject_weapons_by_tier(weapons_by_tier: Dictionary, character_tiers: Dictionary, character_filter_sets: Dictionary, character_stat_modifiers: Dictionary, only_filtered_characters: bool, tier_counts: Dictionary, reduction_counts: Dictionary) -> int:
 	var total_injected := 0
 	for tier in weapons_by_tier:
 		for weapon in weapons_by_tier[tier]:
@@ -379,9 +379,9 @@ func _fengliu_inject_weapons_by_tier(weapons_by_tier: Dictionary, character_tier
 				if _fengliu_character_has_starting_weapon(character, weapon.my_id):
 					continue
 
-				# 角色效果削减了这把武器的缩放属性 → 不注入
-				var stat_reductions: Dictionary = character_stat_reductions.get(character.my_id, {})
-				if _fengliu_weapon_blocked_by_stat_reduction(weapon, stat_reductions):
+				# 角色效果削弱了这把武器的缩放属性（直接负值，或「X的修改」负值且无正值修正）→ 不注入
+				var stat_modifiers: Dictionary = character_stat_modifiers.get(character.my_id, {})
+				if _fengliu_weapon_blocked_by_stat_modifiers(weapon, stat_modifiers):
 					reduction_counts[character.my_id] = int(reduction_counts.get(character.my_id, 0)) + 1
 					continue
 
@@ -399,9 +399,10 @@ func _fengliu_is_stat_gains_modification(effect) -> bool:
 	return "stats_modified" in effect and "stat_displayed" in effect
 
 
-# 收集角色对武器缩放属性的负向修改（直接属性负值 + X的修改；排除伤害 / 百分比伤害）
-func _fengliu_get_character_stat_reductions(character) -> Dictionary:
-	var reductions := {}
+# 收集角色的属性修正：无条件直接负值 + 「X的修改」（排除伤害 / 百分比伤害）
+func _fengliu_get_character_stat_modifiers(character) -> Dictionary:
+	var direct := {}
+	var gains := {}
 	for effect in character.effects:
 		if effect == null:
 			continue
@@ -411,32 +412,26 @@ func _fengliu_get_character_stat_reductions(character) -> Dictionary:
 			var displayed := str(effect.stat_displayed)
 			if displayed == "stat_damage" or displayed == "stat_percent_damage":
 				continue
-
-			if effect.value >= 0:
+			if effect.value == 0:
 				continue
-				
 			for stat in effect.stats_modified:
-				_fengliu_add_stat_reduction(reductions, str(stat), effect.value)
-
+				_fengliu_add_stat_modifier(gains, str(stat), effect.value)
 			continue
 
 		# 条件性效果（custom_key 非空）视为随状态变化，不参与
 		if effect.custom_key != "":
 			continue
-
 		if effect.value >= 0:
 			continue
+		_fengliu_add_stat_modifier(direct, str(effect.key), effect.value)
 
-		_fengliu_add_stat_reduction(reductions, str(effect.key), effect.value)
-
-	return reductions
+	return {"direct": direct, "gains": gains}
 
 
-func _fengliu_add_stat_reduction(reductions: Dictionary, stat: String, value: int) -> void:
+func _fengliu_add_stat_modifier(modifiers: Dictionary, stat: String, value: int) -> void:
 	if stat == "" or stat == "stat_damage" or stat == "stat_percent_damage":
 		return
-
-	reductions[stat] = int(reductions.get(stat, 0)) + value
+	modifiers[stat] = int(modifiers.get(stat, 0)) + value
 
 
 # 武器缩放属性（面板「缩放」）的属性名列表
@@ -463,16 +458,29 @@ func _fengliu_get_weapon_scaling_stats(weapon) -> Array:
 	return stats
 
 
-# 武器的任一缩放属性被角色负向修改时不注入
-func _fengliu_weapon_blocked_by_stat_reduction(weapon, reductions: Dictionary) -> bool:
-	if reductions.size() == 0:
+# 武器的缩放属性是否被角色削弱到不应注入：
+#   - 直接属性负值：命中任一缩放属性即不注入
+#   - 「X的修改」负值：仅当武器的所有缩放属性都没有正值修正时才不注入
+#     （双倍率武器「一降一升」且没有直接负值时仍可注入）
+func _fengliu_weapon_blocked_by_stat_modifiers(weapon, modifiers: Dictionary) -> bool:
+	var direct: Dictionary = modifiers.get("direct", {})
+	var gains: Dictionary = modifiers.get("gains", {})
+	if direct.size() == 0 and gains.size() == 0:
 		return false
 
+	var has_gain_negative := false
+	var has_gain_positive := false
 	for stat_name in _fengliu_get_weapon_scaling_stats(weapon):
-		if reductions.has(stat_name):
+		if direct.has(stat_name):
 			return true
+		if gains.has(stat_name):
+			var value: int = int(gains[stat_name])
+			if value < 0:
+				has_gain_negative = true
+			elif value > 0:
+				has_gain_positive = true
 
-	return false
+	return has_gain_negative and not has_gain_positive
 
 
 # 收集角色「武器套装限制」：武器类别加成（ClassBonusEffect）+ 只允许指定套装（fengliu_can_rand_set_weapon）
