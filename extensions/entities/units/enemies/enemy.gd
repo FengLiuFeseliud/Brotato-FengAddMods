@@ -9,6 +9,7 @@ var effect_fengliu_stronger_aliens_on_stats = Keys.generate_hash("fengliu_strong
 var effect_fengliu_killed_regen_shield = Keys.generate_hash("fengliu_killed_regen_shield")
 var effect_fengliu_knockback_out_of_map = Keys.generate_hash("fengliu_knockback_out_of_map")
 var fengliu_ignore_knockback_resistance_hash = Keys.generate_hash("fengliu_ignore_knockback_resistance")
+var fengliu_freeze_chance_hash = Keys.generate_hash("fengliu_freeze_chance")
 
 
 var _fengliu_charm_behavior_scene: PackedScene = null
@@ -17,9 +18,18 @@ var _fengliu_charm_behavior_scene_resolved := false
 
 const FENGLIU_KNOCKBACK_DECAY_STEP := 0.1
 const FENGLIU_KNOCK_OUT_DEATH_KNOCKBACK := 1.5
+const FENGLIU_FREEZE_TINT := Color(0.55, 0.82, 1.0)
+const FENGLIU_FREEZE_DURATION := 1.5
+const FENGLIU_FREEZE_PARTICLES_SCENE = preload("res://mods-unpacked/FengLiu-FengAddMods/particles/freeze/unit_freeze_particles.tscn")
 
 var _fengliu_knock_out_started := false
 var _fengliu_scene_should_collide_with_borders := true
+
+# 冰冻状态（定身型）
+var _fengliu_is_frozen := false
+var _fengliu_freeze_timer: Timer = null
+var _fengliu_freeze_particles: CPUParticles2D = null
+var _fengliu_freeze_saved_anim_speed := 1.0
 
 
 # 判断攻击来源是否匹配指定类型
@@ -223,6 +233,8 @@ func respawn() -> void :
     _fengliu_knock_out_started = false
     set("_fengliu_ignore_knockback_resistance_percent", 0)
     should_collide_with_borders = _fengliu_scene_should_collide_with_borders
+    # 冰冻状态不能跨池化复用（否则下一个敌人复活即「蓝身 + 物理处理关闭」）
+    fengliu_clear_freeze()
 
 
 # 击杀回盾量：汇总槽内全部实例的效果数值
@@ -264,6 +276,9 @@ func take_damage(value: int, args: TakeDamageArgs) -> Array:
     var effects = RunData.get_player_effect(effect_fengliu_charm_enemy, args.from_player_index)
     if effects.size() > 0:
         fengliu_charm_enemy(effects[0], args)
+
+    # 命中后判定冰冻（伤害已结算，避免冰冻爆伤提前击杀导致本次命中伤害丢失）
+    fengliu_try_freeze_by_hit(args)
 
     if args.from_player_index >= 0 and current_stats.health <= 0:
         # 击杀回盾量 = 槽内全部实例的效果数值之和；0 或负值不广播
@@ -429,3 +444,244 @@ func get_damage_value(dmg_value: int, from_player_index: int, armor_applied: = t
             damage_value.value = current_stats.health - 1
         return damage_value
     return damage_value
+
+# ============================================================
+# 冰冻（定身型）
+#   造成元素伤害时，按「冰冻概率」次要属性掷骰：停止移动与攻击 + 冰蓝染色 + 冰霜粒子
+#   持续 FENGLIU_FREEZE_DURATION 秒（重复命中只刷新时长）
+#   R2 冰冻时若正在燃烧：取消燃烧，并按燃烧跳伤结算一次「2 × 该燃烧单跳伤害」
+#   R3 冰冻期间受到燃烧：不点燃，同样按燃烧跳伤结算一次双倍伤害
+# ============================================================
+
+
+# 命中后判定冰冻：本次伤害必须造成元素伤害（与冰块同口径）
+func fengliu_try_freeze_by_hit(args: TakeDamageArgs) -> void:
+    if args == null or args.hitbox == null:
+        return
+    if not fengliu_can_be_frozen():
+        return
+
+    # 被魅惑的敌人是玩家侧单位，其命中不触发冰冻
+    var from = args.hitbox.from
+    if not is_instance_valid(from) or from is Enemy:
+        return
+
+    if not fengliu_is_elemental_scaling(args.hitbox.scaling_stats):
+        return
+
+    fengliu_try_trigger_freeze(args.from_player_index)
+
+
+# 燃烧跳伤判定冰冻：元素燃烧同样算「造成元素伤害」（参考冰块 on_burned）
+#   返回 true 表示已触发冰冻（燃烧已被取消并按 R2 结算完毕，调用方应结束本跳）
+func fengliu_try_freeze_by_burning(burning_data: BurningData, player_index: int) -> bool:
+    if burning_data == null or _fengliu_is_frozen:
+        return false
+    if not fengliu_can_be_frozen():
+        return false
+    if not fengliu_is_elemental_scaling(burning_data.scaling_stats):
+        return false
+
+    fengliu_try_trigger_freeze(player_index)
+    return _fengliu_is_frozen
+
+
+# 可被冰冻的目标：掉落物 / 被魅惑的宠物 / 已死亡或正在死亡都不处理
+func fengliu_can_be_frozen() -> bool:
+    return not (dead or _pending_die or is_loot or _is_charmed)
+
+
+# 本次伤害是否元素伤害：scaling_stats 含元素属性（stat_all 视为全属性）
+func fengliu_is_elemental_scaling(scaling_stats: Array) -> bool:
+    for scaling_stat in scaling_stats:
+        if not (scaling_stat is Array) or scaling_stat.size() == 0:
+            continue
+        var stat_hash = scaling_stat[0]
+        if not (stat_hash is int):
+            continue
+        if stat_hash == Keys.stat_elemental_damage_hash or stat_hash == Keys.stat_all_hash:
+            return true
+    return false
+
+
+# 按「冰冻概率」次要属性掷骰（%）
+func fengliu_try_trigger_freeze(player_index: int) -> void:
+    # 非玩家来源（DUMMY_PLAYER_INDEX）与越界索引不读属性：
+    # 属性缓存只有 4 个玩家槽位，越界在 release 构建下会触发引擎 trap
+    if player_index < 0 or player_index >= RunData.get_player_count():
+        return
+
+    var chance: float = fengliu_get_freeze_chance(player_index)
+    if chance <= 0.0:
+        return
+    if not Utils.get_chance_success(clamp(chance / 100.0, 0.0, 1.0)):
+        return
+
+    fengliu_apply_freeze(FENGLIU_FREEZE_DURATION)
+
+
+# 读取「冰冻概率」次要属性（%）：槽位由 RunData.get_player_effects 保证存在
+func fengliu_get_freeze_chance(player_index: int) -> float:
+    var raw = RunData.get_player_effects(player_index).get(fengliu_freeze_chance_hash, 0)
+    if raw is int or raw is float:
+        return float(raw)
+    return 0.0
+
+
+# 施加冰冻：重复命中只刷新时长
+func fengliu_apply_freeze(duration: float) -> void:
+    if duration <= 0.0 or dead or _pending_die:
+        return
+
+    if _fengliu_is_frozen:
+        fengliu_refresh_freeze_time(duration)
+        return
+
+    # R2：先把原燃烧上下文拷出来（随后的燃烧跳伤会替换并清空燃烧状态）
+    var had_burning: bool = _burning != null
+    var burn_damage: int = int(_burning.damage) if had_burning else 0
+    var burn_player_index: int = _burning_player_index
+    var burn_from = _burning.from if had_burning else null
+    var burn_scaling: Array = _burning.scaling_stats.duplicate() if had_burning else []
+    var burn_is_global: bool = _burning.is_global_burn if had_burning else false
+    var burn_tracking: String = _burning.tracking_key if had_burning else ""
+
+    _fengliu_is_frozen = true
+
+    # 定身前先清速度：否则 RigidBody 会沿用上一帧的 _integrate_forces_velocity 继续滑行
+    _integrate_forces_velocity = Vector2.ZERO
+    knockback_vector = Vector2.ZERO
+    set_physics_process(false)
+
+    # 变蓝 + 停住 idle 动画 + 冰霜粒子
+    _set_color_modulation(FENGLIU_FREEZE_TINT)
+    fengliu_pause_animation()
+    fengliu_start_freeze_particles()
+
+    fengliu_ensure_freeze_timer()
+    _fengliu_freeze_timer.wait_time = duration
+    _fengliu_freeze_timer.start()
+
+    # R2：冻结生效后再结算，保证伤害跳在蓝色目标身上；
+    # 走完整燃烧跳伤链（多重燃烧/燃烧减速/武器燃烧总和/统计），并在结束时取消燃烧。
+    # 用 call() 调用：该方法在 unit 扩展里，ModLoader 编译 enemy 扩展时尚未挂上 unit 扩展，
+    # 直接写符号名在部分安装顺序下会产生 parse error（与 CanRandSetWeapon 事故同源）。
+    if had_burning:
+        call("fengliu_settle_burn_tick", burn_damage, burn_player_index, burn_from, burn_scaling, burn_is_global, burn_tracking, 2.0)
+
+
+# 冰冻中再次命中：时长刷新为「剩余 / 新时长」中的较大值
+func fengliu_refresh_freeze_time(duration: float) -> void:
+    fengliu_ensure_freeze_timer()
+    var remaining: float = _fengliu_freeze_timer.time_left
+    if duration > remaining:
+        _fengliu_freeze_timer.wait_time = duration
+        _fengliu_freeze_timer.start()
+
+
+# 解除冰冻（幂等）：恢复物理处理、去色、恢复动画、停粒子
+func fengliu_clear_freeze() -> void:
+    if _fengliu_freeze_timer != null and is_instance_valid(_fengliu_freeze_timer):
+        _fengliu_freeze_timer.stop()
+
+    if not _fengliu_is_frozen:
+        return
+
+    _fengliu_is_frozen = false
+    set_physics_process(true)
+    remove_color_modulation(FENGLIU_FREEZE_TINT)
+    fengliu_resume_animation()
+    fengliu_stop_freeze_particles()
+
+
+func fengliu_ensure_freeze_timer() -> void:
+    if _fengliu_freeze_timer != null and is_instance_valid(_fengliu_freeze_timer):
+        return
+
+    _fengliu_freeze_timer = Timer.new()
+    _fengliu_freeze_timer.name = "FengliuFreezeTimer"
+    _fengliu_freeze_timer.one_shot = true
+    add_child(_fengliu_freeze_timer)
+    _fengliu_freeze_timer.connect("timeout", self, "_fengliu_on_freeze_timeout")
+
+
+func _fengliu_on_freeze_timeout() -> void:
+    fengliu_clear_freeze()
+
+
+# 冻结时停住 idle 动画；解冻/死亡前恢复，保证死亡动画正常播放
+func fengliu_pause_animation() -> void:
+    if _animation_player == null:
+        return
+    _fengliu_freeze_saved_anim_speed = _animation_player.playback_speed
+    _animation_player.playback_speed = 0.0
+
+
+func fengliu_resume_animation() -> void:
+    if _animation_player == null:
+        return
+    _animation_player.playback_speed = _fengliu_freeze_saved_anim_speed
+
+
+func fengliu_start_freeze_particles() -> void:
+    if _fengliu_freeze_particles == null or not is_instance_valid(_fengliu_freeze_particles):
+        _fengliu_freeze_particles = FENGLIU_FREEZE_PARTICLES_SCENE.instance()
+        _fengliu_freeze_particles.name = "FengliuFreezeParticles"
+        # 与燃烧粒子同款位置：对齐单位贴图中心
+        if _animation != null:
+            _fengliu_freeze_particles.position = _animation.position
+        add_child(_fengliu_freeze_particles)
+
+    _fengliu_freeze_particles.visible = true
+    _fengliu_freeze_particles.emitting = true
+
+
+func fengliu_stop_freeze_particles() -> void:
+    if _fengliu_freeze_particles == null or not is_instance_valid(_fengliu_freeze_particles):
+        return
+    _fengliu_freeze_particles.emitting = false
+    _fengliu_freeze_particles.visible = false
+
+
+# R3：冰冻期间受到燃烧 → 不点燃，改为按燃烧跳伤链结算一次双倍该燃烧单跳伤害
+func apply_burning(burning_data: BurningData) -> void:
+    if _fengliu_is_frozen:
+        if burning_data != null and not dead and not _pending_die:
+            # 同 R2：用 call() 调用 unit 扩展里的方法，避免扩展编译顺序导致的 parse error
+            call("fengliu_settle_burn_tick",
+                int(burning_data.damage),
+                fengliu_get_burn_player_index(burning_data),
+                burning_data.from,
+                burning_data.scaling_stats.duplicate(),
+                burning_data.is_global_burn,
+                burning_data.tracking_key,
+                2.0)
+        return
+
+    .apply_burning(burning_data)
+
+
+# 与基类 apply_burning 同口径：优先攻击来源，其次沿用上次来源，最后随机
+func fengliu_get_burn_player_index(burning_data: BurningData) -> int:
+    var from = burning_data.from
+    if is_instance_valid(from):
+        return from.player_index
+    if _burning_player_index >= 0:
+        return _burning_player_index
+
+    var player_count: int = RunData.get_player_count()
+    if player_count <= 0:
+        return 0
+    return Utils.randi() % player_count
+
+
+# 池化复用 / 死亡 / 清场：先解除冰冻，避免「蓝色 + 关闭物理处理」带到下一次使用
+func die(args: Entity.DieArgs = Utils.default_die_args) -> void:
+    fengliu_clear_freeze()
+    .die(args)
+
+
+func despawn() -> void:
+    fengliu_clear_freeze()
+    .despawn()
+

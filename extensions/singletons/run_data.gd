@@ -42,6 +42,7 @@ const ALL_SECONDARY_STATS = [
 	"fengliu_puddle_size",
 	"fengliu_overheal",
 	"fengliu_ignore_knockback_resistance",
+	"fengliu_freeze_chance",
 ]
 
 
@@ -90,6 +91,7 @@ const FENGLIU_EXTRA_SECONDARY_STAT_KEYS = [
 	"fengliu_puddle_size",
 	"fengliu_overheal",
 	"fengliu_ignore_knockback_resistance",
+	"fengliu_freeze_chance",
 ]
 
 

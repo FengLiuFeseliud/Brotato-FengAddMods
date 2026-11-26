@@ -5,16 +5,30 @@ var fengliu_rekindling = Keys.generate_hash("fengliu_rekindling")
 var burning_slow_hash = Keys.generate_hash("fengliu_burning_slow")
 var weapon_burn_damage_hash = Keys.generate_hash("fengliu_weapon_burn_damage")
 var _fengliu_ignore_knockback_resistance_percent: int = 0
+# 一次性燃烧跳伤倍数（冰冻联动用）：进入跳伤结算时立即读取并复位，避免泄漏到后续真实跳伤
+var _fengliu_burn_tick_multiplier: float = 1.0
 
 
 # 覆盖: 燃烧跳伤结算 → 多重燃烧补刀、燃烧伤害减速与武器燃烧伤害并入
 func _on_BurningTimer_timeout() -> void:
+	# 一次性跳伤倍数（冰冻联动用）：进入结算立刻读取并复位
+	var tick_multiplier: float = _fengliu_burn_tick_multiplier
+	_fengliu_burn_tick_multiplier = 1.0
+
 	# 先取本跳数值：父类在末跳会把 _burning 置空
 	var burning_ref: BurningData = _burning
 	var burning_player_index: int = _burning_player_index
 
+	# 元素燃烧跳伤同样算「造成元素伤害」→ 按「冰冻概率」判定；
+	# 触发后会取消燃烧并按 R2 结算完（含双倍爆伤），本跳直接结束，避免重复结算
+	if burning_ref != null and has_method("fengliu_try_freeze_by_burning") and call("fengliu_try_freeze_by_burning", burning_ref, burning_player_index):
+		return
+
 	var burn_damage_backup: int = _burning.damage if _burning != null else 0
 	_fengliu_get_weapon_burn_damage(_burning, burning_player_index)
+	# 口径：先按「武器燃烧伤害总和」重算，再乘一次性倍数（多重燃烧按翻倍后的值补刀）
+	if _burning != null and tick_multiplier != 1.0:
+		_burning.damage = int(round(_burning.damage * tick_multiplier))
 	var echo_damage: int = _burning.damage if _burning != null else 0
 
 	._on_BurningTimer_timeout()
@@ -97,3 +111,43 @@ func get_knockback_value() -> Vector2:
 # 覆盖：贯通击退使用有效抗性
 func get_increased_piercing_knockback_amount(amount: float, piercing: float, _resistance: float) -> float:
 	return .get_increased_piercing_knockback_amount(amount, piercing, get_effective_knockback_resistance())
+
+
+# 冰冻联动：把一次「燃烧跳伤」完整走一遍燃烧结算链
+#   → 多重燃烧、燃烧减速、武器燃烧伤害总和、燃烧统计（烤肉/火焰炮塔/武器追踪）、
+#     元素门槛 slow-on-hit、from.on_weapon_hit_something、燃烧承伤行为、燃烧击杀判定全部生效
+#   但不会点燃目标：不播点燃音效、不开火焰粒子、不写 current_burning_enemies、不扩散。
+#   multiplier 只作用于本次跳伤（默认 2.0，用于「双倍该燃烧伤害」）。
+#   调用后目标身上的燃烧会被取消（R2 语义），临时状态一并清理。
+func fengliu_settle_burn_tick(
+	damage: int, player_index: int, from = null, scaling_stats: Array = [],
+	is_global_burn: bool = false, tracking_key: String = "", multiplier: float = 2.0
+) -> void:
+	var can_tick: bool = damage > 0 and not dead and not _pending_die and player_index >= 0 and player_index < RunData.get_player_count()
+
+	if can_tick:
+		# 临时燃烧状态：duration=1 → 父类结算后自然走到 stop_burning()
+		var data := BurningData.new()
+		data.chance = 1.0
+		data.damage = damage
+		data.duration = 1
+		data.spread = 0
+		data.scaling_stats = scaling_stats.duplicate()
+		data.is_global_burn = is_global_burn
+		data.tracking_key = tracking_key
+		# BurningData 的 _late_init 是 deferred，本帧取不到需要手动补
+		data.tracking_key_hash = Keys.generate_hash(tracking_key)
+		data.from = from
+
+		_burnings = {SHARED_BURNING_SOURCE_ID: data.duplicate()}
+		_burning = data
+		_burning_player_index = player_index
+		_fengliu_burn_tick_multiplier = multiplier
+		_on_BurningTimer_timeout()
+
+	# 取消原燃烧 / 清理临时状态（幂等）
+	if _burning != null or _burnings.size() > 0:
+		stop_burning()
+
+	_fengliu_burn_tick_multiplier = 1.0
+
