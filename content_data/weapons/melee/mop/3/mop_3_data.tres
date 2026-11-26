@@ -1,4 +1,4 @@
-[gd_resource type="Resource" load_steps=10 format=2]
+[gd_resource type="Resource" load_steps=11 format=2]
 
 [ext_resource path="res://items/global/weapon_data.gd" type="Script" id=1]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/melee/mop/3/mop_3_stats.tres" type="Resource" id=2]
@@ -9,6 +9,7 @@
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/melee/mop/3/mop_3_effect_1.tres" type="Resource" id=7]
 [ext_resource path="res://items/sets/support/support_set_data.tres" type="Resource" id=8]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/sets/homeware/homeware_set_data.tres" type="Resource" id=9]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/effects/effect_weapon_wet.tres" type="Resource" id=10]
 
 [resource]
 script = ExtResource( 1 )
@@ -19,7 +20,7 @@ icon = ExtResource( 4 )
 name = "WEAPON_MOP"
 tier = 2
 value = 81
-effects = [ ExtResource( 6 ), ExtResource( 7 ) ]
+effects = [ ExtResource( 6 ), ExtResource( 7 ), ExtResource( 10 ) ]
 tracking_text = ""
 is_lockable = true
 unlock_codex_descr_after_get_it = 1

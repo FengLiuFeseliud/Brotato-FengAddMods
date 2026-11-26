@@ -10,6 +10,7 @@ var effect_fengliu_killed_regen_shield = Keys.generate_hash("fengliu_killed_rege
 var effect_fengliu_knockback_out_of_map = Keys.generate_hash("fengliu_knockback_out_of_map")
 var fengliu_ignore_knockback_resistance_hash = Keys.generate_hash("fengliu_ignore_knockback_resistance")
 var fengliu_freeze_chance_hash = Keys.generate_hash("fengliu_freeze_chance")
+var effect_fengliu_weapon_wet = Keys.generate_hash("fengliu_weapon_wet")
 
 
 var _fengliu_charm_behavior_scene: PackedScene = null
@@ -29,6 +30,17 @@ const FENGLIU_FREEZE_SOUND_PATHS := [
     "res://mods-unpacked/FengLiu-FengAddMods/resources/sounds/freeze/freeze_04.wav",
 ]
 const FENGLIU_FREEZE_SOUND_MIN_INTERVAL_MSEC := 150
+# 潮湿（Wet）：武器命中必定施加，持续 N 秒，期间显示雨滴粒子
+const FENGLIU_WET_DEFAULT_DURATION := 2.0
+const FENGLIU_WET_PARTICLES_SCENE = preload("res://mods-unpacked/FengLiu-FengAddMods/particles/wet/unit_wet_particles.tscn")
+# 潮湿雨滴：从身体顶部上方指定距离落下，覆盖到身体底部，尾巴不超出身体
+const FENGLIU_WET_PARTICLES_TOP_MARGIN := 8.0
+const FENGLIU_WET_PARTICLES_FALL_TIME := 0.32
+const FENGLIU_WET_PARTICLES_GRAVITY := 300.0
+const FENGLIU_WET_PARTICLES_TAIL_RATIO := 0.2
+const FENGLIU_WET_PARTICLES_DROP_TEXTURE_HEIGHT := 48.0
+# 冰冻向潮湿目标连锁传递的相邻半径（参考燃烧扩散 SpreadArea 半径 128）
+const FENGLIU_FREEZE_SPREAD_RADIUS := 128.0
 
 var _fengliu_knock_out_started := false
 var _fengliu_scene_should_collide_with_borders := true
@@ -40,6 +52,10 @@ var _fengliu_freeze_particles: CPUParticles2D = null
 var _fengliu_freeze_saved_anim_speed := 1.0
 var _fengliu_freeze_sounds: Array = []
 var _fengliu_last_freeze_sound_msec: int = -100000
+
+var _fengliu_is_wet := false
+var _fengliu_wet_timer: Timer = null
+var _fengliu_wet_particles = null
 
 
 # 判断攻击来源是否匹配指定类型
@@ -245,6 +261,7 @@ func respawn() -> void :
     should_collide_with_borders = _fengliu_scene_should_collide_with_borders
     # 冰冻状态不能跨池化复用（否则下一个敌人复活即「蓝身 + 物理处理关闭」）
     fengliu_clear_freeze()
+    fengliu_clear_wet()
 
 
 # 击杀回盾量：汇总槽内全部实例的效果数值
@@ -289,6 +306,8 @@ func take_damage(value: int, args: TakeDamageArgs) -> Array:
 
     # 命中后判定冰冻（伤害已结算，避免冰冻爆伤提前击杀导致本次命中伤害丢失）
     fengliu_try_freeze_by_hit(args)
+    # 命中后按武器词条施加潮湿（无概率，命中必触发）
+    fengliu_try_apply_wet_by_hit(args)
 
     if args.from_player_index >= 0 and current_stats.health <= 0:
         # 击杀回盾量 = 槽内全部实例的效果数值之和；0 或负值不广播
@@ -487,9 +506,57 @@ func _on_BurningTimer_timeout() -> void:
     ._on_BurningTimer_timeout()
 
 
-# 可被冰冻的目标：掉落物 / 被魅惑的宠物 / 已死亡或正在死亡都不处理
-func fengliu_can_be_frozen() -> bool:
+# 可上状态的目标：掉落物 / 被魅惑的宠物 / 已死亡或正在死亡都不处理
+func fengliu_can_get_status() -> bool:
     return not (dead or _pending_die or is_loot or _is_charmed)
+
+
+# 可被冰冻的目标（与通用状态守卫一致）
+func fengliu_can_be_frozen() -> bool:
+    return fengliu_can_get_status()
+
+
+# 命中后按武器词条施加潮湿（无概率，命中必触发；多个词条取最长时长）
+func fengliu_try_apply_wet_by_hit(args: TakeDamageArgs) -> void:
+    if args == null or args.hitbox == null:
+        return
+
+    # 治疗类命中不触发
+    if args.hitbox.is_healing:
+        return
+
+    if not fengliu_can_get_status():
+        return
+
+    # 被魅惑的敌人是玩家侧单位，其命中不触发潮湿
+    var from = args.hitbox.from
+    if not is_instance_valid(from) or from is Enemy:
+        return
+
+    var duration: float = fengliu_get_wet_duration_from_effects(args.hitbox.effects)
+    # 溅射/衍生投射物（如拖把水弹）生成时不携带武器词条，回退到来源武器
+    if duration <= 0.0 and from is Weapon:
+        duration = fengliu_get_wet_duration_from_effects(from.effects)
+
+    if duration <= 0.0:
+        return
+
+    fengliu_apply_wet(duration)
+
+
+# 从效果数组里取潮湿时长（多个词条取最大值；没有潮湿词条返回 0）
+func fengliu_get_wet_duration_from_effects(effects: Array) -> float:
+    var duration := 0.0
+    for effect in effects:
+        if effect == null:
+            continue
+        # 哈希可能尚未生成，回退按 custom_key 字符串识别
+        if effect.custom_key_hash != effect_fengliu_weapon_wet and effect.custom_key != "fengliu_weapon_wet":
+            continue
+        var value = effect.get("wet_duration")
+        duration = max(duration, float(value) if value != null else FENGLIU_WET_DEFAULT_DURATION)
+
+    return duration
 
 
 # 冰冻音效列表：懒加载 mod 内复制的 4 段音效（缺失则跳过，不回退原版燃烧音）
@@ -531,7 +598,7 @@ func fengliu_try_trigger_freeze(player_index: int) -> void:
     if not Utils.get_chance_success(clamp(chance / 100.0, 0.0, 1.0)):
         return
 
-    fengliu_apply_freeze(FENGLIU_FREEZE_DURATION)
+    fengliu_apply_freeze(FENGLIU_FREEZE_DURATION, player_index)
 
 
 # 读取「冰冻概率」次要属性（%）：槽位由 RunData.get_player_effects 保证存在
@@ -547,9 +614,12 @@ func fengliu_is_elite_or_boss() -> bool:
 
 
 # 施加冰冻：重复命中只刷新时长
-func fengliu_apply_freeze(duration: float) -> void:
+func fengliu_apply_freeze(duration: float, source_player_index: int = -1) -> void:
     if duration <= 0.0 or dead or _pending_die:
         return
+
+    # 传递时使用减半前的时长，避免精英/Boss 被减半两次
+    var spread_duration: float = duration
 
     # 精英与 Boss 冰冻时长减半（刷新时长同样按减半后的值比较）
     if fengliu_is_elite_or_boss():
@@ -587,10 +657,42 @@ func fengliu_apply_freeze(duration: float) -> void:
     _fengliu_freeze_timer.wait_time = duration
     _fengliu_freeze_timer.start()
 
+    # 冰冻潮湿目标：向相邻的潮湿目标连锁传递（成功率 = 来源玩家的冰冻概率）
+    if source_player_index >= 0 and _fengliu_is_wet:
+        fengliu_spread_freeze_to_wet_neighbors(spread_duration, source_player_index)
+
     # R2：冻结生效后再结算，保证伤害跳在蓝色目标身上；
     # 走完整燃烧跳伤链（多重燃烧/燃烧减速/武器燃烧总和/统计），并在结束时取消燃烧。
     if had_burning:
         call("fengliu_settle_burn_tick", burn_damage, burn_player_index, burn_from, burn_scaling, burn_is_global, burn_tracking, 2.0)
+
+
+# 向相邻的潮湿目标连锁传递冰冻：每个目标单独按冰冻概率掷骰；
+# 新冻结的潮湿目标会继续传递，直到周围没有可被冻结的潮湿目标
+func fengliu_spread_freeze_to_wet_neighbors(duration: float, source_player_index: int) -> void:
+    var spawner = _entity_spawner_ref
+    if spawner == null or not is_instance_valid(spawner):
+        return
+
+    var chance: float = clamp(fengliu_get_freeze_chance(source_player_index) / 100.0, 0.0, 1.0)
+    if chance <= 0.0:
+        return
+
+    var radius_squared: float = FENGLIU_FREEZE_SPREAD_RADIUS * FENGLIU_FREEZE_SPREAD_RADIUS
+    for other in spawner.get_all_enemies():
+        if other == null or other == self or not is_instance_valid(other) or not (other is Enemy):
+            continue
+        # 只传递给「潮湿且尚未被冻结」的目标
+        if not other._fengliu_is_wet or other._fengliu_is_frozen:
+            continue
+        if not other.fengliu_can_be_frozen():
+            continue
+        if global_position.distance_squared_to(other.global_position) > radius_squared:
+            continue
+        if not Utils.get_chance_success(chance):
+            continue
+
+        other.fengliu_apply_freeze(duration, source_player_index)
 
 
 # 冰冻中再次命中：时长刷新为「剩余 / 新时长」中的较大值
@@ -666,6 +768,114 @@ func fengliu_stop_freeze_particles() -> void:
     _fengliu_freeze_particles.visible = false
 
 
+# 施加潮湿：重复命中只刷新为更长的剩余时长
+func fengliu_apply_wet(duration: float) -> void:
+    if duration <= 0.0 or dead or _pending_die:
+        return
+
+    # 潮湿会取消燃烧（只取消状态，不结算伤害）
+    if _burning != null:
+        stop_burning()
+
+    fengliu_ensure_wet_timer()
+
+    # 已潮湿：只刷新为更长的剩余时长
+    if _fengliu_is_wet:
+        var remaining: float = _fengliu_wet_timer.time_left
+        if duration > remaining:
+            _fengliu_wet_timer.wait_time = duration
+            _fengliu_wet_timer.start()
+        return
+
+    # 首次潮湿：上雨滴粒子并开始计时
+    _fengliu_is_wet = true
+    fengliu_start_wet_particles()
+    _fengliu_wet_timer.wait_time = duration
+    _fengliu_wet_timer.start()
+
+
+# 解除潮湿（幂等）
+func fengliu_clear_wet() -> void:
+    # 无论当前状态如何都先停表，避免残留计时
+    if _fengliu_wet_timer != null and is_instance_valid(_fengliu_wet_timer):
+        _fengliu_wet_timer.stop()
+
+    if not _fengliu_is_wet:
+        return
+
+    _fengliu_is_wet = false
+    fengliu_stop_wet_particles()
+
+
+func fengliu_ensure_wet_timer() -> void:
+    if _fengliu_wet_timer != null and is_instance_valid(_fengliu_wet_timer):
+        return
+
+    # 懒创建一次性计时器
+    _fengliu_wet_timer = Timer.new()
+    _fengliu_wet_timer.name = "FengliuWetTimer"
+    _fengliu_wet_timer.one_shot = true
+    add_child(_fengliu_wet_timer)
+    _fengliu_wet_timer.connect("timeout", self, "_fengliu_on_wet_timeout")
+
+
+func _fengliu_on_wet_timeout() -> void:
+    fengliu_clear_wet()
+
+
+func fengliu_start_wet_particles() -> void:
+    # 身体范围取自 Hurtbox 圆形碰撞；缺失时用默认值（高 56、半径 16）
+    var body_radius: float = 16.0
+    var body_top: float = -48.0
+    var body_bottom: float = 8.0
+    var hurtbox = get_node_or_null("Hurtbox")
+    if hurtbox != null:
+        var collision = hurtbox.get_node_or_null("Collision")
+        if collision != null and collision.shape is CircleShape2D:
+            body_radius = collision.shape.radius
+        body_top = hurtbox.position.y - body_radius
+        body_bottom = hurtbox.position.y + body_radius
+
+    if _fengliu_wet_particles == null or not is_instance_valid(_fengliu_wet_particles):
+        _fengliu_wet_particles = FENGLIU_WET_PARTICLES_SCENE.instance()
+        _fengliu_wet_particles.name = "FengliuWetParticles"
+        add_child(_fengliu_wet_particles)
+
+    # 发射点：身体顶部上方 8px；矩形发射保证雨滴全部从头顶上方落下
+    var emitter_x: float = _animation.position.x if _animation != null else 0.0
+    var emitter_y: float = body_top - FENGLIU_WET_PARTICLES_TOP_MARGIN
+    _fengliu_wet_particles.position = Vector2(emitter_x, emitter_y)
+    _fengliu_wet_particles.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
+    _fengliu_wet_particles.emission_rect_extents = Vector2(max(6.0, body_radius * 0.8), 2.0)
+
+    # 雨滴长度（尾巴）按身体高度取比例，避免垂出身体底部
+    var body_height: float = max(1.0, body_bottom - body_top)
+    var tail_length: float = clamp(body_height * FENGLIU_WET_PARTICLES_TAIL_RATIO, 8.0, 24.0)
+    _fengliu_wet_particles.scale_amount = tail_length / FENGLIU_WET_PARTICLES_DROP_TEXTURE_HEIGHT
+    _fengliu_wet_particles.scale_amount_random = 0.05
+
+    # 由下落距离反解初速：雨滴底端刚好到身体底部（覆盖整只敌人、不超出）
+    var fall_distance: float = max(8.0, body_bottom - emitter_y - tail_length)
+    var fall_time: float = FENGLIU_WET_PARTICLES_FALL_TIME
+    var gravity_y: float = FENGLIU_WET_PARTICLES_GRAVITY
+    _fengliu_wet_particles.lifetime = fall_time
+    _fengliu_wet_particles.gravity = Vector2(0, gravity_y)
+    _fengliu_wet_particles.initial_velocity = max(0.0, (fall_distance - 0.5 * gravity_y * fall_time * fall_time) / fall_time)
+    _fengliu_wet_particles.initial_velocity_random = 0.05
+    _fengliu_wet_particles.amount = int(clamp(body_radius * 0.6, 8.0, 20.0))
+
+    _fengliu_wet_particles.visible = true
+    _fengliu_wet_particles.emitting = true
+
+
+func fengliu_stop_wet_particles() -> void:
+    if _fengliu_wet_particles == null or not is_instance_valid(_fengliu_wet_particles):
+        return
+    # 停止发射并隐藏（节点保留给下次复用）
+    _fengliu_wet_particles.emitting = false
+    _fengliu_wet_particles.visible = false
+
+
 # R3：冰冻期间受到燃烧 → 不点燃，改为按燃烧跳伤链结算一次双倍该燃烧单跳伤害
 func apply_burning(burning_data: BurningData) -> void:
     if _fengliu_is_frozen:
@@ -681,6 +891,10 @@ func apply_burning(burning_data: BurningData) -> void:
                 burning_data.is_global_burn,
                 burning_data.tracking_key,
                 2.0)
+        return
+
+    # 潮湿期间不能点燃（静默忽略，不结算伤害）
+    if _fengliu_is_wet:
         return
 
     .apply_burning(burning_data)
@@ -703,10 +917,12 @@ func fengliu_get_burn_player_index(burning_data: BurningData) -> int:
 # 池化复用 / 死亡 / 清场：先解除冰冻，避免「蓝色 + 关闭物理处理」带到下一次使用
 func die(args: Entity.DieArgs = Utils.default_die_args) -> void:
     fengliu_clear_freeze()
+    fengliu_clear_wet()
     .die(args)
 
 
 func despawn() -> void:
     fengliu_clear_freeze()
+    fengliu_clear_wet()
     .despawn()
 

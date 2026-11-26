@@ -1,7 +1,7 @@
 [gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/zone_events/events/rain/rain_event.gd" type="Script" id=1]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/zone_events/events/rain/puddle.tscn" type="PackedScene" id=2]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/projectiles/water_zones/water_zone.tscn" type="PackedScene" id=2]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/zone_events/events/rain/rain_particles.tscn" type="PackedScene" id=3]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/zone_events/events/rain/textures/puddle_1.png" type="Texture" id=4]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/zone_events/events/rain/textures/puddle_2.png" type="Texture" id=5]

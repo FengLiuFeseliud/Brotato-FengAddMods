@@ -402,3 +402,6 @@ EFFECT_FENGLIU_FREEZE_CHANCE_VALUE,{0} % Freeze Chance,{0} %冰冻概率
 ITEM_ICE_PACK,Ice Pack,冰袋
 WEAPON_CLASS_FREEZE,Freeze,冰冻
 WEAPON_POPSICLE,Popsicle,冰棍
+EFFECT_FENGLIU_WEAPON_WET,Soaks enemies on hit for {0}s,命中使敌人潮湿{0}秒
+WEAPON_WATER_BALLOON,Water Balloon,水球
+EFFECT_WATER_EXPLODING,"On hit, {0} chance to explode and leave a puddle for {1}s that soaks enemies for {2}s",击中时{0}爆炸并留下持续{1}秒的水洼，使范围内敌人潮湿{2}秒

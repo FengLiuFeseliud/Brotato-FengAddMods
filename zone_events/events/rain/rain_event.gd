@@ -9,6 +9,8 @@ export (int) var max_active_puddles = 30
 export (float) var spawn_interval = 0.25
 export (float) var puddle_scale_min = 1.0
 export (float) var puddle_scale_max = 3.0
+export (float) var puddle_wet_duration = 2.0
+export (float) var puddle_wet_tick_interval = 0.5
 
 var _main: Main
 var _rain_particles: CPUParticles2D
@@ -79,9 +81,9 @@ func _try_spawn_puddle() -> void:
 		pos = _fengliu_rand_pos_with_edge(edge)
 
 	var puddle = puddle_scene.instance()
-	puddle.setup(texture, p_scale, puddle_lifetime)
+	# 水洼场景统一为 water_zone：半径按贴图宽度换算（保持原横向判定尺寸 0.40×宽×缩放）
+	puddle.init_water(texture.get_width() * 0.40 * p_scale, puddle_lifetime, puddle_wet_duration, puddle_wet_tick_interval, texture)
 	puddle.position = pos
-	puddle.rotation = rand_range(0, TAU)
 	add_child(puddle)
 
 	_active_puddles.push_back(puddle)

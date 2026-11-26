@@ -1,4 +1,4 @@
-[gd_resource type="Resource" load_steps=8 format=2]
+[gd_resource type="Resource" load_steps=9 format=2]
 
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/ranged/kettle/3/kettle_3_stats.tres" type="Resource" id=1]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/ranged/kettle/4/kettle_4_data.tres" type="Resource" id=2]
@@ -9,6 +9,7 @@
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/ranged/kettle/kettle_effect_1.tres" type="Resource" id=7]
 [ext_resource path="res://items/sets/support/support_set_data.tres" type="Resource" id=8]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/sets/homeware/homeware_set_data.tres" type="Resource" id=9]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/effects/effect_weapon_wet.tres" type="Resource" id=10]
 
 [resource]
 script = ExtResource( 3 )
@@ -19,7 +20,7 @@ icon = ExtResource( 5 )
 name = "WEAPON_KETTLE"
 tier = 2
 value = 80
-effects = [ ExtResource( 6 ), ExtResource( 7 ) ]
+effects = [ ExtResource( 6 ), ExtResource( 7 ), ExtResource( 10 ) ]
 tracking_text = ""
 is_lockable = true
 unlock_codex_descr_after_get_it = 1
