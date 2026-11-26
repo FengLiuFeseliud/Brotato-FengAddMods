@@ -6,7 +6,7 @@
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/melee/green_onion/green_onion_icon.png" type="Texture" id=4]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/melee/green_onion/4/green_onion_4_data.tres" type="Resource" id=5]
 [ext_resource path="res://items/sets/primitive/primitive_set_data.tres" type="Resource" id=6]
-[ext_resource path="res://items/sets/precise/precise_set_data.tres" type="Resource" id=7]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/sets/food/food_set_data.tres" type="Resource" id=7]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/sets/effects/baguette_green_onion_set_effect.tres" type="Resource" id=8]
 
 [resource]
@@ -26,7 +26,7 @@ is_cursed = false
 curse_factor = 0.0
 weapon_id = "weapon_green_onion"
 type = 0
-sets = [ ExtResource( 6 ), ExtResource( 7 ) ]
+sets = [ ExtResource( 7 ), ExtResource( 6 ) ]
 scene = ExtResource( 3 )
 stats = ExtResource( 2 )
 upgrades_into = ExtResource( 5 )

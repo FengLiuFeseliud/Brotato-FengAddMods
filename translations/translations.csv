@@ -391,3 +391,4 @@ EFFECT_WEAPON_SET_REQUIREMENT_SEPARATOR,", ","，"
 EFFECT_WEAPON_SET_NOT_TRIGGERED," (Not triggered)","（未触发）"
 EFFECT_BAGUETTE_GREEN_ONION_SET_UNTRIGGERED,"Hold {0}: [color=gray]{1} {2} (Not triggered)[/color]","套装「葱香法棍」持有{0}时[color=gray]{1}{2}（未触发）[/color]"
 EFFECT_BAGUETTE_GREEN_ONION_SET,"Hold {0}: {1} {2}","套装「葱香法棍」持有{0}时{1}{2}"
+WEAPON_CLASS_FOOD,Food,食材
