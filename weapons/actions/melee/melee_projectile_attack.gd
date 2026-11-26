@@ -31,6 +31,7 @@ var _fengliu_attack_range := 0
 var _fengliu_warned_missing_scene := false
 var _fengliu_cached_source_stats = null
 var _fengliu_cached_projectile_stats = null
+var _fengliu_projectile_scale_effect_key = Keys.generate_hash("fengliu_melee_projectile_scale_by_range")
 
 
 # 武器描述占位：{0} = 射程倍率
@@ -100,18 +101,18 @@ func fengliu_on_passive_after_shoot() -> void:
 			continue
 
 		_fengliu_connect_projectile(weapon, projectile, attack_id)
+		_fengliu_apply_projectile_scale(projectile, weapon)
 
 
-# 记录索敌/开火与子弹射程覆盖值，并同步 Range 检测形状
+# 记录当前面板射程，并同步 Range 检测形状
 func _fengliu_refresh_range() -> void:
 	var weapon = _fengliu_weapon
 	if weapon == null or not is_instance_valid(weapon) or weapon.current_stats == null:
 		return
 
-	var current_range: int = int(weapon.current_stats.max_range)
-	if current_range != _fengliu_attack_range:
-		_fengliu_base_max_range = current_range
-		_fengliu_attack_range = max(1, int(round(float(_fengliu_base_max_range) * max(0.01, range_multiplier))))
+	# 每次都直接用当前面板射程刷新，避免面板射程恰好等于上一次覆盖值时漏掉更新
+	_fengliu_base_max_range = int(weapon.current_stats.max_range)
+	_fengliu_attack_range = max(1, int(round(float(_fengliu_base_max_range) * max(0.01, range_multiplier))))
 
 	if weapon.has_method("fengliu_set_attack_range_override"):
 		weapon.fengliu_set_attack_range_override(_fengliu_attack_range)
@@ -201,6 +202,44 @@ func _fengliu_apply_panel_stats(projectile_params, source) -> void:
 func _fengliu_clear_projectile_stats_cache() -> void:
 	_fengliu_cached_source_stats = null
 	_fengliu_cached_projectile_stats = null
+
+
+# 子弹大小依据额外射程：倍率 = 1 + (当前面板射程 - 基础射程) / 效果槽除数
+func _fengliu_get_projectile_scale_factor(player_index: int, range_bonus: int) -> float:
+	if range_bonus <= 0 or player_index < 0:
+		return 1.0
+
+	var effects = RunData.get_player_effects(player_index)
+	var divisor = effects.get(_fengliu_projectile_scale_effect_key, 0)
+	if not (divisor is int or divisor is float):
+		return 1.0
+
+	divisor = float(divisor)
+	if divisor <= 0.0:
+		return 1.0
+
+	return clamp(1.0 + float(range_bonus) / divisor, 0.1, 10.0)
+
+
+# 只缩放子弹根节点；回池时由 player_projectile 扩展恢复基础缩放
+func _fengliu_apply_projectile_scale(projectile, weapon) -> void:
+	if projectile == null or weapon == null:
+		return
+
+	var current_range: int = _fengliu_base_max_range
+	if current_range <= 0 and weapon.current_stats != null:
+		current_range = int(weapon.current_stats.max_range)
+
+	var base_range: int = 0
+	if weapon.stats != null:
+		base_range = int(weapon.stats.max_range)
+
+	var range_bonus: int = max(0, current_range - base_range)
+	var factor: float = _fengliu_get_projectile_scale_factor(weapon.player_index, range_bonus)
+	if factor <= 0.0 or is_equal_approx(factor, 1.0):
+		return
+
+	projectile.scale = projectile.scale * factor
 
 
 # 多颗子弹按 spread 均匀铺开；spread 为 0 时全部同向

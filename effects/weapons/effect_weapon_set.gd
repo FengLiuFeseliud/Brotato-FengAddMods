@@ -124,25 +124,23 @@ func weapon_set_requirements_met(player_index: int) -> bool:
 	return checked_count > 0
 
 
-# 模板描述：{0}=需求、{1}=数值、{2}=属性
+# 模板描述：{0}=需求、{1}=全部子效果摘要
 func get_args(player_index: int) -> Array:
 	var show_counts: bool = _can_check_trigger(player_index) and not weapon_set_requirements_met(player_index)
 	return [
 		_build_requirements_text(true, true, show_counts, player_index),
-		_build_bonus_text(),
-		_build_attribute_text(true)
+		_build_effects_text(true, true, show_counts)
 	]
 
 
 func get_args_tool() -> Array:
 	return [
 		_build_requirements_text(false, false, false, -1),
-		_build_bonus_text(),
-		_build_attribute_text(false)
+		_build_effects_text(false, false, false)
 	]
 
 
-# 自定义描述：已触发时数值绿色；未触发时数值/属性/后缀整段灰色
+# 自定义描述：已触发时每个效果单独上色；未触发时整段摘要灰色
 func get_text(player_index: int, colored: bool = true) -> String:
 	var key_text: String = text_key.to_upper() if text_key.length() > 0 else key.to_upper()
 	var can_check: bool = _can_check_trigger(player_index)
@@ -152,34 +150,16 @@ func get_text(player_index: int, colored: bool = true) -> String:
 
 	var is_untriggered: bool = can_check and not triggered
 	var display_key: String = key_text
-	# 彩色模式下用专用 key，把 {1}{2}（未触发）整体包进灰色
+	# 彩色模式下用专用 key，把 {1}（未触发）整体包进灰色
 	if colored and is_untriggered:
 		display_key = key_text + "_UNTRIGGERED"
 
 	var args := [
 		_build_requirements_text(true, colored, is_untriggered, player_index),
-		_build_bonus_text(),
-		_build_attribute_text(true)
+		_build_effects_text(true, colored, is_untriggered)
 	]
 
-	var signs := []
-	if colored and args.size() > 1:
-		# 用参数自身的正负号着色（基类 get_sign 取的是效果自身 value，本效果 value 恒为 0）
-		var bonus_value := int(args[1])
-		var value_sign: int = Sign.NEUTRAL
-		if not is_untriggered:
-			if bonus_value > 0:
-				value_sign = Sign.POSITIVE
-			elif bonus_value < 0:
-				value_sign = Sign.NEGATIVE
-
-		signs = [
-			Sign.NEUTRAL,
-			value_sign,
-			value_sign
-		]
-
-	var text: String = Text.text(display_key, args, signs)
+	var text: String = Text.text(display_key, args, [])
 	# 非彩色模式没有灰色标签，单独补纯文本后缀
 	if not colored and is_untriggered:
 		text += tr("EFFECT_WEAPON_SET_NOT_TRIGGERED")
@@ -328,22 +308,44 @@ func _build_requirements_text(translated: bool, colored: bool = true, show_count
 	return PoolStringArray(parts).join(separator)
 
 
-# 只有一个子效果时把数值暴露给翻译占位符 {1}（例如最大生命 +100 的 100）
-func _build_bonus_text() -> String:
-	if active_effects.size() != 1 or active_effects[0] == null:
-		return ""
-	return str(active_effects[0].value)
+# 生成全部子效果摘要：每个效果一段「+值属性」，按翻译分隔符连接
+func _build_effects_text(translated: bool, colored: bool = true, plain: bool = false) -> String:
+	var parts := []
+	var separator: String = tr("EFFECT_WEAPON_SET_EFFECT_SEPARATOR") if translated else ", "
+	var format_text: String = tr("EFFECT_WEAPON_SET_EFFECT_FORMAT") if translated else "{0} {1}"
+	for effect in active_effects:
+		if effect == null:
+			continue
+
+		# 文本型行为效果：直接显示它自己的描述，不拼 +值属性
+		if effect.key == "" and effect.text_key != "":
+			var behavior_text: String = effect.get_text(0, false)
+			if behavior_text != "":
+				parts.push_back(behavior_text)
+			continue
+
+		var value: int = int(effect.value)
+		var sign_text := "+" if value >= 0 else ""
+		var attribute: String = _get_effect_attribute_name(effect, translated)
+		var piece := format_text.replace("{0}", sign_text + str(value)).replace("{1}", attribute).strip_edges()
+		# 已触发时逐段上色；未触发交给外层灰色
+		if colored and not plain:
+			var color := "lime" if value >= 0 else "red"
+			piece = "[color=%s]%s[/color]" % [color, piece]
+		parts.push_back(piece)
+
+	return PoolStringArray(parts).join(separator)
 
 
-# 属性名来自子效果：优先 stat_displayed_name，否则用 key 的翻译
-func _build_attribute_text(translated: bool) -> String:
-	if active_effects.size() != 1 or active_effects[0] == null:
-		return ""
+# 单个子效果的属性名：优先 stat_displayed_name，其次 key，最后 text_key
+func _get_effect_attribute_name(effect, translated: bool) -> String:
+	var attribute_key: String = effect.key
+	if "stat_displayed_name" in effect and str(effect.stat_displayed_name) != "":
+		attribute_key = str(effect.stat_displayed_name)
 
-	var attribute_key: String = active_effects[0].key
-	if "stat_displayed_name" in active_effects[0] and str(active_effects[0].stat_displayed_name) != "":
-		attribute_key = str(active_effects[0].stat_displayed_name)
 	if attribute_key == "":
+		if effect.text_key != "":
+			return tr(effect.text_key) if translated else effect.text_key
 		return ""
 
 	return tr(attribute_key.to_upper()) if translated else attribute_key.to_upper()

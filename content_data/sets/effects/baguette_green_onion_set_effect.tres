@@ -1,7 +1,8 @@
-[gd_resource type="Resource" load_steps=4 format=2]
+[gd_resource type="Resource" load_steps=6 format=2]
 
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/effects/weapons/effect_weapon_set.gd" type="Script" id=1]
 [ext_resource path="res://items/global/effect.gd" type="Script" id=2]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/effects/weapons/effect_melee_projectile_scale_by_range.gd" type="Script" id=3]
 
 [sub_resource type="Resource" id=1]
 script = ExtResource( 2 )
@@ -14,11 +15,11 @@ effect_sign = 3
 custom_args = [  ]
 
 [sub_resource type="Resource" id=2]
-script = ExtResource( 2 )
-key = "piercing"
-text_key = ""
-value = 1
-custom_key = ""
+script = ExtResource( 3 )
+key = ""
+text_key = "EFFECT_MELEE_PROJECTILE_SCALE_BY_RANGE"
+value = 100
+custom_key = "fengliu_melee_projectile_scale_by_range"
 storage_method = 0
 effect_sign = 3
 custom_args = [  ]
@@ -35,4 +36,4 @@ custom_args = [  ]
 weapon_requirements = [ [ "weapon_baguette", 3 ], [ "weapon_green_onion", 3 ] ]
 match_exact_tier = false
 set_key = "set_baguette_green_onion"
-active_effects = [ SubResource( 1 ),  SubResource( 2 )]
+active_effects = [ SubResource( 1 ), SubResource( 2 ) ]
