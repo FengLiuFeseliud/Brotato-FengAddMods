@@ -400,3 +400,4 @@ INFO_POS_FENGLIU_FREEZE_CHANCE,{0}% chance to freeze enemies for 1.5s when deali
 FENGLIU_FREEZE_CHANCE,% Freeze Chance,%冰冻概率
 EFFECT_FENGLIU_FREEZE_CHANCE_VALUE,{0} % Freeze Chance,{0} %冰冻概率
 ITEM_ICE_PACK,Ice Pack,冰袋
+WEAPON_CLASS_FREEZE,Freeze,冰冻
