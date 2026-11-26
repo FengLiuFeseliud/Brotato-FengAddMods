@@ -395,9 +395,10 @@ WEAPON_CLASS_FOOD,Food,食材
 EFFECT_WEAPON_SET_EFFECT_SEPARATOR,", ","、"
 EFFECT_WEAPON_SET_EFFECT_FORMAT,"{0} {1}","{0}{1}"
 EFFECT_MELEE_PROJECTILE_SCALE_BY_RANGE,"Sword aura size scales with bonus Range (Bonus Range / {0})","剑气大小随额外射程提升（额外射程 / {0}）"
-INFO_NEG_FENGLIU_FREEZE_CHANCE,{0}% chance to freeze enemies for 1.5s when dealing elemental damage,造成元素伤害时有{0}%概率冰冻敌人1.5秒
-INFO_POS_FENGLIU_FREEZE_CHANCE,{0}% chance to freeze enemies for 1.5s when dealing elemental damage,造成元素伤害时有{0}%概率冰冻敌人1.5秒
+INFO_NEG_FENGLIU_FREEZE_CHANCE,"{0}% chance to freeze enemies for 1.5s on hit, burn or explosion (halved for elites and bosses)",命中、燃烧或爆炸时有{0}%概率冰冻敌人1.5秒（精英与 Boss 时长减半）
+INFO_POS_FENGLIU_FREEZE_CHANCE,"{0}% chance to freeze enemies for 1.5s on hit, burn or explosion (halved for elites and bosses)",命中、燃烧或爆炸时有{0}%概率冰冻敌人1.5秒（精英与 Boss 时长减半）
 FENGLIU_FREEZE_CHANCE,% Freeze Chance,%冰冻概率
 EFFECT_FENGLIU_FREEZE_CHANCE_VALUE,{0} % Freeze Chance,{0} %冰冻概率
 ITEM_ICE_PACK,Ice Pack,冰袋
 WEAPON_CLASS_FREEZE,Freeze,冰冻
+WEAPON_POPSICLE,Popsicle,冰棍

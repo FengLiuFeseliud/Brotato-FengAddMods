@@ -19,16 +19,13 @@ func _on_BurningTimer_timeout() -> void:
 	var burning_ref: BurningData = _burning
 	var burning_player_index: int = _burning_player_index
 
-	# 元素燃烧跳伤同样算「造成元素伤害」→ 按「冰冻概率」判定；
-	# 触发后会取消燃烧并按 R2 结算完（含双倍爆伤），本跳直接结束，避免重复结算
-	if burning_ref != null and has_method("fengliu_try_freeze_by_burning") and call("fengliu_try_freeze_by_burning", burning_ref, burning_player_index):
-		return
-
 	var burn_damage_backup: int = _burning.damage if _burning != null else 0
 	_fengliu_get_weapon_burn_damage(_burning, burning_player_index)
-	# 口径：先按「武器燃烧伤害总和」重算，再乘一次性倍数（多重燃烧按翻倍后的值补刀）
+
+	# 先按「武器燃烧伤害总和」重算，再乘一次性倍数（多重燃烧按翻倍后的值补刀）
 	if _burning != null and tick_multiplier != 1.0:
 		_burning.damage = int(round(_burning.damage * tick_multiplier))
+
 	var echo_damage: int = _burning.damage if _burning != null else 0
 
 	._on_BurningTimer_timeout()
@@ -113,12 +110,7 @@ func get_increased_piercing_knockback_amount(amount: float, piercing: float, _re
 	return .get_increased_piercing_knockback_amount(amount, piercing, get_effective_knockback_resistance())
 
 
-# 冰冻联动：把一次「燃烧跳伤」完整走一遍燃烧结算链
-#   → 多重燃烧、燃烧减速、武器燃烧伤害总和、燃烧统计（烤肉/火焰炮塔/武器追踪）、
-#     元素门槛 slow-on-hit、from.on_weapon_hit_something、燃烧承伤行为、燃烧击杀判定全部生效
-#   但不会点燃目标：不播点燃音效、不开火焰粒子、不写 current_burning_enemies、不扩散。
-#   multiplier 只作用于本次跳伤（默认 2.0，用于「双倍该燃烧伤害」）。
-#   调用后目标身上的燃烧会被取消（R2 语义），临时状态一并清理。
+# 冰冻联动 把一次「燃烧跳伤」完整走一遍燃烧结算链
 func fengliu_settle_burn_tick(
 	damage: int, player_index: int, from = null, scaling_stats: Array = [],
 	is_global_burn: bool = false, tracking_key: String = "", multiplier: float = 2.0

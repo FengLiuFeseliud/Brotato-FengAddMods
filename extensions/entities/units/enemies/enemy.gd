@@ -445,19 +445,16 @@ func get_damage_value(dmg_value: int, from_player_index: int, armor_applied: = t
         return damage_value
     return damage_value
 
-# ============================================================
-# 冰冻（定身型）
-#   造成元素伤害时，按「冰冻概率」次要属性掷骰：停止移动与攻击 + 冰蓝染色 + 冰霜粒子
-#   持续 FENGLIU_FREEZE_DURATION 秒（重复命中只刷新时长）
-#   R2 冰冻时若正在燃烧：取消燃烧，并按燃烧跳伤结算一次「2 × 该燃烧单跳伤害」
-#   R3 冰冻期间受到燃烧：不点燃，同样按燃烧跳伤结算一次双倍伤害
-# ============================================================
 
-
-# 命中后判定冰冻：本次伤害必须造成元素伤害（与冰块同口径）
+# 命中后判定冰冻
 func fengliu_try_freeze_by_hit(args: TakeDamageArgs) -> void:
     if args == null or args.hitbox == null:
         return
+
+    # 治疗类命中不触发
+    if args.hitbox.is_healing:
+        return
+
     if not fengliu_can_be_frozen():
         return
 
@@ -466,42 +463,23 @@ func fengliu_try_freeze_by_hit(args: TakeDamageArgs) -> void:
     if not is_instance_valid(from) or from is Enemy:
         return
 
-    if not fengliu_is_elemental_scaling(args.hitbox.scaling_stats):
-        return
-
     fengliu_try_trigger_freeze(args.from_player_index)
 
 
-# 燃烧跳伤判定冰冻：元素燃烧同样算「造成元素伤害」（参考冰块 on_burned）
-#   返回 true 表示已触发冰冻（燃烧已被取消并按 R2 结算完毕，调用方应结束本跳）
-func fengliu_try_freeze_by_burning(burning_data: BurningData, player_index: int) -> bool:
-    if burning_data == null or _fengliu_is_frozen:
-        return false
-    if not fengliu_can_be_frozen():
-        return false
-    if not fengliu_is_elemental_scaling(burning_data.scaling_stats):
-        return false
+# 燃烧跳伤判定冰冻：真实计时器每跳调用，在父类结算前掷骰
+#   触发后会取消燃烧并按 R2 结算完（含双倍爆伤），本跳直接结束
+func _on_BurningTimer_timeout() -> void:
+    if _burning != null and not _fengliu_is_frozen and fengliu_can_be_frozen():
+        fengliu_try_trigger_freeze(_burning_player_index)
+        if _fengliu_is_frozen:
+            return
 
-    fengliu_try_trigger_freeze(player_index)
-    return _fengliu_is_frozen
+    ._on_BurningTimer_timeout()
 
 
 # 可被冰冻的目标：掉落物 / 被魅惑的宠物 / 已死亡或正在死亡都不处理
 func fengliu_can_be_frozen() -> bool:
     return not (dead or _pending_die or is_loot or _is_charmed)
-
-
-# 本次伤害是否元素伤害：scaling_stats 含元素属性（stat_all 视为全属性）
-func fengliu_is_elemental_scaling(scaling_stats: Array) -> bool:
-    for scaling_stat in scaling_stats:
-        if not (scaling_stat is Array) or scaling_stat.size() == 0:
-            continue
-        var stat_hash = scaling_stat[0]
-        if not (stat_hash is int):
-            continue
-        if stat_hash == Keys.stat_elemental_damage_hash or stat_hash == Keys.stat_all_hash:
-            return true
-    return false
 
 
 # 按「冰冻概率」次要属性掷骰（%）
@@ -528,10 +506,18 @@ func fengliu_get_freeze_chance(player_index: int) -> float:
     return 0.0
 
 
+func fengliu_is_elite_or_boss() -> bool:
+    return "is_elite" in self
+
+
 # 施加冰冻：重复命中只刷新时长
 func fengliu_apply_freeze(duration: float) -> void:
     if duration <= 0.0 or dead or _pending_die:
         return
+
+    # 精英与 Boss 冰冻时长减半（刷新时长同样按减半后的值比较）
+    if fengliu_is_elite_or_boss():
+        duration *= 0.5
 
     if _fengliu_is_frozen:
         fengliu_refresh_freeze_time(duration)
@@ -564,8 +550,6 @@ func fengliu_apply_freeze(duration: float) -> void:
 
     # R2：冻结生效后再结算，保证伤害跳在蓝色目标身上；
     # 走完整燃烧跳伤链（多重燃烧/燃烧减速/武器燃烧总和/统计），并在结束时取消燃烧。
-    # 用 call() 调用：该方法在 unit 扩展里，ModLoader 编译 enemy 扩展时尚未挂上 unit 扩展，
-    # 直接写符号名在部分安装顺序下会产生 parse error（与 CanRandSetWeapon 事故同源）。
     if had_burning:
         call("fengliu_settle_burn_tick", burn_damage, burn_player_index, burn_from, burn_scaling, burn_is_global, burn_tracking, 2.0)
 
