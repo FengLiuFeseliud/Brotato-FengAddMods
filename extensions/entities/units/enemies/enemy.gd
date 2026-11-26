@@ -21,6 +21,14 @@ const FENGLIU_KNOCK_OUT_DEATH_KNOCKBACK := 1.5
 const FENGLIU_FREEZE_TINT := Color(0.55, 0.82, 1.0)
 const FENGLIU_FREEZE_DURATION := 1.5
 const FENGLIU_FREEZE_PARTICLES_SCENE = preload("res://mods-unpacked/FengLiu-FengAddMods/particles/freeze/unit_freeze_particles.tscn")
+# 冰冻音效：复制自原版燃烧音（首次冻结 / 刷新 / 冰冻中受燃烧都播放）
+const FENGLIU_FREEZE_SOUND_PATHS := [
+    "res://mods-unpacked/FengLiu-FengAddMods/resources/sounds/freeze/freeze_01.wav",
+    "res://mods-unpacked/FengLiu-FengAddMods/resources/sounds/freeze/freeze_02.wav",
+    "res://mods-unpacked/FengLiu-FengAddMods/resources/sounds/freeze/freeze_03.wav",
+    "res://mods-unpacked/FengLiu-FengAddMods/resources/sounds/freeze/freeze_04.wav",
+]
+const FENGLIU_FREEZE_SOUND_MIN_INTERVAL_MSEC := 150
 
 var _fengliu_knock_out_started := false
 var _fengliu_scene_should_collide_with_borders := true
@@ -30,6 +38,8 @@ var _fengliu_is_frozen := false
 var _fengliu_freeze_timer: Timer = null
 var _fengliu_freeze_particles: CPUParticles2D = null
 var _fengliu_freeze_saved_anim_speed := 1.0
+var _fengliu_freeze_sounds: Array = []
+var _fengliu_last_freeze_sound_msec: int = -100000
 
 
 # 判断攻击来源是否匹配指定类型
@@ -482,6 +492,32 @@ func fengliu_can_be_frozen() -> bool:
     return not (dead or _pending_die or is_loot or _is_charmed)
 
 
+# 冰冻音效列表：懒加载 mod 内复制的 4 段音效（缺失则跳过，不回退原版燃烧音）
+func fengliu_get_freeze_sounds() -> Array:
+    if _fengliu_freeze_sounds.empty():
+        for path in FENGLIU_FREEZE_SOUND_PATHS:
+            if not ResourceLoader.exists(path):
+                continue
+            var sound = load(path)
+            if sound != null:
+                _fengliu_freeze_sounds.push_back(sound)
+    return _fengliu_freeze_sounds
+
+
+# 播放一次冰冻音效（150ms 节流，随机取一段；与燃烧音同参数）
+func fengliu_play_freeze_sound() -> void:
+    var now: int = OS.get_ticks_msec()
+    if now - _fengliu_last_freeze_sound_msec < FENGLIU_FREEZE_SOUND_MIN_INTERVAL_MSEC:
+        return
+
+    var sounds: Array = fengliu_get_freeze_sounds()
+    if sounds.empty():
+        return
+
+    _fengliu_last_freeze_sound_msec = now
+    SoundManager2D.play(Utils.get_rand_element(sounds), global_position, 0, 0.2)
+
+
 # 按「冰冻概率」次要属性掷骰（%）
 func fengliu_try_trigger_freeze(player_index: int) -> void:
     # 非玩家来源（DUMMY_PLAYER_INDEX）与越界索引不读属性：
@@ -518,6 +554,9 @@ func fengliu_apply_freeze(duration: float) -> void:
     # 精英与 Boss 冰冻时长减半（刷新时长同样按减半后的值比较）
     if fengliu_is_elite_or_boss():
         duration *= 0.5
+
+    # 首次冻结与刷新都播放冰霜音效（150ms 节流）
+    fengliu_play_freeze_sound()
 
     if _fengliu_is_frozen:
         fengliu_refresh_freeze_time(duration)
@@ -631,6 +670,8 @@ func fengliu_stop_freeze_particles() -> void:
 func apply_burning(burning_data: BurningData) -> void:
     if _fengliu_is_frozen:
         if burning_data != null and not dead and not _pending_die:
+            # 冰冻中受到燃烧：播放冰冻音效（与首次冻结同 4 段）
+            fengliu_play_freeze_sound()
             # 同 R2：用 call() 调用 unit 扩展里的方法，避免扩展编译顺序导致的 parse error
             call("fengliu_settle_burn_tick",
                 int(burning_data.damage),
