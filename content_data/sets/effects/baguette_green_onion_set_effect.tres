@@ -1,0 +1,28 @@
+[gd_resource type="Resource" load_steps=4 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/effects/weapons/effect_weapon_set.gd" type="Script" id=1]
+[ext_resource path="res://items/global/effect.gd" type="Script" id=2]
+
+[sub_resource type="Resource" id=1]
+script = ExtResource( 2 )
+key = "piercing"
+text_key = ""
+value = 1
+custom_key = ""
+storage_method = 0
+effect_sign = 3
+custom_args = [  ]
+
+[resource]
+script = ExtResource( 1 )
+key = ""
+text_key = "EFFECT_BAGUETTE_GREEN_ONION_SET"
+value = 0
+custom_key = ""
+storage_method = 0
+effect_sign = 3
+custom_args = [  ]
+weapon_requirements = [ [ "weapon_baguette", 3 ], [ "weapon_green_onion", 3 ] ]
+match_exact_tier = false
+set_key = "set_baguette_green_onion"
+active_effects = [ SubResource( 1 ) ]

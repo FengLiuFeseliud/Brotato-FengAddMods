@@ -1,4 +1,4 @@
-[gd_resource type="Resource" load_steps=8 format=2]
+[gd_resource type="Resource" load_steps=9 format=2]
 
 [ext_resource path="res://items/global/weapon_data.gd" type="Script" id=1]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/melee/green_onion/2/green_onion_2_stats.tres" type="Resource" id=2]
@@ -7,6 +7,7 @@
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/melee/green_onion/3/green_onion_3_data.tres" type="Resource" id=5]
 [ext_resource path="res://items/sets/primitive/primitive_set_data.tres" type="Resource" id=6]
 [ext_resource path="res://items/sets/precise/precise_set_data.tres" type="Resource" id=7]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/sets/effects/baguette_green_onion_set_effect.tres" type="Resource" id=8]
 
 [resource]
 script = ExtResource( 1 )
@@ -17,7 +18,7 @@ icon = ExtResource( 4 )
 name = "WEAPON_GREEN_ONION"
 tier = 1
 value = 35
-effects = [  ]
+effects = [ ExtResource( 8 ) ]
 tracking_text = ""
 is_lockable = true
 unlock_codex_descr_after_get_it = 1

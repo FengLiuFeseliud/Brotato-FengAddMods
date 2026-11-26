@@ -5,6 +5,10 @@ extends "res://singletons/run_data.gd"
 signal fengliu_shield_regen(value, player_index)
 
 
+# 武器套装效果脚本：只用于读取状态槽常量，不实例化
+const WEAPON_SET_EFFECT_SCRIPT = preload("res://mods-unpacked/FengLiu-FengAddMods/effects/weapons/effect_weapon_set.gd")
+
+
 const ALL_SECONDARY_STATS = [
 	"consumable_heal",
 	"xp_gain",
@@ -260,6 +264,11 @@ var _fengliu_pending_full_shield_link: Dictionary = {}
 var _fengliu_full_shield_link_flush_scheduled: Dictionary = {}
 
 
+# 武器套装效果：按 set_key 记录运行时实例，最后一个持有者被移除后仍能撤销
+var weapon_set_effect_registry: Dictionary = {}
+var _weapon_set_refreshing_players: Dictionary = {}
+
+
 # 原版 init_effects() 的默认值缓存（缺槽时按原版默认类型补齐）
 var _fengliu_default_effect_values: Dictionary = {}
 
@@ -329,6 +338,10 @@ func reset_players_data_stats_and_effects() -> void :
 			player_data.fengliu_apply_base_shield()
 			player_data.fengliu_apply_effect_init_values()
 
+	# 效果字典被重建：武器套装状态重新判定并补回 active_effects
+	for player_index in range(players_data.size()):
+		refresh_weapon_set_effects(player_index)
+
 
 # 台账键哈希（is_linked_layer 区分层：true = StatLink 层，false = TempStats 层）
 func fengliu_secondary_ledger_key_hash(is_linked_layer: bool = false) -> int:
@@ -343,6 +356,10 @@ func resume_from_state(state: Dictionary) -> void :
 	if state.has(FENGLIU_WAVE_INTENSITY_STATE_KEY):
 		fengliu_restore_wave_intensity_state(state)
 	.resume_from_state(state)
+
+	# 读档后按恢复出来的武器列表重判武器套装（不会重复叠加：状态随存档恢复）
+	for player_index in get_player_count():
+		refresh_weapon_set_effects(player_index)
 
 
 # 读档前把 effects 里的数字归一化为 int
@@ -1590,6 +1607,74 @@ func apply_item_effects(item_data: ItemParentData, player_index: int) -> void :
 	.apply_item_effects(item_data, player_index)
 	# 还原效果
 	item_data.effects = old_effects
+
+
+# 扩展道具/武器相关结算：武器列表变化后重判武器套装条件
+func update_item_related_effects(player_index: int) -> void :
+	.update_item_related_effects(player_index)
+	refresh_weapon_set_effects(player_index)
+
+
+# 重判玩家的全部武器套装效果：先把当前持有者注册进运行时表，再逐套刷新
+func refresh_weapon_set_effects(player_index: int) -> void:
+	if player_index < 0 or player_index >= players_data.size() or player_index == DUMMY_PLAYER_INDEX:
+		return
+	if _weapon_set_refreshing_players.has(player_index):
+		return
+
+	_weapon_set_refreshing_players[player_index] = true
+
+	var seen_keys := {}
+	for effect in _get_weapon_set_holder_effects(player_index):
+		if effect == null or not effect.has_method("weapon_set_refresh"):
+			continue
+
+		var key_hash: int = Keys.generate_hash(effect.get_set_key())
+		weapon_set_effect_registry[key_hash] = effect
+		if seen_keys.has(key_hash):
+			continue
+
+		seen_keys[key_hash] = true
+		effect.weapon_set_refresh(player_index)
+
+	# 最后一个持有者已被移除（例如清空武器）时，用注册表里的同配置实例撤销
+	var state = get_player_effects(player_index).get(Keys.generate_hash(WEAPON_SET_EFFECT_SCRIPT.STATE_SLOT_KEY), {})
+	if state is Dictionary:
+		for state_key in state.keys():
+			var key_hash: int = int(state_key)
+			if int(state[state_key]) == 0 or seen_keys.has(key_hash):
+				continue
+
+			var effect = weapon_set_effect_registry.get(key_hash)
+			if effect != null and is_instance_valid(effect):
+				effect.weapon_set_refresh(player_index)
+
+	_weapon_set_refreshing_players.erase(player_index)
+
+
+# 收集玩家当前可能携带武器套装效果的实例：武器 / 道具（含角色）/ 当前角色 / 套装效果
+func _get_weapon_set_holder_effects(player_index: int) -> Array:
+	var result := []
+	var player_data = players_data[player_index]
+	if player_data == null:
+		return result
+
+	_append_weapon_set_holder_effects(result, player_data.weapons)
+	_append_weapon_set_holder_effects(result, player_data.items)
+	_append_weapon_set_holder_effects(result, [player_data.current_character])
+
+	for entry in player_data.active_set_effects:
+		if entry is Array and entry.size() > 1 and entry[1] != null:
+			result.push_back(entry[1])
+
+	return result
+
+
+func _append_weapon_set_holder_effects(result: Array, holders: Array) -> void:
+	for holder in holders:
+		if holder == null or holder.effects == null:
+			continue
+		result.append_array(holder.effects)
 
 
 # 扩展重置波次状态

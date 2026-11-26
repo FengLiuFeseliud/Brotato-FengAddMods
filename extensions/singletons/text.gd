@@ -53,7 +53,9 @@ var fengliu_keys_needing_operator = {
 	"effect_weapon_killed_shield": [0],
 	"effect_weapon_killed_loot": [1],
 	"effect_weapon_killed_add_temp_stat": [0, 2],
-	"effect_stat_for_every_character": [0, 2]
+	"effect_stat_for_every_character": [0, 2],
+	"effect_baguette_green_onion_set": [1],
+	"effect_baguette_green_onion_set_untriggered": [1]
 }
 
 

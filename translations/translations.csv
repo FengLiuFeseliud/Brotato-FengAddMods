@@ -386,3 +386,8 @@ ALL,all,所有
 WEAPON_BAGUETTE,Baguette,法棍
 ITEM_GOLDEN_APPLE,Golden Apple,金苹果
 EFFECT_GOLDEN_APPLE,"When health is below {0}, fully restore health and shield and gain the stats of all survival-oriented Tier {1} upgrades; this item disappears after triggering",生命低于{0}时回满生命与护盾并获得所有生存向{1}级升级项的属性，触发后本道具消失
+EFFECT_WEAPON_SET_REQUIREMENT_FORMAT,"{0} {1}","{0}{1}"
+EFFECT_WEAPON_SET_REQUIREMENT_SEPARATOR,", ","，"
+EFFECT_WEAPON_SET_NOT_TRIGGERED," (Not triggered)","（未触发）"
+EFFECT_BAGUETTE_GREEN_ONION_SET_UNTRIGGERED,"Hold {0}: [color=gray]{1} {2} (Not triggered)[/color]","套装「葱香法棍」持有{0}时[color=gray]{1}{2}（未触发）[/color]"
+EFFECT_BAGUETTE_GREEN_ONION_SET,"Hold {0}: {1} {2}","套装「葱香法棍」持有{0}时{1}{2}"
