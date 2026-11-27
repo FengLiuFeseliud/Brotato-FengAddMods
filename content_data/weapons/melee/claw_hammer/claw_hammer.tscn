@@ -30,6 +30,7 @@ outline_shader_mat = SubResource( 3 )
 
 [node name="Sprite" parent="." index="0"]
 position = Vector2( 24, 0 )
+scale = Vector2( 0.8, 0.8 )
 texture = ExtResource( 2 )
 
 [node name="Collision" parent="Sprite/Hitbox" index="0"]
