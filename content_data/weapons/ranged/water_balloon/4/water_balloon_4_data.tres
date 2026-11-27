@@ -1,4 +1,4 @@
-[gd_resource type="Resource" load_steps=8 format=2]
+[gd_resource type="Resource" load_steps=9 format=2]
 
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/ranged/water_balloon/4/water_balloon_4_stats.tres" type="Resource" id=1]
 [ext_resource path="res://items/global/weapon_data.gd" type="Script" id=3]
@@ -7,6 +7,7 @@
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/ranged/water_balloon/4/water_balloon_4_effect_0.tres" type="Resource" id=6]
 [ext_resource path="res://items/sets/explosive/explosive_set_data.tres" type="Resource" id=8]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/sets/burn/burn_set_data.tres" type="Resource" id=9]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/wet_mechanic_note.tres" type="Resource" id=10]
 
 [resource]
 script = ExtResource( 3 )
@@ -17,7 +18,7 @@ icon = ExtResource( 5 )
 name = "WEAPON_WATER_BALLOON"
 tier = 3
 value = 91
-effects = [ ExtResource( 6 ) ]
+effects = [ ExtResource( 6 ), ExtResource( 10 ) ]
 tracking_text = ""
 is_lockable = true
 unlock_codex_descr_after_get_it = 1

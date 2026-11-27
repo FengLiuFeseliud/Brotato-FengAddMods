@@ -1,4 +1,4 @@
-[gd_resource type="Resource" load_steps=13 format=2]
+[gd_resource type="Resource" load_steps=14 format=2]
 
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/ranged/tech_water_gun/1/tech_water_gun_stats.tres" type="Resource" id=1]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/ranged/tech_water_gun/2/tech_water_gun_2_data.tres" type="Resource" id=2]
@@ -12,6 +12,7 @@
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/sets/unique/unique_set_data.tres" type="Resource" id=10]
 [ext_resource path="res://items/sets/gun/gun_set_data.tres" type="Resource" id=11]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/effects/effect_weapon_wet.tres" type="Resource" id=13]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/wet_mechanic_note.tres" type="Resource" id=14]
 
 [resource]
 script = ExtResource( 3 )
@@ -22,7 +23,7 @@ icon = ExtResource( 5 )
 name = "WEAPON_TECH_WATER_GUN"
 tier = 0
 value = 40
-effects = [ ExtResource( 7 ), ExtResource( 8 ), ExtResource( 9 ), ExtResource( 12 ), ExtResource( 13 ) ]
+effects = [ ExtResource( 7 ), ExtResource( 8 ), ExtResource( 9 ), ExtResource( 12 ), ExtResource( 13 ), ExtResource( 14 ) ]
 tracking_text = ""
 is_lockable = true
 unlock_codex_descr_after_get_it = 1

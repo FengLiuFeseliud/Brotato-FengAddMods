@@ -398,13 +398,15 @@ EFFECT_MELEE_PROJECTILE_SCALE_BY_RANGE,"Sword aura size scales with bonus Range 
 INFO_NEG_FENGLIU_FREEZE_CHANCE,"{0}% chance to freeze enemies for 1.5s on hit, burn or explosion (halved for elites and bosses)",命中、燃烧或爆炸时有{0}%概率冰冻敌人1.5秒（精英与 Boss 时长减半）
 INFO_POS_FENGLIU_FREEZE_CHANCE,"{0}% chance to freeze enemies for 1.5s on hit, burn or explosion (halved for elites and bosses)",命中、燃烧或爆炸时有{0}%概率冰冻敌人1.5秒（精英与 Boss 时长减半）
 FENGLIU_FREEZE_CHANCE,% Freeze Chance,%冰冻概率
-EFFECT_FENGLIU_FREEZE_CHANCE_VALUE,{0} % Freeze Chance,{0} %冰冻概率
-ITEM_ICE_PACK,Ice Pack,冰袋
+EFFECT_FREEZE_CHANCE_VALUE,{0} % Freeze Chance,{0} %冰冻概率
+ITEM_ICE_SLUSH,Ice Slush,冰沙
 WEAPON_CLASS_FREEZE,Freeze,冰冻
-WEAPON_POPSICLE,Popsicle,冰棍
+WEAPON_ICE_CREAM,Ice Cream,雪糕
 EFFECT_FENGLIU_WEAPON_WET,Soaks enemies on hit for {0}s,命中使敌人潮湿{0}秒
 WEAPON_WATER_BALLOON,Water Balloon,水球
 EFFECT_WATER_EXPLODING,"On hit, {0} chance to explode and leave a puddle for {1}s that soaks enemies for {2}s",击中时{0}爆炸并留下持续{1}秒的水洼，使范围内敌人潮湿{2}秒
 WEAPON_ICE_HAMMER,Ice Pick,碎冰镐
 EFFECT_FROZEN_KILL_PROJECTILE,"On killing a frozen enemy, fires {0} projectile dealing {1} ({2}) damage",击杀被冰冻的敌人后发射{0}发冰锥，造成{1}（{2}）伤害
 EFFECT_FROZEN_BONUS_DAMAGE,"Deals {0}x damage to frozen enemies",对冰冻目标造成{0}倍伤害
+EFFECT_FENGLIU_FREEZE_MECHANIC_NOTE,"[color=gray]Freeze roots the enemy and tints it blue for 1.5s; elites and bosses are halved. If the enemy is already burning or is ignited while frozen, it takes one double burn tick and the burn is cancelled (affected by Multi Burn and other burn effects).[/color]","[color=gray]冰冻使敌人定身1.5秒，精英与 Boss 时长减半，若敌人已点燃或冰冻后点燃，将造成一次双倍的燃烧伤害后取消点燃（吃多重燃烧与其它燃烧效果）[/color]"
+EFFECT_FENGLIU_WET_MECHANIC_NOTE,"[color=gray]Wet enemies cannot be ignited and their burning is cancelled; when a wet enemy is frozen, freeze spreads to nearby wet enemies with your freeze chance[/color]","[color=gray]潮湿期间无法被点燃，且会取消已有的燃烧，潮湿目标被冰冻时，会按冰冻概率把冰冻传递给附近的潮湿敌人[/color]"
