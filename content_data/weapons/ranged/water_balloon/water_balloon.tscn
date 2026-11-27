@@ -26,6 +26,7 @@ script = ExtResource( 2 )
 outline_shader_mat = SubResource( 2 )
 
 [node name="Sprite" parent="." index="0"]
+scale = Vector2( 0.8, 0.8 )
 position = Vector2( 24, 0 )
 texture = ExtResource( 3 )
 

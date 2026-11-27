@@ -9,6 +9,13 @@ var effect_fengliu_bullet_scale = Keys.generate_hash("fengliu_bullet_scale")
 # 弹丸根节点自带缩放
 var _fengliu_base_projectile_scale: Vector2 = Vector2.ONE
 
+# 动作相关 meta：回池时清理，避免普通子弹复用带出上一次爆炸/动作快照
+const FENGLIU_ACTION_META_KEYS = [
+	"fengliu_action_snapshot",
+	"fengliu_whale_action_snapshot",
+	"fengliu_explosion_bullet_effect",
+]
+
 
 # 缓存弹丸根节点基础缩放（发射时叠加玩家体型）
 func _ready() -> void:
@@ -63,6 +70,11 @@ func _fengliu_get_player_scale_factor() -> float:
 
 # 子弹回池时还原缩放，避免污染之后取用的子弹
 func _return_to_pool() -> void:
+	# 清理动作 meta，避免普通子弹复用池对象时继承爆炸效果
+	for meta_key in FENGLIU_ACTION_META_KEYS:
+		if has_meta(meta_key):
+			remove_meta(meta_key)
+
 	# 还原弹丸缩放，避免污染池对象
 	scale = _fengliu_base_projectile_scale
 	._return_to_pool()

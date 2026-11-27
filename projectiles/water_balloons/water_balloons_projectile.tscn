@@ -43,12 +43,15 @@ height = 100.0
 rotation_speed = 1
 
 [node name="Sprite" parent="." index="0"]
+scale = Vector2( 0.8, 0.8 )
 position = Vector2( 1, 1 )
 
 [node name="Hitbox" parent="." index="1"]
+scale = Vector2( 0.8, 0.8 )
 position = Vector2( -23, 1 )
 
 [node name="Collision" parent="Hitbox" index="0"]
+scale = Vector2( 0.8, 0.8 )
 position = Vector2( 26.5, -6 )
 shape = SubResource( 3 )
 
