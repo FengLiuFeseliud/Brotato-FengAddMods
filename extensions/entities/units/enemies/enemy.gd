@@ -11,6 +11,7 @@ var effect_fengliu_knockback_out_of_map = Keys.generate_hash("fengliu_knockback_
 var fengliu_ignore_knockback_resistance_hash = Keys.generate_hash("fengliu_ignore_knockback_resistance")
 var fengliu_freeze_chance_hash = Keys.generate_hash("fengliu_freeze_chance")
 var effect_fengliu_weapon_wet = Keys.generate_hash("fengliu_weapon_wet")
+var effect_fengliu_frozen_bonus_damage = Keys.generate_hash("fengliu_frozen_bonus_damage")
 
 
 var _fengliu_charm_behavior_scene: PackedScene = null
@@ -296,6 +297,8 @@ func _fengliu_apply_ignore_knockback_resistance(player_index: int) -> void:
 func take_damage(value: int, args: TakeDamageArgs) -> Array:
     var was_pending: bool = _pending_die
     var health_before: int = current_stats.health
+    # 击中已冰冻目标时按武器词条放大伤害（本次命中才造成的冰冻不参与）
+    value = fengliu_apply_frozen_bonus_damage(value, args)
     _fengliu_apply_ignore_knockback_resistance(args.from_player_index)
     var damage_taken = .take_damage(value, args)
 
@@ -319,6 +322,35 @@ func take_damage(value: int, args: TakeDamageArgs) -> Array:
     _fengliu_try_knock_out_of_map(args, value, health_before, was_pending)
 
     return damage_taken
+
+
+# 从命中词条里取「对冰冻目标的伤害倍率」（多个词条取最大值；没有则 1.0）
+func fengliu_get_frozen_bonus_multiplier(effects: Array) -> float:
+    var multiplier: float = 1.0
+    for effect in effects:
+        if effect == null:
+            continue
+        # 哈希可能尚未生成，回退按 custom_key 字符串识别
+        if effect.custom_key_hash != effect_fengliu_frozen_bonus_damage and effect.custom_key != "fengliu_frozen_bonus_damage":
+            continue
+        var raw = effect.get("multiplier")
+        if raw == null:
+            continue
+        multiplier = max(multiplier, float(raw))
+
+    return multiplier
+
+
+# 冰冻目标被带该词条的武器命中时，按倍率放大最终伤害
+func fengliu_apply_frozen_bonus_damage(value: int, args: TakeDamageArgs) -> int:
+    if not _fengliu_is_frozen or args == null or args.hitbox == null:
+        return value
+
+    var multiplier: float = fengliu_get_frozen_bonus_multiplier(args.hitbox.effects)
+    if multiplier <= 1.0:
+        return value
+
+    return int(round(value * multiplier))
 
 
 # 读取攻击玩家的「击退出地图」效果阈值

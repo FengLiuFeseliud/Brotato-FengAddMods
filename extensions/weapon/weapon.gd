@@ -9,6 +9,11 @@ var effect_fengliu_wpapon_killed_add_temp_stat = Keys.generate_hash("fengliu_wpa
 var effect_fengliu_weapon_hit_slow = Keys.generate_hash("fengliu_weapon_hit_slow")
 var effect_fengliu_waepon_shop_empty_slot_add_damage = Keys.generate_hash("fengliu_waepon_shop_empty_slot_add_damage")
 var effect_fengliu_use_shield_shoot = Keys.generate_hash("fengliu_use_shield_shoot")
+var effect_fengliu_frozen_kill_projectile = Keys.generate_hash("fengliu_frozen_kill_projectile")
+
+# 冰冻击杀子弹的 stats 缓存（原版口径：属性刷新 / 新波开始时重建）
+var _fengliu_frozen_kill_proj_stats = null
+var _fengliu_frozen_kill_proj_stats_effect = null
 
 
 var wave_gain = Keys.generate_hash("wave_gain")
@@ -166,6 +171,10 @@ func init_stats(at_wave_begin: bool = true) -> void :
 	.init_stats(at_wave_begin)
 	stats.damage -= add_damage
 
+	# 属性刷新 / 新波开始：清空冰冻击杀子弹 stats 缓存（同原版 on_stats_updated 口径）
+	_fengliu_frozen_kill_proj_stats = null
+	_fengliu_frozen_kill_proj_stats_effect = null
+
 
 # 扩展武器命中处理（命中触发减速）
 func on_weapon_hit_something(thing_hit: Node, damage_dealt: int, hitbox: Hitbox) -> void :
@@ -208,6 +217,46 @@ func on_killed_something(_thing_killed: Node, hitbox: Hitbox) -> void :
 		if effect.custom_key_hash == effect_fengliu_wpapon_killed_add_temp_stat:
 			fengliu_wpapon_killed_add_temp_stat(effect)
 			continue
+
+		if effect.custom_key_hash == effect_fengliu_frozen_kill_projectile:
+			# 击杀冰冻敌人后发射子弹
+			fengliu_fire_projectiles_on_frozen_kill(effect, _thing_killed)
+			continue
+
+
+# 击杀被冰冻的敌人：从尸体位置发射效果配置的子弹（stats 按原版口径缓存复用）
+func fengliu_fire_projectiles_on_frozen_kill(effect, killed) -> void:
+	if not is_instance_valid(killed) or effect.weapon_stats == null:
+		return
+
+	# 只有击杀瞬间仍处于冰冻状态的目标才触发
+	if killed.get("_fengliu_is_frozen") != true:
+		return
+
+	# 首次使用或效果变化时初始化，之后复用缓存
+	if _fengliu_frozen_kill_proj_stats == null or _fengliu_frozen_kill_proj_stats_effect != effect:
+		_fengliu_frozen_kill_proj_stats = WeaponService.init_ranged_stats(effect.weapon_stats, player_index, true)
+		_fengliu_frozen_kill_proj_stats_effect = effect
+
+	var main = Utils.get_scene_node()
+	var spawner = null
+	if main != null and "_entity_spawner" in main:
+		spawner = main._entity_spawner
+
+	var spawn_args = WeaponServiceSpawnProjectileArgs.new()
+	spawn_args.from_player_index = player_index
+	spawn_args.damage_tracking_key_hash = damage_tracking_key_hash
+
+	for _i in max(1, int(effect.value)):
+		WeaponService.manage_special_spawn_projectile(
+			killed,
+			_fengliu_frozen_kill_proj_stats,
+			rand_range( - PI, PI),
+			effect.auto_target_enemy,
+			spawner,
+			self,
+			spawn_args
+		)
 
 
 func should_shoot() -> bool:

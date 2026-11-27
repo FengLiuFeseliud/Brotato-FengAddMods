@@ -1,0 +1,16 @@
+[gd_resource type="Resource" load_steps=3 format=2]
+
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/effects/weapons/effect_frozen_kill_projectile.gd" type="Script" id=1]
+[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/melee/ice_pick/3/ice_pick_3_projectile_stats.tres" type="Resource" id=2]
+
+[resource]
+script = ExtResource( 1 )
+key = ""
+text_key = "EFFECT_FROZEN_KILL_PROJECTILE"
+value = 10
+custom_key = "fengliu_frozen_kill_projectile"
+storage_method = 0
+effect_sign = 3
+custom_args = [  ]
+weapon_stats = ExtResource( 2 )
+auto_target_enemy = false

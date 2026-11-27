@@ -405,3 +405,6 @@ WEAPON_POPSICLE,Popsicle,冰棍
 EFFECT_FENGLIU_WEAPON_WET,Soaks enemies on hit for {0}s,命中使敌人潮湿{0}秒
 WEAPON_WATER_BALLOON,Water Balloon,水球
 EFFECT_WATER_EXPLODING,"On hit, {0} chance to explode and leave a puddle for {1}s that soaks enemies for {2}s",击中时{0}爆炸并留下持续{1}秒的水洼，使范围内敌人潮湿{2}秒
+WEAPON_ICE_HAMMER,Ice Pick,碎冰镐
+EFFECT_FROZEN_KILL_PROJECTILE,"On killing a frozen enemy, fires {0} projectile dealing {1} ({2}) damage",击杀被冰冻的敌人后发射{0}发冰锥，造成{1}（{2}）伤害
+EFFECT_FROZEN_BONUS_DAMAGE,"Deals {0}x damage to frozen enemies",对冰冻目标造成{0}倍伤害
