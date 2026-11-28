@@ -7,7 +7,7 @@
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/ranged/water_balloon/water_balloon_icon.png" type="Texture" id=5]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/weapons/ranged/water_balloon/1/water_balloon_1_effect_0.tres" type="Resource" id=6]
 [ext_resource path="res://items/sets/explosive/explosive_set_data.tres" type="Resource" id=8]
-[ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/sets/burn/burn_set_data.tres" type="Resource" id=9]
+[ext_resource path="res://items/sets/fire/fire_set_data.tres" type="Resource" id=9]
 [ext_resource path="res://mods-unpacked/FengLiu-FengAddMods/content_data/items/wet_mechanic_note.tres" type="Resource" id=10]
 
 [resource]
